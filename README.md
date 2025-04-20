@@ -1,0 +1,2 @@
+# ArgoCD
+ Homelab ArgoCD manifests
