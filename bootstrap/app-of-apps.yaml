@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'git@github.com:gyulaasztalos/ArgoCD.git'
+    repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
     path: apps
     targetRevision:
     kustomize:

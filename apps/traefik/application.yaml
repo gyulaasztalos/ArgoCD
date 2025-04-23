@@ -14,14 +14,10 @@ spec:
       helm:
         valueFiles:
           - $config/values.yaml
-    - repoURL: 'git@github.com:gyulaasztalos/ArgoCD.git'
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       path: apps/traefik
       ref: config
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik
-  syncPolicy:
-    automated:
-      selfHeal: true
-      prune: true

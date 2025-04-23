@@ -15,7 +15,7 @@ spec:
         valueFiles:
           - $config/values.yaml
       path: argo-cd
-    - repoURL: 'git@github.com:gyulaasztalos/ArgoCD.git'
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       path: apps/argocd
       ref: config
