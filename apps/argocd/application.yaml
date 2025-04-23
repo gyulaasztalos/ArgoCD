@@ -10,11 +10,11 @@ spec:
     server: https://kubernetes.default.svc
   sources:
     - repoURL: https://argoproj.github.io/argo-helm
-      targetRevision: HEAD
+      targetRevision: 7.8.27
       helm:
         valueFiles:
           - $config/values.yaml
-      path: argo-cd
+      chart: argo-cd
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       path: apps/argocd
