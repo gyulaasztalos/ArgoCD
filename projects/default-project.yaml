@@ -7,7 +7,7 @@ metadata:
 spec:
   description: Default project, allows all sources and destinations
   sourceRepos:
-    - '*'
+    - 'ssh://git@github.com/gyulaasztalos/ArgoCD.git'
   destinations:
     - namespace: '*'
       server: '*'
