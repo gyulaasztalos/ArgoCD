@@ -5,7 +5,7 @@ metadata:
   name: sealed-secrets
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "0"  # Lowest wave number deploys first
+    argocd.argoproj.io/sync-wave: "-1"
 spec:
   project: default
   source:
@@ -21,3 +21,5 @@ spec:
     automated:
       selfHeal: true
       prune: true
+    syncOptions:
+      - CreateNamespace=true
