@@ -8,6 +8,9 @@ metadata:
 spec:
   project: default
   sources:
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      ref: config
     - repoURL: https://helm.traefik.io/traefik
       chart: traefik
       targetRevision: 35.0.1
@@ -17,7 +20,6 @@ spec:
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       path: apps/traefik
-      ref: config
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik

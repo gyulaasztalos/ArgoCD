@@ -9,6 +9,9 @@ spec:
     namespace: argocd
     server: https://kubernetes.default.svc
   sources:
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      ref: config
     - repoURL: https://argoproj.github.io/argo-helm
       targetRevision: 7.8.27
       helm:
@@ -18,7 +21,6 @@ spec:
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       path: apps/argocd
-      ref: config
   project: default
   syncPolicy:
     automated:
