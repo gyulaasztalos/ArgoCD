@@ -8,7 +8,11 @@ spec:
   source:
     repoURL: 'git@github.com:gyulaasztalos/ArgoCD.git'
     path: apps
-    targetRevision: main
+    targetRevision:
+    kustomize:
+      # Enable recursive discovery of child applications
+      commonAnnotations:
+        argocd.argoproj.io/sync-wave: "0"
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
