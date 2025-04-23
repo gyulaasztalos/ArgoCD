@@ -16,11 +16,11 @@ spec:
       targetRevision: 7.8.27
       helm:
         valueFiles:
-          - $config/values.yaml
+          - $config/apps/argocd/values.yaml
       chart: argo-cd
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/argocd
+      path: apps/argocd/post-install
   project: default
   syncPolicy:
     automated:

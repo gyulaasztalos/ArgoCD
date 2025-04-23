@@ -16,10 +16,10 @@ spec:
       targetRevision: 35.0.1
       helm:
         valueFiles:
-          - $config/values.yaml
+          - $config/apps/traefik/values.yaml
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/traefik
+      path: apps/traefik/post-install
   destination:
     server: https://kubernetes.default.svc
     namespace: traefik
