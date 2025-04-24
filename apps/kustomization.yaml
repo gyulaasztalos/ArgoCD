@@ -4,3 +4,4 @@ resources:
   - argocd/application.yaml
   - traefik/application.yaml
   - sealed-secrets/application.yaml
+  - cert-manager/application.yaml
