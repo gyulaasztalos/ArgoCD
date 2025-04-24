@@ -12,3 +12,7 @@
     cp kubeconfig ~/.kube/config
 3. traefik-cert-manager
     https://technotim.live/posts/kube-traefik-cert-manager-le/
+4. Install ArgoCD
+    helm repo add argo https://argoproj.github.io/argo-helm
+    helm repo update
+    helm install argocd argo/argo-cd --namespace argocd --values values.yaml

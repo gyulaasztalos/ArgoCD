@@ -5,3 +5,4 @@ resources:
   - traefik/application.yaml
   - sealed-secrets/application.yaml
   - cert-manager/application.yaml
+  - rancher/application.yaml
