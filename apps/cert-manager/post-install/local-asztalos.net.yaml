@@ -1,0 +1,15 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: local-asztalos-net
+  namespace: default
+spec:
+  secretName: local-asztalos-net-tls
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: "*.local.asztalos.net"
+  dnsNames:
+  - "local.asztalos.net"
+  - "*.local.asztalos.net"
