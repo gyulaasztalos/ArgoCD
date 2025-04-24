@@ -26,8 +26,5 @@ spec:
       path: apps/cert-manager/post-install
   project: default
   syncPolicy:
-    automated:
-      selfHeal: true
-      prune: true
     syncOptions:
       - CreateNamespace=true
