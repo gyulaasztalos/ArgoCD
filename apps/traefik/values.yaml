@@ -54,3 +54,14 @@ service:
     loadBalancerIP: 10.10.50.30 # this should be an IP in the MetalLB range
   loadBalancerSourceRanges: []
   externalIPs: []
+
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values:
+                - traefik
+        topologyKey: kubernetes.io/hostname

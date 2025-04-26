@@ -3,7 +3,7 @@
 # See README.md for details.
 additionalTrustedCAs: false
 
-antiAffinity: preferred
+antiAffinity: required
 topologyKey: kubernetes.io/hostname
 
 # Audit Logs
