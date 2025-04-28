@@ -18,6 +18,9 @@ spec:
       helm:
         valueFiles:
           - $config/apps/longhorn/values.yaml
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/longhorn/post-install
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
