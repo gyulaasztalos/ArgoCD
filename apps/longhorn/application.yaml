@@ -17,10 +17,7 @@ spec:
       targetRevision: 1.8.1
       helm:
         valueFiles:
-          - $config/apps/rancher/values.yaml
-    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
-      targetRevision: main
-      path: apps/rancher/post-install
+          - $config/apps/longhorn/values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
