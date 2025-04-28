@@ -6,3 +6,4 @@ resources:
   - sealed-secrets/application.yaml
   - cert-manager/application.yaml
   - rancher/application.yaml
+  - longhorn/application.yaml
