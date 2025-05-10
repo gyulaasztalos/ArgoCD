@@ -1,2 +1,4 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
 resources:
-  - https://github.com/cloudnative-pg/postgres-containers//Debian/ClusterImageCatalog-bookworm.yaml?ref=main
+  - https://github.com/cloudnative-pg/postgres-containers/Debian/ClusterImageCatalog-bookworm.yaml?ref=main
