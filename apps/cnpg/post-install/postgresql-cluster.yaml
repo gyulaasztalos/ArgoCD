@@ -10,7 +10,7 @@ spec:
     apiGroup: postgresql.cnpg.io
     kind: ClusterImageCatalog
     name: postgresql
-  major: 17
+    major: 17
   storage:
     size: 20Gi
     storageClass: longhorn-1r
