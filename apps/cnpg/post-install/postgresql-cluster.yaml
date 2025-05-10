@@ -1,0 +1,28 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres
+  namespace: databases
+spec:
+  instances: 3
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql
+  major: 17
+  storage:
+    size: 20Gi
+    storageClass: longhorn-1r
+  affinity:
+    podAntiAffinityType: required  # Ensure pods are always on separate nodes
+  bootstrap:
+    initdb:
+      database: authentik_db
+      owner: authentik_user
+      postInitSQL:
+      - CREATE DATABASE paperless_db;
+      - CREATE USER paperless_user;
+      - GRANT ALL PRIVILEGES ON DATABASE paperless_db TO paperless_user;
+  monitoring:
+    enablePodMonitor: true

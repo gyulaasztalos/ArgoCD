@@ -7,3 +7,4 @@ resources:
   - cert-manager/application.yaml
   - rancher/application.yaml
   - longhorn/application.yaml
+  - cnpg/application.yaml
