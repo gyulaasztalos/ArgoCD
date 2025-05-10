@@ -9,9 +9,6 @@ metadata:
 spec:
   project: default
   sources:
-    - repoURL: 'https://github.com/cloudnative-pg/postgres-containers.git'
-      targetRevision: main
-      path: Debian/ClusterImageCatalog-bookworm.yaml
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       path: apps/cnpg/pre-install

@@ -1,0 +1,2 @@
+resources:
+  - https://github.com/cloudnative-pg/postgres-containers//Debian/ClusterImageCatalog-bookworm.yaml?ref=main
