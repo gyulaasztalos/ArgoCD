@@ -8,7 +8,7 @@ parameters:
   numberOfReplicas: "1"  # Critical for PG workloads
   staleReplicaTimeout: "30"
   fsType: "ext4"
-  dataLocality: "best-effort"
+  dataLocality: "strict-local"
 allowVolumeExpansion: true
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
