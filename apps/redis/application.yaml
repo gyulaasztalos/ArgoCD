@@ -17,12 +17,12 @@ spec:
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       ref: config
-    - repoURL: oci://registry-1.docker.io
+    - repoURL: oci://registry-1.docker.io/bitnamicharts
       targetRevision: 21.0.3
       helm:
         valueFiles:
           - $config/apps/redis/values.yaml
-      chart: bitnamicharts/redis
+      chart: redis
   project: default
   syncPolicy:
     automated:
