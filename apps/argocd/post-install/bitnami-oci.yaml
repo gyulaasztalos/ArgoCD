@@ -7,6 +7,8 @@ metadata:
     argocd.argoproj.io/secret-type: repository
 stringData:
   name: bitnami-oci
-  url: oci://registry-1.docker.io
+  url: registry-1.docker.io
   enableOCI: "true"
   type: helm
+  username: <YOUR_DOCKERHUB_USERNAME>
+  password: <YOUR_DOCKERHUB_PASSWORD_OR_ACCESS_TOKEN>
