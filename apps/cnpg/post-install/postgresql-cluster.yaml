@@ -10,11 +10,6 @@ metadata:
   namespace: databases
 spec:
   instances: 3
-  certificates:
-    serverTLSSecret: my-postgres-server-cert
-    serverCASecret: my-postgres-server-cert
-    clientCASecret: my-postgres-client-cert
-    replicationTLSSecret: my-postgres-client-cert
   imageCatalogRef:
     apiGroup: postgresql.cnpg.io
     kind: ClusterImageCatalog
