@@ -8,3 +8,4 @@ resources:
   - rancher/application.yaml
   - longhorn/application.yaml
   - cnpg/application.yaml
+  - redis/application.yaml
