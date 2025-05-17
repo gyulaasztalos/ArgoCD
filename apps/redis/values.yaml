@@ -186,11 +186,6 @@ auth:
     ##     keys: "~*"
     ##     channels: "&*"
     users:
-      - username: "default"
-        password: ""
-        enabled: "on"
-        commands: "+ping"
-        keys: "~*"
       - username: "sentinel"
         password: ""
         enabled: "on"
