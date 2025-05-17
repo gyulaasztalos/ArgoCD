@@ -186,6 +186,11 @@ auth:
     ##     keys: "~*"
     ##     channels: "&*"
     users:
+      - username: "default"
+        password: ""
+        enabled: "on"
+        commands: "+ping"
+        keys: "~*"
       - username: "sentinel"
         password: ""
         enabled: "on"
@@ -801,7 +806,7 @@ replica:
       - sh
       - -c
       - |
-        redis-cli --user sentinel -a "$(cat /tmp/secrets/sentinel)" ping | grep -q PONG
+        redis-cli -a "$(cat /opt/bitnami/redis/secrets/redis-password)" ping | grep -q PONG
   ## @param replica.readinessProbe.enabled Enable readinessProbe on Redis(R) replicas nodes
   ## @param replica.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
   ## @param replica.readinessProbe.periodSeconds Period seconds for readinessProbe
@@ -820,7 +825,7 @@ replica:
       - sh
       - -c
       - |
-        redis-cli --user sentinel -a "$(cat /tmp/secrets/sentinel)" ping | grep -q PONG
+        redis-cli -a "$(cat /opt/bitnami/redis/secrets/redis-password)" ping | grep -q PONG
   ## @param replica.customStartupProbe Custom startupProbe that overrides the default one
   ##
   customStartupProbe: {}
