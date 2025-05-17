@@ -155,10 +155,10 @@ auth:
   ## @param auth.existingSecret The name of an existing secret with Redis(R) credentials
   ## NOTE: When it's set, the previous `auth.password` parameter is ignored
   ##
-  existingSecret: ""
+  existingSecret: redis-password
   ## NOTE: ignored unless `auth.existingSecret` parameter is set
   ##
-  existingSecretPasswordKey: ""  ## @param auth.existingSecretPasswordKey Password key to be retrieved from existing secret
+  existingSecretPasswordKey: redis-password  ## @param auth.existingSecretPasswordKey Password key to be retrieved from existing secret
   ## @param auth.usePasswordFiles Mount credentials as files instead of using an environment variable
   ##
   usePasswordFiles: true
@@ -186,6 +186,11 @@ auth:
     ##     keys: "~*"
     ##     channels: "&*"
     users:
+      - username: "default"
+        password: ""
+        enabled: "on"
+        commands: "+ping"
+        keys: "~*"
       - username: "sentinel"
         password: ""
         enabled: "on"
@@ -301,11 +306,7 @@ master:
     timeoutSeconds: 5
     successThreshold: 1
     failureThreshold: 5
-    command:
-      - sh
-      - -c
-      - |
-        redis-cli --user sentinel -a "$(cat /tmp/secrets/sentinel)" ping | grep -q PONG
+
   ## @param master.readinessProbe.enabled Enable readinessProbe on Redis(R) master nodes
   ## @param master.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
   ## @param master.readinessProbe.periodSeconds Period seconds for readinessProbe
@@ -320,11 +321,6 @@ master:
     timeoutSeconds: 1
     successThreshold: 1
     failureThreshold: 5
-    command:
-      - sh
-      - -c
-      - |
-        redis-cli --user sentinel -a "$(cat /tmp/secrets/sentinel)" ping | grep -q PONG
   ## @param master.customStartupProbe Custom startupProbe that overrides the default one
   ##
   customStartupProbe: {}
@@ -499,15 +495,7 @@ master:
   lifecycleHooks: {}
   ## @param master.extraVolumes Optionally specify extra list of additional volumes for the Redis(R) master pod(s)
   ##
-    ## Mount the sentinel password as a file for probes
-  extraVolumes:
-    - name: acl-user-secret
-      secret:
-        secretName: redis-acl-users
-  extraVolumeMounts:
-    - name: acl-user-secret
-      mountPath: /tmp/secrets/sentinel
-      subPath: sentinel
+  extraVolumes: []
 
   ## @param master.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Redis(R) master container(s)
   ##
@@ -1003,15 +991,7 @@ replica:
   lifecycleHooks: {}
   ## @param replica.extraVolumes Optionally specify extra list of additional volumes for the Redis(R) replicas pod(s)
   ##
-  ## Mount the sentinel password as a file for probes
-  extraVolumes:
-    - name: acl-user-secret
-      secret:
-        secretName: redis-acl-users
-  extraVolumeMounts:
-    - name: acl-user-secret
-      mountPath: /tmp/secrets/sentinel
-      subPath: sentinel
+  extraVolumes: []
 
   ## @param replica.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Redis(R) replicas container(s)
   ##
@@ -1487,15 +1467,7 @@ sentinel:
   lifecycleHooks: {}
   ## @param sentinel.extraVolumes Optionally specify extra list of additional volumes for the Redis(R) Sentinel
   ##
-  ## Mount the sentinel password as a file for probes
-  extraVolumes:
-    - name: acl-user-secret
-      secret:
-        secretName: redis-acl-users
-  extraVolumeMounts:
-    - name: acl-user-secret
-      mountPath: /tmp/secrets/sentinel
-      subPath: sentinel
+  extraVolumes: []
 
   ## @param sentinel.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Redis(R) Sentinel container(s)
   ##
