@@ -161,10 +161,10 @@ auth:
   existingSecretPasswordKey: ""  ## @param auth.existingSecretPasswordKey Password key to be retrieved from existing secret
   ## @param auth.usePasswordFiles Mount credentials as files instead of using an environment variable
   ##
-  usePasswordFiles: false
+  usePasswordFiles: true
   ## @param auth.usePasswordFileFromSecret Mount password file from secret
   ##
-  usePasswordFileFromSecret: false
+  usePasswordFileFromSecret: true
   ## Redis ACL restricts connections by limiting commands and key access with auth management.
   ## ref: https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/
   ##
@@ -305,7 +305,7 @@ master:
       - sh
       - -c
       - |
-        redis-cli --user sentinel -a "$(cat /opt/bitnami/redis/secrets/sentinel)" ping | grep -q PONG
+        redis-cli --user sentinel -a "$(cat /tmp/secrets/sentinel)" ping | grep -q PONG
   ## @param master.readinessProbe.enabled Enable readinessProbe on Redis(R) master nodes
   ## @param master.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
   ## @param master.readinessProbe.periodSeconds Period seconds for readinessProbe
@@ -324,7 +324,7 @@ master:
       - sh
       - -c
       - |
-        redis-cli --user sentinel -a "$(cat /opt/bitnami/redis/secrets/sentinel)" ping | grep -q PONG
+        redis-cli --user sentinel -a "$(cat /tmp/secrets/sentinel)" ping | grep -q PONG
   ## @param master.customStartupProbe Custom startupProbe that overrides the default one
   ##
   customStartupProbe: {}
@@ -506,7 +506,7 @@ master:
         secretName: redis-acl-users
   extraVolumeMounts:
     - name: acl-user-secret
-      mountPath: /opt/bitnami/redis/secrets/sentinel
+      mountPath: /tmp/secrets/sentinel
       subPath: sentinel
 
   ## @param master.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Redis(R) master container(s)
@@ -809,7 +809,7 @@ replica:
       - sh
       - -c
       - |
-        redis-cli --user sentinel -a "$(cat /opt/bitnami/redis/secrets/sentinel)" ping | grep -q PONG
+        redis-cli --user sentinel -a "$(cat /tmp/secrets/sentinel)" ping | grep -q PONG
   ## @param replica.readinessProbe.enabled Enable readinessProbe on Redis(R) replicas nodes
   ## @param replica.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
   ## @param replica.readinessProbe.periodSeconds Period seconds for readinessProbe
@@ -828,7 +828,7 @@ replica:
       - sh
       - -c
       - |
-        redis-cli --user sentinel -a "$(cat /opt/bitnami/redis/secrets/sentinel)" ping | grep -q PONG
+        redis-cli --user sentinel -a "$(cat /tmp/secrets/sentinel)" ping | grep -q PONG
   ## @param replica.customStartupProbe Custom startupProbe that overrides the default one
   ##
   customStartupProbe: {}
@@ -1010,7 +1010,7 @@ replica:
         secretName: redis-acl-users
   extraVolumeMounts:
     - name: acl-user-secret
-      mountPath: /opt/bitnami/redis/secrets/sentinel
+      mountPath: /tmp/secrets/sentinel
       subPath: sentinel
 
   ## @param replica.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Redis(R) replicas container(s)
@@ -1360,7 +1360,7 @@ sentinel:
       - sh
       - -c
       - |
-        redis-cli -p 26379 --user sentinel -a "$(cat /opt/bitnami/redis/secrets/sentinel)" ping | grep -q PONG
+        redis-cli -p 26379 --user sentinel -a "$(cat /tmp/secrets/sentinel)" ping | grep -q PONG
   ## @param sentinel.readinessProbe.enabled Enable readinessProbe on Redis(R) Sentinel nodes
   ## @param sentinel.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
   ## @param sentinel.readinessProbe.periodSeconds Period seconds for readinessProbe
@@ -1379,7 +1379,7 @@ sentinel:
       - sh
       - -c
       - |
-        redis-cli -p 26379 --user sentinel -a "$(cat /opt/bitnami/redis/secrets/sentinel)" ping | grep -q PONG
+        redis-cli -p 26379 --user sentinel -a "$(cat /tmp/secrets/sentinel)" ping | grep -q PONG
   ## @param sentinel.customStartupProbe Custom startupProbe that overrides the default one
   ##
   customStartupProbe: {}
@@ -1494,7 +1494,7 @@ sentinel:
         secretName: redis-acl-users
   extraVolumeMounts:
     - name: acl-user-secret
-      mountPath: /opt/bitnami/redis/secrets/sentinel
+      mountPath: /tmp/secrets/sentinel
       subPath: sentinel
 
   ## @param sentinel.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Redis(R) Sentinel container(s)
