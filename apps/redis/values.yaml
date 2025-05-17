@@ -161,10 +161,10 @@ auth:
   existingSecretPasswordKey: ""  ## @param auth.existingSecretPasswordKey Password key to be retrieved from existing secret
   ## @param auth.usePasswordFiles Mount credentials as files instead of using an environment variable
   ##
-  usePasswordFiles: true
+  usePasswordFiles: false
   ## @param auth.usePasswordFileFromSecret Mount password file from secret
   ##
-  usePasswordFileFromSecret: true
+  usePasswordFileFromSecret: false
   ## Redis ACL restricts connections by limiting commands and key access with auth management.
   ## ref: https://redis.io/docs/latest/operate/oss_and_stack/management/security/acl/
   ##
