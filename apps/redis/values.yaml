@@ -301,7 +301,11 @@ master:
     timeoutSeconds: 5
     successThreshold: 1
     failureThreshold: 5
-
+    command:
+      - sh
+      - -c
+      - |
+        redis-cli -a "$(cat /opt/bitnami/redis/secrets/redis-password)" ping | grep -q PONG
   ## @param master.readinessProbe.enabled Enable readinessProbe on Redis(R) master nodes
   ## @param master.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
   ## @param master.readinessProbe.periodSeconds Period seconds for readinessProbe
@@ -316,6 +320,11 @@ master:
     timeoutSeconds: 1
     successThreshold: 1
     failureThreshold: 5
+    command:
+      - sh
+      - -c
+      - |
+        redis-cli -a "$(cat /opt/bitnami/redis/secrets/redis-password)" ping | grep -q PONG
   ## @param master.customStartupProbe Custom startupProbe that overrides the default one
   ##
   customStartupProbe: {}
@@ -1335,8 +1344,8 @@ sentinel:
       - sh
       - -c
       - |
-        redis-cli -p 26379 --user sentinel -a "$(cat /tmp/secrets/sentinel)" ping | grep -q PONG
-  ## @param sentinel.readinessProbe.enabled Enable readinessProbe on Redis(R) Sentinel nodes
+        redis-cli -a -p 26379 "$(cat /opt/bitnami/redis/secrets/redis-password)" ping | grep -q PONG
+ ## @param sentinel.readinessProbe.enabled Enable readinessProbe on Redis(R) Sentinel nodes
   ## @param sentinel.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
   ## @param sentinel.readinessProbe.periodSeconds Period seconds for readinessProbe
   ## @param sentinel.readinessProbe.timeoutSeconds Timeout seconds for readinessProbe
@@ -1354,7 +1363,7 @@ sentinel:
       - sh
       - -c
       - |
-        redis-cli -p 26379 --user sentinel -a "$(cat /tmp/secrets/sentinel)" ping | grep -q PONG
+        redis-cli -a -p 26379 "$(cat /opt/bitnami/redis/secrets/redis-password)" ping | grep -q PONG
   ## @param sentinel.customStartupProbe Custom startupProbe that overrides the default one
   ##
   customStartupProbe: {}
@@ -1869,6 +1878,12 @@ metrics:
     timeoutSeconds: 5
     successThreshold: 1
     failureThreshold: 5
+    command:
+      - sh
+      - -c
+      - |
+        redis-cli -a "$(cat /opt/bitnami/redis/secrets/redis-password)" ping | grep -q PONG
+
   ## @param metrics.readinessProbe.enabled Enable readinessProbe on Redis(R) replicas nodes
   ## @param metrics.readinessProbe.initialDelaySeconds Initial delay seconds for readinessProbe
   ## @param metrics.readinessProbe.periodSeconds Period seconds for readinessProbe
@@ -1883,6 +1898,12 @@ metrics:
     timeoutSeconds: 1
     successThreshold: 1
     failureThreshold: 3
+    command:
+      - sh
+      - -c
+      - |
+        redis-cli -a "$(cat /opt/bitnami/redis/secrets/redis-password)" ping | grep -q PONG
+
   ## @param metrics.customStartupProbe Custom startupProbe that overrides the default one
   ##
   customStartupProbe: {}
