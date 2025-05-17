@@ -499,10 +499,19 @@ master:
   lifecycleHooks: {}
   ## @param master.extraVolumes Optionally specify extra list of additional volumes for the Redis(R) master pod(s)
   ##
-  extraVolumes: []
+    ## Mount the sentinel password as a file for probes
+  extraVolumes:
+    - name: acl-user-secret
+      secret:
+        secretName: redis-acl-users
+  extraVolumeMounts:
+    - name: acl-user-secret
+      mountPath: /opt/bitnami/redis/secrets/sentinel
+      subPath: sentinel
+
   ## @param master.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Redis(R) master container(s)
   ##
-  extraVolumeMounts: []
+  # extraVolumeMounts: []
   ## @param master.sidecars Add additional sidecar containers to the Redis(R) master pod(s)
   ## e.g:
   ## sidecars:
@@ -994,10 +1003,19 @@ replica:
   lifecycleHooks: {}
   ## @param replica.extraVolumes Optionally specify extra list of additional volumes for the Redis(R) replicas pod(s)
   ##
-  extraVolumes: []
+  ## Mount the sentinel password as a file for probes
+  extraVolumes:
+    - name: acl-user-secret
+      secret:
+        secretName: redis-acl-users
+  extraVolumeMounts:
+    - name: acl-user-secret
+      mountPath: /opt/bitnami/redis/secrets/sentinel
+      subPath: sentinel
+
   ## @param replica.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Redis(R) replicas container(s)
   ##
-  extraVolumeMounts: []
+  # extraVolumeMounts: []
   ## @param replica.sidecars Add additional sidecar containers to the Redis(R) replicas pod(s)
   ## e.g:
   ## sidecars:
@@ -1469,10 +1487,19 @@ sentinel:
   lifecycleHooks: {}
   ## @param sentinel.extraVolumes Optionally specify extra list of additional volumes for the Redis(R) Sentinel
   ##
-  extraVolumes: []
+  ## Mount the sentinel password as a file for probes
+  extraVolumes:
+    - name: acl-user-secret
+      secret:
+        secretName: redis-acl-users
+  extraVolumeMounts:
+    - name: acl-user-secret
+      mountPath: /opt/bitnami/redis/secrets/sentinel
+      subPath: sentinel
+
   ## @param sentinel.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Redis(R) Sentinel container(s)
   ##
-  extraVolumeMounts: []
+  # extraVolumeMounts: []
   ## Redis(R) Sentinel service parameters
   ## Note: values passed in this section also configure the master service, unless the sentinel.masterService is explicitly overridden.
   service:
