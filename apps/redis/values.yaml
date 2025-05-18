@@ -171,7 +171,7 @@ auth:
   acl:
     ## @param auth.acl.enabled Enables the support of the Redis ACL system
     ##
-    enabled: true
+    enabled: false
     ## @param auth.acl.sentinel Enables the support of the Redis ACL system for Sentinel Nodes
     ##
     sentinel: true
@@ -260,12 +260,7 @@ master:
   ##   - name: FOO
   ##     value: "bar"
   ##
-  extraEnvVars:
-    - name: REDIS_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: redis-password
-          key: redis-password
+  extraEnvVars: []
   ## @param master.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for Redis(R) master nodes
   ##
   extraEnvVarsCM: ""
@@ -743,12 +738,7 @@ replica:
   ##   - name: FOO
   ##     value: "bar"
   ##
-  extraEnvVars:
-    - name: REDIS_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: redis-password
-          key: redis-password
+  extraEnvVars: []
   ## @param replica.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for Redis(R) replicas nodes
   ##
   extraEnvVarsCM: ""
@@ -1281,12 +1271,7 @@ sentinel:
   ##   - name: FOO
   ##     value: "bar"
   ##
-  extraEnvVars:
-    - name: REDIS_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: redis-password
-          key: redis-password
+  extraEnvVars: []
   ## @param sentinel.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for Redis(R) Sentinel nodes
   ##
   extraEnvVarsCM: ""
