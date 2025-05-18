@@ -186,6 +186,12 @@ auth:
     ##     keys: "~*"
     ##     channels: "&*"
     users:
+      - username: "default"
+        password: ""
+        enabled: "on"
+        commands: "+@all"
+        keys: "~*"
+        channels: "&*"
       - username: "sentinel"
         password: ""
         enabled: "on"
