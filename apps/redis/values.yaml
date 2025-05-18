@@ -260,7 +260,12 @@ master:
   ##   - name: FOO
   ##     value: "bar"
   ##
-  extraEnvVars: []
+  extraEnvVars:
+    - name: REDIS_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: redis-password
+          key: redis-password
   ## @param master.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for Redis(R) master nodes
   ##
   extraEnvVarsCM: ""
@@ -738,7 +743,12 @@ replica:
   ##   - name: FOO
   ##     value: "bar"
   ##
-  extraEnvVars: []
+  extraEnvVars:
+    - name: REDIS_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: redis-password
+          key: redis-password
   ## @param replica.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for Redis(R) replicas nodes
   ##
   extraEnvVarsCM: ""
@@ -1271,7 +1281,12 @@ sentinel:
   ##   - name: FOO
   ##     value: "bar"
   ##
-  extraEnvVars: []
+  extraEnvVars:
+    - name: REDIS_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: redis-password
+          key: redis-password
   ## @param sentinel.extraEnvVarsCM Name of existing ConfigMap containing extra env vars for Redis(R) Sentinel nodes
   ##
   extraEnvVarsCM: ""
