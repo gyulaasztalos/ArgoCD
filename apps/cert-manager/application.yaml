@@ -15,9 +15,6 @@ spec:
     - repoURL: https://charts.jetstack.io
       targetRevision: v1.17.1
       helm:
-        parameters:
-          - name: crds.enabled
-            value: "true"
         valueFiles:
           - $config/apps/cert-manager/values.yaml
       chart: cert-manager
