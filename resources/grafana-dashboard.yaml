@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-grafana-dashboard
+  namespace: app
+  labels:
+    grafana_dashboard: "1"
+data:
+  app-grafana-dashboard.json: |
+    {
+
+    }
