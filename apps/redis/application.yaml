@@ -23,6 +23,9 @@ spec:
         valueFiles:
           - $config/apps/redis/values.yaml
       chart: redis
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/redis/post-install
   project: default
   syncPolicy:
     automated:
