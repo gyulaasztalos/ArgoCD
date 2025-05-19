@@ -501,7 +501,8 @@ metrics:
     create: true
     ## @param metrics.dashboards.labels Extra labels to be added to the Grafana dashboard ConfigMap
     ##
-    labels: {}
+    labels:
+      grafana_dashboard: "1"
     ## @param metrics.dashboards.annotations Annotations to be added to the Grafana dashboard ConfigMap
     ##
     annotations: {}
