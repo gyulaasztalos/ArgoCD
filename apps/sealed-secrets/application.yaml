@@ -8,12 +8,17 @@ metadata:
     argocd.argoproj.io/sync-wave: "-1"
 spec:
   project: default
-  source:
-    repoURL: https://bitnami-labs.github.io/sealed-secrets
-    chart: sealed-secrets
-    targetRevision: 2.17.2
-    helm:
-      releaseName: sealed-secrets
+  sources:
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      ref: config
+    - repoURL: https://bitnami-labs.github.io/sealed-secrets
+      chart: sealed-secrets
+      targetRevision: 2.17.2
+      helm:
+        releaseName: sealed-secrets
+        valueFiles:
+          - $config/apps/sealed-secrets/values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
