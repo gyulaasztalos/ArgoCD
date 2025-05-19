@@ -527,7 +527,7 @@ prometheus:
     # The namespace that the service monitor should live in, defaults
     # to the cert-manager namespace.
     # +docs:property
-    namespace: monitoring
+    # namespace: monitoring
 
     # Specifies the `prometheus` label on the created ServiceMonitor. This is
     # used when different Prometheus instances have label selectors matching
