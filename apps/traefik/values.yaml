@@ -441,6 +441,55 @@ metrics:
     prometheusRule:
       # -- Enable optional CR for Prometheus Operator. See EXAMPLES.md for more details.
       enabled: true
+      rules:
+        groups:
+          - name: traefik.rules
+            rules:
+              - alert: TraefikDown
+                expr: up{job="traefik"} == 0
+                for: 5m
+                labels:
+                  severity: critical
+                annotations:
+                  summary: "Traefik is down"
+                  description: "No Traefik instances are running for more than 5 minutes."
+
+              - alert: TraefikHigh4xxErrorRate
+                expr: sum(rate(traefik_service_requests_total{code=~"4.."}[5m])) / sum(rate(traefik_service_requests_total[5m])) > 0.05
+                for: 5m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "High 4xx error rate"
+                  description: "More than 5% of requests are returning 4xx errors for over 5 minutes."
+
+              - alert: TraefikHigh5xxErrorRate
+                expr: sum(rate(traefik_service_requests_total{code=~"5.."}[5m])) / sum(rate(traefik_service_requests_total[5m])) > 0.05
+                for: 5m
+                labels:
+                  severity: critical
+                annotations:
+                  summary: "High 5xx error rate"
+                  description: "More than 5% of requests are returning 5xx errors for over 5 minutes."
+
+              - alert: TraefikTooManyOpenRequests
+                expr: traefik_service_open_connections > 50
+                for: 1m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "Too many open requests"
+                  description: "There are more than 50 open requests on Traefik for over 1 minute."
+
+              - alert: TraefikHighResponseLatency
+                expr: histogram_quantile(0.99, sum(rate(traefik_service_request_duration_seconds_bucket[5m])) by (le, service)) > 1
+                for: 10m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "High response latency"
+                  description: "99th percentile response time is greater than 1 second for 10 minutes."
+
       additionalLabels: {}
       namespace: ""
 
