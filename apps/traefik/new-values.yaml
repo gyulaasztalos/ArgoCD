@@ -659,7 +659,7 @@ ports:
       # Added in 2.2, one can make permanent redirects via entrypoints.
       # Same sets of parameters: to, scheme, permanent and priority.
       # https://docs.traefik.io/routing/entrypoints/#redirection
-      entryPoint:
+      entrypoint:
         to: websecure
         priority: 10
     forwardedHeaders:
