@@ -3343,7 +3343,7 @@ notifications:
       additionalLabels: {}
       # -- Prometheus ServiceMonitor annotations
       annotations: {}
-      namespace: monitoring
+      # namespace: monitoring
       # interval: 30s
       # scrapeTimeout: 10s
       # -- Prometheus ServiceMonitor scheme
