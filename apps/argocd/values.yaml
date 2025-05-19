@@ -910,7 +910,7 @@ controller:
       annotations: {}
     rules:
       # -- Deploy a PrometheusRule for the application controller
-      enabled: false
+      enabled: true
       # -- PrometheusRule namespace
       namespace: "" # "monitoring"
 
