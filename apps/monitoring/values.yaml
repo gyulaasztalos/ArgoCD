@@ -1360,6 +1360,7 @@ grafana:
     dashboards:
       enabled: true
       label: grafana_dashboard
+      folderAnnotation: grafana_folder
       labelValue: "1"
       # Allow discovery in all namespaces for dashboards
       searchNamespace: ALL
