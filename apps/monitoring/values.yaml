@@ -1361,6 +1361,7 @@ grafana:
       enabled: true
       label: grafana_dashboard
       folderAnnotation: grafana_folder
+      foldersFromFilesStructure: true
       labelValue: "1"
       # Allow discovery in all namespaces for dashboards
       searchNamespace: ALL
