@@ -5,6 +5,8 @@ metadata:
   namespace: databases
   labels:
     grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "Databases"
 data:
   postgres-grafana-dashboard.json: |
     {
