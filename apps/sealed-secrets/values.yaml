@@ -506,7 +506,7 @@ metrics:
     ## @param metrics.dashboards.annotations Annotations to be added to the Grafana dashboard ConfigMap
     ##
     annotations:
-      grafana_folder: "Tools"
+      grafana_folder: "/tmp/dashboards/Tools"
     ## @param metrics.dashboards.namespace Namespace where Grafana dashboard ConfigMap is deployed
     ##
     namespace: ""
