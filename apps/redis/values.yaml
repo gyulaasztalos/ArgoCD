@@ -334,15 +334,14 @@ master:
   resourcesPreset: "nano"
   ## @param master.resources Set container requests and limits for different resources like CPU or memory (essential for production workloads)
   ## Example:
-  ## resources:
-  ##   requests:
-  ##     cpu: 2
-  ##     memory: 512Mi
-  ##   limits:
-  ##     cpu: 3
-  ##     memory: 1024Mi
+  resources:
+    requests:
+      cpu: 100m
+      memory: 50Mi
+    limits:
+      cpu: 300m
+      memory: 768Mi
   ##
-  resources: {}
   ## Configure Pods Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param master.podSecurityContext.enabled Enabled Redis(R) master pods' Security Context
@@ -826,15 +825,13 @@ replica:
   resourcesPreset: "nano"
   ## @param replica.resources Set container requests and limits for different resources like CPU or memory (essential for production workloads)
   ## Example:
-  ## resources:
-  ##   requests:
-  ##     cpu: 2
-  ##     memory: 512Mi
-  ##   limits:
-  ##     cpu: 3
-  ##     memory: 1024Mi
-  ##
-  resources: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 50Mi
+    limits:
+      cpu: 300m
+      memory: 768Mi
   ## Configure Pods Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param replica.podSecurityContext.enabled Enabled Redis(R) replicas pods' Security Context
