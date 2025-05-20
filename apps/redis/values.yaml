@@ -2130,40 +2130,80 @@ metrics:
     additionalLabels: {}
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
     ## e.g:
-    ## rules:
-    ##   - alert: RedisDown
-    ##     expr: redis_up{service="{{ template "common.names.fullname" . }}-metrics"} == 0
-    ##     for: 2m
-    ##     labels:
-    ##       severity: error
-    ##     annotations:
-    ##       summary: Redis(R) instance {{ "{{ $labels.instance }}" }} down
-    ##       description: Redis(R) instance {{ "{{ $labels.instance }}" }} is down
-    ##    - alert: RedisMemoryHigh
-    ##      expr: >
-    ##        redis_memory_used_bytes{service="{{ template "common.names.fullname" . }}-metrics"} * 100
-    ##        /
-    ##        redis_memory_max_bytes{service="{{ template "common.names.fullname" . }}-metrics"}
-    ##        > 90
-    ##      for: 2m
-    ##      labels:
-    ##        severity: error
-    ##      annotations:
-    ##        summary: Redis(R) instance {{ "{{ $labels.instance }}" }} is using too much memory
-    ##        description: |
-    ##          Redis(R) instance {{ "{{ $labels.instance }}" }} is using {{ "{{ $value }}" }}% of its available memory.
-    ##    - alert: RedisKeyEviction
-    ##      expr: |
-    ##        increase(redis_evicted_keys_total{service="{{ template "common.names.fullname" . }}-metrics"}[5m]) > 0
-    ##      for: 1s
-    ##      labels:
-    ##        severity: error
-    ##      annotations:
-    ##        summary: Redis(R) instance {{ "{{ $labels.instance }}" }} has evicted keys
-    ##        description: |
-    ##          Redis(R) instance {{ "{{ $labels.instance }}" }} has evicted {{ "{{ $value }}" }} keys in the last 5 minutes.
+    rules:
+      - alert: RedisDown
+        expr: redis_up{service="{{ template "common.names.fullname" . }}-metrics"} == 0
+        for: 2m
+        labels:
+          severity: error
+        annotations:
+          summary: Redis(R) instance {{ "{{ $labels.instance }}" }} down
+          description: Redis(R) instance {{ "{{ $labels.instance }}" }} is down
+      - alert: RedisMemoryHigh
+        expr: >
+          redis_memory_used_bytes{service="{{ template "common.names.fullname" . }}-metrics"} * 100
+          /
+          redis_memory_max_bytes{service="{{ template "common.names.fullname" . }}-metrics"}
+          > 90
+        for: 2m
+        labels:
+          severity: error
+        annotations:
+          summary: Redis(R) instance {{ "{{ $labels.instance }}" }} is using too much memory
+          description: |
+            Redis(R) instance {{ "{{ $labels.instance }}" }} is using {{ "{{ $value }}" }}% of its available memory.
+      - alert: RedisKeyEviction
+        expr: |
+          increase(redis_evicted_keys_total{service="{{ template "common.names.fullname" . }}-metrics"}[5m]) > 0
+        for: 1s
+        labels:
+          severity: error
+        annotations:
+          summary: Redis(R) instance {{ "{{ $labels.instance }}" }} has evicted keys
+          description: |
+            Redis(R) instance {{ "{{ $labels.instance }}" }} has evicted {{ "{{ $value }}" }} keys in the last 5 minutes.
+      - alert: RedisTooManyConnections
+        expr: (sum by (instance) (redis_connected_clients + 32)) > (sum by (instance) (process_max_fds{job="node"} * 0.8))
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis too many connections (instance {{ $labels.instance }})"
+          description: "Redis instance has too many connections\nVALUE: {{ $value }}\nLABELS: {{ $labels }}"
+      - alert: RedisRejectedConnections
+        expr: rate(redis_rejected_connections_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis rejected connections (instance {{ $labels.instance }})"
+          description: "Redis is rejecting client connections\nVALUE = {{ $value }}\nLABELS: {{ $labels }}"
+      - alert: RedisHighLatency
+        expr: (rate(redis_commands_duration_seconds_total[5m]) / rate(redis_commands_processed_total[5m])) > 0.250
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis high latency (instance {{ $labels.instance }})"
+          description: "Average response time over 250ms\nVALUE = {{ $value }}\nLABELS: {{ $labels }}"
+      - alert: RedisSlowLog
+        expr: rate(redis_slowlog_length[5m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis slow log growing (instance {{ $labels.instance }})"
+          description: "Slow queries detected\nVALUE = {{ $value }}\nLABELS: {{ $labels }}"
+      - alert: RedisClusterDown
+        expr: redis_cluster_state{state!="ok"} == 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis cluster unhealthy (instance {{ $labels.instance }})"
+          description: "Redis cluster state is not OK\nVALUE = {{ $value }}\nLABELS: {{ $labels }}"
+
     ##
-    rules: []
 ## @section Init Container Parameters
 ##
 
