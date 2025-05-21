@@ -26,3 +26,12 @@ spec:
       owner: app
   monitoring:
     enablePodMonitor: true
+  managed:
+    roles:
+      - name: authentik
+        ensure: present
+        password:
+          secretKeyRef:
+            name: authentik-postgres-password
+            key: password
+        login: true
