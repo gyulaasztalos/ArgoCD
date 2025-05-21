@@ -5,3 +5,4 @@ resources:
   - https://raw.githubusercontent.com/cloudnative-pg/postgres-containers/main/Debian/ClusterImageCatalog-bookworm.yaml
   - certificates.yaml
   - longhorn-storageclass.yaml
+  - authentik-postgres-password.yaml
