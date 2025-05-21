@@ -10,3 +10,4 @@ resources:
   - cnpg/application.yaml
   - monitoring/application.yaml
   - redis/application.yaml
+  - authentik/application.yaml
