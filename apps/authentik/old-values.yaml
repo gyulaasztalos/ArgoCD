@@ -97,11 +97,15 @@ global:
     #   whenUnsatisfiable: DoNotSchedule
 
   # -- Deployment strategy for all deployed Deployments
-  deploymentStrategy: {}
+  deploymentStrategy:
     # type: RollingUpdate
     # rollingUpdate:
     #   maxSurge: 25%
     #   maxUnavailable: 25%
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
 
   # -- Environment variables to pass to all deployed Deployments. Does not apply to GeoIP
   # See configuration options at https://goauthentik.io/docs/installation/configuration/
@@ -130,34 +134,23 @@ global:
 
   # -- Additional volumeMounts to all deployed Deployments. Does not apply to GeoIP
   # @default -- `[]` (See [values.yaml])
-  volumes:
-      - name: authentik-credentials
-        secret:
-          secretName: authentik-credentials
-  volumeMounts:
-      - name: authentik-credentials
-        mountPath: /authentik-credentials
-        readOnly: true
-  # volumeMounts: []
+  volumeMounts: []
     # - name: custom
     #   mountPath: /custom
 
   # -- Additional volumes to all deployed Deployments.
   # @default -- `[]` (See [values.yaml])
-  # volumes: []
+  volumes: []
     # - name: custom
     #   emptyDir: {}
 
 
 ## Authentik configuration
 authentik:
-  # -- whether to create the authentik configuration secret
-  enabled: true
   # -- Log level for server and worker
   log_level: info
   # -- Secret key used for cookie singing and unique user IDs,
   # don't change this after the first install
-  secret_key: "file:///authentic-credentials/secret-key"
   events:
     context_processors:
       # -- Path for the GeoIP City database. If the file doesn't exist, GeoIP features are disabled.
@@ -205,17 +198,15 @@ authentik:
     host: "postgres-rw.databases.svc.cluster.local"
     # -- postgresql Database name
     # @default -- `authentik`
-    name: "authentik"
-    # -- postgresql Username
-    # @default -- `authentik`
-    user: "authentik"
-    password: "file:///authentic-credentials/postgresql-password"
+    user: authentik
+    password: file:///authentic-credentials/postgresql-password
     port: 5432
   redis:
     # -- set the redis hostname to talk to
     # @default -- `{{ .Release.Name }}-redis-master`
-    host: "redis-master.redis.svc.cluster.local"
-    password: "file:///authentic-credentials/redis-password"
+    host: "{{ .Release.Name }}-redis-master"
+    auth:
+      existingSecret: authentik-redis-credentials
 
 
 blueprints:
@@ -229,14 +220,11 @@ blueprints:
 
 ## authentik server
 server:
-  # -- whether to enable server resources
-  enabled: true
-
   # -- authentik server name
   name: server
 
   # -- The number of server pods to run
-  replicas: 3
+  replicas: 1
 
   ## authentik server Horizontal Pod Autoscaler
   autoscaling:
@@ -348,12 +336,30 @@ server:
   #     - echo init
 
   # -- Additional volumeMounts to the authentik server main container
-  volumeMounts: []
+  volumeMounts:
+    - name: postgres-creds
+      mountPath: /postgres-creds
+      readOnly: true
+    - name: email-creds
+      mountPath: /email-creds
+      readOnly: true
+    - name: redis-creds
+      mountPath: /redis-creds
+      readOnly: true
     # - name: custom
     #   mountPath: /custom
 
   # -- Additional volumes to the authentik server pod
-  volumes: []
+  volumes:
+    - name: postgres-creds
+      secret:
+        secretName: postgres-authentik
+    - name: email-creds
+      secret:
+        secretName: authentik-email-credentials
+    - name: redis-creds
+      secret:
+        secretName: authentik-redis-credentials
     # - name: custom
     #   emptyDir: {}
 
@@ -367,13 +373,12 @@ server:
   podLabels: {}
 
   # -- Resource limits and requests for the authentik server
-  resources:
-    limits:
-      memory: 2Gi
-      cpu: 1000m
-    requests:
-      memory: 1Gi
-      cpu: 500m
+  resources: {}
+    # requests:
+    #   cpu: 100m
+    #   memory: 512Mi
+    # limits:
+    #   memory: 512Mi
 
   # authentik server container ports
   containerPorts:
@@ -541,7 +546,7 @@ server:
   ## authentik server metrics service configuration
   metrics:
     # -- deploy metrics service
-    enabled: true
+    enabled: false
     service:
       # -- metrics service type
       type: ClusterIP
@@ -618,57 +623,14 @@ server:
     # -- uses `server.service.servicePortHttps` instead of `server.service.servicePortHttp`
     https: false
 
-  route:
-    main:
-      # -- enable an HTTPRoute resource for the authentik server.
-      # Be aware that this is an early beta of this feature. We don't guarantee this works and is subject to change.
-      enabled: false
-      # -- Set the route apiVersion
-      apiVersion: gateway.networking.k8s.io/v1
-      # -- Set the route kind
-      kind: HTTPRoute
-
-      # -- Route annotations
-      annotations: {}
-      # -- Route labels
-      labels: {}
-
-      # -- Route hostnames
-      hostnames: []
-      # -- Reference to parent gateways
-      parentRefs: []
-
-      # -- Create http route for redirect (https://gateway-api.sigs.k8s.io/guides/http-redirect-rewrite/#http-to-https-redirects).
-      # Take care that you only enable this on the http listener of the gateway to avoid an infinite redirect.
-      # Matches, filters and additionalRules will be ignored if this is set to true
-      httpsRedirect: false
-
-      # -- uses `server.service.servicePortHttps` instead of `server.service.servicePortHttp`
-      https: false
-
-      # -- Route matches
-      matches:
-        - path:
-            type: PathPrefix
-            value: "{{ .Values.authentik.web.path }}"
-
-      # -- Route filters
-      filters: []
-
-      # -- Additional custom rules that can be added to the route
-      additionalRules: []
-
 
 ## authentik worker
 worker:
-  # -- whether to enable worker resources
-  enabled: true
-
   # -- authentik worker name
   name: worker
 
   # -- The number of worker pods to run
-  replicas: 2
+  replicas: 1
 
   ## authentik worker Horizontal Pod Autoscaler
   autoscaling:
@@ -779,13 +741,31 @@ worker:
   #   args:
   #     - echo init
 
-  # -- Additional volumeMounts to the authentik worker main container
-  volumeMounts: []
+  # -- Additional volumeMounts to the authentik server main container
+  volumeMounts:
+    - name: postgres-creds
+      mountPath: /postgres-creds
+      readOnly: true
+    - name: email-creds
+      mountPath: /email-creds
+      readOnly: true
+    - name: redis-creds
+      mountPath: /redis-creds
+      readOnly: true
     # - name: custom
     #   mountPath: /custom
 
-  # -- Additional volumes to the authentik worker pod
-  volumes: []
+  # -- Additional volumes to the authentik server pod
+  volumes:
+    - name: postgres-creds
+      secret:
+        secretName: postgres-authentik
+    - name: email-creds
+      secret:
+        secretName: authentik-email-credentials
+    - name: redis-creds
+      secret:
+        secretName: authentik-redis-credentials
     # - name: custom
     #   emptyDir: {}
 
@@ -799,13 +779,12 @@ worker:
   podLabels: {}
 
   # -- Resource limits and requests for the authentik worker
-  resources:
-    limits:
-      memory: 1Gi
-      cpu: 500m
-    requests:
-      memory: 512Mi
-      cpu: 250m
+  resources: {}
+    # requests:
+    #   cpu: 100m
+    #   memory: 512Mi
+    # limits:
+    #   memory: 512Mi
 
   # -- Host Network for authentik worker pods
   hostNetwork: false
@@ -1023,31 +1002,6 @@ geoip:
 prometheus:
   rules:
     enabled: true
-    rules:
-      - alert: AuthentikServerDown
-        expr: up{job="authentik-server"} == 0
-        for: 5m
-        labels:
-          severity: critical
-        annotations:
-          summary: "Authentik server is down"
-          description: "The authentik server has been unreachable for 5 minutes."
-      - alert: AuthentikHighLatency
-        expr: rate(authentik_http_request_duration_seconds_sum[5m]) / rate(authentik_http_request_duration_seconds_count[5m]) > 0.5
-        for: 10m
-        labels:
-          severity: warning
-        annotations:
-          summary: "High request latency on authentik server"
-          description: "The average request latency on authentik server is above 0.5 seconds for 10 minutes."
-      - alert: AuthentikWorkerDown
-        expr: up{job="authentik-worker"} == 0
-        for: 5m
-        labels:
-          severity: critical
-        annotations:
-          summary: "Authentik worker is down"
-          description: "The authentik worker has been unreachable for 5 minutes."
     # -- PrometheusRule namespace
     namespace: ""
     # -- PrometheusRule selector
@@ -1063,13 +1017,13 @@ prometheus:
 postgresql:
   # -- enable the Bitnami PostgreSQL chart. Refer to https://github.com/bitnami/charts/blob/main/bitnami/postgresql/ for possible values.
   enabled: false
-  image:
-    repository: bitnami/postgresql
-    tag: 15.8.0-debian-12-r18
+  global:
+    storageClass: longhorn
   auth:
+    existingSecret: authentik-postgres-credentials # Reference SealedSecret
     username: authentik
     database: authentik
-    # password: ""
+  architecture: replication
   primary:
     extendedConfiguration: |
       max_connections = 500
@@ -1079,8 +1033,16 @@ postgresql:
     #   storageClass:
     #   accessModes:
     #     - ReadWriteOnce
+  persistence:
+    primary:
+      size: 10Gi
+      accessModes: [ReadWriteMany]
   readReplicas:
     resourcesPreset: "none"
+    replicaCount: 2
+  image:
+    repository: bitnami/postgresql
+    tag: 15.8.0-debian-12-r18
   backup:
     resourcesPreset: "none"
   passwordUpdateJob:
@@ -1090,18 +1052,24 @@ postgresql:
   metrics:
     resourcesPreset: "none"
 
-
 redis:
   # -- enable the Bitnami Redis chart. Refer to https://github.com/bitnami/charts/blob/main/bitnami/redis/ for possible values.
   enabled: false
-  architecture: standalone
+  global:
+    storageClass: longhorn
+  architecture: replication
   auth:
-    enabled: false
+    enabled: true
+    sentinel: true
+    existingSecret: authentik-redis-credentials # Reference SealedSecret
+    existingSecretPasswordKey: password
   master:
+    persistence:
+      size: 5Gi
+      accessModes: [ReadWriteMany]
     resourcesPreset: "none"
   replica:
-    resourcesPreset: "none"
-  sentinel:
+    replicaCount: 2
     resourcesPreset: "none"
   metrics:
     resourcesPreset: "none"
@@ -1109,7 +1077,6 @@ redis:
     resourcesPreset: "none"
   sysctl:
     resourcesPreset: "none"
-
 
 # -- additional resources to deploy. Those objects are templated.
 additionalObjects: []
