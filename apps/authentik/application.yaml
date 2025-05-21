@@ -1,0 +1,35 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: authentik
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  sources:
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/authentik/pre-install
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      ref: config
+    - repoURL: https://charts.goauthentik.io
+      chart: authentik
+      targetRevision: 2025.2.3
+      helm:
+        valueFiles:
+          - $config/apps/authentik/values.yaml
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/authentik/post-install
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: authentik
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
