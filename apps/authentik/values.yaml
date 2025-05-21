@@ -1001,7 +1001,7 @@ geoip:
 
 prometheus:
   rules:
-    enabled: false
+    enabled: true
     # -- PrometheusRule namespace
     namespace: ""
     # -- PrometheusRule selector
