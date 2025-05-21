@@ -134,9 +134,15 @@ global:
       - name: authentik-credentials
         secret:
           secretName: authentik-credentials
+      - name: email-creds
+        secret:
+          secretName: authentik-email-credentials
   volumeMounts:
       - name: authentik-credentials
         mountPath: /authentik-credentials
+        readOnly: true
+      - name: email-creds
+        mountPath: /email-creds
         readOnly: true
   # volumeMounts: []
     # - name: custom
@@ -157,7 +163,7 @@ authentik:
   log_level: info
   # -- Secret key used for cookie singing and unique user IDs,
   # don't change this after the first install
-  secret_key: "file:///authentic-credentials/secret-key"
+  secret_key: "file:///authentik-credentials/secret-key"
   events:
     context_processors:
       # -- Path for the GeoIP City database. If the file doesn't exist, GeoIP features are disabled.
@@ -209,13 +215,13 @@ authentik:
     # -- postgresql Username
     # @default -- `authentik`
     user: "authentik"
-    password: "file:///authentic-credentials/postgresql-password"
+    password: "file:///authentik-credentials/postgresql-password"
     port: 5432
   redis:
     # -- set the redis hostname to talk to
     # @default -- `{{ .Release.Name }}-redis-master`
     host: "redis-master.redis.svc.cluster.local"
-    password: "file:///authentic-credentials/redis-password"
+    password: "file:///authentik-credentials/redis-password"
 
 
 blueprints:
