@@ -30,8 +30,6 @@ spec:
     roles:
       - name: authentik
         ensure: present
-        password:
-          secretKeyRef:
-            name: authentik-postgres-password
-            key: password
+        passwordSecret:
+          name: authentik-postgres-password
         login: true
