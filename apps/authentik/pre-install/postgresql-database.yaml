@@ -1,3 +1,4 @@
+---
 apiVersion: postgresql.cnpg.io/v1
 kind: Database
 metadata:
@@ -7,4 +8,3 @@ spec:
   owner: authentik
   cluster:
     name: postgres
-    namespace: databases
