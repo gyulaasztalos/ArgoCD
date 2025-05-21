@@ -14,7 +14,7 @@ spec:
       match: Host(`auth.local.asztalos.net`)
       priority: 10
       services:
-        - name: authentik
+        - name: authentik-server
           port: 80
   tls:
     secretName: local-asztalos-net-tls
