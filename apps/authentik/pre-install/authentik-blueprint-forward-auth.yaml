@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-blueprint-forward-auth
+  namespace: authentik
+data:
+  forward-auth.yaml: |
+    - model: authentik_providers_proxy.proxyprovider
+      state: present
+      identifiers:
+        name: traefik-forward-auth
+      attrs:
+        mode: forward_auth_domain
+        external_host: "*.local.asztalos.net"
+        cookie_domain: local.asztalos.net

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-blueprint-applications
+  namespace: authentik
+data:
+  applications.yaml: |
+    - model: authentik_core.application
+      state: present
+      identifiers:
+        slug: paperless
+      attrs:
+        name: Paperless-ngx
+        provider: paperless-oauth-provider
+        icon: https://paperless.local.asztalos.net/favicon.ico
+    - model: authentik_core.application
+      state: present
+      identifiers:
+        slug: grafana
+      attrs:
+        name: Grafana
+        provider: grafana-oauth-provider
+        icon: https://grafana.local.asztalos.net/favicon.ico

@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-blueprint-groups
+  namespace: authentik
+data:
+  groups.yaml: |
+    - model: authentik_core.group
+      state: present
+      identifiers:
+        name: powerusers
+      attrs:
+        users: ["Gyula"]
+    - model: authentik_core.group
+      state: present
+      identifiers:
+        name: standardusers
+      attrs:
+        users: ["Anita"]

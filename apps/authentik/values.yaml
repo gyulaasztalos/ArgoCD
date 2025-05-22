@@ -227,11 +227,16 @@ authentik:
 blueprints:
   # -- List of config maps to mount blueprints from.
   # Only keys in the configMap ending with `.yaml` will be discovered and applied.
-  configMaps: []
+  configMaps:
+    - authentik-blueprint-groups
+    - authentik-blueprint-applications
+    - authentik-blueprint-forward-auth
+    - authentik-blueprint-meta
   # -- List of secrets to mount blueprints from.
   # Only keys in the secret ending with `.yaml` will be discovered and applied.
-  secrets: []
-
+  secrets:
+    - authentik-blueprint-users
+    - authentik-blueprint-oauth-providers
 
 ## authentik server
 server:
