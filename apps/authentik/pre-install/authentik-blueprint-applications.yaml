@@ -25,3 +25,11 @@ data:
           name: Grafana
           provider: !Find [authentik_providers_oauth2.oauth2provider, [name, grafana-oauth-provider]]
           icon: https://grafana.local.asztalos.net/favicon.ico
+      - model: authentik_core.application
+        state: present
+        identifiers:
+          slug: traefik-forward-auth
+        attrs:
+          name: "Traefik Forward Auth"
+          provider: !Find [authentik_providers_proxy.proxyprovider, [name, traefik-forward-auth]]
+          icon: https://traefik.local.asztalos.net/favicon.ico
