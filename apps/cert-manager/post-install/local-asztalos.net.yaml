@@ -3,7 +3,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: local-asztalos-net
-  namespace: default
+  namespace: traefik
 spec:
   secretName: local-asztalos-net-tls
   issuerRef:

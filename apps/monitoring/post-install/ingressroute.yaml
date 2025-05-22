@@ -3,7 +3,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: prometheus
-  namespace: monitoring
+  namespace: traefik
   annotations:
     kubernetes.io/ingress.class: traefik-external
 spec:
@@ -23,7 +23,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: grafana
-  namespace: monitoring
+  namespace: traefik
   annotations:
     kubernetes.io/ingress.class: traefik-external
 spec:
@@ -43,7 +43,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: alertmanager
-  namespace: monitoring
+  namespace: traefik
   annotations:
     kubernetes.io/ingress.class: traefik-external
 spec:

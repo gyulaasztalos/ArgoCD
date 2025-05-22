@@ -3,7 +3,7 @@ apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
   name: rancher
-  namespace: cattle-system
+  namespace: traefik
   annotations:
     kubernetes.io/ingress.class: traefik-external
 spec:
@@ -15,6 +15,7 @@ spec:
       priority: 10
       services:
         - name: rancher
+          namespace: cattle-system
           port: 80
   tls:
     secretName: local-asztalos-net-tls
