@@ -9,14 +9,33 @@ data:
     metadata:
       name: "Meta Blueprint"
     entries:
-      - model: authentik_core.meta
+      - model: authentik_blueprints.metaapplyblueprint
         state: present
-        identifiers:
-          name: meta-blueprint
         attrs:
-          blueprints:
-            - users.yaml
-            - groups.yaml
-            - forward-auth.yaml
-            - oauth-providers.yaml
-            - applications.yaml
+          identifiers:
+            name: users
+          required: true
+      - model: authentik_blueprints.metaapplyblueprint
+        state: present
+        attrs:
+          identifiers:
+            name: groups
+          required: true
+      - model: authentik_blueprints.metaapplyblueprint
+        state: present
+        attrs:
+          identifiers:
+            name: forward-auth
+          required: true
+      - model: authentik_blueprints.metaapplyblueprint
+        state: present
+        attrs:
+          identifiers:
+            name: oauth-providers
+          required: true
+      - model: authentik_blueprints.metaapplyblueprint
+        state: present
+        attrs:
+          identifiers:
+            name: applications
+          required: true

@@ -15,7 +15,7 @@ data:
           slug: paperless
         attrs:
           name: Paperless-ngx
-          provider: paperless-oauth-provider
+          provider: !Find [authentik_providers_oauth2.oauth2provider, [name, paperless-oauth-provider]]
           icon: https://paperless.local.asztalos.net/favicon.ico
       - model: authentik_core.application
         state: present
@@ -23,5 +23,5 @@ data:
           slug: grafana
         attrs:
           name: Grafana
-          provider: grafana-oauth-provider
+          provider: !Find [authentik_providers_oauth2.oauth2provider, [name, grafana-oauth-provider]]
           icon: https://grafana.local.asztalos.net/favicon.ico

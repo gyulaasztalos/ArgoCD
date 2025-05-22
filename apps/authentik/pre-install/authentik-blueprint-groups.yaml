@@ -14,10 +14,12 @@ data:
         identifiers:
           name: powerusers
         attrs:
-          users: ["Gyula"]
+          users:
+            - !Find [authentik_core.user, [username, Gyula]]
       - model: authentik_core.group
         state: present
         identifiers:
           name: standardusers
         attrs:
-          users: ["Anita"]
+          users:
+            - !Find [authentik_core.user, [username, Anita]]
