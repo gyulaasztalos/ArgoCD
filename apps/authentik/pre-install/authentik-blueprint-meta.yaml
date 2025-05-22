@@ -13,29 +13,29 @@ data:
         state: present
         attrs:
           identifiers:
-            name: users
+            name: "Users Blueprint"
           required: true
       - model: authentik_blueprints.metaapplyblueprint
         state: present
         attrs:
           identifiers:
-            name: groups
+            name: "Groups Blueprint"
           required: true
       - model: authentik_blueprints.metaapplyblueprint
         state: present
         attrs:
           identifiers:
-            name: forward-auth
+            name: "Forward Auth Provider Blueprint"
           required: true
       - model: authentik_blueprints.metaapplyblueprint
         state: present
         attrs:
           identifiers:
-            name: oauth-providers
+            name: "Oauth Provider Blueprint"
           required: true
       - model: authentik_blueprints.metaapplyblueprint
         state: present
         attrs:
           identifiers:
-            name: applications
+            name: "Applications Blueprint"
           required: true
