@@ -5,11 +5,15 @@ metadata:
   namespace: authentik
 data:
   forward-auth.yaml: |
-    - model: authentik_providers_proxy.proxyprovider
-      state: present
-      identifiers:
-        name: traefik-forward-auth
-      attrs:
-        mode: forward_auth_domain
-        external_host: "*.local.asztalos.net"
-        cookie_domain: local.asztalos.net
+    version: 1
+    metadata:
+      name: "Forward Auth Provider Blueprint"
+    entries:
+      - model: authentik_providers_proxy.proxyprovider
+        state: present
+        identifiers:
+          name: traefik-forward-auth
+        attrs:
+          mode: forward_auth_domain
+          external_host: "*.local.asztalos.net"
+          cookie_domain: local.asztalos.net

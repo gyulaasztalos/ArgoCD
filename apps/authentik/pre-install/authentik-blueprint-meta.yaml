@@ -5,14 +5,18 @@ metadata:
   namespace: authentik
 data:
   meta-blueprint.yaml: |
-    - model: authentik_core.meta
-      state: present
-      identifiers:
-        name: meta-blueprint
-      attrs:
-        blueprints:
-          - users.yaml
-          - groups.yaml
-          - forward-auth.yaml
-          - oauth-providers.yaml
-          - applications.yaml
+    version: 1
+    metadata:
+      name: "Meta Blueprint"
+    entries:
+      - model: authentik_core.meta
+        state: present
+        identifiers:
+          name: meta-blueprint
+        attrs:
+          blueprints:
+            - users.yaml
+            - groups.yaml
+            - forward-auth.yaml
+            - oauth-providers.yaml
+            - applications.yaml

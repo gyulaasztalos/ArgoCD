@@ -5,15 +5,19 @@ metadata:
   namespace: authentik
 data:
   groups.yaml: |
-    - model: authentik_core.group
-      state: present
-      identifiers:
-        name: powerusers
-      attrs:
-        users: ["Gyula"]
-    - model: authentik_core.group
-      state: present
-      identifiers:
-        name: standardusers
-      attrs:
-        users: ["Anita"]
+    version: 1
+    metadata:
+      name: "Groups Blueprint"
+    entries:
+      - model: authentik_core.group
+        state: present
+        identifiers:
+          name: powerusers
+        attrs:
+          users: ["Gyula"]
+      - model: authentik_core.group
+        state: present
+        identifiers:
+          name: standardusers
+        attrs:
+          users: ["Anita"]
