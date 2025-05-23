@@ -11,9 +11,9 @@ spec:
     namespace: default
     server: https://kubernetes.default.svc
   source:
-    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
-      targetRevision: main
-      path: app/nginx/post-install
+    repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+    targetRevision: main
+    path: app/nginx/post-install
   project: default
   syncPolicy:
     automated:
