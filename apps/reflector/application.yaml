@@ -14,7 +14,7 @@ spec:
       ref: config
     - repoURL: oci://ghcr.io/emberstack/helm-charts/reflector
       chart: reflector
-      targetRevision: v9.1.7
+      targetRevision: 9.1.7
       helm:
         releaseName: reflector
         valueFiles:
