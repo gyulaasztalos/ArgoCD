@@ -14,7 +14,7 @@ spec:
       path: apps/cnpg/pre-install
     - repoURL: https://cloudnative-pg.github.io/charts
       chart: cloudnative-pg
-      targetRevision: 0.23.2
+      targetRevision: 0.24.0
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       path: apps/cnpg/post-install
