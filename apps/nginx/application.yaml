@@ -14,7 +14,7 @@ spec:
   source:
     repoURL: https://github.com/gyulaasztalos/ArgoCD.git
     targetRevision: main
-    path: app/nginx/post-install
+    path: apps/nginx/post-install
   syncPolicy:
     automated:
       selfHeal: true
