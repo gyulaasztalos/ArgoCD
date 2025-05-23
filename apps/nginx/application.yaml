@@ -13,7 +13,7 @@ spec:
   sources:
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/argocd/post-install
+      path: app/nginx/post-install
   project: default
   syncPolicy:
     automated:
