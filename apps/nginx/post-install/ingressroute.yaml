@@ -26,8 +26,8 @@ spec:
     - match: Host(`nginx.local.asztalos.net`)
       kind: Rule
       middlewares:
-       # - name: authentik
-       #   namespace: traefik
+        - name: authentik
+          namespace: traefik
         - name: default-headers
           namespace: traefik
       services:
