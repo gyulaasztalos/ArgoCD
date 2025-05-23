@@ -36,6 +36,3 @@ spec:
           port: 80
   tls:
     secretName: local-asztalos-net-tls
-    options:
-      name: opt
-      namespace: cert-manager
