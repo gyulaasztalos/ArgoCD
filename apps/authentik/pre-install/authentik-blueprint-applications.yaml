@@ -35,10 +35,10 @@ data:
           provider: !Find [authentik_providers_proxy.proxyprovider, [name, traefik-forward-auth]]
           icon: https://traefik.local.asztalos.net/favicon.ico
       - model: authentik_outposts.outpost
-          id: embedded_outpost
-          lookup: name:"authentik Embedded Outpost"
-          operations:
-            - op: add
-              path: /applications
-              value:
-                - ref: traefik_forward_auth_app
+        id: embedded_outpost
+        lookup: name:"authentik Embedded Outpost"
+        operations:
+          - op: add
+            path: /applications
+            value:
+              - ref: traefik_forward_auth_app
