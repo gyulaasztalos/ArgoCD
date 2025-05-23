@@ -15,7 +15,7 @@ data:
           name: traefik-forward-auth
         attrs:
           mode: forward_domain
-          external_host: https://traefik.local.asztalos.net
+          external_host: https://auth.local.asztalos.net
           authorization_flow: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
           invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
           cookie_domain: local.asztalos.net
