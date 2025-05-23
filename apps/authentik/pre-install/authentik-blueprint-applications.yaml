@@ -10,6 +10,18 @@ data:
       name: "Applications Blueprint"
     resources:
       - model: authentik_core.application
+        state: absent
+        identifiers:
+          slug: paperless
+      - model: authentik_core.application
+        state: absent
+        identifiers:
+          slug: grafana
+      - model: authentik_core.application
+        state: absent
+        identifiers:
+          slug: traefik-forward-auth
+      - model: authentik_core.application
         state: present
         identifiers:
           slug: paperless
