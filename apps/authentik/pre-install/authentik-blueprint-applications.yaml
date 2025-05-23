@@ -24,7 +24,7 @@ data:
         attrs:
           name: Grafana
           provider: !Find [authentik_providers_oauth2.oauth2provider, [name, grafana-oauth-provider]]
-          icon: https://grafana.local.asztalos.net/favicon.ico
+          icon: https://grafana.local.asztalos.net/public/img/fav32.png
       - model: authentik_core.application
         id: traefik_forward_auth_app
         state: present
@@ -33,7 +33,7 @@ data:
         attrs:
           name: "Traefik Forward Auth"
           provider: !Find [authentik_providers_proxy.proxyprovider, [name, traefik-forward-auth]]
-          icon: https://traefik.local.asztalos.net/favicon.ico
+          icon: https://traefik.local.asztalos.net/dashboard/icons/favicon-32x32.png
       - model: authentik_outposts.outpost
         id: embedded_outpost
         lookup: name:"authentik Embedded Outpost"
