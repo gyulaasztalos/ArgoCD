@@ -4,7 +4,6 @@ kind: Certificate
 metadata:
   name: local-asztalos-net
   namespace: cert-manager
-
 spec:
   secretName: local-asztalos-net-tls
   secretTemplate:
