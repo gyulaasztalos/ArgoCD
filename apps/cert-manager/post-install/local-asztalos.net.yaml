@@ -7,9 +7,9 @@ metadata:
 spec:
   secretName: local-asztalos-net-tls
   secretTemplate:
-  annotations:
-    reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-    reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "app-ns"
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "app-ns"
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
