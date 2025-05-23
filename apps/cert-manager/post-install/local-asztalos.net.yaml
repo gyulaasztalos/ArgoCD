@@ -9,7 +9,7 @@ spec:
   secretTemplate:
     annotations:
       reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,traefik,authentik,monitoring,argocd,cattle-system"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "default,traefik,authentik,monitoring,argocd,cattle-system"
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
