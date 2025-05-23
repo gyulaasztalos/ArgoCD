@@ -16,7 +16,6 @@ spec:
       chart: reflector
       targetRevision: 9.1.7
       helm:
-        releaseName: reflector
         valueFiles:
           - $config/apps/reflector/values.yaml
   destination:
