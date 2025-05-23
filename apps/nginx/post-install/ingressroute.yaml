@@ -1,0 +1,38 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nginx
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+  labels:
+    app: nginx
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`www.nginx.local.asztalos.net`)
+      kind: Rule
+      middlewares:
+        - name: authentik
+          namespace: traefik
+        - name: default-headers
+          namespace: traefik
+      services:
+        - name: nginx
+          namespace: default
+          port: 80
+    - match: Host(`nginx.local.asztalos.net`)
+      kind: Rule
+      middlewares:
+        - name: authentik
+          namespace: traefik
+        - name: default-headers
+          namespace: traefik
+      services:
+        - name: nginx
+          namespace: default
+          port: 80
+  tls:
+    secretName: local-asztalos-net-tls

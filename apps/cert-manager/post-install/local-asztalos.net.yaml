@@ -3,9 +3,14 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: local-asztalos-net
-  namespace: default
+  namespace: cert-manager
+
 spec:
   secretName: local-asztalos-net-tls
+  secretTemplate:
+  annotations:
+    reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+    reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "app-ns"
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer

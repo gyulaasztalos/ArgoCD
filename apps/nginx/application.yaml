@@ -1,0 +1,23 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx
+  namespace: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  sources:
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/argocd/post-install
+  project: default
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
