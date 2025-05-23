@@ -10,7 +10,7 @@ spec:
   destination:
     namespace: default
     server: https://kubernetes.default.svc
-  sources:
+  source:
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       path: app/nginx/post-install
