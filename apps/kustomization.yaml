@@ -4,6 +4,7 @@ resources:
   - argocd/application.yaml
   - traefik/application.yaml
   - sealed-secrets/application.yaml
+  - reflector/application.yaml
   - cert-manager/application.yaml
   - rancher/application.yaml
   - longhorn/application.yaml
