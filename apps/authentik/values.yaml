@@ -183,9 +183,9 @@ authentik:
     # -- SMTP credentials, when left empty, no authentication will be done
     password: "file:///email-creds/password"
     # -- Use StartTLS. Enable either use_tls or use_ssl, they can't be enabled at the same time.
-    use_tls: false
+    use_tls: true
     # -- Use SSL. Enable either use_tls or use_ssl, they can't be enabled at the same time.
-    use_ssl: true
+    use_ssl: false
     # -- Connection timeout
     timeout: 30
     # -- Email from address, can either be in the format "foo@bar.baz" or "authentik <foo@bar.baz>"

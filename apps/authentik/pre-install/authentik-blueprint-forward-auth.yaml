@@ -16,6 +16,6 @@ data:
         attrs:
           mode: forward_domain
           external_host: https://auth.local.asztalos.net
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
           invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
           cookie_domain: local.asztalos.net
