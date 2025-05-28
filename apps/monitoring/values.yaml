@@ -1223,6 +1223,24 @@ grafana:
     passwordKey: admin-password
   namespaceOverride: ""
 
+  envFromSecret: grafana-oauth-secrets  # Reference to your secret with client_secret
+  grafana.ini:
+    auth.generic_oauth:
+      enabled: true
+      name: Authentik
+      allow_sign_up: true
+      client_id: grafana  # Match client ID from your Authentik provider
+      scopes: openid profile email
+      auth_url: https://auth.local.asztalos.net/application/o/authorize/
+      token_url: https://auth.local.asztalos.net/application/o/token/
+      api_url: https://auth.local.asztalos.net/application/o/userinfo/
+      role_attribute_path: "contains(groups[*], 'powerusers') && 'Admin' || contains(groups[*], 'standardusers') && 'Viewer' || 'Viewer'"
+      use_pkce: true
+      auto_login: true
+    server:
+      root_url: https://grafana.local.asztalos.net
+
+
   ## ForceDeployDatasources Create datasource configmap even if grafana deployment has been disabled
   ##
   forceDeployDatasources: false
