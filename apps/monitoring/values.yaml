@@ -1225,6 +1225,9 @@ grafana:
 
   envFromSecret: grafana-oauth-secrets  # Reference to your secret with client_secret
   grafana.ini:
+    auth:
+        signout_redirect_url: "https://auth.local.asztalos.net/application/o/grafana/end-session/"
+        oauth_auto_login: true
     auth.generic_oauth:
       enabled: true
       name: Authentik
@@ -1236,7 +1239,6 @@ grafana:
       api_url: https://auth.local.asztalos.net/application/o/userinfo/
       role_attribute_path: "contains(groups[*], 'powerusers') && 'Admin' || contains(groups[*], 'standardusers') && 'Viewer' || 'Viewer'"
       use_pkce: true
-      auto_login: true
     server:
       root_url: https://grafana.local.asztalos.net
 
