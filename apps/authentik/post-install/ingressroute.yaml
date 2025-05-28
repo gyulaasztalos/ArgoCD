@@ -11,6 +11,9 @@ spec:
     - websecure
   routes:
     - kind: Rule
+      middlewares:
+        - name: default-headers
+          namespace: traefik
       match: Host(`auth.local.asztalos.net`)
       priority: 10
       services:
