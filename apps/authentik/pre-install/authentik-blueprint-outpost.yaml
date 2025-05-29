@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: authentik-blueprint-forward-auth
+  name: authentik-blueprint-outpost
   namespace: authentik
 data:
   outpost.yaml: |
