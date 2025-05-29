@@ -9,7 +9,7 @@ data:
     version: 1
     metadata:
       name: "Applications Blueprint"
-    resources:
+    entries:
       - model: authentik_core.application
         state: present
         identifiers:
