@@ -203,6 +203,20 @@ configs:
     statusbadge.enabled: false
 
     # Dex configuration
+    dex.config: |
+      connectors:
+      - config:
+          issuer: https://auth.local.asztalos.net/application/o/argocd/
+          clientID: argocd
+          clientSecret: $argocd-oidc-secret:oidc.authentik.clientSecret
+          insecureEnableGroups: true
+          scopes:
+            - openid
+            - profile
+            - email
+        name: authentik
+        type: oidc
+        id: authentik
     # dex.config: |
     #   connectors:
     #     # GitHub example
