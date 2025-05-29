@@ -36,11 +36,4 @@ data:
           provider: !Find [authentik_providers_proxy.proxyprovider, [name, traefik-forward-auth]]
           meta_launch_url: "https://traefik.local.asztalos.net"
           icon: https://traefik.local.asztalos.net/dashboard/icons/favicon-32x32.png
-      - model: authentik_outposts.outpost
-        id: embedded_outpost
-        lookup: name:"authentik Embedded Outpost"
-        operations:
-          - op: add
-            path: /applications
-            value:
-              - ref: traefik_forward_auth_app
+

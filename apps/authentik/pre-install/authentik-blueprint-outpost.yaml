@@ -17,4 +17,4 @@ data:
           - op: add
             path: /applications
             value:
-              - ref: traefik-forward-auth
+              - ref: traefik_forward_auth_app
