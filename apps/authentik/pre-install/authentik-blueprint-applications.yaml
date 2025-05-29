@@ -36,7 +36,7 @@ data:
           slug: traefik-forward-auth
         attrs:
           name: "Traefik Forward Auth"
-          provider: !Find [authentik_providers_proxy.proxyprovider, [name, traefik-forward-auth]]
+          provider: !Find [authentik_providers_proxy.proxyprovider, [name, Traefik Forward Auth]]
           policy_engine_mode: any
           meta_launch_url: "https://traefik.local.asztalos.net"
           icon: https://traefik.local.asztalos.net/dashboard/icons/favicon-32x32.png
