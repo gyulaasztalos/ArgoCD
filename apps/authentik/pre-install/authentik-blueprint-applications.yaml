@@ -35,4 +35,11 @@ data:
           provider: !Find [authentik_providers_proxy.proxyprovider, [name, traefik-forward-auth]]
           meta_launch_url: "https://traefik.local.asztalos.net"
           icon: https://traefik.local.asztalos.net/dashboard/icons/favicon-32x32.png
-
+      - model: authentik_core.application
+        state: present
+        identifiers:
+          slug: argocd
+        attrs:
+          name: ArgoCD
+          provider: !Find [authentik_providers_oauth2.oauth2provider, [name, argocd-oauth-provider]]
+          icon: https://argocd.local.asztalos.net/assets/favicon/favicon-32x32.png
