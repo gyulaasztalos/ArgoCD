@@ -1239,6 +1239,8 @@ grafana:
       api_url: https://auth.local.asztalos.net/application/o/userinfo/
       role_attribute_path: "contains(groups[*], 'powerusers') && 'Admin' || contains(groups[*], 'standardusers') && 'Viewer' || 'Viewer'"
       use_pkce: true
+      auto_login: true
+      use_refresh_token: true
     server:
       root_url: https://grafana.local.asztalos.net
 

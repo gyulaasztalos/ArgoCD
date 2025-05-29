@@ -1,21 +1,15 @@
-apiVersion: v1
-kind: ConfigMap
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
 metadata:
+  creationTimestamp: null
   name: authentik-blueprint-forward-auth
   namespace: authentik
-data:
-  forward-auth.yaml: |
-    version: 1
+spec:
+  encryptedData:
+    forward-auth.yaml: AgAeU3WrZeguYMcijcFzmZ3+kjFJmmCsYYTTv9e+JOxahqOYGtWDI1kz/Mv23FIPVODP+oDjm8/PrJ5xkhQv3qyUzBY6PTlq9u8q7MX4vwIHPHOkfLTwIwXg3vgikqOPAsz32yctBgNCOi7tsBlN171t+p7FqQ3F17dKfn62RlqQPVEIN8uhp/DgggHqzmHFyspMpPIC5WY0J3lEXSsCXsE/Y+5RMQLFxhMue06T++sFDxfvPOLHYJVIepwGHoHdIi3pMmk9kFll2/BrmOuTAhvjs0YZqTLagIJ3dhW5uxnB5UDSAlsyJn91uvWdP18EZX9s7t3F/CGVLvHMDqN4ci4UvcWWIRylt7qd3d4lU+oGLvf5zo29hDXMnxL5jxeIEUvD50IlQcjzWafVaHQEfh6WEv9RE7TOYGRg3YFCIGxcEcF/z3JgDXcZiXDIOPFsrGtam7DM28xXHky6zlHG62q8pNpImnSjlI9zoHUsp0SmUr1z9mPTMLOasHRjfVjI4sTU3ABlLTK/zmyxHAA0A4d2wbp731PLjHjct0VVXjVQchZY/6kYqYg7LUpAdIDlpzhpwegps/BsIZTx0SSVLu33s8k3tT15YsxomQ0kpDdZP+Ephl1L9JF/0XBKnrgQDMqJ9Wsbv1mPDs0DiPsLSG+djJem5C2Nn/zIB6K/uNvI7MAwu9LtKI/OJa3GutQnsCC3fmNne8FsfUUOKbzdRJy7UWOI/Om/BdkGHKtFYv4OVifNLIxIx1UNRWc6ecDlkx1a46k59faOSJs644GFr0c3VzL+0WwSApR507JYtLSiEafa22LSyNxMXHo2IVPID2OMYfuWNbvWoX4c4e2qsE9J3DRak7twHiaBcQ+rzF70ZwnBs4onlF7uqh3atd4FHegUamkTAxoc8yes9AHR9/d/ns4QRS4pi07K57U4jmZHfACJAp2XM3hLAApQSEfgK51ghzatr8Jqz4TXecu1Sw5Fh/SdcMz7HT7Tvvn1nL8ypdM7pYfD5Gn9/GL3MMZPcvLMoesukypd+EC5VK7Bx+GSNDj6u8m575aLBVr6G9kwwb0bXoV0zhoMkdyOsgVQpTedTavAvWGPv0+40wLcXr4FCpu8zap7GHTDymPO7/qnBgKuMRhmLlXEu/bagW+4nLK315IjS6z2Z8yfAjxLyhNBf/3aYAyuCuqmiaL/CdP4i9wIvTpwOnixLMzlGMiz/OEYw9gY1JY9VdpdW667um7uhMRO5K73cZ4aCom3JASRC7UZNNJoknB+GVuUoWYnV7TVlUDAoyjVgpyAIoULlA3ewaOdJYDpEMpGc1dF5Iu7p7LADkIuHW3v9WcpaRZwzOKwmfHysd7NU1ODrFcc4JLZD2cC8HVkVkF3UJ2s5ByXpOvLTHSKCnK6vCgeKODUrZFRQVVVyY8MKsE40xQ9iqwCwvHkHk7SGkPKYgR80lB7OuhhGH98cr0MTh2HfIzuU+ylIM8LEfFShRkWybFqABEY7PWjGh1yrqwgswNfDJNEc73Db/wMGruW6NzT9DrhHDBCFIAIoihNOpegMqc=
+  template:
     metadata:
-      name: "Forward Auth Provider Blueprint"
-    resources:
-      - model: authentik_providers_proxy.proxyprovider
-        state: present
-        identifiers:
-          name: traefik-forward-auth
-        attrs:
-          mode: forward_domain
-          external_host: https://auth.local.asztalos.net
-          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
-          invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
-          cookie_domain: local.asztalos.net
+      creationTimestamp: null
+      name: authentik-blueprint-forward-auth
+      namespace: authentik
