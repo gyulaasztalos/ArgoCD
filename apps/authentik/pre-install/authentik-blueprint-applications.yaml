@@ -16,7 +16,7 @@ data:
           slug: paperless
         attrs:
           name: Paperless-ngx
-          provider: !KeyOf paperless-oauth-provider
+          provider: !Find [authentik_providers_oauth2.oauth2provider, [name, paperless-oauth-provider]]
           policy_engine_mode: any
           meta_launch_url: "https://paperless.local.asztalos.net"
           icon: https://paperless.local.asztalos.net/favicon.ico
@@ -26,7 +26,7 @@ data:
           slug: grafana
         attrs:
           name: Grafana
-          provider: !KeyOf grafana-oauth-provider
+          provider: !Find [authentik_providers_oauth2.oauth2provider, [name, grafana-oauth-provider]]
           policy_engine_mode: any
           meta_launch_url: "https://grafana.local.asztalos.net"
           icon: https://grafana.local.asztalos.net/public/img/fav32.png
@@ -36,7 +36,7 @@ data:
           slug: traefik-forward-auth
         attrs:
           name: "Traefik Forward Auth"
-          provider: !KeyOf traefik-forward-auth
+          provider: !Find [authentik_providers_proxy.proxyprovider, [name, traefik-forward-auth]]
           policy_engine_mode: any
           meta_launch_url: "https://traefik.local.asztalos.net"
           icon: https://traefik.local.asztalos.net/dashboard/icons/favicon-32x32.png
@@ -46,7 +46,7 @@ data:
           slug: argocd
         attrs:
           name: ArgoCD
-          provider: !KeyOf argocd-oauth-provider
+          provider: !Find [authentik_providers_oauth2.oauth2provider, [name, argocd-oauth-provider]]
           policy_engine_mode: any
           meta_launch_url: "https://argocd.local.asztalos.net"
           icon: https://argocd.local.asztalos.net/assets/favicon/favicon-32x32.png
