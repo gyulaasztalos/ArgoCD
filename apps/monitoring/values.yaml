@@ -1223,7 +1223,13 @@ grafana:
     passwordKey: admin-password
   namespaceOverride: ""
 
-  envFromSecret: grafana-oauth-secrets  # Reference to your secret with client_secret
+  extraSecretMounts:
+    - name: grafana-oauth-secrets-mount
+      secretName: grafana-oauth-secrets
+      defaultMode: 0440
+      mountPath: /etc/secrets/grafana-oauth-secrets
+      readOnly: true
+
   grafana.ini:
     auth:
         signout_redirect_url: "https://auth.local.asztalos.net/application/o/grafana/end-session/"
@@ -1233,6 +1239,7 @@ grafana:
       name: Authentik
       allow_sign_up: true
       client_id: grafana  # Match client ID from your Authentik provider
+      client_secret: $__file{/etc/secrets/grafana-oauth-secrets/GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}
       scopes: openid profile email offline_access
       auth_url: https://auth.local.asztalos.net/application/o/authorize/
       token_url: https://auth.local.asztalos.net/application/o/token/
