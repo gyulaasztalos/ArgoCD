@@ -5,6 +5,7 @@ metadata:
   name: hourly-volume-snapshot
   namespace: longhorn-system
 spec:
+  name: hourly-volume-snapshot
   cron: "30 * * * *"
   task: "snapshot"
   groups: ["default"]
