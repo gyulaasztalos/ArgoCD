@@ -13,6 +13,11 @@ spec:
     - kind: Rule
       match: Host(`longhorn.local.asztalos.net`)
       priority: 10
+      middlewares:
+        - name: authentik
+          namespace: traefik
+        - name: default-headers
+          namespace: traefik
       services:
         - name: longhorn-frontend
           namespace: longhorn-system
