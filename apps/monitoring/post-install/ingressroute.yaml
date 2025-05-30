@@ -12,6 +12,11 @@ spec:
   routes:
     - kind: Rule
       match: Host(`prometheus.local.asztalos.net`)
+      middlewares:
+        - name: authentik
+          namespace: traefik
+        - name: default-headers
+          namespace: traefik
       services:
         - name: monitoring-kube-prometheus-prometheus
           namespace: monitoring
@@ -52,6 +57,11 @@ spec:
   routes:
     - kind: Rule
       match: Host(`alertmanager.local.asztalos.net`)
+      middlewares:
+        - name: authentik
+          namespace: traefik
+        - name: default-headers
+          namespace: traefik
       services:
         - name: monitoring-kube-prometheus-alertmanager
           namespace: monitoring
