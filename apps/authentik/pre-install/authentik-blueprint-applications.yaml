@@ -13,6 +13,16 @@ data:
       - model: authentik_core.application
         state: present
         identifiers:
+          slug: rancher
+        attrs:
+          name: Rancher
+          provider: !Find [authentik_providers_oauth2.oauth2provider, [name, rancher-oauth-provider]]
+          policy_engine_mode: any
+          meta_launch_url: "https://rancher.local.asztalos.net"
+          icon: https://rancher.local.asztalos.net/favicon.png
+      - model: authentik_core.application
+        state: present
+        identifiers:
           slug: paperless
         attrs:
           name: Paperless-ngx
