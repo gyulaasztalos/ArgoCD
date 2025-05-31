@@ -16,3 +16,5 @@
     helm repo add argo https://argoproj.github.io/argo-helm
     helm repo update
     helm install argocd argo/argo-cd --namespace argocd --values values.yaml
+5. Bootstrap ArgoCD
+    kubrctl apply -f bootstrap/app-of-apps.yaml
