@@ -13,7 +13,7 @@
       "automerge": true
     }
   ],
-  "platformAutomerge": true
+  "platformAutomerge": true,
   "argocd": {
     "managerFilePatterns": ["/application\\.yaml$/"]
   },
