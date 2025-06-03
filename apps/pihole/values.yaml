@@ -275,7 +275,7 @@ admin:
   # -- If set to false admin password will be disabled, adminPassword specified above and the pre-existing secret (if specified) will be ignored.
   enabled: true
   # -- Specify an existing secret to use as admin password
-  existingSecret: "pihole-secrets"
+  existingSecret: "pihole-secret"
   # -- Specify the key inside the secret to use
   passwordKey: "webpassword"
   # -- Specify [annotations](docs/Values.md#admin.annotations) to be added to the secret
