@@ -12,4 +12,5 @@ resources:
   - monitoring/application.yaml
   - redis/application.yaml
   - authentik/application.yaml
+  - pihole/application.yaml
   - nginx/application.yaml
