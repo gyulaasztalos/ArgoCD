@@ -18,7 +18,7 @@ image:
   # -- the repostory to pull the image from
   repository: "pihole/pihole"
   # -- the docker tag, if left empty it will get it from the chart's appVersion
-  tag: ""
+  tag: "2025.05.1"
   # -- the pull policy
   pullPolicy: IfNotPresent
 
@@ -273,7 +273,7 @@ adminPassword: "admin"
 # -- Use an existing secret for the admin password.
 admin:
   # -- If set to false admin password will be disabled, adminPassword specified above and the pre-existing secret (if specified) will be ignored.
-  enabled: true
+  enabled: false
   # -- Specify an existing secret to use as admin password
   existingSecret: "pihole-secret"
   # -- Specify the key inside the secret to use
