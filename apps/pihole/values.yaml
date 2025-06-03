@@ -231,7 +231,7 @@ persistentVolumeClaim:
   annotations: {}
 
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
 
   # -- volume claim size
   size: "500Mi"
