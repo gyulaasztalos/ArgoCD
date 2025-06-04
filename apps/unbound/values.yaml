@@ -10,7 +10,6 @@ containers:
         memory: 20Mi
     serverPort: 53
     config:
-      controleEnable: "no"
       verbosity: 2
       # Note  that  it takes time to print these lines which makes the server (significantly) slower.
       logReplies: "yes"
