@@ -55,7 +55,7 @@ serviceDns:
   loadBalancerIPv6: ""
   # -- `spec.loadBalancerClass` for the DNS Service. Only used if type is LoadBalancer.
   # loadBalancerClass: kube-vip.io/kube-vip-class  # Optional for kube-vip, but recommended for clarity  # -- A fixed `spec.loadBalancerIP` for the IPv6 DNS Service
-  loadBalancerClass: "metallb.universe.tf/metallb"
+  # loadBalancerClass: "metallb.universe.tf/metallb"
 
   # -- Annotations for the DNS service
   annotations:
