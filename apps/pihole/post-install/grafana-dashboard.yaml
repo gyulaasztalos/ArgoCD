@@ -1451,18 +1451,18 @@ data:
             "hide": 2,
             "label": null,
             "name": "PiholeDevices",
-            "query": "${VAR_PIHOLEDEVICES}",
+            "query": "1",
             "skipUrlSync": false,
             "type": "constant",
             "current": {
-              "value": "${VAR_PIHOLEDEVICES}",
-              "text": "${VAR_PIHOLEDEVICES}",
+              "value": "1",
+              "text": "1",
               "selected": false
             },
             "options": [
               {
-                "value": "${VAR_PIHOLEDEVICES}",
-                "text": "${VAR_PIHOLEDEVICES}",
+                "value": "1",
+                "text": "1",
                 "selected": false
               }
             ]
