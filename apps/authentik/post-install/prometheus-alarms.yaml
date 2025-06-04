@@ -4,7 +4,7 @@ metadata:
   name: authentik-prometheus-rules
   namespace: monitoring
   labels:
-    prometheus: kube-prometheus
+    prometheus: authentik
     role: alert-rules
 spec:
   groups:
