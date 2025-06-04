@@ -13,4 +13,5 @@ resources:
   - redis/application.yaml
   - authentik/application.yaml
   - pihole/application.yaml
+  - unbound/application.yaml
   - nginx/application.yaml

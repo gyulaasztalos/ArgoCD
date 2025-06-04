@@ -1,0 +1,86 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: unbound-alerts
+  namespace: monitoring  # Must match your Prometheus Operator's namespace
+spec:
+  groups:
+  - name: unbound.rules
+    rules:
+    # Critical: Unbound service is down
+    - alert: UnboundDown
+      expr: unbound_up == 0
+      for: 3m
+      labels:
+        severity: critical
+        team: networking
+      annotations:
+        description: Unbound DNS resolver is down. DNS resolution is unavailable.
+        summary: Unbound service is down
+        runbook: https://github.com/your-org/runbooks/blob/master/unbound.md#unbounddown
+
+    # Warning: High number of failed queries
+    - alert: UnboundFailedQueries
+      expr: increase(unbound_queries_failed_total[5m]) > 10
+      for: 5m
+      labels:
+        severity: warning
+        team: networking
+      annotations:
+        description: Unbound has recorded a high number of failed DNS queries in the last 5 minutes.
+        summary: High number of failed DNS queries
+
+    # Warning: High number of recursion failures
+    - alert: UnboundRecursionFailure
+      expr: increase(unbound_recursion_failure_total[5m]) > 5
+      for: 5m
+      labels:
+        severity: warning
+        team: networking
+      annotations:
+        description: Unbound has recorded a high number of recursion failures in the last 5 minutes.
+        summary: High number of recursion failures
+
+    # Warning: High query response time
+    - alert: UnboundSlowResponse
+      expr: avg(rate(unbound_query_time_seconds_sum[5m])) by (instance) > 0.5
+      for: 10m
+      labels:
+        severity: warning
+        team: networking
+      annotations:
+        description: Unbound is experiencing slow DNS query responses (average > 0.5s per query).
+        summary: Slow DNS query responses
+
+    # Critical: DNSSEC validation failures
+    - alert: UnboundDNSSECFailure
+      expr: increase(unbound_validation_failure_total[10m]) > 0
+      for: 10m
+      labels:
+        severity: critical
+        team: security
+      annotations:
+        description: Unbound has detected DNSSEC validation failures.
+        summary: DNSSEC validation failures detected
+
+    # Critical: High memory usage
+    - alert: UnboundHighMemory
+      expr: unbound_memory_bytes / 1024 / 1024 > 512  # >512MB
+      for: 10m
+      labels:
+        severity: warning
+        team: networking
+      annotations:
+        description: Unbound memory usage is high (over 512MB).
+        summary: High memory usage
+
+    # Optional: Storage capacity low (if using persistent storage)
+    - alert: UnboundStorageFull
+      expr: node_filesystem_avail_bytes{mountpoint="/etc/unbound"} / node_filesystem_size_bytes{mountpoint="/etc/unbound"} < 0.1
+      for: 15m
+      labels:
+        severity: critical
+        team: storage
+      annotations:
+        description: Unbound storage volume has less than 10% free space.
+        summary: Low storage capacity for Unbound
