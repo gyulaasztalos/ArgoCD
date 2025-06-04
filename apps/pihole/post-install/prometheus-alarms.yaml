@@ -1,0 +1,64 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: pihole-alerts
+  namespace: monitoring  # Must match your Prometheus Operator's namespace
+spec:
+  groups:
+  - name: pihole.rules
+    rules:
+    # Critical: Pi-hole service is down
+    - alert: PiHoleDown
+      expr: pihole_status == 0
+      for: 5m
+      labels:
+        severity: critical
+        team: networking
+      annotations:
+        description: Pi-hole has been down for 5 minutes. DNS resolution and ad-blocking are unavailable.
+        summary: Pi-hole service is down
+        runbook: https://github.com/your-org/runbooks/blob/master/pihole.md#piholedown
+
+    # Warning: DNS query rate dropped significantly
+    - alert: DNSQueriesDrop
+      expr: rate(pihole_dns_queries_total[10m]) < (rate(pihole_dns_queries_total[30m] offset 10m) * 0.5)
+      for: 10m
+      labels:
+        severity: warning
+        team: networking
+      annotations:
+        description: DNS query rate has dropped by more than 50% compared to historical averages.
+        summary: Significant drop in DNS query volume
+
+    # Critical: Ads blocking rate dropped
+    - alert: AdsBlockedDrop
+      expr: (rate(pihole_ads_blocked_today[1h]) / rate(pihole_dns_queries_today[1h])) < 0.2  # <20% ads blocked
+      for: 30m
+      labels:
+        severity: critical
+        team: networking
+      annotations:
+        description: Ads blocking rate has fallen below 20%. Check filter lists and gravity updates.
+        summary: Low ads blocking rate
+
+    # Critical: Upstream DNS resolution failure
+    - alert: UpstreamDNSFailure
+      expr: sum(probe_success{job="blackbox", probe_type="dns"}) == 0
+      for: 5m
+      labels:
+        severity: critical
+        team: networking
+      annotations:
+        description: All configured upstream DNS servers are unreachable.
+        summary: Upstream DNS resolution failure
+
+    # Critical: Storage capacity low
+    - alert: PiHoleStorageFull
+      expr: node_filesystem_avail_bytes{mountpoint="/etc/pihole"} / node_filesystem_size_bytes{mountpoint="/etc/pihole"} < 0.1
+      for: 15m
+      labels:
+        severity: critical
+        team: storage
+      annotations:
+        description: Pi-hole storage volume has less than 10% free space.
+        summary: Low storage capacity for Pi-hole
