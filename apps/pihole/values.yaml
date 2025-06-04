@@ -54,13 +54,13 @@ serviceDns:
   loadBalancerIP: 10.10.50.31
   loadBalancerIPv6: ""
   # -- `spec.loadBalancerClass` for the DNS Service. Only used if type is LoadBalancer.
-  loadBalancerClass: kube-vip.io/kube-vip-class  # Optional for kube-vip, but recommended for clarity  # -- A fixed `spec.loadBalancerIP` for the IPv6 DNS Service
+  # loadBalancerClass: kube-vip.io/kube-vip-class  # Optional for kube-vip, but recommended for clarity  # -- A fixed `spec.loadBalancerIP` for the IPv6 DNS Service
 
   # -- Annotations for the DNS service
   annotations:
-    kube-vip.io/loadbalancerIPs: 10.10.50.31
-    # metallb.universe.tf/address-pool: network-services
-    # metallb.universe.tf/allow-shared-ip: pihole-svc
+    # kube-vip.io/loadbalancerIPs: 10.10.50.31
+    metallb.universe.tf/address-pool: network-services
+    metallb.universe.tf/allow-shared-ip: pihole-svc
 
   # -- Labels for the DNS service
   extraLabels:
