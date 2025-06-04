@@ -1470,7 +1470,7 @@ data:
           {
             "allValue": "",
             "current": {},
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "Prometheus",
             "definition": "label_values(pihole_status,job)",
             "description": null,
             "error": null,
@@ -1497,7 +1497,7 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "Prometheus",
             "definition": "query_result(pihole_status{job=~'$JobName'})",
             "description": null,
             "error": null,
@@ -1524,7 +1524,7 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "Prometheus",
             "definition": "label_values(pihole_querytypes,type)",
             "description": "To filter out specific types use something similar to /^(?!ANY|DNSKEY|DS|HTTPS|MX|RRSIG|SOA|SVCB)/",
             "error": null,
