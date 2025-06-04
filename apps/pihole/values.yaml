@@ -60,8 +60,8 @@ serviceDns:
   # -- Annotations for the DNS service
   annotations:
     # kube-vip.io/loadbalancerIPs: 10.10.50.31
-    metallb.universe.tf/address-pool: network-services
-    metallb.universe.tf/allow-shared-ip: pihole-svc
+    metallb.io/loadBalancerIPs: "10.10.50.31"
+    metallb.io/allow-shared-ip: pihole-dns-shared
 
   # -- Labels for the DNS service
   extraLabels:
