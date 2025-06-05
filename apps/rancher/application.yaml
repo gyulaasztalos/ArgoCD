@@ -18,6 +18,9 @@ spec:
       helm:
         valueFiles:
           - $config/apps/rancher/values.yaml
+        parameters:
+          - name: kubeVersion
+            value: "1.32.0"
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       path: apps/rancher/post-install
