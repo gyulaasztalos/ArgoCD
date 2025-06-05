@@ -11,6 +11,13 @@ spec:
     - websecure
   routes:
     - kind: Rule
+      match: Host(`pihole.local.asztalos.net`) && PathPrefix(`/api`)
+      priority: 20  # Higher than your main route
+      services:
+        - name: pihole-web
+          namespace: pihole
+          port: 80
+    - kind: Rule
       middlewares:
         - name: authentik
           namespace: traefik
