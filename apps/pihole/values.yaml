@@ -291,8 +291,10 @@ extraEnvVars:
   REV_SERVER: "true"
   REV_SERVER_DOMAIN: local.asztalos.net
   REV_SERVER_TARGET: 10.10.50.1
-  REV_SERVER_CIDR: 10.0.0.0/8
-  FTLCONF_dns_revServers: 'true,10.0.0.0/8,10.10.50.1,local.asztalos.net'
+  REV_SERVER_CIDR: 10.10.0.0/16
+  FTLCONF_dns_revServers: |
+    true,10.10.0.0/16,10.10.50.1,local.asztalos.net
+    true,10.43.0.0/16,10.43.0.10,cluster.local
   FTLCONF_dns_listeningMode: 'SINGLE'
   FTLCONF_webserver_api_app_sudo: true
   # TZ: UTC
