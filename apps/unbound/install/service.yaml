@@ -21,5 +21,5 @@ spec:
     - name: metrics
       protocol: TCP
       port: 9167
-      targetPort: 9167
+      targetPort: metrics
   type: ClusterIP

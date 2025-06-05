@@ -41,6 +41,8 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 20
           volumeMounts:
+            - name: unbound-socket
+              mountPath: /var/run/socket
             - name: unbound-main-conf-volume
               mountPath: /etc/unbound/unbound.conf
               subPath: unbound.conf
@@ -48,15 +50,22 @@ spec:
               mountPath: /etc/unbound/forward-records.conf
               subPath: forward-records.conf
         - name: "exporter"
-          image: anthochamp/unbound-exporter
+          image: cyb3rjak3/unbound-exporter:0.4.6
           imagePullPolicy: IfNotPresent
           resources: {}
           ports:
           - name: metrics
             containerPort: 9167
             protocol: TCP
+          volumeMounts:
+            - name: unbound-socket
+              mountPath: /var/run/socket
+          args:
+            - -unbound.host=unix:///var/run/socket/unbound.ctl
       restartPolicy: Always
       volumes:
+        - name: unbound-socket
+          emptyDir: {}
         - name: unbound-main-conf-volume
           configMap:
             name: unbound-main-conf

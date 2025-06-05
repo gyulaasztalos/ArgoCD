@@ -85,6 +85,7 @@ data:
 
         # Only log errors
         verbosity: 0
+        extended-statistics: yes
 
         ###########################################################################
         # PRIVACY SETTINGS
@@ -167,7 +168,7 @@ data:
         # are signed. This enforces DNSSEC validation on nameserver NS sets and the
         # nameserver addresses that are encountered on the referral path to the
         # answer. Experimental option.
-        harden-referral-path: no
+        harden-referral-path: yes
 
         # Ignore very small EDNS buffer sizes from queries.
         harden-short-bufsize: yes
@@ -336,3 +337,4 @@ data:
     remote-control:
         control-enable: yes
         control-use-cert: no
+        control-interface: /var/run/socket/unbound.ctl
