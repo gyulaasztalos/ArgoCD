@@ -42,10 +42,10 @@ spec:
             periodSeconds: 20
           volumeMounts:
             - name: unbound-main-conf-volume
-              mountPath: /opt/unbound/etc/unbound/unbound.conf
+              mountPath: /etc/unbound/unbound.conf
               subPath: unbound.conf
             - name: unbound-forward-conf-volume
-              mountPath: /opt/unbound/etc/unbound/forward-records.conf
+              mountPath: /etc/unbound/forward-records.conf
               subPath: forward-records.conf
         - name: "exporter"
           image: anthochamp/unbound-exporter
