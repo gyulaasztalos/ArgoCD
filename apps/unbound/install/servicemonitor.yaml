@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: unbound-exporter
+  namespace: unbound  # or the namespace where your exporter runs
+  labels:
+    release: prometheus-operator  # match your Prometheus Operator’s selector if needed
+spec:
+  selector:
+    matchLabels:
+      app: unbound  # or the label used by your exporter service
+  endpoints:
+    - path: /metrics
+      interval: 30s
+      targetPort: metrics
+      honorLabels: true
+  namespaceSelector:
+    matchNames:
+      - unbound

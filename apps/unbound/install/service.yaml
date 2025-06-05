@@ -1,0 +1,25 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: unbound
+  namespace: unbound
+  labels:
+    app: unbound
+spec:
+  selector:
+    app: unbound
+  ports:
+    - name: dns-udp
+      protocol: UDP
+      port: 53
+      targetPort: 53
+    - name: dns-tcp
+      protocol: TCP
+      port: 53
+      targetPort: 53
+    - name: metrics
+      protocol: TCP
+      port: 9167
+      targetPort: 9167
+  type: ClusterIP

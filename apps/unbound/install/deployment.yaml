@@ -1,0 +1,60 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unbound
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unbound
+  template:
+    metadata:
+      labels:
+        app: unbound
+    spec:
+      containers:
+        - name: "unbound"
+          image: mvance/unbound
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: "dns-udp"
+              containerPort: 53
+              protocol: "UDP"
+            - name: "dns-tcp"
+              containerPort: 53
+              protocol: "TCP"
+          resources: {}
+          readinessProbe:
+            tcpSocket:
+              port: 53
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 53
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          volumeMounts:
+            - name: unbound-main-conf-volume
+              mountPath: /opt/unbound/etc/unbound/unbound.conf
+              subPath: unbound.conf
+            - name: unbound-forward-conf-volume
+              mountPath: /opt/unbound/etc/unbound/forward-records.conf
+              subPath: forward-records.conf
+        - name: "exporter"
+          image: anthochamp/unbound-exporter
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          ports:
+          - name: metrics
+            containerPort: 9167
+            protocol: TCP
+      restartPolicy: Always
+      volumes:
+        - name: unbound-main-conf-volume
+          configMap:
+            name: unbound-main-conf
+        - name: unbound-forward-conf-volume
+          configMap:
+            name: unbound-forward-records-conf

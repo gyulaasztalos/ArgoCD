@@ -11,13 +11,7 @@ spec:
   sources:
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      ref: config
-    - repoURL: https://pixelfederation.github.io/unbound
-      chart: unbound
-      targetRevision: 0.1.4
-      helm:
-        valueFiles:
-          - $config/apps/unbound/values.yaml
+      path: apps/unbound/install
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       path: apps/unbound/post-install
