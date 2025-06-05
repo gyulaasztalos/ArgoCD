@@ -569,7 +569,7 @@ server:
       portName: metrics
     serviceMonitor:
       # -- enable a prometheus ServiceMonitor
-      enabled: false
+      enabled: true
       # -- Prometheus ServiceMonitor interval
       interval: 30s
       # -- Prometheus ServiceMonitor scrape timeout
