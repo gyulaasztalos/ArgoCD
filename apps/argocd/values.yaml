@@ -192,6 +192,8 @@ configs:
     ## Ref: https://argo-cd.readthedocs.io/en/latest/faq/#how-to-disable-admin-user
     admin.enabled: true
 
+    accounts.vscode: apiKey
+
     # -- Timeout to discover if a new manifests version got published to the repository
     timeout.reconciliation: 180s
 
@@ -357,6 +359,9 @@ configs:
     policy.csv: |
       g, powerusers, role:admin
       g, standardusers, role:readonly
+      p, vscode, applications, get, */*, allow
+      p, vscode, applications, sync, */*, allow
+      p, vscode, applications, update, */*, allow
     # Policy rules are in the form:
     #  p, subject, resource, action, object, effect
     # Role definitions and bindings are in the form:
