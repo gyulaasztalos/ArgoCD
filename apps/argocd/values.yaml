@@ -360,7 +360,7 @@ configs:
       g, powerusers, role:admin
       g, standardusers, role:readonly
       p, vscode, applications, get, */*, allow
-      p, vscode, applications, sync, */*, allow
+      p, vscode, logs, get, *, allow
       p, vscode, applications, update, */*, allow
     # Policy rules are in the form:
     #  p, subject, resource, action, object, effect
