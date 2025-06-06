@@ -1,20 +1,120 @@
 # ArgoCD
- Homelab ArgoCD manifests
+## Homelab ArgoCD Manifests
+### Introduction and Disclaimer
+This repository contains Kubernetes manifests for managing my HomeLab infrastructure using GitOps principles. The goal is to deploy a high-availability K3s cluster with essential applications.
 
-1. Prepare hosts
-    ansible-playbook setup_environment_rpi_cluster.yml
-2. install k3s
-    https://technotim.live/posts/k3s-etcd-ansible/
-    git clone https://github.com/techno-tim/k3s-ansible
-    resources/ansible.cfg
-    resources/my-cluster
-    ansible-playbook site.yml -i inventory/my-cluster/hosts.ini
-    cp kubeconfig ~/.kube/config
-3. traefik-cert-manager
-    https://technotim.live/posts/kube-traefik-cert-manager-le/
-4. Install ArgoCD
-    helm repo add argo https://argoproj.github.io/argo-helm
-    helm repo update
-    helm install argocd argo/argo-cd --namespace argocd --values values.yaml
-5. Bootstrap ArgoCD
-    kubrctl apply -f bootstrap/app-of-apps.yaml
+**Important Notes:**
+- This setup is **not** a universal solution and should **never** be used in production environments.
+- Security measures are implemented at a level appropriate for a HomeLab but are not the primary focus.
+
+---
+
+### Prerequisites
+**Hardware:**
+- 3 × Raspberry Pi 5 devices with:
+  - 8 GB RAM
+  - 256 GB NVMe SSD (primary storage)
+  - Fixed IP addresses
+  - Debian 12 Bookworm (latest)
+- External NAS with NFS share for backups
+
+**Notes:**
+- Hosts configured via Ansible (playbook not yet included)
+- HA K3s control plane nodes that also run workloads
+
+---
+
+### Architecture
+#### Network Configuration
+- **Primary IP range:** `10.0.0.0/8`
+- **Server VLAN:** `10.10.50.0/24`
+- **Local domain:** `local.asztalos.net`
+- **Node IPs:**
+  - `10.10.50.22`
+  - `10.10.50.23`
+  - `10.10.50.24`
+- **Key Services:**
+  - MetalLB range: `10.10.50.30-39`
+  - Traefik LB: `10.10.50.30`
+  - Pi-Hole LB: `10.10.50.31`
+  - KubeVIP API: `10.10.50.20`
+
+#### Core Infrastructure
+- **Base System:** Debian 12 Bookworm
+- **Kubernetes:** HA K3s v1.33.1+k3s1
+  - MetalLB (service load balancer)
+  - KubeVIP (control plane LB)
+- **GitOps:** ArgoCD
+- **Storage:** HA Longhorn
+- **Networking:**
+  - Traefik (reverse proxy)
+  - Cert-manager with Let's Encrypt wildcard certificates (Cloudflare DNS challenge)
+- **Authentication**
+  - Authentik (OIDC/OAuth 2.0 and forward auth middleware for traefik)
+    - Configured with blueprints
+- **Database**
+  - PostgreSQL HA (CloudNativePG)
+  - redis HA
+- **Security:**
+  - Sealed Secrets (encrypted secret storage)
+  - Reflector (cross-namespace secret replication)
+- **Monitoring:**
+  - kube-prometheus-stack
+    - Prometheus, Grafana, Alertmanager
+    - ServiceMonitors, PrometheusRules, and custom dashboards
+
+#### Deployed Applications
+- Rancher (read-only access)
+- Nginx (testing)
+- Pi-Hole + Unbound (DNS with TLS forwarding to Cloudflare DNS)
+
+### Bootstrap Process
+1. **Host Preparation:**
+    `ansible-playbook setup_environment_rpi_cluster.yml`
+2. **K3s Installation:**
+Follow [TechnoTim's guide](https://technotim.live/posts/k3s-etcd-ansible/)
+    * `git clone https://github.com/techno-tim/k3s-ansible`
+
+      * resources/ansible.cfg
+      * resources/my-cluster
+    * `ansible-playbook site.yml -i inventory/my-cluster/hosts.ini`
+    * `cp kubeconfig ~/.kube/config`
+3. **Traefik & Cert-Manager Setup:**
+Follow [TechnoTim's guide](https://technotim.live/posts/kube-traefik-cert-manager-le/)
+4. **ArgoCD Deployment:**
+    * `helm repo add argo https://argoproj.github.io/argo-helm`
+    * `helm repo update`
+    * `helm install argocd argo/argo-cd --namespace argocd --values values.yaml`
+5. **GitOps Bootstrap:**
+kubectl apply -f bootstrap/app-of-apps.yaml
+
+---
+
+### Sealed Secrets Management
+**Creating Secrets:**
+1. Create the secret manifest as usual
+2. `kubeseal –controller-name sealed-secrets -o yaml < pihole-secret.yaml > sealed-pihole-secret.yaml`
+
+**Backup/Restore Master Key:**
+* Backup:
+`kubectl get secret -n kube-system -l sealedsecrets.bitnami.com/sealed-secrets-key -o yaml > sealed-secrets-backup.key`
+* Restore:
+`kubectl apply -f sealed-secrets-backup.key`
+
+---
+
+### Known Issues
+1. **Rancher Compatibility:** The latest Helm chart (v2.11.2) doesn't support Kubernetes 1.33. Workaround: Use K3s v1.32 or await Rancher updates.
+2. **Resource Usage:** High idle consumption.---
+
+### Known Issues
+1. **Rancher Compatibility:** The latest Helm chart (v2.11.2) doesn't support Kubernetes 1.33. Workaround: Use K3s v1.32 or await Rancher updates.
+2. **Resource Usage:** High idle consumption ---
+
+### Known Issues
+1. **Rancher Compatibility:** The latest Helm chart (v2.11.2) doesn't support Kubernetes 1.33. Workaround: Use K3s v1.32 or await Rancher updates.
+2. **Resource Usage:** High idle consumption. A 4th node (dedicated worker node) will be needed soon.
+
+---
+
+> **Note:** This setup evolves regularly. Check GitHub commits for latest updates.
