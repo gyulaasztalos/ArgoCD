@@ -100,8 +100,8 @@ global:
   deploymentStrategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
+      maxSurge: 1
+      maxUnavailable: 1
 
   # -- Environment variables to pass to all deployed Deployments. Does not apply to GeoIP
   # See configuration options at https://goauthentik.io/docs/installation/configuration/

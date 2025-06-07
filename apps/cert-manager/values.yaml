@@ -111,7 +111,7 @@ replicaCount: 1
 strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 0
+      maxSurge: 1
       maxUnavailable: 1
 
 podDisruptionBudget:
@@ -697,7 +697,7 @@ webhook:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 0
+      maxSurge: 1
       maxUnavailable: 1
 
   # Pod Security Context to be set on the webhook component Pod.
@@ -1068,7 +1068,7 @@ cainjector:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 0
+      maxSurge: 1
       maxUnavailable: 1
 
   # Pod Security Context to be set on the cainjector component Pod
