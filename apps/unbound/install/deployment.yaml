@@ -6,6 +6,8 @@ metadata:
   namespace: unbound
   labels:
     app: unbound
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "Unbound requires a writable root filesystem for /var/unbound"
 spec:
   replicas: 1
   selector:
@@ -21,10 +23,21 @@ spec:
       labels:
         app: unbound
     spec:
+      securityContext:
+        fsGroup: 102  # Match "unbound" group in Unbound images
       containers:
         - name: "unbound"
           image: klutchell/unbound:1.23.0
           imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 101  # Match "unbound" user in Unbound images
+            runAsGroup: 102
+            readOnlyRootFilesystem: false
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+              add: [NET_BIND_SERVICE]  # Only if using privileged ports (e.g., 53)
           resources:
             requests:
               memory: "128Mi"
@@ -72,7 +85,7 @@ spec:
             runAsNonRoot: true
             runAsUser: 101  # Must match Unbound's user/group for socket access
             runAsGroup: 102
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: false
             allowPrivilegeEscalation: false
             capabilities:
               drop: [ALL]
