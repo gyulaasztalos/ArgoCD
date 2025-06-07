@@ -642,11 +642,6 @@ tracing:  # @schema additionalProperties: false
         # -- When set to true, the TLS connection accepts any certificate presented by the server regardless of the hostnames it covers.
         insecureSkipVerify: false
 
-# -- Global command arguments to be passed to all traefik's pods
-global:
-  checkNewVersion: true
-  sendAnonymousUsage: false
-
 # -- Additional arguments to be passed at Traefik's binary
 # See [CLI Reference](https://docs.traefik.io/reference/static-configuration/cli/)
 # Use curly braces to pass values: `helm install --set="additionalArguments={--providers.kubernetesingress.ingressclass=traefik-internal,--log.level=DEBUG}"`
@@ -1170,6 +1165,8 @@ oci_meta:
 # -- Required for Azure Marketplace integration.
 # See https://learn.microsoft.com/en-us/partner-center/marketplace-offers/azure-container-technical-assets-kubernetes?tabs=linux,linux2#update-the-helm-chart
 global:
+  checkNewVersion: true
+  sendAnonymousUsage: false
   azure:
     # -- Enable specific values for Azure Marketplace
     enabled: false
