@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: "unbound"
-          image: klutchell/unbound
+          image: klutchell/unbound:1.23.0
           imagePullPolicy: IfNotPresent
           resources:
             requests:
