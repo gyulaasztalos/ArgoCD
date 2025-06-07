@@ -85,8 +85,10 @@ Follow [TechnoTim's guide](https://technotim.live/posts/kube-traefik-cert-manage
     * `helm repo add argo https://argoproj.github.io/argo-helm`
     * `helm repo update`
     * `helm install argocd argo/argo-cd --namespace argocd --values values.yaml`
-5. **GitOps Bootstrap:**
-kubectl apply -f bootstrap/app-of-apps.yaml
+5. **Add your git repo to ArgoCD:**
+Use the WebUI or the argocd CLI tool!
+6. **GitOps Bootstrap:**
+`kubectl apply -f bootstrap/app-of-apps.yaml`
 
 ---
 
