@@ -108,7 +108,11 @@ replicaCount: 1
 #    rollingUpdate:
 #      maxSurge: 0
 #      maxUnavailable: 1
-strategy: {}
+strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
 
 podDisruptionBudget:
   # Enable or disable the PodDisruptionBudget resource.
@@ -690,7 +694,11 @@ webhook:
   #    rollingUpdate:
   #      maxSurge: 0
   #      maxUnavailable: 1
-  strategy: {}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
 
   # Pod Security Context to be set on the webhook component Pod.
   # For more information, see [Configure a Security Context for a Pod or Container](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
@@ -1057,7 +1065,11 @@ cainjector:
   #    rollingUpdate:
   #      maxSurge: 0
   #      maxUnavailable: 1
-  strategy: {}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
 
   # Pod Security Context to be set on the cainjector component Pod
   # For more information, see [Configure a Security Context for a Pod or Container](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).

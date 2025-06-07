@@ -22,6 +22,12 @@ spec:
         - name: "unbound"
           image: klutchell/unbound
           imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+              - ALL
           ports:
             - name: "dns-udp"
               containerPort: 53
@@ -72,3 +78,13 @@ spec:
         - name: unbound-forward-conf-volume
           configMap:
             name: unbound-forward-records-conf
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - unbound
+              topologyKey: kubernetes.io/hostname
