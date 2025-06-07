@@ -22,14 +22,40 @@ spec:
         fsGroup: 102  # Match "unbound" group in Unbound images
       initContainers:
         - name: copy-unbound-data
-          image: klutchell/unbound
+          image: alpine:3.21
           command: ["/bin/sh", "-c"]
           args:
-            - cp -r /var/unbound/* /unbound-data/
+            - cp -r /unbound-src/* /unbound-dest/
           volumeMounts:
+            - name: unbound-src
+              mountPath: /unbound-src
             - name: unbound-run
-              mountPath: /unbound-data
+              mountPath: /unbound-dest
       containers:
+        - name: unbound-sidecar
+          image: klutchell/unbound
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 101  # Match "unbound" user in Unbound images
+            runAsGroup: 102
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+              add: [NET_BIND_SERVICE]  # Only if using privileged ports (e.g., 53)
+          command: ["sleep", "3600"]
+          volumeMounts:
+            - name: unbound-src
+              mountPath: /var/unbound
+              readOnly: true
         - name: "unbound"
           image: klutchell/unbound
           imagePullPolicy: IfNotPresent
