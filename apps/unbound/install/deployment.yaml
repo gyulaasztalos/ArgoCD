@@ -22,8 +22,17 @@ spec:
         - name: "unbound"
           image: klutchell/unbound
           imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
           securityContext:
             allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
             readOnlyRootFilesystem: true
             capabilities:
               drop:
@@ -35,7 +44,6 @@ spec:
             - name: "dns-tcp"
               containerPort: 53
               protocol: "TCP"
-          resources: {}
           readinessProbe:
             tcpSocket:
               port: 53
@@ -58,7 +66,21 @@ spec:
         - name: "exporter"
           image: cyb3rjak3/unbound-exporter:0.4.6
           imagePullPolicy: IfNotPresent
-          resources: {}
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+              - ALL
           ports:
           - name: metrics
             containerPort: 9167
