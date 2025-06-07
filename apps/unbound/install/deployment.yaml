@@ -134,6 +134,8 @@ spec:
       volumes:
         - name: unbound-run
           emptyDir: {}
+        - name: unbound-src
+          emptyDir: {}
         - name: unbound-socket
           emptyDir: {}
         - name: unbound-main-conf-volume
