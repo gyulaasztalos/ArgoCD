@@ -18,6 +18,10 @@ spec:
       labels:
         app: unbound
     spec:
+      securityContext:  # Applies to all containers
+        fsGroup: 1000   # Ensures volume write permissions for group
+        seccompProfile:
+      type: RuntimeDefault
       containers:
         - name: "unbound"
           image: klutchell/unbound
@@ -30,12 +34,14 @@ spec:
               memory: "256Mi"
               cpu: "250m"
           securityContext:
-            allowPrivilegeEscalation: false
             runAsNonRoot: true
-            runAsUser: 1000
+            runAsUser: 1000  # Match "unbound" user in Unbound images
+            runAsGroup: 1000
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
             capabilities:
-              drop:
-              - ALL
+              drop: [ALL]
+              add: [NET_BIND_SERVICE]  # Only if using privileged ports (e.g., 53)
           ports:
             - name: "dns-udp"
               containerPort: 53
@@ -73,13 +79,13 @@ spec:
               memory: "128Mi"
               cpu: "250m"
           securityContext:
-            allowPrivilegeEscalation: false
             runAsNonRoot: true
-            runAsUser: 1000
+            runAsUser: 1000  # Must match Unbound's user/group for socket access
+            runAsGroup: 1000
             readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
             capabilities:
-              drop:
-              - ALL
+              drop: [ALL]
           ports:
           - name: metrics
             containerPort: 9167
