@@ -36,7 +36,6 @@ spec:
               cpu: "250m"
           securityContext:
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 1000
             capabilities:
