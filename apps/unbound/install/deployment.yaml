@@ -18,6 +18,8 @@ spec:
       labels:
         app: unbound
     spec:
+      securityContext:
+        fsGroup: 102  # Match "unbound" group in Unbound images
       containers:
         - name: "unbound"
           image: klutchell/unbound
@@ -59,7 +61,7 @@ spec:
             - name: unbound-run
               mountPath: /var/unbound
             - name: unbound-socket
-              mountPath: /var/run/socket
+              mountPath: /var/run/unbound
             - name: unbound-main-conf-volume
               mountPath: /etc/unbound/unbound.conf
               subPath: unbound.conf
@@ -90,9 +92,9 @@ spec:
             protocol: TCP
           volumeMounts:
             - name: unbound-socket
-              mountPath: /var/run/socket
+              mountPath: /var/run/unbound
           args:
-            - -unbound.host=unix:///var/run/socket/unbound.ctl
+            - -unbound.host=unix:///var/run/unbound/unbound.ctl
       restartPolicy: Always
       volumes:
         - name: unbound-run
