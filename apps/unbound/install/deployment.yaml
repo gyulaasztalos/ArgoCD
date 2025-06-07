@@ -18,43 +18,6 @@ spec:
       labels:
         app: unbound
     spec:
-      securityContext:
-        fsGroup: 102  # Match "unbound" group in Unbound images
-      initContainers:
-        - name: unbound-sidecar
-          image: klutchell/unbound
-          imagePullPolicy: IfNotPresent
-          resources:
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
-            limits:
-              memory: "256Mi"
-              cpu: "250m"
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 101  # Match "unbound" user in Unbound images
-            runAsGroup: 102
-            readOnlyRootFilesystem: true
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: [ALL]
-              add: [NET_BIND_SERVICE]  # Only if using privileged ports (e.g., 53)
-          command: ["sleep", "3600"]
-          volumeMounts:
-            - name: unbound-src
-              mountPath: /var/unbound
-              readOnly: true
-        - name: copy-unbound-data
-          image: alpine:3.21
-          command: ["/bin/sh", "-c"]
-          args:
-            - cp -r /unbound-src/* /unbound-dest/
-          volumeMounts:
-            - name: unbound-src
-              mountPath: /unbound-src
-            - name: unbound-run
-              mountPath: /unbound-dest
       containers:
         - name: "unbound"
           image: klutchell/unbound
@@ -66,15 +29,6 @@ spec:
             limits:
               memory: "256Mi"
               cpu: "250m"
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 101  # Match "unbound" user in Unbound images
-            runAsGroup: 102
-            readOnlyRootFilesystem: true
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: [ALL]
-              add: [NET_BIND_SERVICE]  # Only if using privileged ports (e.g., 53)
           ports:
             - name: "dns-udp"
               containerPort: 53
@@ -93,8 +47,6 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 20
           volumeMounts:
-            - name: unbound-run
-              mountPath: /var/unbound
             - name: unbound-socket
               mountPath: /var/run/unbound
             - name: unbound-main-conf-volume
@@ -132,10 +84,6 @@ spec:
             - -unbound.host=unix:///var/run/unbound/unbound.ctl
       restartPolicy: Always
       volumes:
-        - name: unbound-run
-          emptyDir: {}
-        - name: unbound-src
-          emptyDir: {}
         - name: unbound-socket
           emptyDir: {}
         - name: unbound-main-conf-volume
