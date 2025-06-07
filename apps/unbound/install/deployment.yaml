@@ -21,17 +21,6 @@ spec:
       securityContext:
         fsGroup: 102  # Match "unbound" group in Unbound images
       initContainers:
-        - name: copy-unbound-data
-          image: alpine:3.21
-          command: ["/bin/sh", "-c"]
-          args:
-            - cp -r /unbound-src/* /unbound-dest/
-          volumeMounts:
-            - name: unbound-src
-              mountPath: /unbound-src
-            - name: unbound-run
-              mountPath: /unbound-dest
-      containers:
         - name: unbound-sidecar
           image: klutchell/unbound
           imagePullPolicy: IfNotPresent
@@ -56,6 +45,17 @@ spec:
             - name: unbound-src
               mountPath: /var/unbound
               readOnly: true
+        - name: copy-unbound-data
+          image: alpine:3.21
+          command: ["/bin/sh", "-c"]
+          args:
+            - cp -r /unbound-src/* /unbound-dest/
+          volumeMounts:
+            - name: unbound-src
+              mountPath: /unbound-src
+            - name: unbound-run
+              mountPath: /unbound-dest
+      containers:
         - name: "unbound"
           image: klutchell/unbound
           imagePullPolicy: IfNotPresent
