@@ -38,7 +38,7 @@ data:
         cache-min-ttl: 300
 
         # Set the working directory for the program.
-        directory: "/var/run/unbound"
+        directory: "/var/unbound"
 
         # RFC 6891. Number  of bytes size to advertise as the EDNS reassembly buffer
         # size. This is the value put into  datagrams over UDP towards peers.
