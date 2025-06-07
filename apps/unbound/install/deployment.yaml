@@ -60,6 +60,8 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 20
           volumeMounts:
+            - name: unbound-run
+              mountPath: /var/unbound
             - name: unbound-socket
               mountPath: /var/run/socket
             - name: unbound-main-conf-volume
@@ -97,6 +99,8 @@ spec:
             - -unbound.host=unix:///var/run/socket/unbound.ctl
       restartPolicy: Always
       volumes:
+        - name: unbound-run
+          emptyDir: {}
         - name: unbound-socket
           emptyDir: {}
         - name: unbound-main-conf-volume
