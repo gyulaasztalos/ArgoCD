@@ -18,10 +18,6 @@ spec:
       labels:
         app: unbound
     spec:
-      securityContext:  # Applies to all containers
-        fsGroup: 102   # Ensures volume write permissions for group
-        seccompProfile:
-      type: RuntimeDefault
       containers:
         - name: "unbound"
           image: klutchell/unbound
