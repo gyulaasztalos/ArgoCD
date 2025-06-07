@@ -80,8 +80,8 @@ spec:
               cpu: "250m"
           securityContext:
             runAsNonRoot: true
-            runAsUser: 1000  # Must match Unbound's user/group for socket access
-            runAsGroup: 1000
+            runAsUser: 101  # Must match Unbound's user/group for socket access
+            runAsGroup: 102
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             capabilities:

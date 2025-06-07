@@ -260,7 +260,7 @@ data:
         # Number  of  bytes  size  of  the  message  cache.
         # Unbound recommendation is to Use roughly twice as much rrset cache memory
         # as you use msg cache memory.
-        msg-cache-size: 178814293
+        msg-cache-size: "64m"
 
         # Number of slabs in the message cache. Slabs reduce lock contention by
         # threads. Must be set to a power of 2. Setting (close) to the number of
@@ -288,7 +288,7 @@ data:
 
         # Number of bytes size of the RRset cache.
         # Use roughly twice as much rrset cache memory as msg cache memory
-        rrset-cache-size: 357628586
+        rrset-cache-size: "128m"
 
         # Number of slabs in the RRset cache. Slabs reduce lock contention by
         # threads. Must be set to a power of 2.
