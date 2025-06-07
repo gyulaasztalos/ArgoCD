@@ -19,7 +19,7 @@ spec:
         app: unbound
     spec:
       securityContext:  # Applies to all containers
-        fsGroup: 1000   # Ensures volume write permissions for group
+        fsGroup: 102   # Ensures volume write permissions for group
         seccompProfile:
       type: RuntimeDefault
       containers:
@@ -35,8 +35,8 @@ spec:
               cpu: "250m"
           securityContext:
             runAsNonRoot: true
-            runAsUser: 1000  # Match "unbound" user in Unbound images
-            runAsGroup: 1000
+            runAsUser: 101  # Match "unbound" user in Unbound images
+            runAsGroup: 102
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             capabilities:
