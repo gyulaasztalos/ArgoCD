@@ -1,4 +1,4 @@
-name: Lint Kubernetes Manifests
+name: Scan Kubernetes Manifests
 
 on:
   push:
@@ -15,3 +15,7 @@ jobs:
         uses: stackrox/kube-linter-action@v1
         with:
           directory: ./
+      - name: Run Kubescape
+        uses: kubescape/github-action@v2
+        with:
+          files: ./
