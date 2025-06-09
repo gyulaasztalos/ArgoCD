@@ -16,6 +16,6 @@ jobs:
         with:
           directory: ./
       - name: Run Kubescape
-        uses: kubescape/github-action@v2
+        uses: kubescape/github-action@main
         with:
           files: ./
