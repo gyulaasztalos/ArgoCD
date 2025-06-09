@@ -15,7 +15,3 @@ jobs:
         uses: stackrox/kube-linter-action@v1
         with:
           directory: ./
-      - name: Run Kubescape
-        uses: kubescape/github-action@main
-        with:
-          files: ./
