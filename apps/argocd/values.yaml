@@ -725,10 +725,18 @@ controller:
   imagePullSecrets: []
 
   # -- Additional command line arguments to pass to application controller
-  extraArgs: []
+  extraArgs:
+    - --redis=redis-master.redis.svc.cluster.local:6379
+    - --redis-username=default
+    - --redis-password=$(REDIS_PASSWORD)
 
   # -- Environment variables to pass to application controller
-  env: []
+  env:
+    - name: REDIS_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: redis-password
+          key: redis-password
 
   # -- envFrom to pass to application controller
   # @default -- `[]` (See [values.yaml])
@@ -1294,7 +1302,7 @@ dex:
 ## Redis
 redis:
   # -- Enable redis
-  enabled: true
+  enabled: false
   # -- Redis name
   name: redis
 
@@ -1862,10 +1870,18 @@ server:
   imagePullSecrets: []
 
   # -- Additional command line arguments to pass to Argo CD server
-  extraArgs: []
+  extraArgs:
+    - --redis=redis-master.redis.svc.cluster.local:6379
+    - --redis-username=default
+    - --redis-password=$(REDIS_PASSWORD)
 
-  # -- Environment variables to pass to Argo CD server
-  env: []
+  # -- Environment variables to pass to application controller
+  env:
+    - name: REDIS_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: redis-password
+          key: redis-password
 
   # -- envFrom to pass to Argo CD server
   # @default -- `[]` (See [values.yaml])
@@ -2533,10 +2549,18 @@ repoServer:
   imagePullSecrets: []
 
   # -- Additional command line arguments to pass to repo server
-  extraArgs: []
+  extraArgs:
+    - --redis=redis-master.redis.svc.cluster.local:6379
+    - --redis-username=default
+    - --redis-password=$(REDIS_PASSWORD)
 
-  # -- Environment variables to pass to repo server
-  env: []
+  # -- Environment variables to pass to application controller
+  env:
+    - name: REDIS_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: redis-password
+          key: redis-password
 
   # -- envFrom to pass to repo server
   # @default -- `[]` (See [values.yaml])
