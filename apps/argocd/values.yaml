@@ -1696,7 +1696,7 @@ externalRedis:
   # -- External Redis server host
   host: "redis-master.redis.svc.cluster.local"
   # -- External Redis username
-  username: ""
+  username: "default"
   # -- External Redis password
   password: ""
   # -- External Redis server port
