@@ -171,7 +171,7 @@ auth:
   acl:
     ## @param auth.acl.enabled Enables the support of the Redis ACL system
     ##
-    enabled: true
+    enabled: false
     ## @param auth.acl.sentinel Enables the support of the Redis ACL system for Sentinel Nodes
     ##
     sentinel: true

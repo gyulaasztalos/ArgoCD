@@ -222,7 +222,6 @@ authentik:
     # @default -- `{{ .Release.Name }}-redis-master`
     host: "redis-master.redis.svc.cluster.local"
     password: "file:///authentik-credentials/redis-password"
-    username: "authentik"
 
 blueprints:
   # -- List of config maps to mount blueprints from.
