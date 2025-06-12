@@ -1696,7 +1696,7 @@ externalRedis:
   # -- External Redis server host
   host: "redis-master.redis.svc.cluster.local"
   # -- External Redis username
-  username: "default"
+  username: ""
   # -- External Redis password
   password: ""
   # -- External Redis server port
@@ -1709,7 +1709,7 @@ externalRedis:
 
 redisSecretInit:
   # -- Enable Redis secret initialization. If disabled, secret must be provisioned by alternative methods
-  enabled: true
+  enabled: false
   # -- Redis secret-init name
   name: redis-secret-init
 
