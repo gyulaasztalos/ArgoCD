@@ -727,8 +727,6 @@ controller:
   # -- Additional command line arguments to pass to application controller
   extraArgs:
     - --redis=redis-master.redis.svc.cluster.local:6379
-    - --redis-username=default
-    - --redis-password=$(REDIS_PASSWORD)
 
   # -- Environment variables to pass to application controller
   env:
@@ -1872,8 +1870,6 @@ server:
   # -- Additional command line arguments to pass to Argo CD server
   extraArgs:
     - --redis=redis-master.redis.svc.cluster.local:6379
-    - --redis-username=default
-    - --redis-password=$(REDIS_PASSWORD)
 
   # -- Environment variables to pass to application controller
   env:
@@ -2551,8 +2547,6 @@ repoServer:
   # -- Additional command line arguments to pass to repo server
   extraArgs:
     - --redis=redis-master.redis.svc.cluster.local:6379
-    - --redis-username=default
-    - --redis-password=$(REDIS_PASSWORD)
 
   # -- Environment variables to pass to application controller
   env:
