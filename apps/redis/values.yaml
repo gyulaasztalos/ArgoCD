@@ -202,6 +202,12 @@ auth:
         commands: "+@all"
         keys: "~authentik:*"
         channels: "&*"
+      - username: "argocd"
+        password: ""
+        enabled: "on"
+        commands: "+ping +info +client|setname +client|kill +subscribe +psubscribe"
+        keys: "~argocd:*"
+        channels: "&argocd:*"
     ## @param auth.acl.userSecret Name of the Secret, containing user credentials for ACL users. Keys must match usernames.
     userSecret: redis-acl-users
 ## @param commonConfiguration [string] Common configuration to be added into the ConfigMap
