@@ -725,17 +725,10 @@ controller:
   imagePullSecrets: []
 
   # -- Additional command line arguments to pass to application controller
-  extraArgs:
-    - --redis=redis-master.redis.svc.cluster.local:6379
+  extraArgs: []
 
   # -- Environment variables to pass to application controller
-  env:
-    - name: REDIS_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: redis-password
-          key: redis-password
-
+  env: []
   # -- envFrom to pass to application controller
   # @default -- `[]` (See [values.yaml])
   envFrom: []
@@ -1701,7 +1694,7 @@ redis-ha:
 # External Redis parameters
 externalRedis:
   # -- External Redis server host
-  host: ""
+  host: "redis-master.redis.svc.cluster.local"
   # -- External Redis username
   username: ""
   # -- External Redis password
@@ -1710,7 +1703,7 @@ externalRedis:
   port: 6379
   # -- The name of an existing secret with Redis (must contain key `redis-password`) and Sentinel credentials.
   # When it's set, the `externalRedis.password` parameter is ignored
-  existingSecret: ""
+  existingSecret: "redis-password"
   # -- External Redis Secret annotations
   secretAnnotations: {}
 
@@ -1868,16 +1861,10 @@ server:
   imagePullSecrets: []
 
   # -- Additional command line arguments to pass to Argo CD server
-  extraArgs:
-    - --redis=redis-master.redis.svc.cluster.local:6379
+  extraArgs: []
 
   # -- Environment variables to pass to application controller
-  env:
-    - name: REDIS_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: redis-password
-          key: redis-password
+  env: []
 
   # -- envFrom to pass to Argo CD server
   # @default -- `[]` (See [values.yaml])
@@ -2545,16 +2532,10 @@ repoServer:
   imagePullSecrets: []
 
   # -- Additional command line arguments to pass to repo server
-  extraArgs:
-    - --redis=redis-master.redis.svc.cluster.local:6379
+  extraArgs: []
 
   # -- Environment variables to pass to application controller
-  env:
-    - name: REDIS_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: redis-password
-          key: redis-password
+  env: []
 
   # -- envFrom to pass to repo server
   # @default -- `[]` (See [values.yaml])
