@@ -1293,7 +1293,7 @@ dex:
 ## Redis
 redis:
   # -- Enable redis
-  enabled: true
+  enabled: false
   # -- Redis name
   name: redis
 
@@ -1694,7 +1694,7 @@ redis-ha:
 # External Redis parameters
 externalRedis:
   # -- External Redis server host
-  host: ""
+  host: "redis-master.redis.svc.cluster.local"
   # -- External Redis username
   username: ""
   # -- External Redis password
@@ -1709,7 +1709,7 @@ externalRedis:
 
 redisSecretInit:
   # -- Enable Redis secret initialization. If disabled, secret must be provisioned by alternative methods
-  enabled: true
+  enabled: false
   # -- Redis secret-init name
   name: redis-secret-init
 
