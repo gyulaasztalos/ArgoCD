@@ -1695,17 +1695,18 @@ redis-ha:
 externalRedis:
   # -- External Redis server host
   host: "redis-master.redis.svc.cluster.local"
-  # -- External Redis username
-  username: ""
-  # -- External Redis password
-  password: ""
   # -- External Redis server port
   port: 6379
   # -- The name of an existing secret with Redis (must contain key `redis-password`) and Sentinel credentials.
   # When it's set, the `externalRedis.password` parameter is ignored
-  existingSecret: "argocd-redis-secret"
+  existingSecret: "redis-password"
   # -- External Redis Secret annotations
   secretAnnotations: {}
+  db: 0
+  tls:
+    enabled: false
+  sentinel:
+    enabled: false
 
 redisSecretInit:
   # -- Enable Redis secret initialization. If disabled, secret must be provisioned by alternative methods
