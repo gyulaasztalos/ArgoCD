@@ -71,7 +71,7 @@ global:
     # -- Set the global logging format. Either: `text` or `json`
     format: text
     # -- Set the global logging level. One of: `debug`, `info`, `warn` or `error`
-    level: info
+    level: debug
 
   # -- Annotations for the all deployed Statefulsets
   statefulsetAnnotations: {}
