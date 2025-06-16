@@ -171,10 +171,10 @@ auth:
   acl:
     ## @param auth.acl.enabled Enables the support of the Redis ACL system
     ##
-    enabled: false
+    enabled: true
     ## @param auth.acl.sentinel Enables the support of the Redis ACL system for Sentinel Nodes
     ##
-    sentinel: true
+    sentinel: false
     ## @param auth.acl.users A list of the configured users in the Redis ACL system
     ##
     ## Example:
@@ -186,11 +186,6 @@ auth:
     ##     keys: "~*"
     ##     channels: "&*"
     users:
-      - username: "sentinel"
-        password: ""
-        enabled: "on"
-        commands: "+multi +slaveof +ping +exec +subscribe +config|rewrite +role +publish +info +client|setname +client|kill +script|kill"
-        channels: "allchannels"
       - username: "paperless"
         password: ""
         enabled: "on"
