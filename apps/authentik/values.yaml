@@ -319,11 +319,19 @@ server:
   # See configuration options at https://goauthentik.io/docs/installation/configuration/
   # @default -- `[]` (See [values.yaml])
   env:
-    - name: AUTHENTIK_REDIS__URL
+    - name: AUTHENTIK_REDIS__HOST
+      value: "redis-master.redis.svc.cluster.local"
+    - name: AUTHENTIK_REDIS__PORT
+      value: "6379"
+    - name: AUTHENTIK_REDIS__USERNAME
+      value: "authentik"                # Only if using ACLs
+    - name: AUTHENTIK_REDIS__PASSWORD
       valueFrom:
         secretKeyRef:
           name: authentik-redis-credentials
-          key: url
+          key: redis-password
+    - name: AUTHENTIK_REDIS__DB
+      value: "0"
     # - name: AUTHENTIK_VAR_NAME
     #   value: VALUE
     # - name: AUTHENTIK_VAR_OTHER
@@ -756,11 +764,19 @@ worker:
   # See configuration options at https://goauthentik.io/docs/installation/configuration/
   # @default -- `[]` (See [values.yaml])
   env:
-    - name: AUTHENTIK_REDIS__URL
+    - name: AUTHENTIK_REDIS__HOST
+      value: "redis-master.redis.svc.cluster.local"
+    - name: AUTHENTIK_REDIS__PORT
+      value: "6379"
+    - name: AUTHENTIK_REDIS__USERNAME
+      value: "authentik"                # Only if using ACLs
+    - name: AUTHENTIK_REDIS__PASSWORD
       valueFrom:
         secretKeyRef:
           name: authentik-redis-credentials
-          key: url
+          key: redis-password
+    - name: AUTHENTIK_REDIS__DB
+      value: "0"
     # - name: AUTHENTIK_VAR_NAME
     #   value: VALUE
     # - name: AUTHENTIK_VAR_OTHER
