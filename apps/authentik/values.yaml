@@ -217,12 +217,11 @@ authentik:
     user: "authentik"
     password: "file:///authentik-credentials/postgresql-password"
     port: 5432
-  redis:
+  redis: []
     # -- set the redis hostname to talk to
     # @default -- `{{ .Release.Name }}-redis-master`
-    host: "redis-master.redis.svc.cluster.local"
-    user: "authentik"
-    password: "file:///authentik-credentials/redis-password"
+    # host: "redis-master.redis.svc.cluster.local"
+    # password: "file:///authentik-credentials/redis-password"
 
 blueprints:
   # -- List of config maps to mount blueprints from.
@@ -319,7 +318,12 @@ server:
   # -- Environment variables to pass to the authentik server. Does not apply to GeoIP
   # See configuration options at https://goauthentik.io/docs/installation/configuration/
   # @default -- `[]` (See [values.yaml])
-  env: []
+  env:
+    - name: REDIS__URL
+      valueFrom:
+        secretKeyRef:
+          name: authentik-redis-credentials
+          key: url
     # - name: AUTHENTIK_VAR_NAME
     #   value: VALUE
     # - name: AUTHENTIK_VAR_OTHER
@@ -751,7 +755,12 @@ worker:
   # -- Environment variables to pass to the authentik worker. Does not apply to GeoIP
   # See configuration options at https://goauthentik.io/docs/installation/configuration/
   # @default -- `[]` (See [values.yaml])
-  env: []
+  env:
+    - name: REDIS__URL
+      valueFrom:
+        secretKeyRef:
+          name: authentik-redis-credentials
+          key: url
     # - name: AUTHENTIK_VAR_NAME
     #   value: VALUE
     # - name: AUTHENTIK_VAR_OTHER
