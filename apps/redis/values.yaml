@@ -195,7 +195,7 @@ auth:
         password: ""
         enabled: "on"
         commands: "+@all"
-        keys: "~authentik:*"
+        keys: "~authentik:* ~unacked_mutex ~_kombu* ~celery*"
         channels: "&*"
       - username: "argocd"
         password: ""
