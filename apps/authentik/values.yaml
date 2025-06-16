@@ -217,7 +217,7 @@ authentik:
     user: "authentik"
     password: "file:///authentik-credentials/postgresql-password"
     port: 5432
-  redis: []
+  # redis:
     # -- set the redis hostname to talk to
     # @default -- `{{ .Release.Name }}-redis-master`
     # host: "redis-master.redis.svc.cluster.local"
