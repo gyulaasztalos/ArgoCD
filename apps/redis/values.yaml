@@ -195,7 +195,7 @@ auth:
         password: ""
         enabled: "on"
         commands: "+@all"
-        keys: "~authentik:* ~unacked_* ~_kombu* ~celery* ~*.reply.celery.pidbox ~celery.pidbox ~celery.pidbox.*"
+        keys: "~authentik:* ~unacked_* ~_kombu* ~celery* ~*.reply.celery.pidbox* ~celery.pidbox ~celery.pidbox.*"
         channels: "&*"
       - username: "argocd"
         password: ""
