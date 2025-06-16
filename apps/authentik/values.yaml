@@ -319,7 +319,7 @@ server:
   # See configuration options at https://goauthentik.io/docs/installation/configuration/
   # @default -- `[]` (See [values.yaml])
   env:
-    - name: REDIS__URL
+    - name: AUTHENTIK_REDIS__URL
       valueFrom:
         secretKeyRef:
           name: authentik-redis-credentials
@@ -756,7 +756,7 @@ worker:
   # See configuration options at https://goauthentik.io/docs/installation/configuration/
   # @default -- `[]` (See [values.yaml])
   env:
-    - name: REDIS__URL
+    - name: AUTHENTIK_REDIS__URL
       valueFrom:
         secretKeyRef:
           name: authentik-redis-credentials
