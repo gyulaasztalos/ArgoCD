@@ -185,26 +185,28 @@ auth:
     ##     commands: "+@all"
     ##     keys: "~*"
     ##     channels: "&*"
-    users:
-      - username: "paperless"
-        password: ""
-        enabled: "on"
-        commands: "+@all"
-        keys: "~paperless:*"
-      - username: "authentik"
-        password: ""
-        enabled: "on"
-        commands: "+@all"
-        keys: "~authentik* ~authentik:* ~unacked* ~unacked_* ~_kombu* ~celery* ~*.reply.celery.pidbox* ~celery.pidbox ~celery.pidbox.*"
-        channels: "&*"
-      - username: "argocd"
-        password: ""
-        enabled: "on"
-        commands: "+ping +info +client|setname +client|kill +subscribe +psubscribe"
-        keys: "~argocd:*"
-        channels: "&argocd:*"
+    users: []
+    #  - username: "paperless"
+    #    password: ""
+    #    enabled: "on"
+    #    commands: "+@all"
+    #    keys: "~paperless:*"
+    #  - username: "authentik"
+    #    password: ""
+    #    enabled: "on"
+    #    commands: "+@all"
+    #    keys: "~authentik* ~authentik:* ~unacked* ~unacked_* ~_kombu* ~celery* ~*.reply.celery.pidbox* ~celery.pidbox ~celery.pidbox.*"
+    #    channels: "&*"
+    #  - username: "argocd"
+    #    password: ""
+    #    enabled: "on"
+    #    commands: "+ping +info +client|setname +client|kill +subscribe +psubscribe"
+    #    keys: "~argocd:*"
+    #    channels: "&argocd:*"
     ## @param auth.acl.userSecret Name of the Secret, containing user credentials for ACL users. Keys must match usernames.
-    userSecret: redis-acl-users
+    # If userSecret is created by SealedSecrets inside the cluster, the secret won't be available during template rendering in ArgoCD. The users.acl will have nopass parameters which is unusable.
+    # We have to mount our own users.acl from a Secret created by SealedSecrets.
+   # userSecret: redis-acl-users
 ## @param commonConfiguration [string] Common configuration to be added into the ConfigMap
 ## ref: https://redis.io/topics/config
 ##
@@ -217,6 +219,7 @@ commonConfiguration: |-
   save ""
 ## @param existingConfigmap The name of an existing ConfigMap with your custom configuration for Redis(R) nodes
 ##
+# Don't use with gitops and ACLs as users.acl contains sensitive information
 existingConfigmap: ""
 ## @section Redis(R) master configuration parameters
 ##
@@ -497,7 +500,15 @@ master:
   lifecycleHooks: {}
   ## @param master.extraVolumes Optionally specify extra list of additional volumes for the Redis(R) master pod(s)
   ##
-  extraVolumes: []
+  extraVolumes:
+    - name: redis-acl-users
+      secret:
+        secretName: redis-acl-users
+  extraVolumeMounts:
+    - name: redis-acl-users
+      subPath: users.acl
+      mountPath: /opt/bitnami/redis/etc/users.acl
+      readOnly: true
 
   ## @param master.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Redis(R) master container(s)
   ##
@@ -987,7 +998,15 @@ replica:
   lifecycleHooks: {}
   ## @param replica.extraVolumes Optionally specify extra list of additional volumes for the Redis(R) replicas pod(s)
   ##
-  extraVolumes: []
+  extraVolumes:
+    - name: redis-acl-users
+      secret:
+        secretName: redis-acl-users
+  extraVolumeMounts:
+    - name: redis-acl-users
+      subPath: users.acl
+      mountPath: /opt/bitnami/redis/etc/users.acl
+      readOnly: true
 
   ## @param replica.extraVolumeMounts Optionally specify extra list of additional volumeMounts for the Redis(R) replicas container(s)
   ##
