@@ -171,7 +171,7 @@ auth:
   acl:
     ## @param auth.acl.enabled Enables the support of the Redis ACL system
     ##
-    enabled: true
+    enabled: false
     ## @param auth.acl.sentinel Enables the support of the Redis ACL system for Sentinel Nodes
     ##
     sentinel: false
@@ -217,6 +217,7 @@ commonConfiguration: |-
   maxmemory-policy allkeys-lru
   # Disable RDB persistence, AOF persistence already enabled.
   save ""
+  aclfile /opt/bitnami/redis/etc/users.acl
 ## @param existingConfigmap The name of an existing ConfigMap with your custom configuration for Redis(R) nodes
 ##
 # Don't use with gitops and ACLs as users.acl contains sensitive information
