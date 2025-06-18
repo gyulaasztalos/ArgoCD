@@ -4,5 +4,6 @@ kind: Kustomization
 
 resources:
   - nebula-sync-env.yaml
+  - nebula-sync-secret.yaml
   - deployment.yaml
 
