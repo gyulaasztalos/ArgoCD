@@ -4442,7 +4442,7 @@ data:
           "30d"
         ]
       },
-      "timezone": "",
+      "timezone": "browser",
       "title": "ArgoCD",
       "uid": "LCAgc9rWz",
       "version": 2,

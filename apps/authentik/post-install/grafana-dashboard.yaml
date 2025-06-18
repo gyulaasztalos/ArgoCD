@@ -1392,7 +1392,7 @@ data:
         "to": "now"
       },
       "timepicker": {},
-      "timezone": "",
+      "timezone": "browser",
       "title": "authentik",
       "uid": "authentik",
       "version": 32

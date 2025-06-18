@@ -1555,7 +1555,7 @@ data:
         "to": "now"
       },
       "timepicker": {},
-      "timezone": "",
+      "timezone": "browser",
       "title": "Pi-hole UI",
       "uid": "k3hcIZqMk",
       "version": 89

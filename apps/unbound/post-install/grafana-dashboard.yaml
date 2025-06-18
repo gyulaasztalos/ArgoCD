@@ -3660,7 +3660,7 @@ data:
           "1d"
         ]
       },
-      "timezone": "",
+      "timezone": "browser",
       "title": "Unbound",
       "uid": "9FQf4fEWz",
       "version": 25

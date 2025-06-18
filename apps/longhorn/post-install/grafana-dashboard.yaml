@@ -2347,7 +2347,7 @@ data:
           "1d"
         ]
       },
-      "timezone": "",
+      "timezone": "browser",
       "title": "Longhorn",
       "uid": "ozk-lh-mon",
       "version": 3,
