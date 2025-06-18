@@ -1,0 +1,36 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nebula-sync-env
+  namespace: nebula-sync
+data:
+  FULL_SYNC: false
+  RUN_GRAVITY: false
+  CRON: "55 2 * * *"
+  CLIENT_SKIP_TLS_VERIFICATION: true
+  TZ: Europe/Budapest
+  SYNC_CONFIG_DNS: false
+  SYNC_CONFIG_DNS_EXCLUDE: interface,upstreams
+  # WEBHOOK_SYNC_SUCCESS_URL: 'https://apprise.apprise.svc.cluster.local/notify/apprise'
+  # WEBHOOK_SYNC_SUCCESS_BODY: '{"tag":"nebula","type":"success","body":"[nebula-sync] [✅] Pi-Hole synced successfully","title":"[k3s] Successful sync"}'
+  # WEBHOOK_SYNC_SUCCESS_HEADERS: 'Content-Type:application/json'
+  # WEBHOOK_SYNC_FAILURE_URL: 'https://apprise.apprise.svc.cluster.local/notify/apprise'
+  # WEBHOOK_SYNC_FAILURE_BODY: '{"tag":"nebula","type":"failure","body":"[nebula-sync] [🔴] Pi-Hole failed to sync","title":"[k3s] Failed sync"}'
+  # WEBHOOK_SYNC_FAILURE_HEADERS: 'Content-Type:application/json'
+  SYNC_CONFIG_DHCP: false
+  SYNC_CONFIG_NTP: false
+  SYNC_CONFIG_RESOLVER: false
+  SYNC_CONFIG_DATABASE: false
+  SYNC_CONFIG_MISC: false
+  SYNC_CONFIG_DEBUG: false
+  SYNC_GRAVITY_DHCP_LEASES: false
+  SYNC_GRAVITY_GROUP: true
+  SYNC_GRAVITY_AD_LIST: true
+  SYNC_GRAVITY_AD_LIST_BY_GROUP: true
+  SYNC_GRAVITY_DOMAIN_LIST: true
+  SYNC_GRAVITY_DOMAIN_LIST_BY_GROUP: true
+  SYNC_GRAVITY_CLIENT: true
+  SYNC_GRAVITY_CLIENT_BY_GROUP: true
+  CLIENT_TIMEOUT_SECONDS: 60
+  CLIENT_RETRY_DELAY_SECONDS: 5

@@ -15,4 +15,5 @@ resources:
   - authentik/application.yaml
   - pihole/application.yaml
   - unbound/application.yaml
+  - nebula-sync/application.yaml
   - nginx/application.yaml
