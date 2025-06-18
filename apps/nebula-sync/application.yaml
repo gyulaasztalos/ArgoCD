@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: unbound
+  name: nebula-sync
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "0"
@@ -11,13 +11,10 @@ spec:
   sources:
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/unbound/install
-    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
-      targetRevision: main
-      path: apps/unbound/post-install
+      path: apps/nebula-sync/install
   destination:
     server: https://kubernetes.default.svc
-    namespace: unbound
+    namespace: nebula-sync
   syncPolicy:
     automated:
       selfHeal: true
