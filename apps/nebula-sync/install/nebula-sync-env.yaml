@@ -7,17 +7,17 @@ metadata:
 data:
   FULL_SYNC: "false"
   RUN_GRAVITY: "false"
-  CRON: "55 2 * * *"
+  CRON: "55 * * * *"
   CLIENT_SKIP_TLS_VERIFICATION: "true"
   TZ: "Europe/Budapest"
   SYNC_CONFIG_DNS: "false"
   SYNC_CONFIG_DNS_EXCLUDE: "interface,upstreams"
-  # WEBHOOK_SYNC_SUCCESS_URL: 'https://apprise.apprise.svc.cluster.local/notify/apprise'
-  # WEBHOOK_SYNC_SUCCESS_BODY: '{"tag":"nebula","type":"success","body":"[nebula-sync] [✅] Pi-Hole synced successfully","title":"[k3s] Successful sync"}'
-  # WEBHOOK_SYNC_SUCCESS_HEADERS: 'Content-Type:application/json'
-  # WEBHOOK_SYNC_FAILURE_URL: 'https://apprise.apprise.svc.cluster.local/notify/apprise'
-  # WEBHOOK_SYNC_FAILURE_BODY: '{"tag":"nebula","type":"failure","body":"[nebula-sync] [🔴] Pi-Hole failed to sync","title":"[k3s] Failed sync"}'
-  # WEBHOOK_SYNC_FAILURE_HEADERS: 'Content-Type:application/json'
+  WEBHOOK_SYNC_SUCCESS_URL: 'http://apprise.apprise.svc.cluster.local:8000/notify/apprise'
+  WEBHOOK_SYNC_SUCCESS_BODY: '{"tag":"nebula","type":"success","body":"[nebula-sync] [✅] Pi-Hole synced successfully","title":"[k3s] Successful sync"}'
+  WEBHOOK_SYNC_SUCCESS_HEADERS: 'Content-Type:application/json'
+  WEBHOOK_SYNC_FAILURE_URL: 'http://apprise.apprise.svc.cluster.local:8000/notify/apprise'
+  WEBHOOK_SYNC_FAILURE_BODY: '{"tag":"nebula","type":"failure","body":"[nebula-sync] [🔴] Pi-Hole failed to sync","title":"[k3s] Failed sync"}'
+  WEBHOOK_SYNC_FAILURE_HEADERS: 'Content-Type:application/json'
   SYNC_CONFIG_DHCP: "false"
   SYNC_CONFIG_NTP: "false"
   SYNC_CONFIG_RESOLVER: "false"
