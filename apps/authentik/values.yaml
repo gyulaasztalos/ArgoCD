@@ -106,7 +106,9 @@ global:
   # -- Environment variables to pass to all deployed Deployments. Does not apply to GeoIP
   # See configuration options at https://goauthentik.io/docs/installation/configuration/
   # @default -- `[]` (See [values.yaml])
-  env: []
+  env:
+    - name: AUTHENTIK_REVERSE_PROXY_ADDRESSES
+      value: 10.42.0.0/16
     # - name: AUTHENTIK_VAR_NAME
     #   value: VALUE
     # - name: AUTHENTIK_VAR_OTHER
