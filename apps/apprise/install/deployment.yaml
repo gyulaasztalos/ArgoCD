@@ -28,7 +28,6 @@ spec:
           image: lscr.io/linuxserver/apprise-api:v1.2.0-ls193
           imagePullPolicy: IfNotPresent
           securityContext:
-            runAsNonRoot: true
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
           resources:
