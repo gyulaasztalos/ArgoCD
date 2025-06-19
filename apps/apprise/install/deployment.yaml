@@ -6,6 +6,8 @@ metadata:
   namespace: apprise
   labels:
     app: apprise
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "LinuxServer.io images do not require a read-only root filesystem"
 spec:
   replicas: 1
   selector:
@@ -28,7 +30,6 @@ spec:
           image: lscr.io/linuxserver/apprise-api:v1.2.0-ls193
           imagePullPolicy: IfNotPresent
           securityContext:
-            readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
           resources:
             requests:
