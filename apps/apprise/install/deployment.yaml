@@ -22,8 +22,6 @@ spec:
         app: apprise
     spec:
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
         fsGroup: 1000
       containers:
         - name: apprise
@@ -63,6 +61,10 @@ spec:
             successThreshold: 1
             timeoutSeconds: 5
           env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
             - name: TZ
               value: Europe/Budapest
             - name: APPRISE_STATEFUL_MODE
