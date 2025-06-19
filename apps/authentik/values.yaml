@@ -451,7 +451,7 @@ server:
     # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
     successThreshold: 1
     # -- Number of seconds after which the [probe] times out
-    timeoutSeconds: 1
+    timeoutSeconds: 3
     ## Probe configuration
     httpGet:
       path: "{{ .Values.authentik.web.path }}-/health/live/"
@@ -467,7 +467,7 @@ server:
     # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
     successThreshold: 1
     # -- Number of seconds after which the [probe] times out
-    timeoutSeconds: 1
+    timeoutSeconds: 3
     ## Probe configuration
     httpGet:
       path: "{{ .Values.authentik.web.path }}-/health/ready/"
@@ -885,7 +885,7 @@ worker:
     # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
     successThreshold: 1
     # -- Number of seconds after which the [probe] times out
-    timeoutSeconds: 1
+    timeoutSeconds: 3
     ## Probe configuration
     exec:
       command:
@@ -902,7 +902,7 @@ worker:
     # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
     successThreshold: 1
     # -- Number of seconds after which the [probe] times out
-    timeoutSeconds: 1
+    timeoutSeconds: 3
     ## Probe configuration
     exec:
       command:
