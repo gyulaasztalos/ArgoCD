@@ -1026,7 +1026,7 @@ alertmanager:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 2Gi
+              storage: 1Gi
        # selector: {}
 
 
@@ -1377,7 +1377,7 @@ grafana:
     storageClassName: longhorn
     accessModes:
       - ReadWriteOnce
-    size: 5Gi
+    size: 1500Mi
   #   finalizers:
   #     - kubernetes.io/pvc-protection
 
@@ -4358,7 +4358,7 @@ prometheus:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 20Gi
+              storage: 60Gi
      # selector: {}
     ## Using PersistentVolumeClaim
     ##
