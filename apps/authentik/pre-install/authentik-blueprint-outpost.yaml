@@ -11,8 +11,8 @@ data:
       name: "Authentik Embedded Outpost Blueprint"
     entries:
       - model: authentik_outposts.outpost
-        id: embedded_outpost
-        lookup: name:"authentik Embedded Outpost"
+        identifiers:
+          name: "authentik Embedded Outpost"
         operations:
           - op: add
             path: /applications
