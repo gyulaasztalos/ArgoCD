@@ -1,0 +1,98 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apprise
+  namespace: apprise
+  labels:
+    app: apprise
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apprise
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: apprise
+    spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: apprise
+          image: lscr.io/linuxserver/apprise-api:v1.2.0-ls193
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          ports:
+            - containerPort: 8000
+              name: http
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 5
+          env:
+            - name: TZ
+              value: Europe/Budapest
+            - name: APPRISE_STATEFUL_MODE
+              value: simple
+            - name: APPRISE_ATTACH_SIZE
+              value: "5"
+          volumeMounts:
+            - name: attachments
+              mountPath: /attachments
+            - name: config
+              mountPath: /config
+            - name: apprise-config
+              mountPath: /config/apprise.yml
+              subPath: apprise.yml
+      restartPolicy: Always
+      volumes:
+        - name: attachments
+          emptyDir: {}
+        - name: config
+          emptyDir: {}
+        - name: apprise-config
+          secret:
+            secretName: apprise-config
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - apprise
+              topologyKey: kubernetes.io/hostname

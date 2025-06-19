@@ -1,0 +1,40 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: apprise
+  namespace: apprise
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`apprise.local.asztalos.net`) && PathPrefix(`/notify/`)
+      priority: 25  # Higher than your main route
+      services:
+        - name: apprise
+          namespace: apprise
+          port: 8000
+    - kind: Rule
+      match: Host(`apprise.local.asztalos.net`) && PathPrefix(`/apprise/`)
+      priority: 20  # Higher than your main route
+      services:
+        - name: apprise
+          namespace: apprise
+          port: 8000
+    - kind: Rule
+      middlewares:
+        - name: authentik
+          namespace: traefik
+        - name: default-headers
+          namespace: traefik
+      match: Host(`apprise.local.asztalos.net`)
+      priority: 10
+      services:
+        - name: apprise
+          namespace: apprise
+          port: 80
+  tls:
+    secretName: local-asztalos-net-tls

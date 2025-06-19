@@ -16,4 +16,5 @@ resources:
   - pihole/application.yaml
   - unbound/application.yaml
   - nebula-sync/application.yaml
+  - apprise/application.yaml
   - nginx/application.yaml

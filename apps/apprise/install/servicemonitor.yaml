@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: apprise-exporter
+  namespace: apprise  # or the namespace where your exporter runs
+  labels:
+    release: prometheus-operator  # match your Prometheus Operator’s selector if needed
+spec:
+  selector:
+    matchLabels:
+      app: apprise
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      honorLabels: true
+  namespaceSelector:
+    matchNames:
+      - apprise

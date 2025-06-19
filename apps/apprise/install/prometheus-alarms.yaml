@@ -1,0 +1,37 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: apprise-rules
+  namespace: apprise
+  labels:
+    app: apprise
+spec:
+  groups:
+    - name: apprise.rules
+      rules:
+        - alert: AppriseApiDown
+          expr: up{job="apprise"} == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Apprise API is down"
+            description: "No Apprise API targets are available for scraping."
+
+        - alert: AppriseApiHighErrorRate
+          expr: increase(http_requests_total{job="apprise",status=~"5.."}[5m]) > 5
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High 5xx error rate on Apprise API"
+            description: "More than 5 5xx errors in the last 5 minutes."
+
+        - alert: AppriseApiHighLatency
+          expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job="apprise"}[5m])) by (le)) > 1
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High latency on Apprise API"
+            description: "95th percentile latency is above 1 second."
