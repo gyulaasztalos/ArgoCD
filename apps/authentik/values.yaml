@@ -108,7 +108,7 @@ global:
   # @default -- `[]` (See [values.yaml])
   env:
     - name: AUTHENTIK_REVERSE_PROXY_ADDRESSES
-      value: 10.42.0.0/16
+      value: "10.42.0.0/16"
     # - name: AUTHENTIK_VAR_NAME
     #   value: VALUE
     # - name: AUTHENTIK_VAR_OTHER
