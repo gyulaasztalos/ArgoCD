@@ -9,7 +9,7 @@ data:
     version: 1
     metadata:
       name: "Groups Blueprint"
-    resources:
+    entries:
       - model: authentik_core.group
         state: present
         identifiers:

@@ -9,7 +9,7 @@ data:
     version: 1
     metadata:
       name: "Authentik Embedded Outpost Blueprint"
-    resources:
+    entries:
       - model: authentik_outposts.outpost
         id: embedded_outpost
         lookup: name:"authentik Embedded Outpost"

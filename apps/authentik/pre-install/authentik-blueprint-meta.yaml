@@ -9,7 +9,7 @@ data:
     version: 1
     metadata:
       name: "Meta Blueprint"
-    resources:
+    entries:
       - model: authentik_blueprints.metaapplyblueprint
         state: present
         attrs:
