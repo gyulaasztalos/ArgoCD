@@ -705,7 +705,7 @@ ports:
         priority: 10
     forwardedHeaders:
       # -- Trust forwarded headers information (X-Forwarded-*).
-      trustedIPs: []
+      trustedIPs: "0.0.0.0/0"
       insecure: false
     proxyProtocol:
       # -- Enable the Proxy Protocol header parsing for the entry point
@@ -753,7 +753,7 @@ ports:
     advertisedPort: 4443 # @schema type:[integer, null]; minimum:0
     forwardedHeaders:
         # -- Trust forwarded headers information (X-Forwarded-*).
-      trustedIPs: []
+      trustedIPs: "0.0.0.0/0"
       insecure: false
     proxyProtocol:
       # -- Enable the Proxy Protocol header parsing for the entry point
