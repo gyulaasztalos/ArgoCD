@@ -117,8 +117,8 @@ spec:
           secret:
             secretName: apprise-config
         - name: mailrise-config
-          secret:
-            secretName: mailrise-config
+          configMap:
+            name: mailrise-config
       securityContext:
         fsGroup: 1000
       affinity:
