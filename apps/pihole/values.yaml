@@ -312,7 +312,7 @@ extraEnvVarsSecret: {}
   #   key: secret-key
 
 # -- default upstream DNS 1 server to use
-DNS1: "unbound.unbound#53"
+DNS1: "unbound.unbound.svc.cluster.local#53"
 # -- default upstream DNS 2 server to use
 DNS2: ""
 
@@ -695,11 +695,17 @@ monitoring:
       #  memory: 128Mi
 
 podDnsConfig:
-  enabled: false
+  enabled: true
   policy: "None"
   nameservers:
-    - 127.0.0.1
-    - 1.1.1.1
+    - 10.43.0.10
+  options:
+    - name: ndots
+      value: "1"
+  searches:
+    - pihole.svc.cluster.local
+    - svc.cluster.local
+    - cluster.local
 
 # -- configure a Pod Disruption Budget
 podDisruptionBudget:
