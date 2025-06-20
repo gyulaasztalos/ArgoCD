@@ -4,6 +4,7 @@ kind: Kustomization
 
 resources:
   - apprise-config.yaml
+  - mailrise-config.yaml
   - deployment.yaml
   - service.yaml
   - servicemonitor.yaml

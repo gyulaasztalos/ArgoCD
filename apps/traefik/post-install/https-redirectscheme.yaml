@@ -1,0 +1,10 @@
+---
+apiVersion: traefik.io/v1alpha1 # traefik.containo.us/v1alpha1 depreciated in Traefik v3
+kind: Middleware
+metadata:
+  name: https-redirectscheme
+  namespace: traefik
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true

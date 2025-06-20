@@ -12,3 +12,7 @@ spec:
       protocol: TCP
       port: 8000
       targetPort: 8000
+    - name: mailsecure
+      protocol: TCP
+      port: 8025
+      targetPort: 8025

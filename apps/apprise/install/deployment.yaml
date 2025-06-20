@@ -80,6 +80,33 @@ spec:
             - name: apprise-config
               mountPath: /config/apprise.yml
               subPath: apprise.yml
+        - name: mailrise
+          image: yoryan/mailrise:1.4.0
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 101          # hardcode user to non-root if not set in Dockerfile
+            runAsGroup: 101         # hardcode group to non-root if not set in Dockerfile
+            runAsNonRoot: true       # hardcode to non-root. Redundant to above if Dockerfile is set USER 1000
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false # prevent sudo, etc.
+            privileged: false               # prevent acting like host root
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          ports:
+            - containerPort: 8025
+              name: mailsecure
+              protocol: TCP
+          volumeMounts:
+            - name: mailrise-config
+              mountPath: /etc/mailrise.conf
+              subPath: mailrise.conf
       restartPolicy: Always
       volumes:
         - name: attachments
@@ -89,6 +116,9 @@ spec:
         - name: apprise-config
           secret:
             secretName: apprise-config
+        - name: mailrise-config
+          secret:
+            secretName: mailrise-config
       securityContext:
         fsGroup: 1000
       affinity:
