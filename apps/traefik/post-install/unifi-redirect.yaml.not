@@ -1,4 +1,15 @@
 ---
+apiVersion: traefik.io/v1alpha1 # traefik.containo.us/v1alpha1 depreciated in Traefik v3
+kind: TraefikService
+metadata:
+  name: unifi
+  namespace: traefik
+spec:
+  loadBalancer:
+    servers:
+      - url: "https://10.10.90.1"
+    passHostHeader: true
+---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
