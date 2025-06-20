@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: mailrise
+  namespace: apprise
+spec:
+  entryPoints:
+    - mailsecure
+  routes:
+    - match: HostSNI(`*`)
+      services:
+        - name: apprise
+          port: 8025  # Use the target port of your mailrise TCP service
+          nativeLB: true

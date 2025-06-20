@@ -799,6 +799,12 @@ ports:
     exposedPort: 9100
     # -- The port protocol (TCP/UDP)
     protocol: TCP
+  mailsecure:
+    # -- The port for the mailsecure entrypoint
+    port: 465
+    expose: true
+    exposedPort: 465
+    protocol: TCP
 
 # -- TLS Options are created as [TLSOption CRDs](https://doc.traefik.io/traefik/https/tls/#tls-options)
 # When using `labelSelector`, you'll need to set labels on tlsOption accordingly.
