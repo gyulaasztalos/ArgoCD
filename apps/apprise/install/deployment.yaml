@@ -9,6 +9,7 @@ metadata:
   annotations:
     ignore-check.kube-linter.io/no-read-only-root-fs: "LinuxServer.io images do not require a read-only root filesystem"
     ignore-check.kube-linter.io/run-as-non-root: "LinuxServer.io images do not require a non-root user"
+    ignore-check.kube-linter.io/latest-tag: "This deployment intentionally uses the latest tag"
 spec:
   replicas: 1
   progressDeadlineSeconds: 600
