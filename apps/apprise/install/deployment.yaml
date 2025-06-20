@@ -84,8 +84,8 @@ spec:
           image: yoryan/mailrise:1.4.0
           imagePullPolicy: IfNotPresent
           securityContext:
-            runAsUser: 101          # hardcode user to non-root if not set in Dockerfile
-            runAsGroup: 101         # hardcode group to non-root if not set in Dockerfile
+            runAsUser: 1000          # hardcode user to non-root if not set in Dockerfile
+            runAsGroup: 1000         # hardcode group to non-root if not set in Dockerfile
             runAsNonRoot: true       # hardcode to non-root. Redundant to above if Dockerfile is set USER 1000
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false # prevent sudo, etc.
