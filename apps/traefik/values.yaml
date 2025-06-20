@@ -826,7 +826,7 @@ service:
   # -- Cannot contain type, selector or ports entries.
   spec:
     loadBalancerIP: 10.10.50.30
-  # externalTrafficPolicy: Cluster
+    externalTrafficPolicy: Local
   # loadBalancerIP: "1.2.3.4"
   # clusterIP: "2.3.4.5"
   loadBalancerSourceRanges: []
