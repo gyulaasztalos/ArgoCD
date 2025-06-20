@@ -8,14 +8,16 @@ metadata:
     app: nebula-sync
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: nebula-sync
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: nebula-sync
   template:
     metadata:
       labels:
@@ -25,12 +27,12 @@ spec:
         - name: nebula-sync
           image: ghcr.io/lovelaze/nebula-sync:v0.11.0
           imagePullPolicy: IfNotPresent
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false # prevent sudo, etc.
+            privileged: false               # prevent acting like host root
           ports:
             - containerPort: 8080
-          securityContext:
-            runAsNonRoot: true
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
           envFrom:
             - secretRef:
                 name: nebula-sync-secret
@@ -64,6 +66,12 @@ spec:
       volumes:
         - name: config
           emptyDir: {}
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsUser: 1000          # hardcode user to non-root if not set in Dockerfile
+        runAsGroup: 1000         # hardcode group to non-root if not set in Dockerfile
+        runAsNonRoot: true       # hardcode to non-root. Redundant to above if Dockerfile is set USER 1000          # prevent acting like host root
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

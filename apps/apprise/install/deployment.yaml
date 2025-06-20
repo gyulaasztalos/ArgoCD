@@ -11,27 +11,27 @@ metadata:
     ignore-check.kube-linter.io/run-as-non-root: "LinuxServer.io images do not require a non-root user"
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: apprise
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: apprise
   template:
     metadata:
       labels:
         app: apprise
     spec:
-      securityContext:
-        fsGroup: 1000
       containers:
         - name: apprise
           image: lscr.io/linuxserver/apprise-api:v1.2.0-ls193
           imagePullPolicy: IfNotPresent
           securityContext:
-            allowPrivilegeEscalation: false
+            allowPrivilegeEscalation: false  # prevent sudo, etc.
           resources:
             requests:
               cpu: 100m
@@ -89,6 +89,8 @@ spec:
         - name: apprise-config
           secret:
             secretName: apprise-config
+      securityContext:
+        fsGroup: 1000
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
