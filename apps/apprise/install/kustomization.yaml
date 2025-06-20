@@ -9,4 +9,5 @@ resources:
   - service.yaml
   - servicemonitor.yaml
   - ingressroute.yaml
+  - ingressrouteTCP.yaml
   - prometheus-alarms.yaml
