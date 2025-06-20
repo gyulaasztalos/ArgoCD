@@ -10,5 +10,6 @@ spec:
     - match: HostSNI(`*`)
       services:
         - name: apprise
-          port: 8025  # Use the target port of your mailrise TCP service
-          nativeLB: true
+          port: 8025
+  tls:
+    secretName: local-asztalos-net-tls
