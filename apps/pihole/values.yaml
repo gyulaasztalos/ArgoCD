@@ -312,7 +312,7 @@ extraEnvVarsSecret: {}
   #   key: secret-key
 
 # -- default upstream DNS 1 server to use
-DNS1: "unbound.unbound.svc.cluster.local#53"
+DNS1: "unbound.unbound#53"
 # -- default upstream DNS 2 server to use
 DNS2: ""
 
