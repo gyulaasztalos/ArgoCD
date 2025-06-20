@@ -454,7 +454,7 @@ dnsmasq:
   - cname=homepage.local.asztalos.net,archer.local.asztalos.net
   - cname=pihole-archer.local.asztalos.net,archer.local.asztalos.net
   - cname=apprise.local.asztalos.net,traefik-svc.local.asztalos.net
-  - cname=mailrise.local.asztalos.net,archer.local.asztalos.net
+  - cname=mailrise.local.asztalos.net,traefik-svc.local.asztalos.net
   - cname=portainer.local.asztalos.net,archer.local.asztalos.net
   - cname=flexget.local.asztalos.net,archer.local.asztalos.net
   - cname=homebridge.local.asztalos.net,archer.local.asztalos.net
