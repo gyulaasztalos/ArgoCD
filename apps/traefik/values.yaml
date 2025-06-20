@@ -802,7 +802,8 @@ ports:
   mailsecure:
     # -- The port for the mailsecure entrypoint
     port: 465
-    expose: true
+    expose:
+      default: true
     exposedPort: 465
     protocol: TCP
 
