@@ -27,6 +27,28 @@ spec:
         - name: nginx
           image: nginx:1.28.0
           imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 3
           resources:
             requests:
               memory: "64Mi"
@@ -35,11 +57,9 @@ spec:
               memory: "128Mi"
               cpu: "250m"
           securityContext:
-            runAsNonRoot: true
-            runAsUser: 101  # Non-root user (e.g., "nginx" user in official images)
-            runAsGroup: 101
             readOnlyRootFilesystem: true
-            allowPrivilegeEscalation: false
+            allowPrivilegeEscalation: false # prevent sudo, etc.
+            privileged: false               # prevent acting like host root
             capabilities:
               drop: [ALL]
               add: [NET_BIND_SERVICE]  # Required for ports <1024 (e.g., 80/443)
@@ -57,6 +77,13 @@ spec:
           emptyDir: {}
         - name: nginx-tmp
           emptyDir: {}
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault   # enable seccomp and the runtimes default profile
+        runAsUser: 101          # hardcode user to non-root if not set in Dockerfile
+        runAsGroup: 101         # hardcode group to non-root if not set in Dockerfile
+        runAsNonRoot: true       # hardcode to non-root. Redundant to above if Dockerfile is set USER 1000
+        fsGroup: 101          # hardcode fsGroup to non-root if not set in Dockerfile
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
