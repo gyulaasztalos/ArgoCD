@@ -34,7 +34,7 @@ spec:
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: unifi-https
+  name: unifi
   namespace: traefik
 spec:
   entryPoints:
@@ -51,21 +51,4 @@ spec:
       serversTransport: unifi-servers-transport  # Self-signed handling
   tls:
     secretName: local-asztalos-net-tls  # Wildcard cert
----
-# 5. HTTP IngressRoute (Redirector)
-apiVersion: traefik.io/v1alpha1
-kind: IngressRoute
-metadata:
-  name: unifi-http
-  namespace: traefik
-spec:
-  entryPoints:
-  - web
-  routes:
-  - match: Host(`unifi.local.asztalos.net`)
-    kind: Rule
-    middlewares:
-    - name: https-redirectscheme  # HTTP→HTTPS
-    services:
-    - kind: TraefikService
-      name: noop@internal  # Traefik's dummy service
+
