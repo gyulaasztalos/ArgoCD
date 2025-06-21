@@ -441,7 +441,7 @@ dnsmasq:
   #   - cname=cname.foo.bar,foo.bar
   #   - cname=cname.bar.foo,bar.foo
   #   - cname=cname record,dns record
-  - cname=unifi.local.asztalos.net,vip1.local.asztalos.net
+  - cname=unifi.local.asztalos.net,traefik-svc.local.asztalos.net
   - cname=pihole.local.asztalos.net,traefik-svc.local.asztalos.net
   - cname=printer.local,printer.local.asztalos.net
   - cname=t.ncore.sh.local.asztalos.net,t.ncore.sh
