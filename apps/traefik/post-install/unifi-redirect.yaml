@@ -1,0 +1,71 @@
+---
+# 1. Service & Endpoints (External Router)
+apiVersion: v1
+kind: Service
+metadata:
+  name: unifi-router
+  namespace: apps
+spec:
+  ports:
+  - port: 443
+    targetPort: 443  # UniFi uses port 443
+---
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: unifi-router
+  namespace: apps
+subsets:
+- addresses:
+  - ip: 10.10.90.1  # Router IP
+  ports:
+  - port: 443
+---
+# 2. ServersTransport (Self-Signed Cert Bypass)
+apiVersion: traefik.io/v1alpha1
+kind: ServersTransport
+metadata:
+  name: unifi-servers-transport
+  namespace: apps
+spec:
+  insecureSkipVerify: true
+---
+# 4. HTTPS IngressRoute (Main Configuration)
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: unifi-https
+  namespace: apps
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - match: Host(`unifi.local.asztalos.net`)
+    kind: Rule
+    middlewares:
+    - name: default-headers  # Your default-headers equivalent
+    services:
+    - name: unifi-router
+      port: 443
+      scheme: https
+      serversTransport: unifi-servers-transport  # Self-signed handling
+  tls:
+    secretName: local-asztalos-net-tls  # Wildcard cert
+---
+# 5. HTTP IngressRoute (Redirector)
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: unifi-http
+  namespace: apps
+spec:
+  entryPoints:
+  - web
+  routes:
+  - match: Host(`unifi.local.asztalos.net`)
+    kind: Rule
+    middlewares:
+    - name: https-redirectscheme  # HTTP→HTTPS
+    services:
+    - kind: TraefikService
+      name: noop@internal  # Traefik's dummy service
