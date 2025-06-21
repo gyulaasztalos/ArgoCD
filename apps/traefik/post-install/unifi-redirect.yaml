@@ -36,6 +36,8 @@ kind: IngressRoute
 metadata:
   name: unifi
   namespace: traefik
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
 spec:
   entryPoints:
   - websecure
