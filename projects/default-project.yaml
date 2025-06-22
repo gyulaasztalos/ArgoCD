@@ -14,8 +14,6 @@ spec:
   clusterResourceWhitelist:
     - group: '*'
       kind: '*'
-    - group: discovery.k8s.io
-      kind: EndpointSlice
   namespaceResourceWhitelist:
     - group: '*'
       kind: '*'

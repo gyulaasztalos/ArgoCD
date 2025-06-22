@@ -204,15 +204,6 @@ configs:
     ## Ref: https://argo-cd.readthedocs.io/en/stable/user-guide/status-badge/
     statusbadge.enabled: false
 
-        # Add resource inclusions here
-    resource.inclusions: |
-      - apiGroups: ["*"]
-        kinds: ["*"]
-        clusters: ["*"]
-      - apiGroups: ["discovery.k8s.io"]
-        kinds: ["EndpointSlice"]
-        clusters: ["*"]
-
     # Dex configuration
     dex.config: |
       connectors:
