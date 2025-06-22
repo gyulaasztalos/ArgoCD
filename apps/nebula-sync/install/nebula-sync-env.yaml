@@ -7,7 +7,7 @@ metadata:
 data:
   FULL_SYNC: "false"
   RUN_GRAVITY: "false"
-  CRON: "55 * * * *"
+  CRON: "55 2 * * *"
   CLIENT_SKIP_TLS_VERIFICATION: "true"
   TZ: "Europe/Budapest"
   SYNC_CONFIG_DNS: "false"
