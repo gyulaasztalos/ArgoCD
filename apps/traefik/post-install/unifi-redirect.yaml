@@ -17,7 +17,6 @@ metadata:
   namespace: traefik
   labels:
     kubernetes.io/service-name: unifi-router  # REQUIRED for Service binding
-    endpointslice.kubernetes.io/managed-by: manual
 addressType: IPv4
 ports:
   - name: https
