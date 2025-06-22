@@ -206,6 +206,9 @@ configs:
 
         # Add resource inclusions here
     resource.inclusions: |
+      - apiGroups: ["*"]
+        kinds: ["*"]
+        clusters: ["*"]
       - apiGroups: ["discovery.k8s.io"]
         kinds: ["EndpointSlice"]
         clusters: ["*"]
