@@ -7,7 +7,8 @@ metadata:
   namespace: traefik
 spec:
   ports:
-  - port: 443
+  - name: https
+    port: 443
     targetPort: 443  # UniFi uses port 443
 ---
 apiVersion: discovery.k8s.io/v1
@@ -24,7 +25,7 @@ ports:
     protocol: TCP
 endpoints:
   - addresses:
-      - "10.10.90.1"  # Router IP
+      - "10.10.50.1"  # Router IP
     conditions:
       ready: true
 
