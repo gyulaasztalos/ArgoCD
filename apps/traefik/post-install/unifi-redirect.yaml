@@ -5,6 +5,8 @@ kind: Service
 metadata:
   name: unifi-router
   namespace: traefik
+  annotations:
+    ignore-check.kube-linter.io/dangling-service: "This service intentionally has no selector; used for external endpoint routing."
 spec:
   ports:
   - name: https
