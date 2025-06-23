@@ -14,7 +14,7 @@ spec:
       ref: config
     - repoURL: https://releases.rancher.com/server-charts/latest
       chart: rancher
-      targetRevision: 2.11.2
+      targetRevision: 2.12.0-rc1
       helm:
         valueFiles:
           - $config/apps/rancher/values.yaml
