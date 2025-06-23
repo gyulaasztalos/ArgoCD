@@ -10,34 +10,34 @@ data:
         mailrise:
           title_template: "[ $from ] $subject ($config)"
         urls:
-          - apprises://apprise:8000/apprise/?overflow=split&tags=unattended-upgrades
+          - apprise://apprise:8000/apprise/?overflow=split&tags=unattended-upgrades
 
       flexget:
         mailrise:
           title_template: "$subject"
         urls:
-          - apprises://apprise:8000/apprise/?overflow=split&tags=flexget
+          - apprise://apprise:8000/apprise/?overflow=split&tags=flexget
 
       grafana:
         mailrise:
           title_template: "$subject"
         urls:
-          - apprises://apprise:8000/apprise/?overflow=split&tags=grafana
+          - apprise://apprise:8000/apprise/?overflow=split&tags=grafana
 
       alertmanager:
         mailrise:
           title_template: "$subject"
         urls:
-          - apprises://apprise:8000/apprise/?overflow=split&tags=alertmanager
+          - apprise://apprise:8000/apprise/?overflow=split&tags=alertmanager
 
       "babybuddy":
         mailrise:
           title_template: "$subject"
         urls:
-          - apprises://apprise:8000/apprise/?overflow=split&tags=babybuddy
+          - apprise://apprise:8000/apprise/?overflow=split&tags=babybuddy
 
       "*@*":
         mailrise:
           title_template: "[ $from ] $subject ($config)"
         urls:
-          - apprises://apprise:8000/apprise/?overflow=split&tags=admin
+          - apprise://apprise:8000/apprise/?overflow=split&tags=admin
