@@ -546,7 +546,7 @@ alertmanager:
     - name: 'null'
     - name: "apprise"
       webhook_configs:
-        - url: "http://apprise.apprise.svc.cluster.local:8000/apprise/?tags=alertmanager"
+        - url: "http://apprise.apprise.svc.cluster.local:8000/notify/apprise/?tags=alertmanager"
           send_resolved: true
     templates:
     - '/etc/alertmanager/config/*.tmpl'
