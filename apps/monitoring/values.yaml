@@ -1224,7 +1224,7 @@ alertmanager:
       - name: ndots
         value: "1"
     searches:
-      - pihole.svc.cluster.local
+      - monitoring.svc.cluster.local
       - svc.cluster.local
       - cluster.local
 
