@@ -544,20 +544,6 @@ alertmanager:
           - alertname = "Watchdog"
     receivers:
     - name: 'null'
-    - name: "apprise"
-      webhook_configs:
-        - url: "http://apprise.apprise.svc.cluster.local:8000/notify/apprise/?tags=alertmanager"
-          send_resolved: true
-          http_config:
-            headers:
-              - key: "Content-Type"   # Fixed header structure
-                value: "application/json"
-            body: |
-              {
-                "title": "{{ .CommonAnnotations.summary }}",
-                "body": "{{ range .Alerts }}{{ .Annotations.description }}\n{{ end }}",
-                "type": "{{ if eq .Status \"firing\" }}failure{{ else }}success{{ end }}"
-              }
     templates:
     - '/etc/alertmanager/config/*.tmpl'
 

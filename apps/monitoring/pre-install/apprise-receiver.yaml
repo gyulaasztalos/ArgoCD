@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: apprise-receiver
+  namespace: monitoring
+spec:
+  receivers:
+  - name: apprise
+    webhookConfigs:
+    - url: http://apprise.apprise.svc.cluster.local:8000/notify/apprise/?tags=alertmanager
+      sendResolved: true
+      httpConfig:
+        headers:
+        - key: Content-Type
+          value: application/json
+      body: |
+        {
+          "title": "{{ .CommonAnnotations.summary }}",
+          "body": "{{ range .Alerts }}{{ .Annotations.description }}\n{{ end }}",
+          "type": "{{ if eq .Status \"firing\" }}failure{{ else }}success{{ end }}"
+        }
