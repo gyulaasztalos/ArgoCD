@@ -533,7 +533,7 @@ alertmanager:
       - target_matchers:
           - 'alertname = InfoInhibitor'
     route:
-      receiver: "apprise"
+      receiver: "mailrise"
       group_by: ['namespace']
       group_wait: 30s
       group_interval: 5m
@@ -543,7 +543,12 @@ alertmanager:
         matchers:
           - alertname = "Watchdog"
     receivers:
-    - name: 'null'
+      - name: 'null'
+      - name: "mailrise"
+        email_configs:
+          - to: "alertmanager@mailrise.xyz"     # Or your custom Mailrise domain/recipient
+            from: "alertmanager@local.asztalos.net"
+            smarthost: "apprise.apprise.svc.cluster.local:8025"
     templates:
     - '/etc/alertmanager/config/*.tmpl'
 
