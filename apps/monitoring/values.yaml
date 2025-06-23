@@ -549,6 +549,7 @@ alertmanager:
           - to: "alertmanager@mailrise.xyz"     # Or your custom Mailrise domain/recipient
             from: "alertmanager@local.asztalos.net"
             smarthost: "apprise.apprise.svc.cluster.local:8025"
+            require_tls: false
     templates:
     - '/etc/alertmanager/config/*.tmpl'
 
