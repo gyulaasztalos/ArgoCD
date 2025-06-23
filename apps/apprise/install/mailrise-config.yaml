@@ -24,6 +24,12 @@ data:
         urls:
           - apprises://apprise:8000/apprise/?overflow=split&tags=grafana
 
+      alertmanager:
+        mailrise:
+          title_template: "$subject"
+        urls:
+          - apprises://apprise:8000/apprise/?overflow=split&tags=alertmanager
+
       "babybuddy":
         mailrise:
           title_template: "$subject"
