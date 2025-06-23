@@ -13,9 +13,9 @@ spec:
         headers:
         - key: Content-Type
           value: application/json
-      body: |
-        {
-          "title": "{{ .CommonAnnotations.summary }}",
-          "body": "{{ range .Alerts }}{{ .Annotations.description }}\n{{ end }}",
-          "type": "{{ if eq .Status \"firing\" }}failure{{ else }}success{{ end }}"
-        }
+        body: |
+          {
+            "title": "{{ .CommonAnnotations.summary }}",
+            "body": "{{ range .Alerts }}{{ .Annotations.description }}\n{{ end }}",
+            "type": "{{ if eq .Status \"firing\" }}failure{{ else }}success{{ end }}"
+          }
