@@ -4,6 +4,10 @@ kind: AppProject
 metadata:
   name: default
   namespace: argocd
+  annotations:
+    notifications.argoproj.io/subscribe.on-sync-succeeded.apprise: "default"
+    notifications.argoproj.io/subscribe.on-sync-failed.apprise: "default"
+    notifications.argoproj.io/subscribe.on-health-degraded.apprise: "default"
 spec:
   description: Default project, allows all sources and destinations
   sourceRepos:
