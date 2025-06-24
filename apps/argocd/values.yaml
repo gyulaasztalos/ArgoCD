@@ -3394,10 +3394,10 @@ notifications:
     # service.slack: |
     #   token: $slack-    
     service.apprise: |
-      url: http://apprise.apprise.svc.cluster.local:8000/notify/apprise
+      url: "http://apprise.apprise.svc.cluster.local:8000/notify/apprise"
       method: POST
       headers:
-        Content-Type: application/json
+        Content-Type: "application/json"
 
   # -- Annotations to be applied to the notifications controller Deployment
   deploymentAnnotations: {}
