@@ -5,12 +5,14 @@ global:
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-              - key: app.kubernetes.io/name
-                operator: In
-                values: [external-secrets]
-          topologyKey: kubernetes.io/hostname
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values: [external-secrets]
+            topologyKey: kubernetes.io/hostname
   compatibility:
     openshift:
       # -- Manages the securityContext properties to make them compatible with OpenShift.
