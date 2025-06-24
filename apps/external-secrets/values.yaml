@@ -9,7 +9,7 @@ global:
           podAffinityTerm:
             labelSelector:
               matchExpressions:
-                - key: app.kubernetes.io/name
+                - key: app.kubernetes.io/instance
                   operator: In
                   values: [external-secrets]
             topologyKey: kubernetes.io/hostname
