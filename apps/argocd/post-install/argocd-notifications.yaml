@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+  namespace: argocd
+data:
+  service.apprise: |
+    url: http://apprise.apprise.svc.cluster.local:8000/notify/apprise
+    method: POST
+    headers:
+      Content-Type: application/json
+  template.app-sync-succeeded: |
+    webhook:
+      apprise:
+        method: POST
+        body: |
+          {
+            "title": "ArgoCD: {{.app.metadata.name}}",
+            "body": "Application {{.app.metadata.name}} synced successfully at {{.app.status.operationState.finishedAt}}.",
+            "type": "info"
+          }
+  template.app-sync-failed: |
+    webhook:
+      apprise:
+        method: POST
+        body: |
+          {
+            "title": "ArgoCD: {{.app.metadata.name}}",
+            "body": "Application {{.app.metadata.name}} sync failed with message: {{.app.status.operationState.message | replace \"\\\"\" \"\\\\\\\"\"}}.",
+            "type": "error"
+          }
+  template.app-health-degraded: |
+    webhook:
+      apprise:
+        method: POST
+        body: |
+          {
+            "title": "ArgoCD: {{.app.metadata.name}}",
+            "body": "Application {{.app.metadata.name}} health degraded: {{.app.status.health.status | replace \"\\\"\" \"\\\\\\\"\"}}.",
+            "type": "warning"
+          }
+  trigger.on-sync-succeeded: |
+    - send: [app-sync-succeeded]
+  trigger.on-sync-failed: |
+    - send: [app-sync-failed]
+  trigger.on-health-degraded: |
+    - send: [app-health-degraded]
