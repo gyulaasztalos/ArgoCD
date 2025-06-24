@@ -3390,9 +3390,14 @@ notifications:
   # -- Configures notification services such as slack, email or custom webhook
   # @default -- See [values.yaml]
   ## For more information: https://argo-cd.readthedocs.io/en/stable/operator-manual/notifications/services/overview/
-  notifiers: {}
+  notifiers:
     # service.slack: |
-    #   token: $slack-token
+    #   token: $slack-    
+    service.apprise: |
+      url: http://apprise.apprise.svc.cluster.local:8000/notify/apprise
+      method: POST
+      headers:
+        Content-Type: application/json
 
   # -- Annotations to be applied to the notifications controller Deployment
   deploymentAnnotations: {}
@@ -3539,7 +3544,7 @@ notifications:
 
   # -- The notification template is used to generate the notification content
   ## For more information: https://argo-cd.readthedocs.io/en/stable/operator-manual/notifications/templates/
-  templates: {}
+  templates:
     # template.app-deployed: |
     #   email:
     #     subject: New version of an application {{.app.metadata.name}} is up and running.
@@ -3753,10 +3758,40 @@ notifications:
     #         {{end}}
     #         ]
     #       }]
+    app-sync-succeeded: |
+      webhook:
+        apprise:
+          method: POST
+          body: |
+            {
+              "title": "ArgoCD: {{.app.metadata.name}}",
+              "body": "Application {{.app.metadata.name}} synced successfully at {{.app.status.operationState.finishedAt}}.",
+              "type": "info"
+            }
+    app-sync-failed: |
+      webhook:
+        apprise:
+          method: POST
+          body: |
+            {
+              "title": "ArgoCD: {{.app.metadata.name}}",
+              "body": "Application {{.app.metadata.name}} sync failed with message: {{.app.status.operationState.message | replace "\"" "\\\""}}.",
+              "type": "error"
+            }
+    app-health-degraded: |
+      webhook:
+        apprise:
+          method: POST
+          body: |
+            {
+              "title": "ArgoCD: {{.app.metadata.name}}",
+              "body": "Application {{.app.metadata.name}} health degraded: {{.app.status.health.status}}.",
+              "type": "warning"
+            }
 
   # -- The trigger defines the condition when the notification should be sent
   ## For more information: https://argo-cd.readthedocs.io/en/stable/operator-manual/notifications/triggers/
-  triggers: {}
+  triggers:
     # trigger.on-deployed: |
     #   - description: Application is synced and healthy. Triggered once per commit.
     #     oncePer: app.status.sync.revision
@@ -3792,6 +3827,12 @@ notifications:
     # For more information: https://argo-cd.readthedocs.io/en/stable/operator-manual/notifications/triggers/#default-triggers
     # defaultTriggers: |
     #   - on-sync-status-unknown
+    on-sync-succeeded:
+      - send: [app-sync-succeeded]
+    on-sync-failed:
+      - send: [app-sync-failed]
+    on-health-degraded:
+      - send: [app-health-degraded]
 
 commitServer:
   # -- Enable commit server
