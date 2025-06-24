@@ -44,8 +44,11 @@ data:
             "type": "warning"
           }
   trigger.on-sync-succeeded: |
-    - send: [app-sync-succeeded]
+    - when: app.status.operationState.phase in ['Succeeded']
+      send: [app-sync-succeeded]
   trigger.on-sync-failed: |
-    - send: [app-sync-failed]
+    - when: app.status.operationState.phase in ['Error', 'Failed']
+      send: [app-sync-failed]
   trigger.on-health-degraded: |
-    - send: [app-health-degraded]
+    - when: app.status.health.status == 'Degraded'
+      send: [app-health-degraded]
