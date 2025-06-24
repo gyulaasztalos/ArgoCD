@@ -4,7 +4,7 @@ metadata:
   name: argocd-notifications-cm
   namespace: argocd
 data:
-  service.apprise: |
+  service.webhook.apprise: |
     url: http://apprise.apprise.svc.cluster.local:8000/notify/apprise
     method: POST
     headers:
