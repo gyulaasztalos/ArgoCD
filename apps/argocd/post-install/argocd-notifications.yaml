@@ -17,7 +17,7 @@ data:
         body: |
           {
             "title": "ArgoCD: {{.app.metadata.name}}",
-            "body": "Application {{.app.metadata.name}} synced successfully at {{.app.status.operationState.finishedAt}}.",
+            "body": {{ printf "Application %s synced successfully at %s." .app.metadata.name .app.status.operationState.finishedAt | quote }},
             "type": "info"
           }
   template.app-sync-failed: |
@@ -27,7 +27,7 @@ data:
         body: |
           {
             "title": "ArgoCD: {{.app.metadata.name}}",
-            "body": "Application {{.app.metadata.name}} sync failed with message: {{.app.status.operationState.message | replace \"\\\"\" \"\\\\\\\"\"}}.",
+            "body": {{ .app.status.operationState.message | quote }},
             "type": "error"
           }
   template.app-health-degraded: |
@@ -37,7 +37,7 @@ data:
         body: |
           {
             "title": "ArgoCD: {{.app.metadata.name}}",
-            "body": "Application {{.app.metadata.name}} health degraded: {{.app.status.health.status | replace \"\\\"\" \"\\\\\\\"\"}}.",
+            "body": {{ printf "Application %s health degraded: %s." .app.metadata.name .app.status.health.status | quote }},
             "type": "warning"
           }
   trigger.on-sync-succeeded: |
