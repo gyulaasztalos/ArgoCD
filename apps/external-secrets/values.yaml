@@ -306,10 +306,10 @@ webhook:
   # -- Specifies if webhook pod should use hostNetwork or not.
   hostNetwork: false
   image:
-    repository: oci.external-secrets.io/external-secrets/external-secrets
+    repository: ghcr.io/external-secrets/external-secrets
     pullPolicy: IfNotPresent
     # -- The image tag to use. The default is the chart appVersion.
-    tag: ""
+    tag: "v0.18.0"
     # -- The flavour of tag you want to use
     flavour: ""
   imagePullSecrets: []
@@ -484,9 +484,9 @@ certController:
   revisionHistoryLimit: 10
 
   image:
-    repository: oci.external-secrets.io/external-secrets/external-secrets
+    repository: ghcr.io/external-secrets/external-secrets
     pullPolicy: IfNotPresent
-    tag: ""
+    tag: "v0.18.0"
     flavour: ""
   imagePullSecrets: []
   nameOverride: ""
