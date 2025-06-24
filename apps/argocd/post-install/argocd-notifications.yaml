@@ -8,7 +8,8 @@ data:
     url: http://apprise.apprise.svc.cluster.local:8000/notify/apprise
     method: POST
     headers:
-      Content-Type: application/json
+      - name: Content-Type
+        value: application/json
   template.app-sync-succeeded: |
     webhook:
       apprise:
