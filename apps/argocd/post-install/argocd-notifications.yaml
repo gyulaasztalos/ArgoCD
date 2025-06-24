@@ -16,7 +16,7 @@ data:
         method: POST
         body: |
           {
-            "tag": "argocd"
+            "tag": "argocd",
             "title": "ArgoCD: {{.app.metadata.name}}",
             "body": {{ printf "Application %s synced successfully at %s." .app.metadata.name .app.status.operationState.finishedAt | quote }},
             "type": "info"
@@ -27,7 +27,7 @@ data:
         method: POST
         body: |
           {
-            "tag": "argocd"
+            "tag": "argocd",
             "title": "ArgoCD: {{.app.metadata.name}}",
             "body": {{ .app.status.operationState.message | quote }},
             "type": "error"
@@ -38,7 +38,7 @@ data:
         method: POST
         body: |
           {
-            "tag": "argocd"
+            "tag": "argocd",
             "title": "ArgoCD: {{.app.metadata.name}}",
             "body": {{ printf "Application %s health degraded: %s." .app.metadata.name .app.status.health.status | quote }},
             "type": "warning"
