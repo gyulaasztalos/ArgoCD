@@ -5,9 +5,9 @@ metadata:
   name: default
   namespace: argocd
   annotations:
-    notifications.argoproj.io/subscribe.on-sync-succeeded.apprise: "default"
-    notifications.argoproj.io/subscribe.on-sync-failed.apprise: "default"
-    notifications.argoproj.io/subscribe.on-health-degraded.apprise: "default"
+    notifications.argoproj.io/subscribe.on-sync-succeeded.webhook: apprise
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook: apprise
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook: apprise
 spec:
   description: Default project, allows all sources and destinations
   sourceRepos:
