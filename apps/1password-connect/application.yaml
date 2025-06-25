@@ -11,6 +11,9 @@ spec:
   sources:
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
+      path: apps/1password-connect/pre-install
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
       ref: config
     - repoURL: https://1password.github.io/connect-helm-charts
       chart: connect
@@ -20,7 +23,7 @@ spec:
           - $config/apps/1password-connect/values.yaml
   destination:
     server: https://kubernetes.default.svc
-    namespace: external-secrets
+    namespace: 1password-connect
   syncPolicy:
     automated:
       selfHeal: true

@@ -1,602 +1,384 @@
-global:
-  nodeSelector: {}
-  tolerations: []
-  topologySpreadConstraints: []
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 100
-          podAffinityTerm:
-            labelSelector:
-              matchExpressions:
-                - key: app.kubernetes.io/name
-                  operator: In
-                  values: [external-secrets]
-            topologyKey: kubernetes.io/hostname
-  compatibility:
-    openshift:
-      # -- Manages the securityContext properties to make them compatible with OpenShift.
-      # Possible values:
-      # auto - Apply configurations if it is detected that OpenShift is the target platform.
-      # force - Always apply configurations.
-      # disabled - No modification applied.
-      adaptSecurityContext: auto
+# Note: values.yaml files don't support templating out of the box, so that means
+# that every value "{{ .Between.Curly.Braces }}" in this file needs to be
+# explicitly interpolated on the template side by using the `tpl` function.
 
-replicaCount: 3
-
-bitwarden-sdk-server:
-  enabled: false
-
-# -- Specifies the amount of historic ReplicaSets k8s should keep (see https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy)
-revisionHistoryLimit: 10
-
-image:
-  repository: ghcr.io/external-secrets/external-secrets
-  pullPolicy: IfNotPresent
-  # -- The image tag to use. The default is the chart appVersion.
-  tag: "v0.18.0"
-  # -- The flavour of tag you want to use
-  # There are different image flavours available, like distroless and ubi.
-  # Please see GitHub release notes for image tags for these flavors.
-  # By default, the distroless image is used.
-  flavour: ""
-
-# -- If set, install and upgrade CRDs through helm chart.
-installCRDs: true
-
-crds:
-  # -- If true, create CRDs for Cluster External Secret.
-  createClusterExternalSecret: true
-  # -- If true, create CRDs for Cluster Secret Store.
-  createClusterSecretStore: true
-  # -- If true, create CRDs for Cluster Generator.
-  createClusterGenerator: true
-  # -- If true, create CRDs for Cluster Push Secret.
-  createClusterPushSecret: true
-  # -- If true, create CRDs for Push Secret.
-  createPushSecret: true
-  annotations: {}
-  conversion:
-    # -- Conversion is disabled by default as we stopped supporting v1alpha1.
-    enabled: false
-
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
-namespaceOverride: ""
-
-# -- Additional labels added to all helm chart resources.
+# global common labels, applied to all ressources
 commonLabels: {}
 
-# -- If true, external-secrets will perform leader election between instances to ensure no more
-# than one instance of external-secrets operates at a time.
-leaderElect: true
-
-# -- If set external secrets will filter matching
-# Secret Stores with the appropriate controller values.
-controllerClass: ""
-
-# -- If true external secrets will use recommended kubernetes
-# annotations as prometheus metric labels.
-extendedMetricLabels: false
-
-# -- If set external secrets are only reconciled in the
-# provided namespace
-scopedNamespace: ""
-
-# -- Must be used with scopedNamespace. If true, create scoped RBAC roles under the scoped namespace
-# and implicitly disable cluster stores and cluster external secrets
-scopedRBAC: false
-
-# -- If true the OpenShift finalizer permissions will be added to RBAC
-openshiftFinalizers: true
-
-# -- if true, the operator will process cluster external secret. Else, it will ignore them.
-processClusterExternalSecret: true
-
-# -- if true, the operator will process cluster push secret. Else, it will ignore them.
-processClusterPushSecret: true
-
-# -- if true, the operator will process cluster store. Else, it will ignore them.
-processClusterStore: true
-
-# -- if true, the operator will process push secret. Else, it will ignore them.
-processPushSecret: true
-
-# -- Specifies whether an external secret operator deployment be created.
-createOperator: true
-
-# -- Specifies the number of concurrent ExternalSecret Reconciles external-secret executes at
-# a time.
-concurrent: 1
-# -- Specifices Log Params to the External Secrets Operator
-log:
-  level: info
-  timeEncoding: epoch
-service:
-  # -- Set the ip family policy to configure dual-stack see [Configure dual-stack](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services)
-  ipFamilyPolicy: ""
-  # -- Sets the families that should be supported and the order in which they should be applied to ClusterIP as well. Can be IPv4 and/or IPv6.
-  ipFamilies: []
-
-serviceAccount:
-  # -- Specifies whether a service account should be created.
-  create: true
-  # -- Automounts the service account token in all containers of the pod
-  automount: true
-  # -- Annotations to add to the service account.
-  annotations: {}
-  # -- Extra Labels to add to the service account.
-  extraLabels: {}
-  # -- The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template.
-  name: ""
-
-rbac:
-  # -- Specifies whether role and rolebinding resources should be created.
+# This section of values is for 1Password Connect API and Sync Configuration
+connect:
+  # Denotes whether the 1Password Connect server will be deployed
   create: true
 
-  servicebindings:
-    # -- Specifies whether a clusterrole to give servicebindings read access should be created.
-    create: true
+  # The number of replicas to run the 1Password Connect deployment
+  replicas: 1
 
-  # -- Specifies whether permissions are aggregated to the view ClusterRole
-  aggregateToView: true
+  # The 1Password Connect API Specific Values
+  api:
+    name: connect-api
+    # The 1Password Connect API repository
+    imageRepository: 1password/connect-api
+    resources:
+      limits:
+        memory: 128Mi
+      requests:
+        cpu: 0.2
+    httpPort: 8080
+    httpsPort: 8443
+    logLevel: info
+    # Prometheus Service Monitor
+    # ref: https://github.com/coreos/prometheus-operator
+    #
+    serviceMonitor:
+      # Create ServiceMonitor Resource for scraping metrics using PrometheusOperator
+      #
+      enabled: true
+      # Specify the interval at which metrics should be scraped
+      #
+      interval: 30s
+      # Define the path used by ServiceMonitor to scrape metrics
+      #
+      path: "/metrics"
+      # Define the HTTP URL parameters used by ServiceMonitor
+      #
+      params: {}
+      # Extra annotations for the ServiceMonitor
+      #
+      annotations: {}
 
-  # -- Specifies whether permissions are aggregated to the edit ClusterRole
-  aggregateToEdit: true
+  # The 1Password Connect Sync Specific Values
+  sync:
+    name: connect-sync
+    imageRepository: 1password/connect-sync
+    resources: {}
+    httpPort: 8081
+    logLevel: info
 
-## -- Extra environment variables to add to container.
-extraEnv: []
+  # The name of 1Password Connect Application
+  applicationName: onepassword-connect
 
-## -- Map of extra arguments to pass to container.
-extraArgs: {}
+  # The name of 1Password Connect Host
+  host: onepassword-connect
 
-## -- Extra volumes to pass to pod.
-extraVolumes: []
+  # The type of Service resource to create for the Connect API and sync services.
+  # See: https://kubernetes.io/docs/concepts/services-networking/service
+  # This by default is ClusterIP and can also be defined as NodePort or LoadBalancer.
+  # If serviceType is LoadBalancer then loadBalancerSourceRanges and loadBalancerIP should be defined.
+  # See: https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer
+  serviceType: ClusterIP
 
-## -- Extra Kubernetes objects to deploy with the helm chart
-extraObjects: []
+  # Additional annotations to be added to the service resource
+  serviceAnnotations: {}
 
-## -- Extra volumes to mount to the container.
-extraVolumeMounts: []
+  # loadBalancerSourceRanges:
+  #   - 10.0.0.0/16
+  #   - 1.84.26.4/32
 
-## -- Extra containers to add to the pod.
-extraContainers: []
+  # loadBalancerIP:
 
-# -- Annotations to add to Deployment
-deploymentAnnotations: {}
+  # The name of Kubernetes Secret containing the 1Password Connect credentials
+  credentialsName: onepassword-connect-credentials
+  # The key for the 1Password Connect Credentials stored in the credentials secret
+  credentialsKey: 1password-credentials.json
 
-# -- Annotations to add to Pod
-podAnnotations: {}
+  # Contents of the 1password-credentials.json file for Connect.
+  # Can be set be adding --set-file connect.credentials=<path/to/1password-credentials.json>
+  # to your helm install command
+  credentials:
 
-podLabels: {}
+  # Base64-encoded contents of the 1password-credentials.json file for Connect.
+  # This can be used instead of connect.credentials in case supplying raw JSON
+  # to connect.credentials leads to issues.
+  credentials_base64:
 
-podSecurityContext:
-  enabled: true
-  # fsGroup: 2000
+  # The 1Password Connect API repository
+  imagePullPolicy: IfNotPresent
 
-securityContext:
-  allowPrivilegeEscalation: false
-  capabilities:
-    drop:
-      - ALL
-  enabled: true
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
-  runAsUser: 1000
-  seccompProfile:
-    type: RuntimeDefault
+  # List of secret names to use as image pull secrets. Secrets must exist in the same namespace.
+  imagePullSecrets: []
 
-resources:
-  limits:
-    cpu: 100m
-    memory: 256Mi
-  requests:
-    cpu: 10m
-    memory: 64Mi
+  # The 1Password Connect version to pull
+  version: "{{ .Chart.AppVersion }}"
 
-serviceMonitor:
-  # -- Specifies whether to create a ServiceMonitor resource for collecting Prometheus metrics
-  enabled: true
+  # Node selector stanza for the Connect pod
+  # See: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+  nodeSelector: {}
 
-  # -- namespace where you want to install ServiceMonitors
-  namespace: "monitoring"
+  # Affinity rules for the Connect pod
+  affinity: {}
 
-  # -- Additional labels
-  additionalLabels: {}
-
-  # --  Interval to scrape metrics
-  interval: 30s
-
-  # -- Timeout if metrics can't be retrieved in given time interval
-  scrapeTimeout: 25s
-
-  # -- Let prometheus add an exported_ prefix to conflicting labels
-  honorLabels: false
-
-  # -- Metric relabel configs to apply to samples before ingestion. [Metric Relabeling](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#metric_relabel_configs)
-  metricRelabelings: []
-  # - action: replace
-  #   regex: (.*)
-  #   replacement: $1
-  #   sourceLabels:
-  #   - exported_namespace
-  #   targetLabel: namespace
-
-  # -- Relabel configs to apply to samples before ingestion. [Relabeling](https://prometheus.io/docs/prometheus/latest/configuration/configuration/#relabel_config)
-  relabelings: []
-  # - sourceLabels: [__meta_kubernetes_pod_node_name]
-  #   separator: ;
-  #   regex: ^(.*)$
-  #   targetLabel: nodename
-  #   replacement: $1
-  #   action: replace
-
-metrics:
-
-  listen:
-    port: 8080
-
-  service:
-    # -- Enable if you use another monitoring tool than Prometheus to scrape the metrics
+  ## Horizontal Pod Autoscaling for the Connect pod
+  hpa:
+    # Enable Horizontal Pod Autoscaling for the Connect pod
     enabled: false
-
-    # -- Metrics service port to scrape
-    port: 8080
-
-    # -- Additional service annotations
+    # Additional annotations to be added to the HPA Connect
     annotations: {}
+    # Minimum number of replicas for the Connect pod
+    minReplicas: 1
+    # Maximum number of replicas for the Connect pod
+    maxReplicas: 3
+    # Average Memory utilization percentage for the Connect pod
+    avgMemoryUtilization: 50
+    # Average CPU utilization percentage for the Connect pod
+    avgCpuUtilization: 50
+    # Defines the Autoscaling Behavior in up/down directions
+    behavior: {}
 
-grafanaDashboard:
-  # -- If true creates a Grafana dashboard.
-  enabled: true
+  ## Pod Disruption Budget for the Connect pod
+  pdb:
+    # Enable Pod Disruption Budget for the Connect pod
+    enabled: false
+    # Additional annotations to be added to the PDB Connect
+    annotations: {}
+    # Number of pods that are unavailble after eviction as number or percentage (eg.: 50%)
+    maxUnavailable: 1
+    # Number of pods that are available after eviction as number or percentage (eg.: 50%)
+    minAvailable: 0
 
-  # -- Label that ConfigMaps should have to be loaded as dashboards.
-  sidecarLabel: "grafana_dashboard"
+  # 1Password Connect API and Sync Service
+  probes:
+    # Denotes whether the 1Password Connect API readiness probe will operate
+    # and ensure the pod is ready before serving traffic
+    liveness: true
+    # Denotes whether the 1Password Connect API will be continually checked
+    # by Kubernetes for liveness and restarted if the pod becomes unresponsive
+    readiness: true
 
-  # -- Label value that ConfigMaps should have to be loaded as dashboards.
-  sidecarLabelValue: "1"
+  # priorityClassName to apply to the Connect API deployment resource.
+  priorityClassName: ''
 
-  # -- Annotations that ConfigMaps can have to get configured in Grafana,
-  # See: sidecar.dashboards.folderAnnotation for specifying the dashboard folder.
-  # https://github.com/grafana/helm-charts/tree/main/charts/grafana
+  # Additional annotations to be added to the Connect API deployment resource.
   annotations: {}
 
-nodeSelector: {}
+  # Additional labels to be added to the Connect API deployment resource.
+  labels: {}
 
-tolerations: []
-
-topologySpreadConstraints: []
-
-affinity: {}
-
-# -- Pod priority class name.
-priorityClassName: ""
-
-# -- Pod disruption budget - for more details see https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
-podDisruptionBudget:
-  enabled: true
-  minAvailable: 2    # @schema type:[integer, string]
-  # maxUnavailable: "50%"
-
-# -- Run the controller on the host network
-hostNetwork: false
-
-webhook:
-  # -- Annotations to place on validating webhook configuration.
-  annotations: {}
-  # -- Specifies whether a webhook deployment be created. If set to false, crds.conversion.enabled should also be set to false otherwise the kubeapi will be hammered because the conversion is looking for a webhook endpoint.
-  create: true
-  # -- Specifices the time to check if the cert is valid
-  certCheckInterval: "5m"
-  # -- Specifices the lookaheadInterval for certificate validity
-  lookaheadInterval: ""
-  replicaCount: 3
-  # -- Specifices Log Params to the Webhook
-  log:
-    level: info
-    timeEncoding: epoch
-  # -- Specifies the amount of historic ReplicaSets k8s should keep (see https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy)
-  revisionHistoryLimit: 10
-
-  certDir: /tmp/certs
-  # -- Specifies whether validating webhooks should be created with failurePolicy: Fail or Ignore
-  failurePolicy: Fail
-  # -- Specifies if webhook pod should use hostNetwork or not.
-  hostNetwork: false
-  image:
-    repository: ghcr.io/external-secrets/external-secrets
-    pullPolicy: IfNotPresent
-    # -- The image tag to use. The default is the chart appVersion.
-    tag: "v0.18.0"
-    # -- The flavour of tag you want to use
-    flavour: ""
-  imagePullSecrets: []
-  nameOverride: ""
-  fullnameOverride: ""
-  # -- The port the webhook will listen to
-  port: 10250
-  rbac:
-  # -- Specifies whether role and rolebinding resources should be created.
-    create: true
-  serviceAccount:
-    # -- Specifies whether a service account should be created.
-    create: true
-    # -- Automounts the service account token in all containers of the pod
-    automount: true
-    # -- Annotations to add to the service account.
-    annotations: {}
-    # -- Extra Labels to add to the service account.
-    extraLabels: {}
-    # -- The name of the service account to use.
-    # If not set and create is true, a name is generated using the fullname template.
-    name: ""
-  nodeSelector: {}
-
-  certManager:
-    # -- Enabling cert-manager support will disable the built in secret and
-    # switch to using cert-manager (installed separately) to automatically issue
-    # and renew the webhook certificate. This chart does not install
-    # cert-manager for you, See https://cert-manager.io/docs/
-    enabled: true
-    # -- Automatically add the cert-manager.io/inject-ca-from annotation to the
-    # webhooks and CRDs. As long as you have the cert-manager CA Injector
-    # enabled, this will automatically setup your webhook's CA to the one used
-    # by cert-manager. See https://cert-manager.io/docs/concepts/ca-injector
-    addInjectorAnnotations: true
-    cert:
-      # -- Create a certificate resource within this chart. See
-      # https://cert-manager.io/docs/usage/certificate/
-      create: true
-      # -- For the Certificate created by this chart, setup the issuer. See
-      # https://cert-manager.io/docs/reference/api-docs/#cert-manager.io/v1.IssuerSpec
-      issuerRef:
-        group: cert-manager.io
-        kind: "ClusterIssuer"
-        name: "selfsigned-issuer"
-      # -- Set the requested duration (i.e. lifetime) of the Certificate. See
-      # https://cert-manager.io/docs/reference/api-docs/#cert-manager.io/v1.CertificateSpec
-      # One year by default.
-      duration: "8760h"
-      # -- Set the revisionHistoryLimit on the Certificate. See
-      # https://cert-manager.io/docs/reference/api-docs/#cert-manager.io/v1.CertificateSpec
-      # Defaults to 0 (ignored).
-      revisionHistoryLimit: 0
-      # -- How long before the currently issued certificate’s expiry
-      # cert-manager should renew the certificate. See
-      # https://cert-manager.io/docs/reference/api-docs/#cert-manager.io/v1.CertificateSpec
-      # Note that renewBefore should be greater than .webhook.lookaheadInterval
-      # since the webhook will check this far in advance that the certificate is
-      # valid.
-      renewBefore: "360h"
-      # -- Add extra annotations to the Certificate resource.
-      annotations: {}
-
-  tolerations: []
-
-  topologySpreadConstraints: []
-
-  affinity: {}
-
-    # -- Pod priority class name.
-  priorityClassName: ""
-
-  # -- Pod disruption budget - for more details see https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
-  podDisruptionBudget:
-    enabled: true   # Add PDB for HA
-    minAvailable: 2
-
-  metrics:
-
-    listen:
-      port: 8080
-
-    service:
-      # -- Enable if you use another monitoring tool than Prometheus to scrape the metrics
-      enabled: false
-
-      # -- Metrics service port to scrape
-      port: 8080
-
-      # -- Additional service annotations
-      annotations: {}
-
-
-  readinessProbe:
-    # -- Address for readiness probe
-    address: ""
-    # -- ReadinessProbe port for kubelet
-    port: 8081
-
-
-    ## -- Extra environment variables to add to container.
-  extraEnv: []
-
-    ## -- Map of extra arguments to pass to container.
-  extraArgs: {}
-
-    ## -- Extra volumes to pass to pod.
-  extraVolumes: []
-
-    ## -- Extra volumes to mount to the container.
-  extraVolumeMounts: []
-
-    # -- Annotations to add to Secret
-  secretAnnotations: {}
-
-    # -- Annotations to add to Deployment
-  deploymentAnnotations: {}
-
-    # -- Annotations to add to Pod
+  # Additional annotations to be added to the Connect API pods.
   podAnnotations: {}
 
+  # Additional labels to be added to the Connect API pods.
   podLabels: {}
 
-  podSecurityContext:
-    enabled: true
-      # fsGroup: 2000
+  # List of tolerations to be added to the Connect API pods.
+  tolerations: []
 
-  securityContext:
-    allowPrivilegeEscalation: false
-    capabilities:
-      drop:
-        - ALL
-    enabled: true
-    readOnlyRootFilesystem: true
-    runAsNonRoot: true
-    runAsUser: 1000
-    seccompProfile:
-      type: RuntimeDefault
+  # 1Password Connect volume shared between 1Password Connect Containers
+  dataVolume:
+    # The name of the shared volume used between 1Password Connect Containers
+    name: shared-data
+    # The type of the shared volume used between
+    # 1Password Connect Containers
+    type: emptyDir
+    # Desribes the fields and values for configuration of
+    # shared volume for 1Password Connect
+    values: {}
 
-  resources:
-    limits:
-      cpu: 50m
-      memory: 128Mi
-    requests:
-      cpu: 5m
-      memory: 32Mi
+  # Determines if HTTPS Port if setup for the 1Password Connect
+  # Services for 1Password Connect API and Sync
+  tls:
+    # Denotes whether the Connect API is secured with TLS
+    enabled: false
+    # The name of the secret containing the TLS key (tls.key) and certificate (tls.crt)
+    secret: op-connect-tls
 
-  # -- Manage the service through which the webhook is reached.
-  service:
-    # -- Whether the service object should be enabled or not (it is expected to exist).
-    enabled: true
-    # -- Custom annotations for the webhook service.
-    annotations: {}
-    # -- Custom labels for the webhook service.
+  # Ingress allows ingress services to be created to allow external access
+  # from Kubernetes to access 1Password Connect pods.
+  # In order to expose the service, use the route section below
+  ingress:
+    enabled: false
     labels: {}
-    # -- The service type of the webhook service.
-    type: ClusterIP
-    # -- If the webhook service type is LoadBalancer, you can assign a specific load balancer IP here.
-    # Check the documentation of your load balancer provider to see if/how this should be used.
-    loadBalancerIP: ""
-
-certController:
-  # -- Specifies whether a certificate controller deployment be created.
-  create: true
-  requeueInterval: "5m"
-  replicaCount: 3
-  # -- Specifices Log Params to the Certificate Controller
-  log:
-    level: info
-    timeEncoding: epoch
-  # -- Specifies the amount of historic ReplicaSets k8s should keep (see https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy)
-  revisionHistoryLimit: 10
-
-  image:
-    repository: ghcr.io/external-secrets/external-secrets
-    pullPolicy: IfNotPresent
-    tag: "v0.18.0"
-    flavour: ""
-  imagePullSecrets: []
-  nameOverride: ""
-  fullnameOverride: ""
-  rbac:
-  # -- Specifies whether role and rolebinding resources should be created.
-    create: true
-  serviceAccount:
-    # -- Specifies whether a service account should be created.
-    create: true
-    # -- Automounts the service account token in all containers of the pod
-    automount: true
-    # -- Annotations to add to the service account.
+      # traffic: external
     annotations: {}
-    # -- Extra Labels to add to the service account.
-    extraLabels: {}
-    # -- The name of the service account to use.
-    # If not set and create is true, a name is generated using the fullname template.
-    name: ""
+      # |
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+      #   or
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+
+    # Optionally use ingressClassName instead of deprecated annotation.
+    # See: https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation
+    ingressClassName: ""
+
+    # As of Kubernetes 1.19, all Ingress Paths must have a pathType configured. The default value below should be sufficient in most cases.
+    # See: https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types for other possible values.
+    pathType: Prefix
+    hosts:
+      - host: chart-example.local
+        paths: []
+    # Extra paths to prepend to the host configuration.
+    # This is useful when working with annotation based services.
+    extraPaths: []
+    # - path: /*
+    #   backend:
+    #     service:
+    #       name: ssl-redirect
+    #       port:
+    #         number: use-annotation
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  # Optionally the internal profiler can be enabled to debug memory or performance issues.
+  # For normal operation of Connect this does not have to enabled.
+  profiler:
+    enabled: false
+    # The interval at which profiler snapshots are taken.
+    interval: 6h
+    # Number of profiler snapshots to keep.
+    keepLast: 12
+
+  # 1Password Connect Custom Container Environment Variables
+  # Must be written in the following format:
+  # - name: VARIABLE_NAME
+  #   value: VARIABLE_VALUE
+  customEnvVars: []
+
+# This section of values is for 1Password Operator Configuration
+operator:
+  # Denotes whether the 1Password Operator will be deployed
+  create: false
+
+  # The number of replicas to run the 1Password Connect Operator deployment
+  replicas: 1
+
+  # Denotes whether the 1Password Operator will automatically restart deployments based on associated updated secrets.
+  autoRestart: false
+
+  # The name of 1Password Operator Application
+  applicationName: onepassword-connect-operator
+
+  # The 1Password Operator image pull policy
+  imagePullPolicy: IfNotPresent
+
+  # List of secret names to use as image pull secrets. Secrets must exist in the same namespace.
+  imagePullSecrets: []
+
+  # The 1Password Operator repository
+  imageRepository: 1password/onepassword-operator
+
+  # How often the 1Password Operator will poll for secrets updates.
+  pollingInterval: 600
+
+  # The 1Password Operator version to pull
+  version: "1.8.1"
+
+  # Node selector stanza for the Operator pod
+  # See: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
   nodeSelector: {}
 
-  tolerations: []
-
-  topologySpreadConstraints: []
-
+  # Affinity rules for the Operator pod
   affinity: {}
 
-  # -- Run the certController on the host network
-  hostNetwork: false
+  ## Horizontal Pod Autoscaling for the Operator pod
+  hpa:
+    # Enable Horizontal Pod Autoscaling for the Operator pod
+    enabled: false
+    # Additional annotations to be added to the HPA Operator
+    annotations: {}
+    # Minimum number of replicas for the Operator pod
+    minReplicas: 1
+    # Maximum number of replicas for the Operator pod
+    maxReplicas: 3
+    # Average Memory utilization percentage for the Operator pod
+    avgMemoryUtilization: 50
+    # Average CPU utilization percentage for the Operator pod
+    avgCpuUtilization: 50
+    # Defines the Autoscaling Behavior in up/down directions
+    behavior: {}
 
-    # -- Pod priority class name.
-  priorityClassName: ""
+  ## Pod Disruption Budget for the Operator pod
+  pdb:
+    # Enable Pod Disruption Budget for the Operator pod
+    enabled: false
+    # Additional annotations to be added to the PDB Operator
+    annotations: {}
+    # Number of pods that are unavailble after eviction as number or percentage (eg.: 50%)
+    maxUnavailable: 1
+    # Number of pods that are available after eviction as number or percentage (eg.: 50%)
+    minAvailable: 0
 
-  # -- Pod disruption budget - for more details see https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
-  podDisruptionBudget:
-    enabled: true
-    minAvailable: 2    # @schema type:[integer, string]
-    # maxUnavailable: "50%"
+  # Additional annotations to be added to the Operator pods.
+  annotations: {}
 
-  metrics:
+  # Additional labels to be added to the Operator deployment resource.
+  labels: {}
 
-    listen:
-      port: 8080
-
-    service:
-      # -- Enable if you use another monitoring tool than Prometheus to scrape the metrics
-      enabled: false
-
-      # -- Metrics service port to scrape
-      port: 8080
-
-      # -- Additional service annotations
-      annotations: {}
-
-  readinessProbe:
-    # -- Address for readiness probe
-    address: ""
-    # -- ReadinessProbe port for kubelet
-    port: 8081
-
-    ## -- Extra environment variables to add to container.
-  extraEnv: []
-
-    ## -- Map of extra arguments to pass to container.
-  extraArgs: {}
-
-
-    ## -- Extra volumes to pass to pod.
-  extraVolumes: []
-
-    ## -- Extra volumes to mount to the container.
-  extraVolumeMounts: []
-
-    # -- Annotations to add to Deployment
-  deploymentAnnotations: {}
-
-    # -- Annotations to add to Pod
+  # Additional annotations to be added to the Operator pods.
   podAnnotations: {}
 
+  # Additional labels to be added to the Operator pods.
   podLabels: {}
 
-  podSecurityContext:
-    enabled: true
-      # fsGroup: 2000
+  # priorityClassName to apply to the Operator pods.
+  priorityClassName: ''
 
-  securityContext:
-    allowPrivilegeEscalation: false
-    capabilities:
-      drop:
-        - ALL
-    enabled: true
-    readOnlyRootFilesystem: true
-    runAsNonRoot: true
-    runAsUser: 1000
-    seccompProfile:
-      type: RuntimeDefault
+  # List of tolerations to be added to the Operator pods.
+  tolerations: []
 
-  resources:
-    limits:
-      cpu: 50m
-      memory: 128Mi
-    requests:
-      cpu: 5m
-      memory: 32Mi
+  # A list of namespaces for the 1Password Operator to watch and manage. Use the empty list to watch all namespaces.
+  watchNamespace: []
 
-# -- Specifies `dnsPolicy` to deployment
-dnsPolicy: ClusterFirst
+  # The resources requests/limits for the 1Password Operator pod
+  resources: {}
 
-# -- Specifies `dnsOptions` to deployment
-dnsConfig: {}
+  # 1Password Operator Token Configuration
+  token:
+    # The name of Kubernetes Secret containing the 1Password Connect API token
+    name: onepassword-token
 
-# -- Any extra pod spec on the deployment
-podSpecExtra: {}
+    # The key for the 1Password Connect token stored in the 1Password token secret
+    key: token
+
+    # An API token generated for 1Password Connect to be used by the Operator
+    value:
+
+  # 1Password Operator Service Account Configuration
+  serviceAccount:
+    # The name of the 1Password Conenct Operator
+    create: "{{ .Values.operator.create }}"
+
+    # Annotations for the 1Password Connect Service Account
+    annotations: {}
+
+    # The name of the 1Password Conenct Operator
+    name: onepassword-connect-operator
+
+  # 1Password Operator Role Binding Configuration
+  roleBinding:
+    # Denotes whether or not a role binding will be created for each Namespace for the 1Password Operator Service Account
+    create: "{{ .Values.operator.create }}"
+
+    # The name of the 1Password Operator Role Binding
+    name: onepassword-connect-operator
+
+  # 1Password Operator Cluster Role Configuration
+  clusterRole:
+    # Denotes whether or not a cluster role will be created for each for the 1Password Operator
+    create: "{{ .Values.operator.create }}"
+
+    # The name of the 1Password Operator Cluster Role
+    name: onepassword-connect-operator
+
+  # 1Password Operator Cluster Role Binding Configuration
+  clusterRoleBinding:
+    # Denotes whether or not a Cluster role binding will be created for the 1Password Operator Service Account
+    create: "{{ .Values.operator.create }}"
+
+    # The name of the 1Password Operator Cluster Role
+    name: onepassword-connect-operator
+
+  # 1Password Operator Log Level Configuration
+  logLevel: info
+
+  # 1Password Operator Custom Container Environment Variables
+  # Must be written in the following format:
+  # - name: VARIABLE_NAME
+  #   value: VARIABLE_VALUE
+  customEnvVars: []
+
+# 1Password Acceptance Tests Functionality
+acceptanceTests:
+  enabled: false
+  fixtures: {}
