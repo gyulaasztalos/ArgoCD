@@ -79,17 +79,17 @@ connect:
   # The name of Kubernetes Secret containing the 1Password Connect credentials
   credentialsName: onepassword-connect-credentials
   # The key for the 1Password Connect Credentials stored in the credentials secret
-  credentialsKey: 1password-credentials.json
+  credentialsKey: onepassword-credentials.json
 
   # Contents of the 1password-credentials.json file for Connect.
   # Can be set be adding --set-file connect.credentials=<path/to/1password-credentials.json>
   # to your helm install command
-  # credentials: ""
+  credentials: ""
 
   # Base64-encoded contents of the 1password-credentials.json file for Connect.
   # This can be used instead of connect.credentials in case supplying raw JSON
   # to connect.credentials leads to issues.
-  # credentials_base64: ""
+  credentials_base64: ""
 
   # The 1Password Connect API repository
   imagePullPolicy: IfNotPresent
