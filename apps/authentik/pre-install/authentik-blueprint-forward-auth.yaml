@@ -1,15 +1,18 @@
 ---
-apiVersion: bitnami.com/v1alpha1
-kind: SealedSecret
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
 metadata:
-  creationTimestamp: null
   name: authentik-blueprint-forward-auth
   namespace: authentik
 spec:
-  encryptedData:
-    forward-auth.yaml: AgCyqtzd+V+Fd/2CVcOOEYNdDziOg16L6uiGN5FASH3cfuHATabu5H2/ritwJYvsE5OHFJNXSl4Rdm0V8Pt0qbucTV9vkYu/JH8zBuiRCIQsdgt7XUMCgDMPXY9sl1rydElzxcjP9vgKieNimf4SXxJeah8iBA3X4Kt+J+KBcMLuyv7am799ddc8EtVPk+F5hXz94KRTdWoSGQAb9ogSrrSifMzxIovq1uyzIYScSO1rEFp4f3MzGqURBTQV3JL3bla4eCXDcjqIkezg8/Uvg270+mB3carbWKwlUjDCU/udx3HEqP7r3T8PaA/xAe63qIITolzKeX32FK76ffDLxJMZECfRbcHvImHH2inoSS4pKsM184nWZGufcBQZ9jqlCjg/ecsWPVxlT1UAiMHuz+oQYtsK5dnln2iuEj6NsjiJr8Zg/d5EMM62zUQRldmoaBiTT/+aUQ5dasUHDXRa2JC98wSL36lgdpU1AHXmuMllUxFGfV9xWvNpKMc5ghJicrXqfMdqRRhCDjffChqpjs4gzUvC3dVNSnkOu5VOFalMsTkdfgtaJjFG6biY9/u3UPxNBaU3iUXc6csj3Vcos8/asvnWd30Q+ThcwpNIoyL0kjybJsPCIH5gQAZixP8dpDuoIcExZCgWTM4qKowOSGe2CdgF5DI4zdCizA5GAjTfHZWfnGNFLOCwBP/7+0V7rzWmz/bvMfOGlfZw+DsdOET9G3Wc9hqdDyjJIKZnCFCOM/xQp5law0sYrTuDsY28d1r/SpcZSVRo+F/fxJL4R8x4oCVcISh4OF7W4SKyhEWfTvLqGGyQqf2D8cKZp3hyKZFC63tByBO9VjXFh0YjCZKS7mEVFtddiRxd7Au5p7ZxDZ+xndv7/f7zAHt9lpOoMTV0DZWwvt7STLPPsnXbRmry1bAjUirSaZ3UUgvOtJXx+DJT+M+HkwEFYyCCGeYMzGgbji6DfWjFJsQ738SHddr2zhZuRGEXqGwqGHczudjsgjEBn3tFhb5AFdeS7jCySxb69Gh/4PryUOI1D83KxvkbLiaUd8PqqTbAvg18oeWzgDp3V/xp8Hhr7FC8JcK8iSWzm91KA8aVUFu0yy0U5d0UlBWcYwwV2WgQs3xW2p/c2dihewRBGac8KijYnhdj4ItrTRW1AmuYhELWPxDh5mMgJSAelNQq/BJSIKgyMzLLFhPnEmn7dXhH94foBqXsaXtPWm/6/YjeTaYutMzF1VP4chs0vZ01WvdLAwP47mAgbGqIodOOYcd0VXTjg202ohjOEoz3Yk2R01pzC8tgAOgtCxfTMiZzoUQh0rnSm9JHcXJgPjicuXNJd9U4ccULoBXg4/cUHvPqf5ALBE7Xhr48OBqleG45bKOWOpib7EOTgc0fNXX8AIlAXLFBMmj4Zy2XPVfwqOeYEayEVcs3ghvsi+QZlxouOh+0Xr4kF7r88p9zKqrp7I1gAZOLyXwMy5c6aedM0lNOYDZI2AZ+WT7n8QeB3vPi2KhEsMsCcYNi15B9QXt4BPrxEtCFxIb5CtjGyaDpJopnivUcEFxQjStDv784qzTLjD1WWdtplTVqVFQ6XQ==
-  template:
-    metadata:
-      creationTimestamp: null
-      name: authentik-blueprint-forward-auth
-      namespace: authentik
+  refreshInterval: 1h
+  secretStoreRef:
+    name: onepassword-store           # your ClusterSecretStore name
+    kind: ClusterSecretStore
+  target:
+    name: authentik-blueprint-forward-auth     # name of the Kubernetes Secret to be created
+    creationPolicy: Owner
+  data:
+    - secretKey: forward-auth.yaml                # key in the Kubernetes Secret
+      remoteRef:
+        key: authentik-blueprint-forward-auth/forward-auth.yaml    # 1Password item name
