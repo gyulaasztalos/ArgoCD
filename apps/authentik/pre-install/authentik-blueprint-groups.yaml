@@ -24,3 +24,11 @@ data:
         attrs:
           users:
             - !Find [authentik_core.user, [username, Anita]]
+      - model: authentik_core.group
+        state: present
+        identifiers:
+          name: authentik Admins
+        attrs:
+          users:
+            - !Find [authentik_core.user, [username, Gyula]]
+            - !Find [authentik_core.user, [username, akadmin]]
