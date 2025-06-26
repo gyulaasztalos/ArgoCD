@@ -1,15 +1,18 @@
 ---
-apiVersion: bitnami.com/v1alpha1
-kind: SealedSecret
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
 metadata:
-  creationTimestamp: null
   name: authentik-blueprint-users
   namespace: authentik
 spec:
-  encryptedData:
-    users.yaml: AgDYVV6zsl9sE+tOQVUivSucoKgVOw5DuQ4lp98TfbfCDrxIWSS45A7GsfQWV78CkpFChU7JH7xFnyOGbmsF5UJvpIkpHaaUzHgzCwKgQVkM+TJS2GWUe5tHoRzq0i0KuBo1yQ/BRgFi3NXuHCAIEGEieEPUx/A3xc8d6Iks1UJyDZma+x8a76/kyRp20zirKKb2JqNq0QjjP2kKRhVTkACQhdvMLSuVUt30AFFUSnOoYTbfMZgaEt48FkIT1zMRExf9F//dZ8fIAShDvXPcC5rFQ5kvVODffLaMb5esLoLAE6bpRbHWfmPyBadtYTq4WSEQegF4blQZRIpHzZvZJnuizouIH9VVNH3wfHBIMAsvWSTHsMRCDjEdhU4Rq20t/fK6jXkMS99YE5VDI1SmLeXpge/xjMwGaWC+rvrko2kO029V4R9RaDbJu8ZLA4/6gHNkF6h8QA0w2hxBCLOoxZg+uBiriGzVxUpZWqRcLH3UWr0+15J4T+1a2oZm7bdk1ptUjd/T8IX0Lc71Yi0RSoHYF7aKH1gytDzkgzDmbeJrmFSzwQi98ZztwyAMmBhhiS38uBb3chFR28Pz4xQmz8BgDL6/MxT2D4Gt2vEDcTKBkhZSVpN//ZFBSt2xp/eJSRLkmOjckymmO9oa/0x4ohcoH/zwggmMpx9DGdxITWSy7FN9K30NcLCh5Xuk1KjFlLopZhdFpYnXGIsJh+w/y/0ZX8eixNiKJTbraixGozSZSe2jI7meEqzjJr/KZSCRdC81eN732ekgSIxt8QXOrY9sOCJaPfhCtSa9HDSVkDlCWLe/cQOzzI+cYUFG1lZKGsrcxHDvQOJ0QvnR/ItcjE1VIST0nudJBcE7nUyumqUGTt+r+snBOWeVkNN18PwBXAXO9fA4fDu3aZbEQ/lOiX5hNitcdK5Xx3OrKDE1VRt5KG2/LmQ+CdjgHuFB4eEwVrvnzzJDW42ysKmwU86uWSPpRUahTtfOmmhCId1lhVm8MwfIwl0FLY1bIKEWuZiwmgYjhulcGfZd8XCOuEYnRzQ7FwFLzxcSlbUeLvuETggccBPJt87h8y6qX3Ybn6jz7gbhYC23RwpyI3ptxjbqZ4TZu97Alp+nkAAOvNq/4o3AAeGjA/IJ6S8O++nmzTz7Hj6Rfd+6IycDftoQeKeF/KW24nBxMSrsbQ+xab2d3HryaEXiTAWYt+x2FcmhEgUflpa8ObJvpJDeCUvRTER0f7oHdWq9xv7AE2VlOqN6zU7VDqoDT3/Lu63xbLsK5bSBbKmduU268WBkJTmt3zIs5r42T0plZ5gzzig6y0JyuAzZ0aAhJ5Ik23X45LjmmvrjWVwQ2j8mzPTK6WPG+zuHtaR3Y1YGBSZJtz/BrZtzC0iC0sLbREOiurMCDcKHXqBZtwmbCirjgsYS661YZpSsMQt3I6sjbnnJTmfuUfNlv8UWLRY6C3fjJpozyUFngnO4PLLxeaPAPcU6mbKLiRK0p2UwOF9e/jW1SveDCkXrPdy5OBkP8tpD7e0O/1bzn3cBpnRCi2IJoLfYdGBYp5u8tFcJkFTqGJ2yCNbmhqZD26oA8CH7KuQiuQp3GdathPnAc+Hy0MaZPQjw/JuXk7wVt/sAssnQMevLnksy0KV//HXHzZGtxqWyH6o0Lg6lT48rncm+8iq0S3R95auXDA2BBh1/z2xyfAZy3Rhl625HF6wCH/TRA8ma7LMLrqgnJIBhkf/OVefCEp+BEGfYtUIRpUFqshVdPnO6xlPs6oXPUgW+J/AjNp04h95IrGlzwO4Co3NSBuAUy1yAjv4XT+tjNbG8id5UWKhGbqDvnfz1RYMd4izwMkQaGEle7SAw47kaHYOXnQ==
-  template:
-    metadata:
-      creationTimestamp: null
-      name: authentik-blueprint-users
-      namespace: authentik
+  refreshInterval: 1h
+  secretStoreRef:
+    name: onepassword-store           # your ClusterSecretStore name
+    kind: ClusterSecretStore
+  target:
+    name: authentik-blueprint-users     # name of the Kubernetes Secret to be created
+    creationPolicy: Owner
+  data:
+    - secretKey: users.yaml                # key in the Kubernetes Secret
+      remoteRef:
+        key: authentik-blueprint-users/users.yaml    # 1Password item name
