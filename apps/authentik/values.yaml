@@ -236,9 +236,7 @@ blueprints:
   # -- List of secrets to mount blueprints from.
   # Only keys in the secret ending with `.yaml` will be discovered and applied.
   secrets:
-    - authentik-blueprint-users
-    - authentik-blueprint-oauth-providers
-    - authentik-blueprint-forward-auth
+    - authentic-blueprint-secrets
 
 ## authentik server
 server:
@@ -330,7 +328,7 @@ server:
     - name: AUTHENTIK_REDIS__PASSWORD
       valueFrom:
         secretKeyRef:
-          name: authentik-redis-credentials
+          name: authentik-credentials
           key: redis-password
     - name: AUTHENTIK_REDIS__DB
       value: "0"
