@@ -773,7 +773,7 @@ worker:
     - name: AUTHENTIK_REDIS__PASSWORD
       valueFrom:
         secretKeyRef:
-          name: authentik-redis-credentials
+          name: authentik-credentials
           key: redis-password
     - name: AUTHENTIK_REDIS__DB
       value: "0"
