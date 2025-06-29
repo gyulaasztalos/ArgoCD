@@ -297,6 +297,7 @@ extraEnvVars:
     true,10.43.0.0/16,10.43.0.10,cluster.local
   FTLCONF_dns_listeningMode: 'SINGLE'
   FTLCONF_webserver_api_app_sudo: true
+  FTLCONF_MAXDBDAYS: "14"
   # TZ: UTC
   # Project a variable
   # SOME_VAR:
