@@ -4248,11 +4248,11 @@ prometheus:
 
     ## How long to retain metrics
     ##
-    retention: 3d
+    retention: 4d
 
     ## Maximum size of metrics
     ##
-    retentionSize: ""
+    retentionSize: "60GB"
 
     ## Allow out-of-order/out-of-bounds samples ingested into Prometheus for a specified duration
     ## See https://prometheus.io/docs/prometheus/latest/configuration/configuration/#tsdb
