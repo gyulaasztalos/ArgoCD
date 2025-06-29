@@ -1,0 +1,19 @@
+name: Kubernetes API Deprecation Check
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pluto-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install Pluto
+        uses: FairwindsOps/pluto/github-action@master
+        
+      - name: Scan Kubernetes manifests
+        run: |
+          printf "\nScanning YAML manifests for deprecated APIs...\n"
+          pluto detect-files -d ./ -o markdown
