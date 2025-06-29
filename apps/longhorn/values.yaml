@@ -128,7 +128,7 @@ persistence:
   # -- Replica count of the default Longhorn StorageClass.
   defaultClassReplicaCount: 3
   # -- Data locality of the default Longhorn StorageClass. (Options: "disabled", "best-effort")
-  defaultDataLocality: disabled
+  defaultDataLocality: best-effort
   # -- Reclaim policy that provides instructions for handling of a volume after its claim is released. (Options: "Retain", "Delete")
   reclaimPolicy: Delete
   # -- Setting that allows you to enable live migration of a Longhorn volume from one node to another.
