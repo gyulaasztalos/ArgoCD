@@ -208,7 +208,7 @@ configs:
     dex.config: |
       connectors:
       - config:
-          issuer: https://auth.local.asztalos.net/application/o/argocd/
+          issuer: http://authentik-server:9000/application/o/argocd/
           clientID: argocd
           clientSecret: $argocd-credentials:oidc.authentik.clientSecret
           insecureEnableGroups: true
