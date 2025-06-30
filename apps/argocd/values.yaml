@@ -208,7 +208,7 @@ configs:
     dex.config: |
       connectors:
       - config:
-          issuer: http://authentik-server.svc.cluster.local/application/o/argocd/
+          issuer: http://authentik-server.authentik.svc.cluster.local/application/o/argocd/
           clientID: argocd
           clientSecret: $argocd-credentials:oidc.authentik.clientSecret
           insecureEnableGroups: true
