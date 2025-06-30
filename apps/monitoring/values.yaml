@@ -4362,6 +4362,7 @@ prometheus:
         spec:
           storageClassName: longhorn
           accessModes: ["ReadWriteOnce"]
+          snapshotMaxCount: 5
           resources:
             requests:
               storage: 60Gi
