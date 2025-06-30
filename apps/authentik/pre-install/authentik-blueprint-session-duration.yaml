@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-blueprint-session-duration
+  namespace: authentik
+data:
+  session-duration.yaml: |
+    version: 1
+    metadata:
+      name: Custom Session Duration Update
+    entries:
+      - identifiers:
+          name: "default-authentication-login"  # Replace with your actual stage name
+        model: authentik_stages_user_login.userloginstage
+        attrs:
+          session_duration: "days=7"  # Set your desired duration
+        state: present

@@ -232,6 +232,7 @@ blueprints:
     - authentik-blueprint-groups
     - authentik-blueprint-applications
     - authentik-blueprint-outpost
+    - authentik-blueprint-session-duration
     - authentik-blueprint-meta
   # -- List of secrets to mount blueprints from.
   # Only keys in the secret ending with `.yaml` will be discovered and applied.

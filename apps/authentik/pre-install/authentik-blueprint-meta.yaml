@@ -46,3 +46,9 @@ data:
           identifiers:
             name: "Authentik Embedded Outpost Blueprint"
           required: true
+      - model: authentik_blueprints.metaapplyblueprint
+        state: present
+        attrs:
+          identifiers:
+            name: "Custom Session Duration Update"
+          required: true
