@@ -11,6 +11,9 @@ spec:
   sources:
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
+      path: apps/cert-manager/pre-install
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
       ref: config
     - repoURL: https://charts.jetstack.io
       targetRevision: v1.18.1

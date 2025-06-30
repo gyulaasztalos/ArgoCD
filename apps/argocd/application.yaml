@@ -13,6 +13,9 @@ spec:
   sources:
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
+      path: apps/argocd/pre-install
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
       ref: config
     - repoURL: https://argoproj.github.io/argo-helm
       targetRevision: 8.1.2
