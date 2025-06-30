@@ -43,7 +43,7 @@ spec:
         summary: "Slow External Secret reconciliation: {{ $labels.name }}"
         description: |
           External Secret reconciliation taking {{ $value }}s (>30s threshold).
-      expr: externalsecret_reconcile_duration > 30
+      expr: externalsecret_reconcile_duration > 30000000000  # 30 seconds in nanoseconds
       for: 5m
       labels:
         severity: warning
