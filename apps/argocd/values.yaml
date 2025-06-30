@@ -210,7 +210,7 @@ configs:
       - config:
           issuer: https://auth.local.asztalos.net/application/o/argocd/
           clientID: argocd
-          clientSecret: $argocd-oidc-secret:oidc.authentik.clientSecret
+          clientSecret: $argocd-credentials:oidc.authentik.clientSecret
           insecureEnableGroups: true
           scopes:
             - openid
@@ -1700,7 +1700,7 @@ externalRedis:
   port: 6379
   # -- The name of an existing secret with Redis (must contain key `redis-password`) and Sentinel credentials.
   # When it's set, the `externalRedis.password` parameter is ignored
-  existingSecret: "argocd-redis-secret"
+  existingSecret: "argocd-credentials"
   # -- External Redis Secret annotations
   secretAnnotations: {}
   db: 0
@@ -3392,7 +3392,7 @@ notifications:
   ## For more information: https://argo-cd.readthedocs.io/en/stable/operator-manual/notifications/services/overview/
   notifiers: {}
     # service.slack: |
-    #   token: $slack-    
+    #   token: $slack-
 
   # -- Annotations to be applied to the notifications controller Deployment
   deploymentAnnotations: {}
