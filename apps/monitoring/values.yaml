@@ -1224,16 +1224,16 @@ alertmanager:
 grafana:
   enabled: true
   admin:
-    existingSecret: kube-prometheus-stack-grafana
+    existingSecret: grafana-secrets
     userKey: admin-user
     passwordKey: admin-password
   namespaceOverride: ""
 
   extraSecretMounts:
-    - name: grafana-oauth-secrets-mount
-      secretName: grafana-oauth-secrets
+    - name: grafana-secrets-mount
+      secretName: grafana-secrets
       defaultMode: 0440
-      mountPath: /etc/secrets/grafana-oauth-secrets
+      mountPath: /etc/secrets/grafana-secrets
       readOnly: true
 
   grafana.ini:
@@ -1245,7 +1245,7 @@ grafana:
       name: Authentik
       allow_sign_up: true
       client_id: grafana  # Match client ID from your Authentik provider
-      client_secret: $__file{/etc/secrets/grafana-oauth-secrets/GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}
+      client_secret: $__file{/etc/secrets/grafana-secrets/GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET}
       scopes: openid profile email offline_access
       auth_url: https://auth.local.asztalos.net/application/o/authorize/
       token_url: https://auth.local.asztalos.net/application/o/token/
