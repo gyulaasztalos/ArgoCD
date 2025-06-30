@@ -1,22 +1,37 @@
 ---
-apiVersion: bitnami.com/v1alpha1
-kind: SealedSecret
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
 metadata:
-  creationTimestamp: null
-  name: github-oci
+  name: argocd-github-oci
   namespace: argocd
 spec:
-  encryptedData:
-    enableOCI: AgBzZiXs9ZKkaXxbwjQRNReF/eUvEX2gXHZZvy9kbzvCbh1mi4hkbqOVYS33ySZj4eNofiX/cQAwngx5O8No1+zW9aPnEQJos5lgWWx2ehISOXHxqMgYEyv3bDJpARK9jKk31W4cGb5dWzh1jtMaKvzqMD7Wqw7XYKNRqN+/tkgenlJwR7jkeoWmkL4gRaFvEPBzQNPOQ2j8iMZqizk360KDLqp9iIJS+eZoIyJIkwjytp/Yo0/jG9nNwLsn6Sugrrou0fGEuhd2r4aiuxMNrOzuWMxdbSOm3iG7OT9HF9l+OA97/673pi17qcqxu0OQ9W6O20Tv5gImqiXYfek0aKAzm+9uC1eD0xo3WOilj2R8A5fvdqp9kbYxz9RRwNHP0zBpVqJHseOuFdDz9Q6KrJRFHKYMhOvORjkxzWpp8mmcOxuOxzK6xSEF7FhZHrT6RLgThZxNJhzO/3NTon6JDsrYo0FgyAA4ZcSaZ3MRnfiHu75t6D/8UdzUKf5Lp+qm4GgTfdAG7Cytx1MVXFuy/FzMEw8sddBAQD5MjtKy1s5yVFgh1nKB1AJW0b3m2Ok9FhhElsUPCqf7EERx95cieSycqVvYyt6QHunSSAxeQhhw3myK/9u85tSYAXXRr3ns5AIeMbjD8GDLoMCp1Kkw4XnTz07zeWYlv7tIpgO5Fd7UAmXc2uLhS8i8QdVJewwOiPH/hHxu
-    name: AgCokgVPkc7Pipkg9KCDFAGKQrR1OyEnMBKtISbqjOcoOuc/oVTqLObeDwmQDXNogcf/j17nDM9/GUmrcNQ6VbWXz10WB+FsnGqjMizjg3pA31UiLkvuc6xRbEoHs8sGTTcA7JrWw5gUaAywA0ydjk3e8UVCdZwp8TQKbredwwYx0GInRZvjX3eYWe2Iz91XuEDJxlYzFBBeWFr26cb5OQJWyDGe6x7zsD0Obk0vaHmJlP5Fp6Qv9Do6dyc+vrA/0tNnXowNKinsy8JILlRx9uZrfXUlBSO4B1od8GLmCZYjWnUHBSc/RdkgZmxm18RCjUIpi8QmzN3sdKvp1iks4/zasrbDIQ3UM9SpDvnQakn0XAOMsyxsmWHNVxOWF2L3Nbl/eju+Waw+HY3j+YEZOtwHUxRMyB70QUwRlqqH0+ooBLEvTtYVQv/zoqM4t/3c2F25QVD74RztxgNiyHPRLGJWCOcgI/mqg/TZPNCjBUfQJqbjCoJKqWZjeie73ItDYkqgpcE4EWyjeUWGvuS1VqxpRAJNthys8mtp83g7At/9ZZP2lM3bXaOjR/b1cyB9P6xjZzpln6NLaxAlLLxUrMBaMPh6NPImsNo8fXYUOl736KIvrnhBus3kS2iFpMht/C4/+z+C4i/3alte7k5olmF3y7wwBdMdoyw9oGgkxq/BBt0Rv8dUQpggr98KNHUrTXuihIJiWKodFXFl
-    password: AgBnx3EAtM9034hzk/RNpAH73P5W93mSyozh8OTxVwAKoa4iYLW6XN7XZ7P3mXZsjh349f9f6yizhSdtE/ESrieleLylK6/S/dJEjTotUoyWoDUpJ1YnhHpbH9V6fXlEEzZxAt7RtXUhYHhTbsqRurOw5DreD2mC7VYhp8yIVgZhPIggKh/hlABq6uN5E/XjU+NJ07V2Dg+d9Sul8K4ehJi1MmP1yQgLHZWn8Lrk6pf8ESk2MkTmgne97rp2PY/GfKhBPaH2IsoLq5roLv1GOrCsmv7+4TPZzNj6/3vDTk96XLCdOHjyZvLg9B1m3Zr+9lAkUQuF3iFpn1b44nPEdY600MucQ2tkQsT/qUD5C4+B1DJLP1YeVjqmoTuk9cOW+MLbkIavj52EP2x6yMGkgG6sIks+f4YB2rgynHOcUgi11vPbQLxG8aVcr/jS82E8V63mdvf6Obecf0lFyQQQfByQKO9I26ZgycFlIYK8BXHLVqWcPpW+clZt4OSCujAUZY4Tc0L24QvfUOXHSsaJ1YjYfH7DzS0qgxspGJCCrrAip2CiG60qogobays4iPPUZLuicludGoxdlOS9WqcD2gvBtYOuvE5uG+NUg9hws+HuLBWaDlZXCZYwLnVAjPIhJslYY8pFqPQT04lR71TKYfiJEOLnFiDlc+9KMLueSFdAhmW1CB19Yqb+xgn2VDnxnexqjRG6yp45SL9r+nGBgJxOcVHK05nZ7yGILVkjpvfKBhJYuNMtXtPe
-    type: AgBD8huNIVYZhZr71Wrvlu7pnt7l/i5UkuQRrruThFZZNE2kwaDUR7flQuBacA52lQJBV1yRLTuTQj/LRq7ekBb67h9CBBw1oNi7falmCLL9pM8lNsquOffJOePjoTtlriHXgb6jP8wKZ8/c7V24EwNPJnQbQlAtkyAST7uRe+71Wfx4u5ZIsOKhr95wmeau4J5rnvFA4D8M5pksgp2TigslfcPJquW5cqdQx4Spn47yL4GU7x+mtkDb8ZOTGR73X+6xwkdkey8Qh3qk3/oijbZN6H7aUic2bkCbBC5YPl6ces+H7ALplMP2WQsBPs1CRxbHbC3Q17znUOuHNRCv06niGCXEsPuT5AaS3y6OM5fXkMoEayoLoUGi9O0yRPW7VNaQGRFdU8Pd+2iMTOr68IKc2YvHGbi98oYyvN5YaAuEd/lkn562MzryO8z4QN2i1Vy0FopbjeTdTivqAUBD4SZsMN3dBvMnobcL825IoNIAp1Yo2U9TUlUp12CZWqNTxmF5Mrj1nmMK3ulsm5C6C9SC1eoFonkHe4IsegNaQBa1U4UW3vLeUNRDcgDyHN1qBR60oblrF2Tk0sFmcxoW5LsNzqBo3PgMR6CXYgt/yTUK8IjW1jb7XJAlwSEvzF76Kq8ReXhEtbZKYchIgy+EwmvYkqR7IiaqHVpl4OWtaAbKA8fFlYwiYAzNYy/BlnGgWfc2Poxw
-    url: AgAHWMDY5On/psOt3TGPTav1d6zZPNph40nZ9TBuM/WqIxvi21bLsy9XAMYBfQga/sVQLYh95CLq66+emT+CqL2Noamc/UdQwjrbxdpVHdonSAcfRZsmwvRtq64TVGm1cNbAJNWZeyG+lFoRilQcRtxmMrUVpJmH14O0sqnQbActVUQbD6BFp3H7rmuw7Yz28uo/fl6K6Lpr4VdZBbPU6i5M9DoinPC9KCigK2kKeuRioLWpKTqhaOaJ3Ts0Itiib/ghQ15HYdeaRDZybjaLZNs+4DwIInNlCg8xlYwU1uerdT/Sem04vLd0f6oCr0+munsi9eyzMcLDqHehGDibobGMnSDxmvSg2fjmEmByOUMwbpf7YTylwH7G+8xnONYEpk1fNoAHjmtT2ZEfY4IfP7ZpLsygU8YRkDiTw2B8E2gKvdy7yXrCsLuQntyleTfLX4M0k0cNyxZ1GaIVlzjNdTJDod6yvqsK2RPvh6HqfD7DneP7MhrJHfAvuTgjcxQEmxjBMsgTFljgnMV3o3G6e1kyHYRIyM313K1MqAZu4ixlt5QIT3TTKUEvFGmCX+QCAXSTDhSDXwQ048m9vz3nEl6HALT5kZ4WWurlpR0t16q2yBMCFzxJRgfKpUawb7YM2v46E5mcYjFC/pBbnfABNshmImspFD8hJlOdafZpW/BjjxgJRn5qjDh+q8OHz415N8Lx7WGJx9Hr
-    username: AgCVXjhPcb+CYsxMePz9BwOCb3b457jB3fNPgWJTuEWoUuDPr3BovNVAK3rKUx9Q9EBg+YLGHQJyaGjXrq5Vt7G3OotzllSLAP89KKCFAOpTg4AKBZZqbSchmLFy5EULCq161QpazaupEmGEwqNXcGALfi1uGCVjke/st8ZUt3hq/I6RDTw4axV2uLnqlnyhRZSq5amT3n15nlrLONzBrHzRIIrevJ26V4zsD7jZdLS8OQ6KIDdUgZhwU3FiXfS6eS+CqegPFmbdpTkr/eDTafcOOOjq9rovVirwyU/9ZAs9IaTez1/Gf+i3Dj/B3ezYFCEfTLmT4ajORyPYU+Xq/3evDCnFqMfDPoJHJGC5irmzY2fI2rr/ck/sMU/cBtT1EvJ02OKSHrAvnY6HG5PLdqdUPfSw8tKTZrUIBMvwMANAsi5QFUUwauXLfFEvDm24kREQb42XU3UqYS86ZV0VMnfX3QooemHr79vCYlvJqJYKoVzWDkYJYUxAJDoNO2M8EJJtFE4ktV9x7mgPAXNQZwsPpfUJwbjA/W7rWAgYkpvjNFxD1UIlRSmqfLWVqmxpVD10Qrz3IlI5wvyc0MAQ2YvFJCh/DuGnF60R3NeHxBVVWdaEVcUIzM6S4izAuDnZeBve6t4EWZUcAfF1RuGmyMcF6XLTQDtli6gK8COrfsiggYJZKWDRonS9YvwUW7P7e6iZPdEXlvKuqYpa/Ip+
-  template:
-    metadata:
-      creationTimestamp: null
-      labels:
-        argocd.argoproj.io/secret-type: repository
-      name: github-oci
-      namespace: argocd
+  refreshInterval: 4h
+  secretStoreRef:
+    name: onepassword-store           # your ClusterSecretStore name
+    kind: ClusterSecretStore
+  target:
+    name: argocd-github-oci     # name of the Kubernetes Secret to be created
+    creationPolicy: Owner
+    template:
+      metadata:
+        labels:
+          argocd.argoproj.io/secret-type: repository
+  data:
+    - secretKey: username            # key in the Kubernetes Secret
+      remoteRef:
+        key: argocd-github-oci/username
+    - secretKey: password               # key in the Kubernetes Secret
+      remoteRef:
+        key: argocd-github-oci/password
+    - secretKey: name                 # key in the Kubernetes Secret
+      remoteRef:
+        key: argocd-github-oci/name
+    - secretKey: url                 # key in the Kubernetes Secret
+      remoteRef:
+        key: argocd-github-oci/url
+    - secretKey: enableOCI                 # key in the Kubernetes Secret
+      remoteRef:
+        key: argocd-github-oci/enableOCI
+    - secretKey: type                 # key in the Kubernetes Secret
+      remoteRef:
+        key: argocd-github-oci/type

@@ -1,22 +1,37 @@
 ---
-apiVersion: bitnami.com/v1alpha1
-kind: SealedSecret
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
 metadata:
-  creationTimestamp: null
-  name: github-repo
+  name: argocd-github-repo
   namespace: argocd
 spec:
-  encryptedData:
-    name: AgAE+kAFDnkXg51OpbvG85gDqMjs4PysTTNDtfEDtCn76RVcwruL4DdyMcB6uX4LgR2z48PbkzQRHNykEDzciifC7d6Zy4xO/Hf+f13q6ya3XujbrPhi8UeT36b33BjlmJPxRBMEB1878NrVZEHY8JDgqmo29RFKOoH8eG1X3QXHT7qmVHdOWxsoqD9Z0RPN7wG1o1lZogIHmHBhsLsBsUCGpBO58SpF7m+EX5+d4OV1AeIaJbQ7FNXy5ZkzDwpUl15amk8VE1mEZOqGtRRcbi0kukkzcGwhCRAR9Wi7lh1XMMGYckUExXzFUi8WfY0gEIC5tf19RISUF//pFLxEWVyce4Jjop6zWQZvyxXLYFrx/6gPgZXn2G3IbjxIUa5q0hSmAa/C+qBh72UMo6bEWBLiwSpubCi/Lz2yjbNzw/oUi+d94YOkm7iGgpphdQmbgQ/JtCgutuPVw8u7i6RpAKmSa97T4CxxjPm1o2/mQ69vWfrLdPL+bqITq0cWQm7Msf4GnMcI+EU9kUGXOwqmF20MYI0hEBG3pCOfvF9XOQ7zrOsR23ng/Pc6OYcya/bjRPJ2/wUqML82g0JVB6459bKdBgZq3utlV4ANEi5Tl5jxAtGa59CAngwcPEoayiP3COgX070NuB8gwXByYsAX6qpReYFlMtnV6ztlcNd8j/orOpJqVkMem7ivYKXtk11zAx//d0YWCKy2Efzm0xpg
-    password: AgBXH7niAhCQftJOZnfB1A27VCWCKOuoiv/8LqVUGLxX43Umev6vXJ0yu8rigxuvayKbG6nE3ifuYJJjvBt5SIGpRl/93KeeCreIpg0Ll0TAQe5+geT5i6Mquy3LAoa2HGTPp99OvaxND0RU5v2Al9gZhc4/JqQlKSfcqZtOq7usYxND2/sE/RKtLWhnphiHoiToTQQ2ywmeSGl4D62ujNMC6RoI5krKP1v7+E4e9RNHv+WKLo02DGFUJXN9O2uC6xUZcJobnIIPTfT5iJVj5vBdrZLW06Nqp7G9d9M2apzqefvmHYpD1/VS15zwDJEfiZQXphHh96lbVZl4GYhOJVfRkz9EnHmqQXBeu1TB23TCz//n3WDzpeqNX1Zrx/Bk/1ecetN5tuKR4N+jGjNRiEHhYeSNqrh0Pi91yymPJBZn5w+EYY3lgbTzaeUAwbnjQKSWYyU3VFAwI1axXCZ3BL2IkMi2xrKIYoxBDTDNAXE/25EfvYw3sqlf2O9zKbI4Iue7P+wNx/OpyXhM3DlWfdfkTvsQ/0J8FrHTmAzCSJQTkULBI4Rp1IobNTzRwKq+B/FUz9/DpaPSgtXWSUsqrstMIKcBHACNiUz59hVubf7RGvotQQrqpidBLmT423KVDye3XLuiPgFF/ncK213yONKd6BEnDFRWMFXDYGhw5XU4658gq5jwXpwJF9lrJ2C4KRgYfsOn38MJI1Aliqqaw1IJPsbB26azNC5FgYl9X+k23YhN9f/GTU8JF+p247PX6BSKjjR40JsjF5Ig4WkL06vHpA3Bb0ATCaTYO+Zj42KKTwLtoepQzl8KXX6zpK8=
-    project: AgBXONe01X2o8nhk6S2QGHnTtoI/8OdvhZUZ4BSQnCgnDl0TI7hGRfrIWVf6mUeB7apwndftLehNocLCWq/ui5r5qPhRfFRnkNwZBXGUCDnmDB4D5BlyhHdQAhpLOyqAGizMdVN3ChkZjNr5QTrA5KkiZfUl99Wc6hg685xJ01IKcQOlTbwwzJZpr5VV3O+PDCxtZAYagv1q63lere0VAGhmrYq8B9hUGVZ4txti6Pmhj7S/YRvTP2EyRVCjdkWznQUQdPx0Hi/NaNjG+go2Khr9YvbnZNNoQYKeRpeNZ7Y46EXyrj7phv8oORDD2ZqikEKjPEEAyiy20UWLYBxP5n2UIz7ouG9/dXouEDBCksylCJOWJgBNHAu8qXfP4LtyxaCIl3iJOwPXC1jzUI03kj/nWFTQLC9aI6/THiXWTM17Gn4XTUYxGj+ZrmQOd/RVZCpwtb+2tAQgUEQ142TnlRJbSbJ0Mb2XfkJ7p9v1/0v6RixWKod2kvqmqsTD5j2oABx9XhWzQXpnwH4Sx7o4+o0FuEr+7LWltPYsm9Bq+dGGRbJwGQK5OPKv8BhnAZ4QlpjTtZsk/o6AXJGtgYWwhG2Yak7EDl+xcdqH7hiCeuP31gqvRLkE1kuNheiDRXut6fWM0JLC2ozchkrpDXREPzUWpL5JcKibYVRtoqltz/NaphgCDs7SgOc+euMYjw1TopSpCoEi8eoJ
-    type: AgAcS00FrmhWTCztwpHtB9K3GnzewMkh1CLl9IXFlqpa2KN2rHZpiCWuyCMyZ99wvVnl3YJ3OCMJa0gQr4Ea1UQUMAktjP3tB2XI5ZYajMvWz7QHce5mqtRzSL+rSCtYjYipplc9dn4IkDgGjg9iLZwBLSnyEGvhePfM/0tMAVVsX5MN76D7Jfrhm5g6kmxqPaYdTenKI8mMJ5jJr8q/r57FWFZL/q0YPv8R3NTDy5pzWFeRHguSjoqeohdtc3d8ZfBPKLjimzeOV4NsTo7C9nb0Jflh8T6LSqG/1fEJ7GwMSWPyEb/hBDvXEqeCMBkfrQhZHcGJQT8yolXQbqBvCPkqIJIDb5w+A4eTHTpsF8znvS22TO9ZXzbCoR2bGw5R9/iezu/OEDClgnb0k640jI2m9MoOSDv5lmdasIEWt4CHq8mDhJ8A6nkms3NhMr3MLhl5snA+aYajue+TTPGAcX/MbtM21n4uTrSllxNhctnG4kaMdedKDuHVbosC+qmDKKi83JFlwr87v7uIS6ffC59sLELhOVwDJJ1dVa+jJFz7n5U93ZeJ7Wq9HDnrj5uBLXAo7DdpFof3eQS3yev1QHlEOUoowgK33jgwtDBhp6HcKDPoJ/upyOePxdE7DxE3D1TpomOmmiR6ruvftpVCiFgkXuPDpvpMgfh30ySNu2fiiSqkUzXE+RMEm9dGFD6ToijpQfU=
-    url: AgCC2glhOFgMUw0MBsOiQHd7HZxV5W5LU+ndu33MgpnKmhgxF37dnO4sbOpezlEsCQplsqSmVcR48PZqlczGR3+lYpQM2yP1GYr35/wRPVttWi9CYX2A1uBwyi8XiOiEF17jHNsQdZ8cQDnZr7DQ6fqDtNthMy2OHvNmyvbQtmg7zPaAldrneOFV9fUrGFPXi3eopKglnHzGaMzXPK5LFJZY8fdYHPmAc66LLm6ziwDmMKAk6C0740frpU8AS9Udi6wMTBZIwtK1xpyoinhn2hwNFzIMEi2tI6QxKh7eFNN6pqhBDcX+JHhtgagH6sIj52DV3ep2zyzVCRwbrzoSlabj6jCQ2vNIxc5T1KCmIR8RYsA2DvAu5XLVUaU06dEcYZhMB/4fQQC9wHGc/OyRS8WVXze305jqsC86iEix0YkPM/ZOXxSY6c2/9AY9uD+3q5f2FMOS1djDDh+vmPJb4EO8z6t3Z48S2iuFvpMSuh/hw6+K2orhbCRcOgW5rgf8cRu+MpzVYIzDObfvRAHrJ4QuchKQnC1kNN2QfKBbx0bbYiLF9i457hHuxD/5VY4yxWfZqG+IOMORt3WliwQSnx6NxxJLkqZxiSVf6xGQalJqZqDXDsnbFjtL+Uc0XKuFDLzPrdzIuOwOPdC49CN49Wa2VCsTYpF33cfPnr0xrDE+ulsR3ANEfLU7czxFwkHrepLq0rLYjA/ZwCjTIKWJs/BGO2MPAhLzrCF6c40E5QekcTx8wscC3F81iGOv
-    username: AgDhyPtnOTZBk9V5GmzqOe9x3bi+mh/gyX+/6C0iKxDvnJnfDLGutWevef1vIwHkKHIsDdackulAwILmMuDcNMX8wNmHSoxiX5zXjKJXNAGKKzrRREHNGwb0wul2C0wI2oyvKsVQHizu1WvWsXKF3i3NUWBnQJMZfaLAMVKnucneUGhY62vRNenyeQKt7Nu2rhorPoSwuMm5ckAU64CP5QZHB6xgSmY1rZKsJUmmw4bn53jrGANMPtigKI5DlwNLQcTIA4jFdmxFbB2QC5lELwqWOj4CLyISKuXb8NKqFZKHE1FH+dZNkch2rGmD33DoKp5ciO8D2PsTKhCg6nd1TWnoctC2BjQQbp2dn4roqHW+al0MsHFEX3lBO7Z42VCwY2YqJ6DIOO97AO7QIO0aBKSmSo0k10/zjoI4tonjKeHq3C9Odr7TZAVXiEBlO/mWr6HVdaZb8y/ArEMrDZErMv51KYQ/xLOCwzaFqgDf824b7D7nWoJcBPQ7wao28JZX8o7z7rmHGHU4FuM5a3ZvpIrQix+iHrckgZCoktG/RdnLt2E2kWLWsTlxexGmxoU6ZRJkVKMtrUTME+4mG/QcbC/49FSzav5ME2YMBrwE5gVOzK4SSaOqw5zlIa3njo1MosNOA08hdLx8JA78B7PsQDv55S0HRkGfUnO92TslGMzEKlQGBjrPwKam/Sy5fIkvyNM2s5LoeLFY426TGePO
-  template:
-    metadata:
-      creationTimestamp: null
-      labels:
-        argocd.argoproj.io/secret-type: repository
-      name: github-repo
-      namespace: argocd
+  refreshInterval: 4h
+  secretStoreRef:
+    name: onepassword-store           # your ClusterSecretStore name
+    kind: ClusterSecretStore
+  target:
+    name: argocd-github-repo     # name of the Kubernetes Secret to be created
+    creationPolicy: Owner
+    template:
+      metadata:
+        labels:
+          argocd.argoproj.io/secret-type: repository
+  data:
+    - secretKey: username            # key in the Kubernetes Secret
+      remoteRef:
+        key: argocd-github-repo/username
+    - secretKey: password               # key in the Kubernetes Secret
+      remoteRef:
+        key: argocd-github-repo/password
+    - secretKey: name                 # key in the Kubernetes Secret
+      remoteRef:
+        key: argocd-github-repo/name
+    - secretKey: url                 # key in the Kubernetes Secret
+      remoteRef:
+        key: argocd-github-repo/url
+    - secretKey: project                 # key in the Kubernetes Secret
+      remoteRef:
+        key: argocd-github-repo/project
+    - secretKey: type                 # key in the Kubernetes Secret
+      remoteRef:
+        key: argocd-github-repo/type
