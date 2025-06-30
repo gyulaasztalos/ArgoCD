@@ -1,16 +1,18 @@
 ---
-apiVersion: bitnami.com/v1alpha1
-kind: SealedSecret
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
 metadata:
-  creationTimestamp: null
   name: apprise-config
   namespace: apprise
 spec:
-  encryptedData:
-    apprise.yml: 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
-  template:
-    metadata:
-      creationTimestamp: null
-      name: apprise-config
-      namespace: apprise
-    type: Opaque
+  refreshInterval: 4h
+  secretStoreRef:
+    name: onepassword-store           # your ClusterSecretStore name
+    kind: ClusterSecretStore
+  target:
+    name: apprise-config     # name of the Kubernetes Secret to be created
+    creationPolicy: Owner
+  data:
+    - secretKey: apprise.yml            # key in the Kubernetes Secret
+      remoteRef:
+        key: apprise-config/apprise.yml  # 1Password item name
