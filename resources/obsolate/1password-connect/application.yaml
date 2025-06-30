@@ -17,7 +17,7 @@ spec:
       ref: config
     - repoURL: https://1password.github.io/connect-helm-charts
       chart: connect
-      targetRevision: 1.17.1
+      targetRevision: 2.0.0
       helm:
         valueFiles:
           - $config/apps/1password-connect/values.yaml
