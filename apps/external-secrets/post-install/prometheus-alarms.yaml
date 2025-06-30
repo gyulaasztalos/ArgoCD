@@ -1,0 +1,60 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: external-secrets-alerts
+  namespace: monitoring
+spec:
+  groups:
+  - name: external-secrets
+    rules:
+    - alert: ExternalSecretSyncError
+      annotations:
+        summary: "External Secret sync failing: {{ $labels.name }}"
+        description: |
+          External Secret `{{ $labels.name }}` in namespace `{{ $labels.namespace }}`
+          has been failing to sync for more than 10 minutes.
+      expr: increase(externalsecret_sync_calls_error[5m]) > 0
+      for: 10m
+      labels:
+        severity: critical
+
+    - alert: ExternalSecretProviderAPIErrors
+      annotations:
+        summary: "Provider API errors: {{ $labels.provider }}"
+        description: |
+          External Secret provider `{{ $labels.provider }}` is experiencing API failures.
+      expr: increase(externalsecret_provider_api_calls_count{status!="success"}[5m]) > 3
+      for: 5m
+      labels:
+        severity: warning
+
+    - alert: ExternalSecretUnhealthy
+      annotations:
+        summary: "External Secret unhealthy: {{ $labels.name }}"
+        description: |
+          External Secret `{{ $labels.name }}` has been unhealthy for 15+ minutes.
+      expr: externalsecret_status_condition{type="Ready", status="False"} == 1
+      for: 15m
+      labels:
+        severity: warning
+
+    - alert: ExternalSecretSlowReconciliation
+      annotations:
+        summary: "Slow External Secret reconciliation: {{ $labels.name }}"
+        description: |
+          External Secret reconciliation taking {{ $value }}s (>30s threshold).
+      expr: externalsecret_reconcile_duration > 30
+      for: 5m
+      labels:
+        severity: warning
+
+    - alert: ClusterSecretStoreUnhealthy
+      annotations:
+        summary: "Cluster Secret Store unhealthy: {{ $labels.name }}"
+        description: |
+          Cluster Secret Store `{{ $labels.name }}` has been unhealthy for more than 10 minutes.
+          This affects External Secrets across multiple namespaces.
+      expr: clustersecretstore_status_condition{type="Ready", status="False"} == 1
+      for: 10m
+      labels:
+        severity: critical
