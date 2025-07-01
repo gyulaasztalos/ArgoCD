@@ -1,0 +1,82 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ddns-updater
+  namespace: ddns-updater
+  labels:
+    app: ddns-updater
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: ddns-updater
+  template:
+    metadata:
+      labels:
+        app: ddns-updater
+    spec:
+      containers:
+        - name: ddns-updater
+          image: qmcgaw/ddns-updater:2.9.0
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false # prevent sudo, etc.
+            privileged: false               # prevent acting like host root
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: ddns-updater-env
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              port: 9999
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              port: 9999
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            failureThreshold: 3
+          volumeMounts:
+            - name: ddns-updater-secret
+              mountPath: /updater/data/config.json
+              subPath: config.json
+      restartPolicy: Always
+      volumes:
+        - name: ddns-updater-secret
+          secret:
+            secretName: ddns-updater-secret
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsUser: 1000          # hardcode user to non-root if not set in Dockerfile
+        runAsGroup: 1000         # hardcode group to non-root if not set in Dockerfile
+        runAsNonRoot: true       # hardcode to non-root. Redundant to above if Dockerfile is set USER 1000          # prevent acting like host root
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - ddns-updater
+              topologyKey: kubernetes.io/hostname

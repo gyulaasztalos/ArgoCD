@@ -19,3 +19,4 @@ resources:
   - nebula-sync/application.yaml
   - apprise/application.yaml
   - nginx/application.yaml
+  - ddns-updater/application.yaml
