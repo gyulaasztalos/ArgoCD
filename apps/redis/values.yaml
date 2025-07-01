@@ -1002,7 +1002,7 @@ replica:
   extraVolumes:
     - name: redis-acl-users
       secret:
-        secretName: redis-acl-users
+        secretName: redis-secrets
   extraVolumeMounts:
     - name: redis-acl-users
       subPath: users.acl
