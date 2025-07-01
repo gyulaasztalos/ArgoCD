@@ -448,7 +448,7 @@ dnsmasq:
   - cname=t.ncore.sh.local.asztalos.net,t.ncore.sh
   - cname=t.ncore.pro.local.asztalos.net,t.ncore.pro
   - cname=transmission.local.asztalos.net,vip1.local.asztalos.net
-  - cname=ddns-updater.local.asztalos.net,vip1.local.asztalos.net
+  - cname=ddns-updater.local.asztalos.net,traefik-svc.local.asztalos.net
   - cname=pihole-rpi.local.asztalos.net,raspberrypi.local.asztalos.net
   - cname=traefik-archer.local.asztalos.net,archer.local.asztalos.net
   - cname=auth-archer.local.asztalos.net,archer.local.asztalos.net
