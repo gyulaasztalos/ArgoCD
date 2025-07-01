@@ -49,19 +49,19 @@ spec:
               memory: "512Mi"
               cpu: "500m"
           readinessProbe:
-            exec:
-              command:
-              - /updater/app
-              - healthcheck
+            httpGet:
+              path: /
+              port: 9999
+              scheme: HTTP
             initialDelaySeconds: 10
             periodSeconds: 60
             successThreshold: 1
             failureThreshold: 3
           livenessProbe:
-            exec:
-              command:
-              - /updater/app
-              - healthcheck
+            httpGet:
+              path: /
+              port: 9999
+              scheme: HTTP
             initialDelaySeconds: 30
             periodSeconds: 60
             failureThreshold: 3
