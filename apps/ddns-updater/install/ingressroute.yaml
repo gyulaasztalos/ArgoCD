@@ -1,0 +1,26 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ddns-updater
+  namespace: ddns-updater
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      middlewares:
+        - name: authentik
+          namespace: traefik
+        - name: default-headers
+          namespace: traefik
+      match: Host(`ddns-updater.local.asztalos.net`)
+      priority: 10
+      services:
+        - name: ddns-updater
+          namespace: ddns-updater
+          port: 8000
+  tls:
+    secretName: local-asztalos-net-tls

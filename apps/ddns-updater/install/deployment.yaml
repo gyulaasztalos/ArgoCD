@@ -81,10 +81,6 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: ddns-updater-data
-            accessModes:
-              - ReadWriteOnce
-            storageClassName: longhorn
-            size: 1Mi
       securityContext:
         seccompProfile:
           type: RuntimeDefault
