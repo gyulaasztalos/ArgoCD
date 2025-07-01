@@ -7,3 +7,5 @@ resources:
   - ddns-updater-env.yaml
   - ddns-updater-secret.yaml
   - deployment.yaml
+  - service.yaml
+  - ingressroute.yaml
