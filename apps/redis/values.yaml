@@ -155,7 +155,7 @@ auth:
   ## @param auth.existingSecret The name of an existing secret with Redis(R) credentials
   ## NOTE: When it's set, the previous `auth.password` parameter is ignored
   ##
-  existingSecret: redis-password
+  existingSecret: redis-secrets
   ## NOTE: ignored unless `auth.existingSecret` parameter is set
   ##
   existingSecretPasswordKey: redis-password  ## @param auth.existingSecretPasswordKey Password key to be retrieved from existing secret
@@ -504,7 +504,7 @@ master:
   extraVolumes:
     - name: redis-acl-users
       secret:
-        secretName: redis-acl-users
+        secretName: redis-secrets
   extraVolumeMounts:
     - name: redis-acl-users
       subPath: users.acl
