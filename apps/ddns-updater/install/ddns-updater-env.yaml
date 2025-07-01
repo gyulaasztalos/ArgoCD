@@ -19,6 +19,7 @@ data:
   ROOT_URL: "/"
   BACKUP_PERIOD: "0" # 0 to disable
   BACKUP_DIRECTORY: "/updater/data"
+  CONFIG_FILEPATH: "/updater/config/config.json"
   LOG_LEVEL: "info"
   LOG_CALLER: "hidden"
   SHOUTRRR_ADDRESSES: "generic://apprise.apprise.svc.cluster.local:8000?template=json&messagekey=body&tag=ddns&type=info&title=DDNS+Updater"

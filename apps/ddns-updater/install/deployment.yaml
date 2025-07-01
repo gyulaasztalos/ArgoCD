@@ -32,7 +32,12 @@ spec:
             allowPrivilegeEscalation: false # prevent sudo, etc.
             privileged: false               # prevent acting like host root
           ports:
-            - containerPort: 8000
+            - name: webui
+              containerPort: 8000
+              protocol: TCP
+            - name: health
+              containerPort: 9999
+              protocol: TCP
           envFrom:
             - configMapRef:
                 name: ddns-updater-env
@@ -43,27 +48,43 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "500m"
-          livenessProbe:
-            httpGet:
-              port: 9999
+          readinessProbe:
+            exec:
+              command:
+              - /updater/app
+              - healthcheck
             initialDelaySeconds: 10
             periodSeconds: 30
+            timeoutSeconds: 5
+            successThreshold: 1
             failureThreshold: 3
-          readinessProbe:
-            httpGet:
-              port: 9999
-            initialDelaySeconds: 5
-            periodSeconds: 15
+          livenessProbe:
+            exec:
+              command:
+              - /updater/app
+              - healthcheck
+            initialDelaySeconds: 30
+            periodSeconds: 60
+            timeoutSeconds: 5
             failureThreshold: 3
           volumeMounts:
             - name: ddns-updater-secret
-              mountPath: /updater/data/config.json
+              mountPath: /updater/config/config.json
               subPath: config.json
+            - name: data
+              mountPath: /updater/data
       restartPolicy: Always
       volumes:
         - name: ddns-updater-secret
           secret:
             secretName: ddns-updater-secret
+        - name: data
+          persistentVolumeClaim:
+            claimName: ddns-updater-data
+            accessModes:
+              - ReadWriteOnce
+            storageClassName: longhorn
+            size: 1Mi
       securityContext:
         seccompProfile:
           type: RuntimeDefault
