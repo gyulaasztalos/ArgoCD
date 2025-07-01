@@ -54,8 +54,7 @@ spec:
               - /updater/app
               - healthcheck
             initialDelaySeconds: 10
-            periodSeconds: 30
-            timeoutSeconds: 5
+            periodSeconds: 60
             successThreshold: 1
             failureThreshold: 3
           livenessProbe:
@@ -65,7 +64,6 @@ spec:
               - healthcheck
             initialDelaySeconds: 30
             periodSeconds: 60
-            timeoutSeconds: 5
             failureThreshold: 3
           volumeMounts:
             - name: ddns-updater-secret
@@ -84,6 +82,7 @@ spec:
       securityContext:
         seccompProfile:
           type: RuntimeDefault
+        fsGroup: 1000            # hardcode group to non-root if not set in Dockerfile
         runAsUser: 1000          # hardcode user to non-root if not set in Dockerfile
         runAsGroup: 1000         # hardcode group to non-root if not set in Dockerfile
         runAsNonRoot: true       # hardcode to non-root. Redundant to above if Dockerfile is set USER 1000          # prevent acting like host root
