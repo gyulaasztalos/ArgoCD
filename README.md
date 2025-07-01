@@ -57,6 +57,7 @@ This repository contains Kubernetes manifests for managing my HomeLab infrastruc
   - redis HA
 - **Security:**
   - Sealed Secrets (encrypted secret storage)
+  - External Secrets Operator with 1PasswordSDK provider
   - Reflector (cross-namespace secret replication)
 - **Monitoring:**
   - kube-prometheus-stack
