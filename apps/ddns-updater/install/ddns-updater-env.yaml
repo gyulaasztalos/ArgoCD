@@ -22,4 +22,5 @@ data:
   CONFIG_FILEPATH: "/updater/config/config.json"
   LOG_LEVEL: "info"
   LOG_CALLER: "hidden"
+  HEALTH_SERVER_ADDRESS: "0.0.0.0:9999"
   SHOUTRRR_ADDRESSES: "generic://apprise.apprise.svc.cluster.local:8000?template=json&messagekey=body&tag=ddns&type=info&title=DDNS+Updater"
