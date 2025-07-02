@@ -13,16 +13,9 @@ data:
       - model: authentik_outposts.outpost
         identifiers:
           name: "authentik Embedded Outpost"
-        operations:
-          - op: add
-            path: /applications
-            value:
-              - ref: traefik-forward-auth
-          - op: add
-            path: /config
-            value: |
-              {
-                "kubernetes_ingress_annotations": {
-                  "cert-manager.io/cluster-issuer": "letsencrypt-production"
-                }
-              }
+        attrs:
+          applications:
+            - !Find [authentik_providers_proxy.proxyprovider, [name, "traefik-forward-auth"]]
+          config:
+            kubernetes_ingress_annotations:
+              cert-manager.io/cluster-issuer: "letsencrypt-production"
