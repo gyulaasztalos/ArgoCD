@@ -20,5 +20,4 @@ data:
               - ref: traefik-forward-auth
           - op: add
             path: /config/kubernetes_ingress_annotations
-            value:
-              cert-manager.io/cluster-issuer: "letsencrypt-production"
+            value: "cert-manager.io/cluster-issuer: letsencrypt-production"
