@@ -14,10 +14,10 @@ data:
         identifiers:
           name: "authentik Embedded Outpost"
         operations:
-          - op: replace
-            path: /applications
-            value:
-              - ref: traefik-forward-auth
+          #- op: replace
+          #  path: /applications
+          #  value:
+          #    - ref: traefik-forward-auth
           - op: replace
             path: /config
             value: |
