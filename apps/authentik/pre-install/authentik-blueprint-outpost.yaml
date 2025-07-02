@@ -18,7 +18,7 @@ data:
             path: /applications
             value:
               - ref: traefik-forward-auth
-          - op: replace
+          - op: add
             path: /config
             value:
               kubernetes_ingress_annotations:
