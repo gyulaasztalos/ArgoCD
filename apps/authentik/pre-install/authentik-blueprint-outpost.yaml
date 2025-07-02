@@ -21,5 +21,4 @@ data:
           - op: replace
             path: /config
             value:
-              kubernetes_ingress_annotations:
-                cert-manager.io/cluster-issuer: "letsencrypt-production"
+              "kubernetes_ingress_annotations": "cert-manager.io/cluster-issuer: letsencrypt-production"
