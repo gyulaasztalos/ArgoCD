@@ -18,3 +18,8 @@ data:
             path: /applications
             value:
               - ref: traefik-forward-auth
+          - op: add
+            path: /config/kubernetes_ingress_annotations
+            value:
+              cert-manager.io/cluster-issuer: "selfsigned-issuer"
+              kubernetes.io/tls-acme: "true"
