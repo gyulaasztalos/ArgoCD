@@ -21,5 +21,4 @@ data:
           - op: add
             path: /config/kubernetes_ingress_annotations
             value:
-              cert-manager.io/cluster-issuer: "selfsigned-issuer"
-              kubernetes.io/tls-acme: "true"
+              cert-manager.io/cluster-issuer: "letsencrypt-production"
