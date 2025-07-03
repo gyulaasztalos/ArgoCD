@@ -63,11 +63,14 @@ This repository contains Kubernetes manifests for managing my HomeLab infrastruc
   - kube-prometheus-stack
     - Prometheus, Grafana, Alertmanager
     - ServiceMonitors, PrometheusRules, and custom dashboards
+- **Notifications:**
+  - Apprise
+  - Mailrise
 
 #### Deployed Applications
 - Rancher (read-only access)
 - Nginx (testing)
-- Pi-Hole + Unbound (DNS with TLS forwarding to Cloudflare DNS)
+- Pi-Hole + Unbound (DNS with TLS forwarding to Cloudflare DNS) + nebula-sync
 
 ### Bootstrap Process
 1. **Host Preparation:**
@@ -107,14 +110,6 @@ Use the WebUI or the argocd CLI tool!
 `kubectl apply -f sealed-secrets-backup.key`
 
 ---
-
-### Known Issues
-1. **Rancher Compatibility:** The latest Helm chart (v2.11.2) doesn't support Kubernetes 1.33. Workaround: Use K3s v1.32 or await Rancher updates.
-2. **Resource Usage:** High idle consumption.---
-
-### Known Issues
-1. **Rancher Compatibility:** The latest Helm chart (v2.11.2) doesn't support Kubernetes 1.33. Workaround: Use K3s v1.32 or await Rancher updates.
-2. **Resource Usage:** High idle consumption ---
 
 ### Known Issues
 1. **Rancher Compatibility:** The latest Helm chart (v2.11.2) doesn't support Kubernetes 1.33. Workaround: Use K3s v1.32 or await Rancher updates.
