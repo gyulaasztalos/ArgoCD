@@ -497,9 +497,9 @@ alertmanager:
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
   ##
   podDisruptionBudget:
-    enabled: false
-    minAvailable: 1
-    maxUnavailable: ""
+    enabled: true
+    minAvailable: 0
+    maxUnavailable: 1
     unhealthyPodEvictionPolicy: AlwaysAllow
 
   ## Alertmanager configuration directives
@@ -3679,9 +3679,9 @@ prometheus:
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
   ##
   podDisruptionBudget:
-    enabled: false
-    minAvailable: 1
-    maxUnavailable: ""
+    enabled: true
+    minAvailable: 0
+    maxUnavailable: 1
     unhealthyPodEvictionPolicy: AlwaysAllow
 
   # Ingress exposes thanos sidecar outside the cluster
