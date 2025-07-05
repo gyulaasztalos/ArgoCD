@@ -1231,6 +1231,7 @@ grafana:
 
   podDisruptionBudget:
     enabled: true
+    minAvailable: ""
     maxUnavailable: 1
 
   extraSecretMounts:
