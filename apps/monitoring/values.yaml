@@ -498,7 +498,7 @@ alertmanager:
   ##
   podDisruptionBudget:
     enabled: true
-    minAvailable: 0
+    minAvailable: ""
     maxUnavailable: 1
     unhealthyPodEvictionPolicy: AlwaysAllow
 
@@ -1228,6 +1228,10 @@ grafana:
     userKey: admin-user
     passwordKey: admin-password
   namespaceOverride: ""
+
+  podDisruptionBudget:
+    enabled: true
+    maxUnavailable: 1
 
   extraSecretMounts:
     - name: grafana-secrets-mount
@@ -3680,7 +3684,7 @@ prometheus:
   ##
   podDisruptionBudget:
     enabled: true
-    minAvailable: 0
+    minAvailable: ""
     maxUnavailable: 1
     unhealthyPodEvictionPolicy: AlwaysAllow
 
