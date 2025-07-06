@@ -453,12 +453,12 @@ metrics:
 
         - alert: TraefikHigh4xxErrorRate
           expr: sum(rate(traefik_service_requests_total{code=~"4.."}[5m])) / sum(rate(traefik_service_requests_total[5m])) > 0.05
-          for: 5m
+          for: 15m
           labels:
             severity: warning
           annotations:
             summary: "High 4xx error rate"
-            description: "More than 5% of requests are returning 4xx errors for over 5 minutes."
+            description: "More than 5% of requests are returning 4xx errors for over 15 minutes."
 
         - alert: TraefikHigh5xxErrorRate
           expr: sum(rate(traefik_service_requests_total{code=~"5.."}[5m])) / sum(rate(traefik_service_requests_total[5m])) > 0.05
@@ -479,13 +479,13 @@ metrics:
             description: "There are more than 50 open requests on Traefik for over 1 minute."
 
         - alert: TraefikHighResponseLatency
-          expr: histogram_quantile(0.99, sum(rate(traefik_service_request_duration_seconds_bucket[5m])) by (le, service)) > 1
+          expr: histogram_quantile(0.99, sum(rate(traefik_service_request_duration_seconds_bucket[5m])) by (le, service)) > 2
           for: 10m
           labels:
             severity: warning
           annotations:
             summary: "High response latency"
-            description: "99th percentile response time is greater than 1 second for 10 minutes."
+            description: "99th percentile response time is greater than 2 second for 10 minutes."
 
       additionalLabels: {}
       namespace: ""
