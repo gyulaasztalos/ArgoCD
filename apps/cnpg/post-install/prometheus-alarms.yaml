@@ -1,0 +1,68 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    prometheus: cnpg
+    role: alert-rules
+  name: prometheus-cnpg-rules
+  namespace: monitoring
+spec:
+  groups:
+  - name: cnpg.rules
+    rules:
+    - alert: CNPGClusterNotReady
+      annotations:
+        description: The CNPG cluster {{ $labels.cluster }} is not ready.
+        summary: CNPG cluster is not ready.
+      expr: cnpg_cluster_ready == 0
+      for: 5m
+      labels:
+        severity: critical
+    - alert: CNPGInstanceNotReady
+      annotations:
+        description: The CNPG instance {{ $labels.instance }} in cluster {{ $labels.cluster }} is not ready.
+        summary: CNPG instance is not ready.
+      expr: cnpg_instance_ready == 0
+      for: 5m
+      labels:
+        severity: warning
+    - alert: CNPGInstanceDown
+      expr: kube_pod_status_phase{namespace="databases", phase="Running", label_postgresql_cnpg_io_cluster!=""} == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "No running CNPG pods in namespace databases"
+        description: "All PostgreSQL pods for a CNPG cluster are down in the 'databases' namespace."
+    - alert: CNPGBackupLastFailed
+      expr: cnpg_backup_last_status{status="Failed"} == 1
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "CloudNativePG backup failed"
+        description: "The last backup for cluster {{ $labels.cluster }} has failed."
+    - alert: CNPGBackupStale
+      expr: time() - cnpg_backup_last_success_timestamp_seconds > 86400
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "No successful CNPG backup in 24h"
+        description: "No successful backup for cluster {{ $labels.cluster }} in the last 24 hours."
+    - alert: CNPGReplicationLagHigh
+      expr: cnpg_replication_lag_bytes > 104857600  # 100MB
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "CNPG replication lag high"
+        description: "Replication lag for cluster {{ $labels.cluster }} is above 100MB."
+    - alert: CNPGDiskSpaceLow
+      expr: (cnpg_data_directory_bytes_total - cnpg_data_directory_bytes_free) / cnpg_data_directory_bytes_total > 0.85
+      for: 10m
+      labels:
+        severity: warning
+      annotations:
+        summary: "CNPG disk space usage high"
+        description: "Disk usage for cluster {{ $labels.cluster }} exceeds 85%."
