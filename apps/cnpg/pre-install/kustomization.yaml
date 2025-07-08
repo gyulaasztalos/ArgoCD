@@ -6,3 +6,4 @@ resources:
   - certificates.yaml
   - longhorn-storageclass.yaml
   - authentik-postgres-password.yaml
+  - cnpg-backblaze-secret.yaml

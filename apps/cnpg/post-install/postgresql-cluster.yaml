@@ -35,3 +35,16 @@ spec:
         passwordSecret:
           name: authentik-postgres-password
         login: true
+  backup:
+    barmanObjectStore:
+      destinationPath: s3://homelab-cnpg-backup-production/cnpg-backup/
+      endpointURL: https://s3.eu-central-003.backblazeb2.com
+      s3Credentials:
+        accessKeyId:
+          name: cnpg-backblaze-secret
+          key: application_key_id
+        secretAccessKey:
+          name: cnpg-backblaze-secret
+          key: application_key
+    retentionPolicy: "7d" # keep 7 days of backups
+    schedule: "0 3 * * *" # daily at 03:00 UTC
