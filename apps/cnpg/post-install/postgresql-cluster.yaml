@@ -47,4 +47,3 @@ spec:
           name: cnpg-backblaze-secret
           key: application_key
     retentionPolicy: "7d" # keep 7 days of backups
-    schedule: "0 3 * * *" # daily at 03:00 UTC

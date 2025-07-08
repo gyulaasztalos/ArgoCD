@@ -1,0 +1,9 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Backup
+metadata:
+  name: postgres-backup
+  namespace: databases
+spec:
+  cluster:
+    name: postgres
+  schedule: "0 3 * * *" # daily at 03:00 UTC
