@@ -447,7 +447,7 @@ dnsmasq:
   - cname=printer.local,printer.local.asztalos.net
   - cname=t.ncore.sh.local.asztalos.net,t.ncore.sh
   - cname=t.ncore.pro.local.asztalos.net,t.ncore.pro
-  - cname=transmission.local.asztalos.net,vip1.local.asztalos.net
+  - cname=transmission.local.asztalos.net,archer.local.asztalos.net
   - cname=ddns-updater.local.asztalos.net,traefik-svc.local.asztalos.net
   - cname=pihole-rpi.local.asztalos.net,raspberrypi.local.asztalos.net
   - cname=traefik-archer.local.asztalos.net,archer.local.asztalos.net
@@ -465,7 +465,7 @@ dnsmasq:
   - cname=rancher.local.asztalos.net,traefik-svc.local.asztalos.net
   - cname=longhorn.local.asztalos.net,traefik-svc.local.asztalos.net
   - cname=auth.local.asztalos.net,traefik-svc.local.asztalos.net
-  - cname=auth-docker.local.asztalos.net,vip1.local.asztalos.net
+  - cname=auth-docker.local.asztalos.net,archer.local.asztalos.net
   - cname=prometheus.local.asztalos.net,traefik-svc.local.asztalos.net
   - cname=prometheus-docker.local.asztalos.net,archer.local.asztalos.net
   - cname=grafana.local.asztalos.net,traefik-svc.local.asztalos.net
