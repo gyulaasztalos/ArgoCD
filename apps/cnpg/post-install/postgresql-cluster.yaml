@@ -37,7 +37,7 @@ spec:
         login: true
   backup:
     barmanObjectStore:
-      destinationPath: s3://homelab-cnpg-backup-production/cnpg-backup/
+      destinationPath: b2://homelab-cnpg-backup-production/cnpg-backup/
       endpointURL: https://s3.eu-central-003.backblazeb2.com
       s3Credentials:
         accessKeyId:
