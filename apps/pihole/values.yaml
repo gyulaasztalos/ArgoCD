@@ -394,25 +394,9 @@ dnsmasq:
   # - server=/bar.foo/192.168.178.11
 
   # -- Add custom dns entries to override the dns resolution. All lines will be added to the pihole dnsmasq configuration.
-  customDnsEntries:
+  customDnsEntries: []
   # - address=/foo.bar/192.168.178.10
   # - address=/bar.foo/192.168.178.11
-  - address=/printer.local.asztalos.net/10.10.20.11
-  - address=/unvr-pro.local.asztalos.net/10.10.50.2
-  - address=/timecapsule.local.asztalos.net/10.10.50.3
-  - address=/celeron1500.local.asztalos.net/10.10.50.4
-  - address=/raspberrypi.local.asztalos.net/10.10.50.5
-  - address=/sulaco.local.asztalos.net/10.10.50.6
-  - address=/sephora.local.asztalos.net/10.10.50.7
-  - address=/verloc.local.asztalos.net/10.10.50.8
-  - address=/vip1.local.asztalos.net/10.10.50.10
-  - address=/vip2.local.asztalos.net/10.10.50.11
-  - address=/archer.local.asztalos.net/10.10.50.21
-  - address=/lana.local.asztalos.net/10.10.50.22
-  - address=/pam.local.asztalos.net/10.10.50.23
-  - address=/cheryl.local.asztalos.net/10.10.50.24
-  - address=/kube-vip.local.asztalos.net/10.10.50.20
-  - address=/traefik-svc.local.asztalos.net/10.10.50.30
 
   # -- Dnsmasq reads the /etc/hosts file to resolve ips. You can add additional entries if you like
   additionalHostsEntries: []
@@ -435,45 +419,13 @@ dnsmasq:
   #  - cname=cname.foo.bar,foo.bar
   #  - cname=cname.bar.foo,bar.foo
   #  - cname=cname record,dns record
-  customCnameEntries:
+  customCnameEntries: []
   # Here we specify custom cname entries that should point to `A` records or
   # elements in customDnsEntries array.
   # The format should be:
   #   - cname=cname.foo.bar,foo.bar
   #   - cname=cname.bar.foo,bar.foo
   #   - cname=cname record,dns record
-  - cname=unifi.local.asztalos.net,traefik-svc.local.asztalos.net
-  - cname=pihole.local.asztalos.net,traefik-svc.local.asztalos.net
-  - cname=printer.local,printer.local.asztalos.net
-  - cname=t.ncore.sh.local.asztalos.net,t.ncore.sh
-  - cname=t.ncore.pro.local.asztalos.net,t.ncore.pro
-  - cname=transmission.local.asztalos.net,archer.local.asztalos.net
-  - cname=ddns-updater.local.asztalos.net,traefik-svc.local.asztalos.net
-  - cname=pihole-rpi.local.asztalos.net,raspberrypi.local.asztalos.net
-  - cname=traefik-archer.local.asztalos.net,archer.local.asztalos.net
-  - cname=auth-archer.local.asztalos.net,archer.local.asztalos.net
-  - cname=homepage.local.asztalos.net,archer.local.asztalos.net
-  - cname=pihole-archer.local.asztalos.net,archer.local.asztalos.net
-  - cname=apprise.local.asztalos.net,traefik-svc.local.asztalos.net
-  - cname=mailrise.local.asztalos.net,traefik-svc.local.asztalos.net
-  - cname=portainer.local.asztalos.net,archer.local.asztalos.net
-  - cname=flexget.local.asztalos.net,archer.local.asztalos.net
-  - cname=homebridge.local.asztalos.net,archer.local.asztalos.net
-  - cname=traefik.local.asztalos.net,traefik-svc.local.asztalos.net
-  - cname=nginx.local.asztalos.net,traefik-svc.local.asztalos.net
-  - cname=argocd.local.asztalos.net,traefik-svc.local.asztalos.net
-  - cname=rancher.local.asztalos.net,traefik-svc.local.asztalos.net
-  - cname=longhorn.local.asztalos.net,traefik-svc.local.asztalos.net
-  - cname=auth.local.asztalos.net,traefik-svc.local.asztalos.net
-  - cname=auth-docker.local.asztalos.net,archer.local.asztalos.net
-  - cname=prometheus.local.asztalos.net,traefik-svc.local.asztalos.net
-  - cname=prometheus-docker.local.asztalos.net,archer.local.asztalos.net
-  - cname=grafana.local.asztalos.net,traefik-svc.local.asztalos.net
-  - cname=grafana-docker.local.asztalos.net,archer.local.asztalos.net
-  - cname=paperless.local.asztalos.net,traefik-svc.local.asztalos.net
-  - cname=paperless-docker.local.asztalos.net,archer.local.asztalos.net
-  - cname=alertmanager.local.asztalos.net,traefik-svc.local.asztalos.net
-
 
 # -- list of adlists to import during initial start of the container
 adlists:
