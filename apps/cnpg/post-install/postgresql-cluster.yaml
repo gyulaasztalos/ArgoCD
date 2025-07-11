@@ -39,6 +39,11 @@ spec:
     barmanObjectStore:
       destinationPath: s3://homelab-cnpg-backup-production/cnpg-backup/
       endpointURL: https://s3.eu-central-003.backblazeb2.com
+      data:
+        compression: bzip2
+      wal:
+        compression: bzip2
+        maxParallel: 4
       s3Credentials:
         accessKeyId:
           name: cnpg-backblaze-secret
