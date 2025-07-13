@@ -32,13 +32,13 @@ spec:
 
     # Critical: Ads blocking rate dropped
     - alert: AdsBlockedDrop
-      expr: (rate(pihole_ads_blocked_today[1h]) / rate(pihole_dns_queries_today[1h])) < 0.2  # <20% ads blocked
+      expr: (rate(pihole_ads_blocked_today[1h]) / rate(pihole_dns_queries_today[1h])) < 0.1  # <10% ads blocked
       for: 30m
       labels:
         severity: critical
         team: networking
       annotations:
-        description: Ads blocking rate has fallen below 20%. Check filter lists and gravity updates.
+        description: Ads blocking rate has fallen below 10%. Check filter lists and gravity updates.
         summary: Low ads blocking rate
 
     # Critical: Upstream DNS resolution failure
