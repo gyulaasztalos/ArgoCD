@@ -9,10 +9,50 @@ spec:
   secretStoreRef:
     name: onepassword-store           # your ClusterSecretStore name
     kind: ClusterSecretStore
+  template:
+    type: Opaque
+    data:
+      apprise.yml: |
+        version: 1
+        tag: admin, devops, restic_fail, restic_warn
+
+        urls:
+          - tgram://{{ .telegram_token }}/{{ .telegram_chat_id }}/?overflow=split:
+              - tag: argocd,telegram,kuma,restic_succ,transmission,ddns,unattended-upgrades,nut,keepalived,watchtower,flexget,grafana,babybuddy,paperless,nebula,alertmanager
+          - mailtos://{{ .email_user_id }}:{{ .email_password }}@icloud.com?smtp=smtp.mail.me.com&to={{ .email_address }}&from={{ .email_address }}:
+              - tag: email
+          - discord://{{ .discord_id }}/{{ .discord_token }}/?overflow=split:
+              - tag: discord
+          - pover://{{ .pover_token }}@{{ .pover_host }}/?overflow=split:
+              - tag:
   target:
     name: apprise-config     # name of the Kubernetes Secret to be created
     creationPolicy: Owner
   data:
-    - secretKey: apprise.yml            # key in the Kubernetes Secret
+    - secretKey: telegram_token           # key in the Kubernetes Secret
       remoteRef:
-        key: apprise-config/apprise.yml  # 1Password item name
+        key: apprise-config/apprise-telegram-token  # 1Password item name
+    - secretKey: telegram_chat_id           # key in the Kubernetes Secret
+      remoteRef:
+        key: apprise-config/apprise-telegram-chat-id # 1Password item name
+    - secretKey: email_user_id          # key in the Kubernetes Secret
+      remoteRef:
+        key: apprise-config/apprise-email-user-id # 1Password item name
+    - secretKey: email_password           # key in the Kubernetes Secret
+      remoteRef:
+        key: apprise-config/apprise-email-password  # 1Password item name
+    - secretKey: email_address           # key in the Kubernetes Secret
+      remoteRef:
+        key: apprise-config/apprise-email-address  # 1Password item name
+    - secretKey: discord_id           # key in the Kubernetes Secret
+      remoteRef:
+        key: apprise-config/apprise-discord-id  # 1Password item name
+    - secretKey: discord_token           # key in the Kubernetes Secret
+      remoteRef:
+        key: apprise-config/apprise-discord-token  # 1Password item name
+    - secretKey: pover_token            # key in the Kubernetes Secret
+      remoteRef:
+        key: apprise-config/apprise-pover-token  # 1Password item name
+    - secretKey: pover_host            # key in the Kubernetes Secret
+      remoteRef:
+        key: apprise-config/apprise-pover-host  # 1Password item name
