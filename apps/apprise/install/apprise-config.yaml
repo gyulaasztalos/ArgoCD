@@ -9,25 +9,26 @@ spec:
   secretStoreRef:
     name: onepassword-store           # your ClusterSecretStore name
     kind: ClusterSecretStore
-  template:
-    type: Opaque
-    data:
-      apprise.yml: |
-        version: 1
-        tag: admin, devops, restic_fail, restic_warn
-
-        urls:
-          - tgram://{{ .telegram_token }}/{{ .telegram_chat_id }}/?overflow=split:
-              - tag: argocd,telegram,kuma,restic_succ,transmission,ddns,unattended-upgrades,nut,keepalived,watchtower,flexget,grafana,babybuddy,paperless,nebula,alertmanager
-          - mailtos://{{ .email_user_id }}:{{ .email_password }}@icloud.com?smtp=smtp.mail.me.com&to={{ .email_address }}&from={{ .email_address }}:
-              - tag: email
-          - discord://{{ .discord_id }}/{{ .discord_token }}/?overflow=split:
-              - tag: discord
-          - pover://{{ .pover_token }}@{{ .pover_host }}/?overflow=split:
-              - tag:
   target:
     name: apprise-config     # name of the Kubernetes Secret to be created
     creationPolicy: Owner
+    template:
+      engineVersion: v2
+      type: Opaque
+      data:
+        apprise.yml: |
+          version: 1
+          tag: admin, devops, restic_fail, restic_warn
+
+          urls:
+            - tgram://{{ .telegram_token }}/{{ .telegram_chat_id }}/?overflow=split:
+                - tag: argocd,telegram,kuma,restic_succ,transmission,ddns,unattended-upgrades,nut,keepalived,watchtower,flexget,grafana,babybuddy,paperless,nebula,alertmanager
+            - mailtos://{{ .email_user_id }}:{{ .email_password }}@icloud.com?smtp=smtp.mail.me.com&to={{ .email_address }}&from={{ .email_address }}:
+                - tag: email
+            - discord://{{ .discord_id }}/{{ .discord_token }}/?overflow=split:
+                - tag: discord
+            - pover://{{ .pover_token }}@{{ .pover_host }}/?overflow=split:
+                - tag:
   data:
     - secretKey: telegram_token           # key in the Kubernetes Secret
       remoteRef:
