@@ -232,6 +232,7 @@ blueprints:
     - authentik-blueprint-groups
     - authentik-blueprint-applications
     - authentik-blueprint-outpost
+    - authentik-blueprint-forward-auth
     - authentik-blueprint-session-duration
     - authentik-blueprint-meta
   # -- List of secrets to mount blueprints from.

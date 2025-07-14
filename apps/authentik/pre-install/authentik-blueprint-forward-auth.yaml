@@ -1,0 +1,24 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authentik-blueprint-forward-auth
+  namespace: authentik
+data:
+  forward-auth.yml: |
+    version: 1
+    metadata:
+      name: "Forward Auth Provider Blueprint"
+    entries:
+      - model: authentik_providers_proxy.proxyprovider
+        state: present
+        identifiers:
+          name: traefik-forward-auth
+        attrs:
+          name: "Traefik Forward Auth"
+          mode: forward_domain
+          external_host: "https://traefik.local.asztalos.net"
+          invalidation_flow: !Find [authentik_flows.flow, [slug, default-invalidation-flow]]
+          authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+          authentication_flow: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
+          cookie_domain: "local.asztalos.net"
