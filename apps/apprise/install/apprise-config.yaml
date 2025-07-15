@@ -5,7 +5,7 @@ metadata:
   name: apprise-config
   namespace: apprise
 spec:
-  refreshInterval: 6h
+  refreshInterval: 12h
   secretStoreRef:
     name: onepassword-store           # your ClusterSecretStore name
     kind: ClusterSecretStore

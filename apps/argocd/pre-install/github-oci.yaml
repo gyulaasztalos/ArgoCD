@@ -5,7 +5,7 @@ metadata:
   name: argocd-github-oci
   namespace: argocd
 spec:
-  refreshInterval: 6h
+  refreshInterval: 12h
   secretStoreRef:
     name: onepassword-store           # your ClusterSecretStore name
     kind: ClusterSecretStore
