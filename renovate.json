@@ -27,6 +27,9 @@
   "argocd": {
     "managerFilePatterns": ["/application\\.yaml$/"]
   },
+  "helm-values": {
+    "managerFilePatterns": ["/values\\.yaml$/"]
+  },
   "kubernetes": {
     "fileMatch": ["\\.yaml$"]
   }
