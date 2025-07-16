@@ -5,6 +5,7 @@ resources:
   - argocd/application.yaml
   - traefik/application.yaml
   - sealed-secrets/application.yaml
+  - onepassword-connect/application.yaml
   - external-secrets/application.yaml
   - reflector/application.yaml
   - cert-manager/application.yaml
