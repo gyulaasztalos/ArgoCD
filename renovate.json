@@ -5,7 +5,7 @@
   ],
   "schedule": [
     "after 5am every weekday",
-    "before 9am every weekday",
+    "before 4pm every weekday",
     "every weekend"
   ],
   "packageRules": [
