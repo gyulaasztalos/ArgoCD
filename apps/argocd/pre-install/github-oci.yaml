@@ -5,9 +5,9 @@ metadata:
   name: argocd-github-oci
   namespace: argocd
 spec:
-  refreshInterval: 12h
+  refreshInterval: 1h
   secretStoreRef:
-    name: onepassword-store           # your ClusterSecretStore name
+    name: onepassword-connect           # your ClusterSecretStore name
     kind: ClusterSecretStore
   target:
     name: argocd-github-oci     # name of the Kubernetes Secret to be created
@@ -19,19 +19,25 @@ spec:
   data:
     - secretKey: username            # key in the Kubernetes Secret
       remoteRef:
-        key: argocd-github-oci/username
+        key: argocd-github-oci
+        property: username
     - secretKey: password               # key in the Kubernetes Secret
       remoteRef:
-        key: argocd-github-oci/password
+        key: argocd-github-oci
+        property: password
     - secretKey: name                 # key in the Kubernetes Secret
       remoteRef:
-        key: argocd-github-oci/name
+        key: argocd-github-oci
+        property: name
     - secretKey: url                 # key in the Kubernetes Secret
       remoteRef:
-        key: argocd-github-oci/url
+        key: argocd-github-oci
+        property: url
     - secretKey: enableOCI                 # key in the Kubernetes Secret
       remoteRef:
-        key: argocd-github-oci/enableOCI
+        key: argocd-github-oci
+        property: enableOCI
     - secretKey: type                 # key in the Kubernetes Secret
       remoteRef:
-        key: argocd-github-oci/type
+        key: argocd-github-oci
+        property: type

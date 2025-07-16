@@ -5,9 +5,9 @@ metadata:
   name: apprise-config
   namespace: apprise
 spec:
-  refreshInterval: 12h
+  refreshInterval: 1h
   secretStoreRef:
-    name: onepassword-store           # your ClusterSecretStore name
+    name: onepassword-connect           # your ClusterSecretStore name
     kind: ClusterSecretStore
   target:
     name: apprise-config     # name of the Kubernetes Secret to be created
@@ -32,28 +32,37 @@ spec:
   data:
     - secretKey: telegram_token           # key in the Kubernetes Secret
       remoteRef:
-        key: apprise-config/apprise-telegram-token  # 1Password item name
+        key: apprise-config
+        property: apprise-telegram-token  # 1Password item name
     - secretKey: telegram_chat_id           # key in the Kubernetes Secret
       remoteRef:
-        key: apprise-config/apprise-telegram-chat-id # 1Password item name
+        key: apprise-config
+        property: apprise-telegram-chat-id # 1Password item name
     - secretKey: email_user_id          # key in the Kubernetes Secret
       remoteRef:
-        key: apprise-config/apprise-email-user-id # 1Password item name
+        key: apprise-config
+        property: apprise-email-user-id # 1Password item name
     - secretKey: email_password           # key in the Kubernetes Secret
       remoteRef:
-        key: apprise-config/apprise-email-password  # 1Password item name
+        key: apprise-config
+        property: apprise-email-password  # 1Password item name
     - secretKey: email_address           # key in the Kubernetes Secret
       remoteRef:
-        key: apprise-config/apprise-email-address  # 1Password item name
+        key: apprise-config
+        property: apprise-email-address  # 1Password item name
     - secretKey: discord_id           # key in the Kubernetes Secret
       remoteRef:
-        key: apprise-config/apprise-discord-id  # 1Password item name
+        key: apprise-config
+        property: apprise-discord-id  # 1Password item name
     - secretKey: discord_token           # key in the Kubernetes Secret
       remoteRef:
-        key: apprise-config/apprise-discord-token  # 1Password item name
+        key: apprise-config
+        property: apprise-discord-token  # 1Password item name
     - secretKey: pover_token            # key in the Kubernetes Secret
       remoteRef:
-        key: apprise-config/apprise-pover-token  # 1Password item name
+        key: apprise-config
+        property: apprise-pover-token  # 1Password item name
     - secretKey: pover_host            # key in the Kubernetes Secret
       remoteRef:
-        key: apprise-config/apprise-pover-host  # 1Password item name
+        key: apprise-config
+        property: apprise-pover-host  # 1Password item name

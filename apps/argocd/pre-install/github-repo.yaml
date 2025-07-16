@@ -5,9 +5,9 @@ metadata:
   name: argocd-github-repo
   namespace: argocd
 spec:
-  refreshInterval: 12h
+  refreshInterval: 1h
   secretStoreRef:
-    name: onepassword-store           # your ClusterSecretStore name
+    name: onepassword-connect           # your ClusterSecretStore name
     kind: ClusterSecretStore
   target:
     name: argocd-github-repo     # name of the Kubernetes Secret to be created
@@ -19,19 +19,25 @@ spec:
   data:
     - secretKey: username            # key in the Kubernetes Secret
       remoteRef:
-        key: argocd-github-repo/username
+        key: argocd-github-repo
+        property: username
     - secretKey: password               # key in the Kubernetes Secret
       remoteRef:
-        key: argocd-github-repo/password
+        key: argocd-github-repo
+        property: password
     - secretKey: name                 # key in the Kubernetes Secret
       remoteRef:
-        key: argocd-github-repo/name
+        key: argocd-github-repo
+        property: name
     - secretKey: url                 # key in the Kubernetes Secret
       remoteRef:
-        key: argocd-github-repo/url
+        key: argocd-github-repo
+        property: url
     - secretKey: project                 # key in the Kubernetes Secret
       remoteRef:
-        key: argocd-github-repo/project
+        key: argocd-github-repo
+        property: project
     - secretKey: type                 # key in the Kubernetes Secret
       remoteRef:
-        key: argocd-github-repo/type
+        key: argocd-github-repo
+        property: type
