@@ -3,6 +3,11 @@
   "extends": [
     "config:base"
   ],
+  "schedule": [
+    "after 5am every weekday",
+    "before 9am every weekday",
+    "every weekend"
+  ],
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
@@ -10,6 +15,11 @@
     },
     {
       "matchDepTypes": ["devDependencies"],
+      "automerge": true
+    },
+    {
+      "description": "Causes the bot to create a PR (and thus, an email notification), whenever there is a new Renovate version",
+      "matchPaths": ["renovate-update-notification/Dockerfile"],
       "automerge": true
     }
   ],
