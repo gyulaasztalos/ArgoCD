@@ -160,7 +160,8 @@ spec:
           secret:
             secretName: transmission-secret
         - name: config
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: transmission-config
         - name: transmission-data
           persistentVolumeClaim:
             claimName: transmission-data
