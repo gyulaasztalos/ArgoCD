@@ -30,6 +30,14 @@ spec:
       initContainers:
         - name: get-flood-for-transmission
           image: alpine:3.22
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 256Mi
           command:
             - sh
             - -c
