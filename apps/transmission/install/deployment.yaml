@@ -54,7 +54,7 @@ spec:
               mountPath: /config
       containers:
         - name: transmission
-          image: lscr.io/linuxserver/transmission:4.0.6
+          image: lscr.io/linuxserver/transmission:4.0.6-r4-ls302
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false  # prevent sudo, etc.
