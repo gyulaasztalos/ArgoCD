@@ -44,7 +44,7 @@ spec:
             - |
               apk add --no-cache curl unzip
               curl -L -o /tmp/flood.zip https://github.com/johman10/flood-for-transmission/releases/download/latest/flood-for-transmission.zip
-              unzip /tmp/flood.zip -d /flood-for-transmission
+              unzip /tmp/flood.zip -d /config
               cp /secrets/settings.json /config/settings.json && chmod 600 /config/settings.json
           volumeMounts:
             - name: transmission-secret
@@ -52,8 +52,6 @@ spec:
               subPath: settings.json  # mounts settings.json from the secret
             - name: config
               mountPath: /config
-            - name: flood-for-transmission
-              mountPath: /flood-for-transmission
       containers:
         - name: transmission
           image: lscr.io/linuxserver/transmission:4.0.6
@@ -153,8 +151,6 @@ spec:
             - name: transmission-data
               mountPath: /watch
               subPath: transmission_watch_dir/k3s  # mounts /private/transmission_watch_dir/k3s from NFS
-            - name: flood-for-transmission
-              mountPath: /flood-for-transmission
             - name: notification-script
               mountPath: /scripts/transmission_notification.sh
               subPath: transmission_notification.sh
@@ -168,8 +164,6 @@ spec:
         - name: transmission-data
           persistentVolumeClaim:
             claimName: transmission-data
-        - name: flood-for-transmission
-          emptyDir: {}
         - name: notification-script
           configMap:
             name: transmission-notification-script
