@@ -806,13 +806,6 @@ ports:
       default: true
     exposedPort: 465
     protocol: TCP
-  rpc:
-    # -- The port for the mailsecure entrypoint
-    port: 9091
-    expose:
-      default: true
-    exposedPort: 9091
-    protocol: TCP
 
 # -- TLS Options are created as [TLSOption CRDs](https://doc.traefik.io/traefik/https/tls/#tls-options)
 # When using `labelSelector`, you'll need to set labels on tlsOption accordingly.
