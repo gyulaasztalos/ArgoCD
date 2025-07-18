@@ -7,7 +7,7 @@ spec:
   entryPoints:
     - rpc
   routes:
-    - match: Host(`transmission.local.asztalos.net`)
+    - match: HostSNI(`*`)
       services:
         - name: transmission-rpc
           port: 9091
