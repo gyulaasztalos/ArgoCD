@@ -83,7 +83,7 @@ spec:
             periodSeconds: 15
             failureThreshold: 3
             successThreshold: 1
-            timeoutSeconds: 5
+            timeoutSeconds: 10
           livenessProbe:
             exec:
               command:
@@ -95,7 +95,7 @@ spec:
             periodSeconds: 20
             failureThreshold: 3
             successThreshold: 1
-            timeoutSeconds: 5
+            timeoutSeconds: 10
           env:
             - name: PUID
               valueFrom:
