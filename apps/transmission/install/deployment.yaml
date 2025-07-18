@@ -170,6 +170,7 @@ spec:
             items:
               - key: transmission_notification.sh
                 path: transmission_notification.sh
+            defaultMode: 0755
       securityContext:
         fsGroup: 119
       affinity:
