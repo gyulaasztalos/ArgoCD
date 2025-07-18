@@ -2,6 +2,15 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+configMapGenerator:
+  - name: transmission-notification-script
+    namespace: transmission
+    files:
+      - transmission_notification.sh=transmission_notification.sh
+  - name: transmission-config
+    namespace: transmission
+    env: transmission-config.env
+
 resources:
   - transmission-secret.yaml
   - pv.yaml
@@ -9,10 +18,3 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingressrouteTCP.yaml
-
-configMapGenerator:
-  - name: transmission-notification-script
-    files:
-      - transmission_notification.sh=transmission_notification.sh
-  - name: transmission-config
-    env: transmission-config.env
