@@ -29,7 +29,7 @@ spec:
     spec:
       initContainers:
         - name: get-flood-for-transmission
-          image: alpine:3.20
+          image: alpine:3.22
           command:
             - sh
             - -c
