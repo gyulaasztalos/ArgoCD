@@ -8,7 +8,6 @@ spec:
     - rpc
   routes:
     - match: Host(`transmission.local.asztalos.net`)
-      kind: Rule
       services:
         - name: transmission-rpc
           port: 9091
