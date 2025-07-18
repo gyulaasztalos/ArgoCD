@@ -1,0 +1,182 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transmission
+  namespace: transmission
+  labels:
+    app: transmission
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "LinuxServer.io images do not require a read-only root filesystem"
+    ignore-check.kube-linter.io/run-as-non-root: "LinuxServer.io images do not require a non-root user"
+    ignore-check.kube-linter.io/latest-tag: "This deployment intentionally uses the latest tag"
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: transmission
+  template:
+    metadata:
+      labels:
+        app: transmission
+    spec:
+      initContainers:
+        - name: get-flood-for-transmission
+          image: alpine:3.20
+          command:
+            - sh
+            - -c
+            - |
+              apk add --no-cache curl unzip
+              curl -L -o /tmp/flood.zip https://github.com/johman10/flood-for-transmission/releases/download/latest/flood-for-transmission.zip
+              unzip /tmp/flood.zip -d /flood-for-transmission
+              cp /secrets/settings.json /config/settings.json && chmod 600 /config/settings.json
+          volumeMounts:
+            - name: transmission-secret
+              mountPath: /secrets/settings.json
+              subPath: settings.json  # mounts settings.json from the secret
+            - name: config
+              mountPath: /config
+            - name: flood-for-transmission
+              mountPath: /flood-for-transmission
+      containers:
+        - name: transmission
+          image: lscr.io/linuxserver/transmission:4.0.5
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false  # prevent sudo, etc.
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          ports:
+            - containerPort: 9091
+              name: rpc
+              protocol: TCP
+            - containerPort: 51413
+              name: peer-port
+              protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  curl -u "$USER:$PASS" -s -o /dev/null -w "%{http_code}" http://localhost:9091/transmission/rpc | grep -q 401 || exit 0
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  curl -u "$USER:$PASS" -s -o /dev/null -w "%{http_code}" http://localhost:9091/transmission/rpc | grep -q 401 || exit 0
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 5
+          env:
+            - name: PUID
+              valueFrom:
+                configMapKeyRef:
+                  name: transmission-config
+                  key: PUID
+            - name: PGID
+              valueFrom:
+                configMapKeyRef:
+                  name: transmission-config
+                  key: PGID
+            - name: TZ
+              valueFrom:
+                configMapKeyRef:
+                  name: transmission-config
+                  key: TZ
+            - name: WHITELIST
+              valueFrom:
+                configMapKeyRef:
+                  name: transmission-config
+                  key: WHITELIST
+            - name: PEERPORT
+              valueFrom:
+                configMapKeyRef:
+                  name: transmission-config
+                  key: PEERPORT
+            - name: HOST_WHITELIST
+              valueFrom:
+                configMapKeyRef:
+                  name: transmission-config
+                  key: HOST_WHITELIST
+            - name: TRANSMISSION_WEB_HOME
+              valueFrom:
+                configMapKeyRef:
+                  name: transmission-config
+                  key: TRANSMISSION_WEB_HOME
+            - name: USER
+              valueFrom:
+                secretKeyRef:
+                  name: transmission-secret
+                  key: username
+            - name: PASS
+              valueFrom:
+                secretKeyRef:
+                  name: transmission-secret
+                  key: password
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: transmission-data
+              mountPath: /downloads
+              subPath: downloads  # mounts /private/downloads from NFS
+            - name: transmission-data
+              mountPath: /watch
+              subPath: transmission_watch_dir/k3s  # mounts /private/transmission_watch_dir/k3s from NFS
+            - name: flood-for-transmission
+              mountPath: /flood-for-transmission
+            - name: notification-script
+              mountPath: /scripts/transmission_notification.sh
+              subPath: transmission_notification.sh
+      restartPolicy: Always
+      volumes:
+        - name: transmission-secret
+          secret:
+            secretName: transmission-secret
+        - name: config
+          emptyDir: {}
+        - name: transmission-data
+          persistentVolumeClaim:
+            claimName: transmission-data
+        - name: flood-for-transmission
+          emptyDir: {}
+        - name: notification-script
+          configMap:
+            name: transmission-notification-script
+            items:
+              - key: transmission_notification.sh
+                path: transmission_notification.sh
+      securityContext:
+        fsGroup: 119
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - transmission
+              topologyKey: kubernetes.io/hostname

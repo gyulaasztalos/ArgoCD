@@ -21,3 +21,4 @@ resources:
   - apprise/application.yaml
   - nginx/application.yaml
   - ddns-updater/application.yaml
+  - transmission/application.yaml

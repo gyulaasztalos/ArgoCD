@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: transmission-peer-tcp
+  namespace: transmission
+  labels:
+    app: transmission
+    release: transmission
+  annotations:
+    metallb.io/allow-shared-ip: "true"
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 10.10.50.32
+  selector:
+    app: transmission
+    release: transmission
+  ports:
+    - name: peer-tcp
+      protocol: TCP
+      port: 51413
+      targetPort: 51413
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transmission-peer-udp
+  namespace: transmission
+  labels:
+    app: transmission
+    release: transmission
+  annotations:
+    metallb.io/allow-shared-ip: "true"
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 10.10.50.32
+  selector:
+    app: transmission
+    release: transmission
+  ports:
+    - name: peer-udp
+      protocol: UDP
+      port: 51413
+      targetPort: 51413
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: transmission-rpc
+  namespace: transmission
+  labels:
+    app: transmission
+    release: transmission
+spec:
+  type: ClusterIP
+  selector:
+    app: transmission
+    release: transmission
+  ports:
+    - name: rpc
+      protocol: TCP
+      port: 9091
+      targetPort: 9091

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: transmission-data
+  namespace: transmission
+  labels:
+    app: transmission
+    release: transmission
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-share
+  resources:
+    requests:
+      storage: 1000Gi

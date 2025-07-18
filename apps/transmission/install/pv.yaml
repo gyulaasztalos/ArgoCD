@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-share-pv
+spec:
+  capacity:
+    storage: 1000Gi # Adjust as needed, this is arbitrary for NFS
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-share
+  nfs:
+    server: unvr-pro.local.asztalos.net
+    path: /private
