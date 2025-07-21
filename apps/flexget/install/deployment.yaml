@@ -51,7 +51,7 @@ spec:
               mountPath: /config
       containers:
         - name: flexget
-          image: lscr.io/linuxserver/flexget:3.16.14-ls239
+          image: lscr.io/linuxserver/flexget:v3.16.14-ls239
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false  # prevent sudo, etc.
