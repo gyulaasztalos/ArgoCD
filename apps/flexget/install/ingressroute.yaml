@@ -1,0 +1,27 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: flexget
+  namespace: flexget
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+  labels:
+    app: flexget
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`flexget.local.asztalos.net`)
+      kind: Rule
+      middlewares:
+        - name: authentik
+          namespace: traefik
+        - name: default-headers
+          namespace: traefik
+      services:
+        - name: flexget
+          namespace: flexget
+          port: 5050
+  tls:
+    secretName: local-asztalos-net-tls

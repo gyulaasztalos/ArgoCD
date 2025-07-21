@@ -1,0 +1,144 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flexget
+  namespace: flexget
+  labels:
+    app: flexget
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "LinuxServer.io images do not require a read-only root filesystem"
+    ignore-check.kube-linter.io/run-as-non-root: "LinuxServer.io images do not require a non-root user"
+    ignore-check.kube-linter.io/latest-tag: "This deployment intentionally uses the latest tag"
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: flexget
+  template:
+    metadata:
+      labels:
+        app: flexget
+    spec:
+      initContainers:
+        - name: init-flexget
+          image: alpine:3.22
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 256Mi
+          command:
+            - sh
+            - -c
+            - |
+              cp /secrets/config.yaml /config/config.yaml && chmod 600 /config/config.yaml
+          volumeMounts:
+            - name: flexget-secret
+              mountPath: /secrets/config.yaml
+              subPath: config.yaml  # mounts config.yaml from the secret
+            - name: config
+              mountPath: /config
+      containers:
+        - name: flexget
+          image: lscr.io/linuxserver/flexget:3.16.14-ls239
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false  # prevent sudo, etc.
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          ports:
+            - containerPort: 5050
+              name: webui
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5050
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5050
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 10
+          env:
+            - name: PUID
+              valueFrom:
+                configMapKeyRef:
+                  name: flexget-config
+                  key: PUID
+            - name: PGID
+              valueFrom:
+                configMapKeyRef:
+                  name: flexget-config
+                  key: PGID
+            - name: TZ
+              valueFrom:
+                configMapKeyRef:
+                  name: flexget-config
+                  key: TZ
+            - name: FG_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: flexget-config
+                  key: FG_LOG_LEVEL
+            - name: FG_LOG_FILE
+              valueFrom:
+                configMapKeyRef:
+                  name: flexget-config
+                  key: FG_LOG_FILE
+            - name: FG_CONFIG_FILE
+              valueFrom:
+                configMapKeyRef:
+                  name: flexget-config
+                  key: FG_CONFIG_FILE
+            - name: FG_WEBUI_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: flexget-secret
+                  key: FG_WEBUI_PASSWORD
+          volumeMounts:
+            - name: config
+              mountPath: /config
+      restartPolicy: Always
+      volumes:
+        - name: flexget-secret
+          secret:
+            secretName: flexget-secret
+        - name: config
+          persistentVolumeClaim:
+            claimName: flexget-config-pvc
+      securityContext:
+        fsGroup: 1000
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - flexget
+              topologyKey: kubernetes.io/hostname

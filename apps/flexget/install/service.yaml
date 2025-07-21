@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flexget
+  namespace: flexget
+spec:
+  selector:
+    app: flexget
+  ports:
+  - name: webui
+    targetPort: 5050
+    port: 5050

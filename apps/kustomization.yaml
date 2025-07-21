@@ -22,3 +22,4 @@ resources:
   - nginx/application.yaml
   - ddns-updater/application.yaml
   - transmission/application.yaml
+  - flexget/application.yaml
