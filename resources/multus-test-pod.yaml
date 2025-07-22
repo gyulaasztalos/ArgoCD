@@ -9,8 +9,7 @@ metadata:
       [{
         "name": "multus-iot",
         "namespace": "kube-system",
-        "ips": [ "10.10.20.13/24" ],
-        "mac": "ce:ff:6a:78:88:a1"
+        "ips": [ "10.10.20.13/24" ]
       }]
 spec:
   containers:
