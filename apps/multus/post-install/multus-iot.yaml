@@ -8,9 +8,8 @@ spec:
   config: |-
     {
       "cniVersion": "0.3.1",
-      "type": "macvlan",
-      "master": "eth0.20",
-      "mode": "bridge",
+      "type": "bridge",
+      "bridge": "br-iot",
       "ipam": {
         "type": "static",
         "routes": [
