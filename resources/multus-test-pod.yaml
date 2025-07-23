@@ -18,5 +18,5 @@ metadata:
 spec:
   containers:
   - name: sample-pod
-    command: ["/bin/ash", "-c", "trap : TERM INT; sleep infinity & wait"]
-    image: alpine
+    image: nicolaka/netshoot
+    command: ["/bin/sh", "-c", "trap : TERM INT; sleep infinity & wait"]
