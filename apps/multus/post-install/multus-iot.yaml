@@ -12,8 +12,7 @@ spec:
       "master": "eth0.20",
       "mode": "bridge",
       "ipam": {
-        "type": "host-local",
-        "subnet": "10.10.20.0/24",
+        "type": "static",
         "routes": [
           { "dst": "10.0.20.0/24" }
         ],
