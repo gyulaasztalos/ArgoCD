@@ -27,28 +27,6 @@ spec:
       labels:
         app: flexget
     spec:
-      initContainers:
-        - name: init-flexget
-          image: alpine:3.22
-          imagePullPolicy: IfNotPresent
-          resources:
-            requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
-              cpu: 100m
-              memory: 256Mi
-          command:
-            - sh
-            - -c
-            - |
-              cp /secrets/config.yml /config/config.yml && chmod 600 /config/config.yml
-          volumeMounts:
-            - name: flexget-secret
-              mountPath: /secrets/config.yml
-              subPath: config.yml  # mounts config.yml from the secret
-            - name: config
-              mountPath: /config
       containers:
         - name: flexget
           image: lscr.io/linuxserver/flexget:v3.16.14-ls239
@@ -120,6 +98,9 @@ spec:
                   name: flexget-secret
                   key: FG_WEBUI_PASSWORD
           volumeMounts:
+            - name: flexget-secret
+              mountPath: /config/config.yml
+              subPath: config.yml
             - name: config
               mountPath: /config
       restartPolicy: Always
