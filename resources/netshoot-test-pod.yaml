@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: netshoot
+  namespace: default
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "rw root filesystem is required for netshoot"
+    ignore-check.kube-linter.io/run-as-non-root: "root user is required for netshoot"
+    k8s.v1.cni.cncf.io/networks: |
+      [
+        {
+          "name": "multus-iot",
+          "namespace": "kube-system",
+          "ips": [ "10.10.20.14/24" ],
+          "mac": "ce:ff:6a:78:88:a1"
+        }
+      ]
+spec:
+  containers:
+  - name: netshoot
+    image: nicolaka/netshoot:v0.14
+    command: ["/bin/sh", "-c", "trap : TERM INT; sleep infinity & wait"]
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "100m"
+      limits:
+        memory: "128Mi"
+        cpu: "250m"
