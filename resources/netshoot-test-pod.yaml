@@ -13,7 +13,7 @@ metadata:
           "name": "multus-iot",
           "namespace": "kube-system",
           "ips": [ "10.10.20.14/24" ],
-          "mac": "ce:ff:6a:78:88:a1"
+          "mac": "da:de:b0:2b:f3:ef"
         }
       ]
 spec:
