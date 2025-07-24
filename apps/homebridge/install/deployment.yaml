@@ -1,0 +1,118 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homebridge
+  namespace: homebridge
+  labels:
+    app: homebridge
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "LinuxServer.io images do not require a read-only root filesystem"
+    ignore-check.kube-linter.io/run-as-non-root: "LinuxServer.io images do not require a non-root user"
+    k8s.v1.cni.cncf.io/networks: |
+      [
+        {
+          "name": "multus-iot",
+          "namespace": "kube-system",
+          "ips": [ "10.10.20.13/24" ],
+          "mac": "ce:ff:6a:78:88:a1"
+        }
+      ]
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: homebridge
+  template:
+    metadata:
+      labels:
+        app: homebridge
+    spec:
+      containers:
+        - name: homebridge
+          image: homebridge/homebridge:2025-07-21
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false  # prevent sudo, etc.
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          ports:
+            - containerPort: 8581
+              name: webui
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8581
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8581
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 10
+          env:
+            - name: PUID
+              valueFrom:
+                configMapKeyRef:
+                  name: homebridge-config
+                  key: PUID
+            - name: PGID
+              valueFrom:
+                configMapKeyRef:
+                  name: homebridge-config
+                  key: PGID
+            - name: TZ
+              valueFrom:
+                configMapKeyRef:
+                  name: homebridge-config
+                  key: TZ
+            - name: ENABLE_AVAHI
+              valueFrom:
+                configMapKeyRef:
+                  name: homebridge-config
+                  key: ENABLE_AVAHI
+          volumeMounts:
+            - name: homebridge-secret
+              mountPath: /homebridge/auth.json
+              subPath: auth.json
+            - name: config
+              mountPath: /homebridge
+      restartPolicy: Always
+      volumes:
+        - name: homebridge-secret
+          secret:
+            secretName: homebridge-secret
+        - name: config
+          persistentVolumeClaim:
+            claimName: homebridge-config-pvc
+      securityContext:
+        fsGroup: 1000
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - homebridge
+              topologyKey: kubernetes.io/hostname
