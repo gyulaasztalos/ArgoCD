@@ -292,7 +292,7 @@ webhook:
   certCheckInterval: "5m"
   # -- Specifices the lookaheadInterval for certificate validity
   lookaheadInterval: ""
-  replicaCount: 3
+  replicaCount: 1
   # -- Specifices Log Params to the Webhook
   log:
     level: info
@@ -475,7 +475,7 @@ certController:
   # -- Specifies whether a certificate controller deployment be created.
   create: true
   requeueInterval: "5m"
-  replicaCount: 3
+  replicaCount: 1
   # -- Specifices Log Params to the Certificate Controller
   log:
     level: info
