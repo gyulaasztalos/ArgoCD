@@ -22,7 +22,7 @@ global:
       # disabled - No modification applied.
       adaptSecurityContext: auto
 
-replicaCount: 3
+replicaCount: 1
 
 bitwarden-sdk-server:
   enabled: false
