@@ -234,7 +234,7 @@ persistentVolumeClaim:
     - ReadWriteOnce
 
   # -- volume claim size
-  size: "1500Mi"
+  size: "2000Mi"
 
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
