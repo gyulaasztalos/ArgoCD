@@ -696,7 +696,7 @@ controller:
   ## Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
   pdb:
     # -- Deploy a [PodDisruptionBudget] for the application controller
-    enabled: true
+    enabled: false
     # -- Labels to be added to application controller pdb
     labels: {}
     # -- Annotations to be added to application controller pdb
@@ -1040,7 +1040,7 @@ dex:
   ## Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
   pdb:
     # -- Deploy a [PodDisruptionBudget] for the Dex server
-    enabled: true
+    enabled: false
     # -- Labels to be added to Dex server pdb
     labels: {}
     # -- Annotations to be added to Dex server pdb
@@ -1834,7 +1834,7 @@ server:
   ## Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
   pdb:
     # -- Deploy a [PodDisruptionBudget] for the Argo CD server
-    enabled: true
+    enabled: false
     # -- Labels to be added to Argo CD server pdb
     labels: {}
     # -- Annotations to be added to Argo CD server pdb
@@ -2505,7 +2505,7 @@ repoServer:
   ## Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
   pdb:
     # -- Deploy a [PodDisruptionBudget] for the repo server
-    enabled: true
+    enabled: false
     # -- Labels to be added to repo server pdb
     labels: {}
     # -- Annotations to be added to repo server pdb
@@ -2873,7 +2873,7 @@ applicationSet:
   ## Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
   pdb:
     # -- Deploy a [PodDisruptionBudget] for the ApplicationSet controller
-    enabled: true
+    enabled: false
     # -- Labels to be added to ApplicationSet controller pdb
     labels: {}
     # -- Annotations to be added to ApplicationSet controller pdb
@@ -3247,7 +3247,7 @@ notifications:
   ## Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
   pdb:
     # -- Deploy a [PodDisruptionBudget] for the notifications controller
-    enabled: true
+    enabled: false
     # -- Labels to be added to notifications controller pdb
     labels: {}
     # -- Annotations to be added to notifications controller pdb
