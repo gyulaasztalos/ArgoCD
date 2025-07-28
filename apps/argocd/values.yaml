@@ -216,6 +216,7 @@ configs:
             - openid
             - profile
             - email
+            - offline_access
         name: authentik
         type: oidc
         id: authentik
