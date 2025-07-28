@@ -701,7 +701,7 @@ master:
   ##
   pdb:
     create: true
-    minAvailable: ""
+    minAvailable: 1
     maxUnavailable: ""
   ## @param master.extraPodSpec Optionally specify extra PodSpec for the Redis(R) master pod(s)
   ##
@@ -1205,7 +1205,7 @@ replica:
   ##
   pdb:
     create: true
-    minAvailable: ""
+    minAvailable: 1
     maxUnavailable: ""
   ## @param replica.extraPodSpec Optionally specify extra PodSpec for the Redis(R) replicas pod(s)
   ##
