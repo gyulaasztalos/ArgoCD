@@ -18,7 +18,7 @@ spec:
       targetRevision: main
       ref: config
     - repoURL: https://prometheus-community.github.io/helm-charts
-      targetRevision: 75.15.0
+      targetRevision: 75.13.0
       helm:
         valueFiles:
           - $config/apps/monitoring/values.yaml
@@ -29,7 +29,7 @@ spec:
   project: default
   syncPolicy:
     automated:
-      selfHeal: true
+      selfHeal: false
       prune: true
     syncOptions:
       - CreateNamespace=true

@@ -25,3 +25,4 @@ resources:
   - transmission/application.yaml
   - flexget/application.yaml
   - homebridge/application.yaml
+  - paperless-ngx/application.yaml

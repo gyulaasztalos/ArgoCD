@@ -1,0 +1,114 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paperless-ngx
+  namespace: paperless-ngx
+  labels:
+    app: paperless-ngx
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "LinuxServer.io images do not require a read-only root filesystem"
+    ignore-check.kube-linter.io/run-as-non-root: "LinuxServer.io images do not require a non-root user"
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: paperless-ngx
+  template:
+    metadata:
+      labels:
+        app: paperless-ngx
+    spec:
+      containers:
+        - name: paperless-ngx
+          image: ghcr.io/paperless-ngx/paperless-ngx:2.17.1
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false  # prevent sudo, etc.
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          ports:
+            - containerPort: 8000
+              name: webui
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 10
+          envFrom:
+            - configMapRef:
+              name: paperless-ngx-config
+            - secretRef:
+              name: paperless-ngx-oauth-secret
+            - secretRef:
+              name: paperless-ngx-redis-secret
+            - secretRef:
+              name: paperless-ngx-postgres-secret
+          volumeMounts:
+            - name: paperless-ngx-data
+              mountPath: /usr/src/paperless/media
+              subPath: media
+            - name: paperless-ngx-data
+              mountPath: /usr/src/paperless/data
+              subPath: data  # mounts /private/downloads from NFS
+            - name: paperless-ngx-notification-script
+              mountPath: /usr/src/paperless/scripts/notification.sh
+              subPath: notification.sh
+            - name: paperless-ngx-consume
+              mountPath: /usr/src/paperless/consume
+              subPath: paperless/consume  # mounts /private/consume from NFS
+            - name: paperless-ngx-consume
+              mountPath: /usr/src/paperless/export
+              subPath: paperless/export  # mounts /private/config from NFS
+      restartPolicy: Always
+      volumes:
+        - name: paperless-ngx-consume
+          persistentVolumeClaim:
+            claimName: paperless-ngx-consume
+        - name: paperless-ngx-data
+          persistentVolumeClaim:
+            claimName: paperless-ngx-data
+        - name: notification-script
+          configMap:
+            name: paperless-ngx-notification-script
+            items:
+              - key: notification.sh
+                path: notification.sh
+            defaultMode: 0755
+      securityContext:
+        fsGroup: 1000
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - paperless-ngx
+              topologyKey: kubernetes.io/hostname
