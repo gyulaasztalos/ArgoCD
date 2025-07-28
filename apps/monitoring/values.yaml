@@ -498,8 +498,8 @@ alertmanager:
   ##
   podDisruptionBudget:
     enabled: true
-    minAvailable: ""
-    maxUnavailable: 1
+    minAvailable: 1
+    maxUnavailable: ""
     unhealthyPodEvictionPolicy: AlwaysAllow
 
   ## Alertmanager configuration directives
