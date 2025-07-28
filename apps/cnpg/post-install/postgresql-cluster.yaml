@@ -35,6 +35,13 @@ spec:
         passwordSecret:
           name: authentik-postgres-password
         login: true
+      - name: paperless
+        connectionLimit: -1
+        ensure: present
+        inherit: true
+        passwordSecret:
+          name: paperless-postgres-password
+        login: true
   backup:
     barmanObjectStore:
       destinationPath: s3://homelab-cnpg-backup-production/cnpg-backup/
