@@ -385,7 +385,7 @@ webhook:
   # -- Pod disruption budget - for more details see https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
   podDisruptionBudget:
     enabled: true   # Add PDB for HA
-    minAvailable: 2
+    minAvailable: 1
 
   metrics:
 
