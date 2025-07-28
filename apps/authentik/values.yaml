@@ -292,10 +292,10 @@ server:
     annotations: {}
     # -- Number of pods that are available after eviction as number or percentage (eg.: 50%)
     # @default -- `""` (defaults to 0 if not specified)
-    minAvailable: ""
+    minAvailable: 1
     # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%)
     ## Has higher precedence over `server.pdb.minAvailable`
-    maxUnavailable: "1"
+    maxUnavailable: ""
 
   ## authentik server image
   ## This should match what is deployed in the worker. Prefer using global.image
@@ -737,10 +737,10 @@ worker:
     annotations: {}
     # -- Number of pods that are available after eviction as number or percentage (eg.: 50%)
     # @default -- `""` (defaults to 0 if not specified)
-    minAvailable: ""
+    minAvailable: "1"
     # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%)
     ## Has higher precedence over `worker.pdb.minAvailable`
-    maxUnavailable: "1"
+    maxUnavailable: ""
 
   ## authentik worker image
   ## This should match what is deployed in the server. Prefer using global.image
