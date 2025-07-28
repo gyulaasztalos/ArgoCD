@@ -538,7 +538,7 @@ metrics:
 pdb:
   ## @param pdb.create Specifies whether a PodDisruptionBudget should be created
   ##
-  create: false
+  create: true
   ## @param pdb.minAvailable The minimum number of pods (non number to omit)
   ##
   minAvailable: 1
