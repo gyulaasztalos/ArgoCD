@@ -16,6 +16,7 @@ resources:
   - paperless-ngx-oauth-secret.yaml
   - paperless-ngx-redis-secret.yaml
   - paperless-ngx-postgres-secret.yaml
+  - pv.yaml
   - pvc.yaml
   - deployment.yaml
   - service.yaml
