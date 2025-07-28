@@ -104,9 +104,9 @@ deployment:
 
 # -- [Pod Disruption Budget](https://kubernetes.io/docs/reference/kubernetes-api/policy-resources/pod-disruption-budget-v1/)
 podDisruptionBudget:  # @schema additionalProperties: false
-  enabled: false
+  enabled: true
   maxUnavailable:  # @schema type:[string, integer, null];minimum:0
-  minAvailable:    # @schema type:[string, integer, null];minimum:0
+  minAvailable: 1   # @schema type:[string, integer, null];minimum:0
 
 # -- Create a default IngressClass for Traefik
 ingressClass:  # @schema additionalProperties: false
