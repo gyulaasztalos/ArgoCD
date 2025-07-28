@@ -62,13 +62,13 @@ spec:
             timeoutSeconds: 10
           envFrom:
             - configMapRef:
-              name: paperless-ngx-config
+                name: paperless-ngx-config
             - secretRef:
-              name: paperless-ngx-oauth-secret
+                name: paperless-ngx-oauth-secret
             - secretRef:
-              name: paperless-ngx-redis-secret
+                name: paperless-ngx-redis-secret
             - secretRef:
-              name: paperless-ngx-postgres-secret
+                name: paperless-ngx-postgres-secret
           volumeMounts:
             - name: paperless-ngx-data
               mountPath: /usr/src/paperless/media
@@ -93,7 +93,7 @@ spec:
         - name: paperless-ngx-data
           persistentVolumeClaim:
             claimName: paperless-ngx-data
-        - name: notification-script
+        - name: paperless-ngx-notification-script
           configMap:
             name: paperless-ngx-notification-script
             items:
