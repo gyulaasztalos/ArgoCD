@@ -8,7 +8,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: nfs-share
+  storageClassName: nfs-share-small
   resources:
     requests:
       storage: 100Mi
