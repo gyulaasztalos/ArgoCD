@@ -285,7 +285,7 @@ server:
   ## Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
   pdb:
     # -- Deploy a [PodDistrubtionBudget] for the authentik server
-    enabled: false
+    enabled: true
     # -- Labels to be added to the authentik server pdb
     labels: {}
     # -- Annotations to be added to the authentik server pdb
@@ -295,7 +295,7 @@ server:
     minAvailable: ""
     # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%)
     ## Has higher precedence over `server.pdb.minAvailable`
-    maxUnavailable: ""
+    maxUnavailable: "1"
 
   ## authentik server image
   ## This should match what is deployed in the worker. Prefer using global.image
@@ -730,7 +730,7 @@ worker:
   ## Ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
   pdb:
     # -- Deploy a [PodDistrubtionBudget] for the authentik worker
-    enabled: false
+    enabled: true
     # -- Labels to be added to the authentik worker pdb
     labels: {}
     # -- Annotations to be added to the authentik worker pdb
@@ -740,7 +740,7 @@ worker:
     minAvailable: ""
     # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%)
     ## Has higher precedence over `worker.pdb.minAvailable`
-    maxUnavailable: ""
+    maxUnavailable: "1"
 
   ## authentik worker image
   ## This should match what is deployed in the server. Prefer using global.image
