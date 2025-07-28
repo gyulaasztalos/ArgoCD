@@ -127,7 +127,7 @@ connect:
   ## Pod Disruption Budget for the Connect pod
   pdb:
     # Enable Pod Disruption Budget for the Connect pod
-    enabled: false
+    enabled: true
     # Additional annotations to be added to the PDB Connect
     annotations: {}
     # Number of pods that are unavailble after eviction as number or percentage (eg.: 50%)
