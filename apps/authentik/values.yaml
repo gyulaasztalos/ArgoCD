@@ -249,7 +249,7 @@ server:
   name: server
 
   # -- The number of server pods to run
-  replicas: 3
+  replicas: 2
 
   ## authentik server Horizontal Pod Autoscaler
   autoscaling:
