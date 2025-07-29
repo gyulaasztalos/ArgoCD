@@ -24,7 +24,7 @@ spec:
         app: netatmo-exporter
     spec:
       initContainers:
-        - name: Add netatmo-token
+        - name: Add-netatmo-token
           image: alpine:3.22
           imagePullPolicy: IfNotPresent
           resources:
