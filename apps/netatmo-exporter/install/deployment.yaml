@@ -38,7 +38,7 @@ spec:
             - sh
             - -c
             - |
-              [ -z /config/netatmo-token.json ] && cp /secrets/netatmo-token.json /config/netatmo-token.json
+              [ -s /config/netatmo-token.json ] && cp /secrets/netatmo-token.json /config/netatmo-token.json
               chmod 600 /config/netatmo-token.json
           volumeMounts:
             - name: netatmo-exporter-secret
