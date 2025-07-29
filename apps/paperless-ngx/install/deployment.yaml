@@ -35,10 +35,10 @@ spec:
           resources:
             requests:
               cpu: 100m
-              memory: 128Mi
+              memory: 800Mi
             limits:
               cpu: 1000m
-              memory: 1Gi
+              memory: 2Gi
           ports:
             - containerPort: 8000
               name: webui
