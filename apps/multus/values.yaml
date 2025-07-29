@@ -94,6 +94,7 @@ config:
     #skipMultusBinaryCopy: false
     #readinessIndicatorFile: ""
     multusConfFile: auto #or specify a file to be copied on each node
+
     #The following options can be used only when multusConfFile=auto
     #multusAutoconfigDir: /host/etc/cni/net.d
     kubeconfig: /var/lib/rancher/k3s/agent/etc/cni/net.d/multus.d/multus.kubeconfig
@@ -108,8 +109,8 @@ config:
     "cniVersion": "0.3.1"
     "logLevel": "verbose"
     "logToStderr": true
-    "cniConfigDir": "/host/var/lib/rancher/k3s/agent/etc/cni/net.d"
-    "multusAutoconfigDir": "/host/var/lib/rancher/k3s/agent/etc/cni/net.d"
+    "cniConfigDir": "/host/etc/cni/net.d"
+    "multusAutoconfigDir": "/host/etc/cni/net.d"
     "multusConfigFile": "auto"
     "socketDir": "/host/run/multus/"
 
