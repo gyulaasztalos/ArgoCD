@@ -39,6 +39,8 @@ This repository contains Kubernetes manifests for managing my HomeLab infrastruc
   - Traefik LB: `10.10.50.30`
   - Pi-Hole LB: `10.10.50.31`
   - KubeVIP API: `10.10.50.20`
+  - Homebridge MAC VLAN: `10.10.20.13`
+- **NAS:** `unvr-pro.local.asztalos.net (10.10.50.2)`
 
 #### Core Infrastructure
 - **Base System:** Debian 12 Bookworm
@@ -73,9 +75,10 @@ This repository contains Kubernetes manifests for managing my HomeLab infrastruc
 - Rancher (read-only access)
 - Nginx (testing)
 - Pi-Hole + Unbound (DNS with TLS forwarding to Cloudflare DNS) + nebula-sync
-- Transmission 
+- Transmission
 - Flexget
 - Homebridge (with multus macvlan interface)
+- Paperless-NGX
 
 ### Bootstrap Process
 1. **Host Preparation:**
