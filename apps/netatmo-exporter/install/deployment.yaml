@@ -90,12 +90,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: netatmo-exporter-secret
-                  key: client_id
+                  key: NETATMO_CLIENT_ID
             - name: NETATMO_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: netatmo-exporter-secret
-                  key: client_secret
+                  key: NETATMO_CLIENT_SECRET
           volumeMounts:
             - name: config
               mountPath: /config
