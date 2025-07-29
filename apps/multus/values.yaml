@@ -108,8 +108,8 @@ config:
     "cniVersion": "0.3.1"
     "logLevel": "verbose"
     "logToStderr": true
-    "cniConfigDir": "/host/etc/cni/net.d"
-    "multusAutoconfigDir": "/host/etc/cni/net.d"
+    "cniConfigDir": "/host/var/lib/rancher/k3s/agent/etc/cni/net.d"
+    "multusAutoconfigDir": "/host/var/lib/rancher/k3s/agent/etc/cni/net.d"
     "multusConfigFile": "auto"
     "socketDir": "/host/run/multus/"
 
