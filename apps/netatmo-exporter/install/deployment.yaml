@@ -1,0 +1,126 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netatmo-exporter
+  namespace: netatmo-exporter
+  labels:
+    app: netatmo-exporter
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: netatmo-exporter
+  template:
+    metadata:
+      labels:
+        app: netatmo-exporter
+    spec:
+      initContainers:
+        - name: Add netatmo-token
+          image: alpine:3.22
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 100m
+              memory: 256Mi
+          command:
+            - sh
+            - -c
+            - |
+              [ -z /config/netatmo-token.json ] && cp /secrets/netatmo-token.json /config/netatmo-token.json
+              chmod 600 /config/netatmo-token.json
+          volumeMounts:
+            - name: netatmo-exporter-secret
+              mountPath: /secrets/netatmo-token.json
+              subPath: netatmo-token.json  # mounts settings.json from the secret
+            - name: config
+              mountPath: /config
+      containers:
+        - name: netatmo-exporter
+          image: ghcr.io/xperimental/netatmo-exporter:2.1.1
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false # prevent sudo, etc.
+            privileged: false               # prevent acting like host root
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 1000m
+              memory: 256Mi
+          ports:
+            - containerPort: 9210
+              name: metrics
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 9210
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 9210
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 10
+          envFrom:
+            - configMapRef:
+                name: netatmo-exporter-config
+          env:
+            - name: NETATMO_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: netatmo-exporter-secret
+                  key: client_id
+            - name: NETATMO_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: netatmo-exporter-secret
+                  key: client_secret
+          volumeMounts:
+            - name: config
+              mountPath: /config
+      restartPolicy: Always
+      volumes:
+        - name: netatmo-exporter-secret
+          secret:
+            secretName: netatmo-exporter-secret
+        - name: config
+          persistentVolumeClaim:
+            claimName: netatmo-exporter-config-pvc
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        fsGroup: 1000            # hardcode group to non-root if not set in Dockerfile
+        runAsUser: 1000          # hardcode user to non-root if not set in Dockerfile
+        runAsGroup: 1000         # hardcode group to non-root if not set in Dockerfile
+        runAsNonRoot: true       # hardcode to non-root. Redundant to above if Dockerfile is set USER 1000
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - netatmo-exporter
+              topologyKey: kubernetes.io/hostname

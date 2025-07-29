@@ -26,3 +26,4 @@ resources:
   - flexget/application.yaml
   - homebridge/application.yaml
   - paperless-ngx/application.yaml
+  - netatmo-exporter/application.yaml

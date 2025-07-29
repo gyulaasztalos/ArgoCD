@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: netatmo-exporter-exporter
+  namespace: netatmo-exporter  # or the namespace where your exporter runs
+  labels:
+    release: prometheus-operator  # match your Prometheus Operator’s selector if needed
+spec:
+  selector:
+    matchLabels:
+      app: netatmo-exporter  # or the label used by your exporter service
+  endpoints:
+    - path: /metrics
+      interval: 30s
+      targetPort: metrics
+      honorLabels: true
+  namespaceSelector:
+    matchNames:
+      - netatmo-exporter
