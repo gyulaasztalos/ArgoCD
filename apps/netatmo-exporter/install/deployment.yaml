@@ -27,6 +27,10 @@ spec:
         - name: add-netatmo-token
           image: alpine:3.22
           imagePullPolicy: IfNotPresent
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false # prevent sudo, etc.
+            privileged: false
           resources:
             requests:
               cpu: 100m
