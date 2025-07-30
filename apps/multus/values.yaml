@@ -94,6 +94,7 @@ config:
     #skipMultusBinaryCopy: false
     #readinessIndicatorFile: ""
     multusConfFile: auto #or specify a file to be copied on each node
+    multusAutoconfigDir: /var/lib/rancher/k3s/agent/etc/cni/net.d
 
     #The following options can be used only when multusConfFile=auto
     #multusAutoconfigDir: /host/etc/cni/net.d
