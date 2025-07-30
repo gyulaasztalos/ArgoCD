@@ -67,7 +67,7 @@ spec:
               memory: 256Mi
           ports:
             - containerPort: 9210
-              name: metrics
+              name: http
           readinessProbe:
             httpGet:
               path: /metrics

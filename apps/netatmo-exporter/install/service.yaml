@@ -10,8 +10,8 @@ spec:
   selector:
     app: netatmo-exporter
   ports:
-    - name: metrics
+    - name: http
       protocol: TCP
       port: 9210
-      targetPort: metrics
+      targetPort: http
   type: ClusterIP
