@@ -21,6 +21,6 @@ spec:
       services:
         - name: netatmo-exporter
           namespace: netatmo-exporter
-          port: 9120
+          port: 9210
   tls:
     secretName: local-asztalos-net-tls
