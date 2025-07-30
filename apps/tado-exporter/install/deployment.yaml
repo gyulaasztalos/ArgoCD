@@ -1,0 +1,84 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tado-exporter
+  namespace: tado-exporter
+  labels:
+    app: tado-exporter
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: tado-exporter
+  template:
+    metadata:
+      labels:
+        app: tado-exporter
+    spec:
+      containers:
+        - name: tado-exporter
+          image: asztalosgyula/tado-exporter:20250730
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false # prevent sudo, etc.
+            privileged: false               # prevent acting like host root
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 1000m
+              memory: 256Mi
+          ports:
+            - containerPort: 9898
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 9898
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 9898
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 10
+          envFrom:
+            - configMapRef:
+                name: tado-exporter-config
+            - secretRef:
+                name: tado-exporter-secret
+      restartPolicy: Always
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        fsGroup: 1000            # hardcode group to non-root if not set in Dockerfile
+        runAsUser: 1000          # hardcode user to non-root if not set in Dockerfile
+        runAsGroup: 1000         # hardcode group to non-root if not set in Dockerfile
+        runAsNonRoot: true       # hardcode to non-root. Redundant to above if Dockerfile is set USER 1000
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - tado-exporter
+              topologyKey: kubernetes.io/hostname

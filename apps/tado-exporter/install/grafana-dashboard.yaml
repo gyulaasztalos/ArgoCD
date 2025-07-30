@@ -1,0 +1,3765 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tado-exporter-grafana-dashboard
+  namespace: tado-exporter
+  labels:
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "/tmp/dashboards/Applications"
+data:
+  app-grafana-dashboard.json: |
+    {
+      "__inputs": [
+        {
+          "name": "DS_PROMETHEUS",
+          "label": "prometheus",
+          "description": "",
+          "type": "datasource",
+          "pluginId": "prometheus",
+          "pluginName": "Prometheus"
+        },
+        {
+          "name": "DS_INFLUXDB-IDUN",
+          "label": "InfluxDB",
+          "description": "",
+          "type": "datasource",
+          "pluginId": "influxdb",
+          "pluginName": "InfluxDB"
+        }
+      ],
+      "__elements": {},
+      "__requires": [
+        {
+          "type": "panel",
+          "id": "bargauge",
+          "name": "Bar gauge",
+          "version": ""
+        },
+        {
+          "type": "panel",
+          "id": "gauge",
+          "name": "Gauge",
+          "version": ""
+        },
+        {
+          "type": "grafana",
+          "id": "grafana",
+          "name": "Grafana",
+          "version": "11.4.0"
+        },
+        {
+          "type": "datasource",
+          "id": "influxdb",
+          "name": "InfluxDB",
+          "version": "1.0.0"
+        },
+        {
+          "type": "datasource",
+          "id": "prometheus",
+          "name": "Prometheus",
+          "version": "1.0.0"
+        },
+        {
+          "type": "panel",
+          "id": "stat",
+          "name": "Stat",
+          "version": ""
+        },
+        {
+          "type": "panel",
+          "id": "state-timeline",
+          "name": "State timeline",
+          "version": ""
+        },
+        {
+          "type": "panel",
+          "id": "table",
+          "name": "Table",
+          "version": ""
+        },
+        {
+          "type": "panel",
+          "id": "text",
+          "name": "Text",
+          "version": ""
+        },
+        {
+          "type": "panel",
+          "id": "timeseries",
+          "name": "Time series",
+          "version": ""
+        }
+      ],
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": {
+              "type": "datasource",
+              "uid": "grafana"
+            },
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "target": {
+              "limit": 100,
+              "matchAny": false,
+              "tags": [],
+              "type": "dashboard"
+            },
+            "type": "dashboard"
+          }
+        ]
+      },
+      "description": "Grafana Dashboard for Prometheus eko/tado-exporter that shows the temperature setting, current temperature, humidity and activity for all rooms. A detailed view is shown based on the selected room.\r\n\r\nUsing this exporter: https://github.com/IamTheLoki/tado-exporter",
+      "editable": true,
+      "fiscalYearStartMonth": 0,
+      "graphTooltip": 2,
+      "id": null,
+      "links": [],
+      "panels": [
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 37,
+          "panels": [],
+          "title": "Zone $zone",
+          "type": "row"
+        },
+        {
+          "gridPos": {
+            "h": 2,
+            "w": 4,
+            "x": 0,
+            "y": 1
+          },
+          "id": 20,
+          "options": {
+            "code": {
+              "language": "plaintext",
+              "showLineNumbers": false,
+              "showMiniMap": false
+            },
+            "content": "<span style=\"font-size:34px\">Temperature</span>\n\n         ",
+            "mode": "html"
+          },
+          "pluginVersion": "11.4.0",
+          "type": "text"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 1,
+              "mappings": [],
+              "max": 32,
+              "min": 15,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 19
+                  },
+                  {
+                    "color": "orange",
+                    "value": 25
+                  },
+                  {
+                    "color": "red",
+                    "value": 30
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 6,
+            "x": 4,
+            "y": 1
+          },
+          "hideTimeOverride": true,
+          "id": 8,
+          "options": {
+            "displayMode": "lcd",
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "maxVizHeight": 300,
+            "minVizHeight": 10,
+            "minVizWidth": 0,
+            "namePlacement": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "last"
+              ],
+              "fields": "",
+              "limit": 1,
+              "values": false
+            },
+            "showUnfilled": true,
+            "sizing": "auto",
+            "text": {},
+            "valueMode": "color"
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_temperature_value{zone=\"$zone\",unit=\"$temperatureScale\"}",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": "5m",
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Outside Temprature"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 5,
+            "x": 10,
+            "y": 1
+          },
+          "id": 49,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "editorMode": "code",
+              "expr": "weather_outside_temperature{unit=\"$temperatureScale\"}",
+              "legendFormat": "Outside Temprature",
+              "range": true,
+              "refId": "Acutal"
+            }
+          ],
+          "title": "Outside Temperature",
+          "type": "stat"
+        },
+        {
+          "gridPos": {
+            "h": 2,
+            "w": 3,
+            "x": 15,
+            "y": 1
+          },
+          "id": 21,
+          "options": {
+            "code": {
+              "language": "plaintext",
+              "showLineNumbers": false,
+              "showMiniMap": false
+            },
+            "content": "<span style=\"font-size:34px\">Humidity</span>         \n",
+            "mode": "html"
+          },
+          "pluginVersion": "11.4.0",
+          "type": "text"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 1,
+              "mappings": [],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "orange",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 40
+                  },
+                  {
+                    "color": "orange",
+                    "value": 70
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 6,
+            "x": 18,
+            "y": 1
+          },
+          "hideTimeOverride": true,
+          "id": 22,
+          "options": {
+            "displayMode": "lcd",
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "maxVizHeight": 300,
+            "minVizHeight": 10,
+            "minVizWidth": 0,
+            "namePlacement": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "last"
+              ],
+              "fields": "",
+              "limit": 1,
+              "values": false
+            },
+            "showUnfilled": true,
+            "sizing": "auto",
+            "text": {},
+            "valueMode": "color"
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_humidity_percentage{zone=\"$zone\"}",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": "5m",
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "\t",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 30,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "degree"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byType",
+                  "options": "number"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 8,
+            "x": 0,
+            "y": 3
+          },
+          "id": 15,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_temperature_value{zone=\"$zone\",unit=\"$temperatureScale\"}",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "valueLabel": "zone"
+              }
+            },
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "instance": true,
+                  "job": true
+                },
+                "indexByName": {},
+                "renameByName": {}
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 19
+                  },
+                  {
+                    "color": "orange",
+                    "value": 25
+                  },
+                  {
+                    "color": "red",
+                    "value": 30
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 2,
+            "x": 8,
+            "y": 3
+          },
+          "id": 12,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "max"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_temperature_value{zone=\"$zone\",unit=\"$temperatureScale\"}",
+              "format": "time_series",
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "Max:",
+              "refId": "A"
+            }
+          ],
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 30,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byType",
+                  "options": "number"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 7,
+            "x": 15,
+            "y": 3
+          },
+          "id": 23,
+          "options": {
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_humidity_percentage{zone=\"$zone\"}",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "valueLabel": "zone"
+              }
+            },
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "instance": true,
+                  "job": true
+                },
+                "indexByName": {},
+                "renameByName": {}
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "orange",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 40
+                  },
+                  {
+                    "color": "blue",
+                    "value": 70
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 2,
+            "x": 22,
+            "y": 3
+          },
+          "id": 24,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "max"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_humidity_percentage{zone=\"$zone\"}",
+              "format": "time_series",
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "Max:",
+              "refId": "A"
+            }
+          ],
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [],
+              "max": 32,
+              "min": 17,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 19
+                  },
+                  {
+                    "color": "orange",
+                    "value": 25
+                  },
+                  {
+                    "color": "red",
+                    "value": 30
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 5,
+            "x": 10,
+            "y": 4
+          },
+          "hideTimeOverride": true,
+          "id": 11,
+          "options": {
+            "displayMode": "lcd",
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "maxVizHeight": 300,
+            "minVizHeight": 10,
+            "minVizWidth": 0,
+            "namePlacement": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "last"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showUnfilled": true,
+            "sizing": "auto",
+            "text": {},
+            "valueMode": "color"
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_setting_temperature_value{zone=\"$zone\",unit=\"$temperatureScale\"}",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "Set Temperature",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": "1m",
+          "title": "Set Temperature",
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 19
+                  },
+                  {
+                    "color": "orange",
+                    "value": 25
+                  },
+                  {
+                    "color": "red",
+                    "value": 30
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 2,
+            "x": 8,
+            "y": 6
+          },
+          "id": 14,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_temperature_value{zone=\"$zone\",unit=\"$temperatureScale\"}",
+              "format": "time_series",
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "Avg:",
+              "refId": "A"
+            }
+          ],
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "orange",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 40
+                  },
+                  {
+                    "color": "blue",
+                    "value": 70
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 2,
+            "x": 22,
+            "y": 6
+          },
+          "id": 25,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_humidity_percentage{zone=\"$zone\"}",
+              "format": "time_series",
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "Avg:",
+              "refId": "A"
+            }
+          ],
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [
+                {
+                  "options": {
+                    "0": {
+                      "text": "OFF"
+                    }
+                  },
+                  "type": "value"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "grey",
+                    "value": null
+                  },
+                  {
+                    "color": "dark-blue",
+                    "value": 1
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byType",
+                  "options": "number"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "dark-blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 5,
+            "x": 10,
+            "y": 7
+          },
+          "hideTimeOverride": true,
+          "id": 9,
+          "options": {
+            "minVizHeight": 104,
+            "minVizWidth": 200,
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "last"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "manual",
+            "text": {}
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_activity_heating_power_percentage{zone=\"$zone\"}",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "Heating Power",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": "1m",
+          "title": "Heating Power",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 19
+                  },
+                  {
+                    "color": "orange",
+                    "value": 25
+                  },
+                  {
+                    "color": "red",
+                    "value": 30
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 2,
+            "x": 8,
+            "y": 9
+          },
+          "id": 13,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "min"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value_and_name",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_temperature_value{zone=\"$zone\",unit=\"$temperatureScale\"}",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "Min:",
+              "refId": "A"
+            }
+          ],
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "orange",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 40
+                  },
+                  {
+                    "color": "blue",
+                    "value": 70
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 2,
+            "x": 22,
+            "y": 9
+          },
+          "id": 30,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "min"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_humidity_percentage{zone=\"$zone\"}",
+              "format": "time_series",
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "Min:",
+              "refId": "A"
+            }
+          ],
+          "type": "stat"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 12
+          },
+          "id": 47,
+          "panels": [],
+          "title": "Zone Details $zone",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 30,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Current Temperature"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "light-blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Set Temperature"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "dark-blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 0,
+            "y": 13
+          },
+          "id": 48,
+          "options": {
+            "legend": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "exemplar": true,
+              "expr": "tado_sensor_temperature_value{zone=\"$zone\",unit=\"$temperatureScale\"}",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "legendFormat": "Current Temperature",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "exemplar": true,
+              "expr": "tado_setting_temperature_value{zone=\"$zone\",unit=\"$temperatureScale\"}",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "Set Temperature",
+              "refId": "B"
+            }
+          ],
+          "title": "Temperature: $zone",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 50,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 0,
+              "mappings": [],
+              "max": 100,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byType",
+                  "options": "number"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 12,
+            "y": 13
+          },
+          "id": 42,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "lastNotNull",
+                "max",
+                "min"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_activity_heating_power_percentage{zone=\"$zone\"}",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "title": "Heatingpower: $zone",
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "valueLabel": "zone"
+              }
+            },
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Kinderzimmer": false,
+                  "instance": true,
+                  "job": true,
+                  "unit": false
+                },
+                "indexByName": {},
+                "renameByName": {}
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 65,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Outside Temprature"
+                },
+                "properties": [
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "blue",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Outside Temprature (Averange)"
+                },
+                "properties": [
+                  {
+                    "id": "custom.fillOpacity",
+                    "value": 0
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 0,
+            "y": 20
+          },
+          "id": 45,
+          "options": {
+            "legend": {
+              "calcs": [
+                "lastNotNull",
+                "max",
+                "min"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "editorMode": "code",
+              "expr": "weather_outside_temperature{unit=\"$temperatureScale\"}",
+              "legendFormat": "Outside Temprature",
+              "range": true,
+              "refId": "Acutal"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "avg_over_time(weather_outside_temperature{unit=\"$temperatureScale\"}[6h])",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "legendFormat": "Outside Temprature (Averange)",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "Temperature Outside (Tado)",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "${DS_INFLUXDB-IDUN}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "blue",
+                "mode": "thresholds"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 50,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Frankfurt am Main"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Kelkheim"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Frankfurt am Main, middle"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Kelkheim, mittel"
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "yellow",
+                      "mode": "fixed"
+                    }
+                  },
+                  {
+                    "id": "custom.gradientMode",
+                    "value": "none"
+                  },
+                  {
+                    "id": "custom.fillOpacity",
+                    "value": 0
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 7,
+            "w": 12,
+            "x": 12,
+            "y": 20
+          },
+          "id": 46,
+          "options": {
+            "legend": {
+              "calcs": [
+                "lastNotNull",
+                "max",
+                "min"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "alias": "$tag_name",
+              "datasource": {
+                "type": "influxdb",
+                "uid": "${DS_INFLUXDB-IDUN}"
+              },
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "sys_country"
+                  ],
+                  "type": "tag"
+                },
+                {
+                  "params": [
+                    "name"
+                  ],
+                  "type": "tag"
+                },
+                {
+                  "params": [
+                    "none"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "measurement": "openweathermap",
+              "orderByTime": "ASC",
+              "policy": "autogen",
+              "refId": "A",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "main_temp"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "last"
+                  },
+                  {
+                    "params": [
+                      "-273.15"
+                    ],
+                    "type": "math"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "sys_country",
+                  "operator": "=",
+                  "value": "DE"
+                },
+                {
+                  "condition": "AND",
+                  "key": "name",
+                  "operator": "=",
+                  "value": "Frankfurt am Main"
+                }
+              ]
+            },
+            {
+              "alias": "$tag_name, middle",
+              "datasource": {
+                "type": "influxdb",
+                "uid": "${DS_INFLUXDB-IDUN}"
+              },
+              "groupBy": [
+                {
+                  "params": [
+                    "$__interval"
+                  ],
+                  "type": "time"
+                },
+                {
+                  "params": [
+                    "sys_country"
+                  ],
+                  "type": "tag"
+                },
+                {
+                  "params": [
+                    "name"
+                  ],
+                  "type": "tag"
+                },
+                {
+                  "params": [
+                    "none"
+                  ],
+                  "type": "fill"
+                }
+              ],
+              "hide": false,
+              "measurement": "openweathermap",
+              "orderByTime": "ASC",
+              "policy": "default",
+              "refId": "B",
+              "resultFormat": "time_series",
+              "select": [
+                [
+                  {
+                    "params": [
+                      "main_temp"
+                    ],
+                    "type": "field"
+                  },
+                  {
+                    "params": [],
+                    "type": "mean"
+                  },
+                  {
+                    "params": [
+                      30
+                    ],
+                    "type": "moving_average"
+                  },
+                  {
+                    "params": [
+                      "-273.15"
+                    ],
+                    "type": "math"
+                  }
+                ]
+              ],
+              "tags": [
+                {
+                  "key": "sys_country",
+                  "operator": "=",
+                  "value": "DE"
+                },
+                {
+                  "condition": "AND",
+                  "key": "name",
+                  "operator": "=",
+                  "value": "Frankfurt am Main"
+                }
+              ]
+            }
+          ],
+          "title": "Temperature Outside (OpenWeatherMap)",
+          "type": "timeseries"
+        },
+        {
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 27
+          },
+          "id": 39,
+          "panels": [],
+          "title": "All Zones",
+          "type": "row"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-GrYlRd"
+              },
+              "custom": {
+                "fillOpacity": 70,
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineWidth": 0,
+                "spanNulls": false
+              },
+              "decimals": 0,
+              "mappings": [
+                {
+                  "options": {
+                    "0": {
+                      "index": 0,
+                      "text": "Closed"
+                    },
+                    "1": {
+                      "index": 1,
+                      "text": "Opened"
+                    }
+                  },
+                  "type": "value"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 1
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 24,
+            "x": 0,
+            "y": 28
+          },
+          "id": 2,
+          "options": {
+            "alignValue": "center",
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "mergeValues": true,
+            "rowHeight": 0.9,
+            "showValue": "auto",
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "tado_sensor_window_opened{type=\"HEATING\"}",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "__auto",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "Open Windows",
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "keepLabels": [
+                  "zone"
+                ],
+                "valueLabel": "zone"
+              }
+            },
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": false,
+                  "__name__": true,
+                  "instance": true,
+                  "job": true,
+                  "type": true,
+                  "unit": true
+                },
+                "includeByName": {},
+                "indexByName": {},
+                "renameByName": {
+                  "Bad": "",
+                  "Badezimmer": "",
+                  "Time": "",
+                  "instance": "",
+                  "job": ""
+                }
+              }
+            }
+          ],
+          "type": "state-timeline"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 50,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 0,
+              "mappings": [],
+              "max": 100,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 0,
+            "y": 34
+          },
+          "id": 40,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "lastNotNull",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_activity_heating_power_percentage",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "title": "Heatingpower: All Zones",
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "valueLabel": "zone"
+              }
+            },
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Kinderzimmer": false,
+                  "instance": true,
+                  "job": true,
+                  "unit": false
+                },
+                "indexByName": {},
+                "renameByName": {}
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 0,
+              "mappings": [
+                {
+                  "options": {
+                    "0": {
+                      "text": "OFF"
+                    }
+                  },
+                  "type": "value"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "grey",
+                    "value": null
+                  },
+                  {
+                    "color": "dark-blue",
+                    "value": 1
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Time"
+                },
+                "properties": [
+                  {
+                    "id": "noValue"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 9,
+            "x": 12,
+            "y": 34
+          },
+          "hideTimeOverride": true,
+          "id": 51,
+          "options": {
+            "minVizHeight": 200,
+            "minVizWidth": 200,
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "last"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": false,
+            "sizing": "auto",
+            "text": {}
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "exemplar": false,
+              "expr": "tado_activity_heating_power_percentage",
+              "format": "time_series",
+              "instant": true,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "exemplar": false,
+              "expr": "tado_sensor_humidity_percentage",
+              "hide": true,
+              "instant": true,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "B"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "exemplar": false,
+              "expr": "tado_sensor_temperature_value{unit=\"celsius\"}",
+              "hide": true,
+              "instant": true,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "C"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "exemplar": false,
+              "expr": "tado_setting_temperature_value{unit=\"celsius\"}",
+              "hide": true,
+              "instant": true,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "D"
+            }
+          ],
+          "timeFrom": "5m",
+          "title": "Heating Power",
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "valueLabel": "zone"
+              }
+            },
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true,
+                  "instance": true,
+                  "job": true,
+                  "unit": true
+                },
+                "indexByName": {},
+                "renameByName": {
+                  "Bad": "",
+                  "Badezimmer": "",
+                  "Time": "",
+                  "instance": "",
+                  "job": ""
+                }
+              }
+            }
+          ],
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "left",
+                "cellOptions": {
+                  "type": "auto"
+                },
+                "filterable": false,
+                "inspect": false,
+                "width": 100
+              },
+              "mappings": [],
+              "max": 25,
+              "min": 18,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "dark-blue",
+                    "value": null
+                  },
+                  {
+                    "color": "blue",
+                    "value": 15
+                  },
+                  {
+                    "color": "green",
+                    "value": 20
+                  },
+                  {
+                    "color": "orange",
+                    "value": 25
+                  },
+                  {
+                    "color": "red",
+                    "value": 27
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 3,
+            "x": 21,
+            "y": 34
+          },
+          "hideTimeOverride": true,
+          "id": 41,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "fields": "",
+              "reducer": [
+                "sum"
+              ],
+              "show": false
+            },
+            "showHeader": false,
+            "sortBy": [
+              {
+                "desc": false,
+                "displayName": "Time"
+              }
+            ]
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_setting_temperature_value{unit=\"celsius\"}",
+              "format": "table",
+              "hide": false,
+              "interval": "",
+              "legendFormat": "Set Temperature",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": "5m",
+          "title": "Set Temp",
+          "transformations": [
+            {
+              "id": "groupBy",
+              "options": {
+                "fields": {
+                  "Time": {
+                    "aggregations": [
+                      "last"
+                    ]
+                  },
+                  "Value": {
+                    "aggregations": [
+                      "last"
+                    ],
+                    "operation": "aggregate"
+                  },
+                  "zone": {
+                    "aggregations": [],
+                    "operation": "groupby"
+                  }
+                }
+              }
+            }
+          ],
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 50,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 0,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 0,
+            "y": 40
+          },
+          "id": 34,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "lastNotNull",
+                "max",
+                "min"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_temperature_value{unit=\"celsius\"}",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_setting_temperature_value{unit=\"celsius\"}",
+              "format": "time_series",
+              "hide": true,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "",
+              "refId": "B"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_humidity_percentage",
+              "format": "time_series",
+              "hide": true,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "",
+              "refId": "C"
+            }
+          ],
+          "title": "Temperature: All Zones",
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "valueLabel": "zone"
+              }
+            },
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "instance": true,
+                  "job": true,
+                  "unit": false
+                },
+                "indexByName": {},
+                "renameByName": {}
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 1,
+              "mappings": [],
+              "max": 32,
+              "min": 15,
+              "noValue": "Off",
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  },
+                  {
+                    "color": "dark-blue",
+                    "value": 19
+                  },
+                  {
+                    "color": "orange",
+                    "value": 25
+                  },
+                  {
+                    "color": "red",
+                    "value": 30
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 9,
+            "x": 12,
+            "y": 40
+          },
+          "hideTimeOverride": true,
+          "id": 3,
+          "options": {
+            "minVizHeight": 200,
+            "minVizWidth": 200,
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "last"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto",
+            "text": {}
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "exemplar": false,
+              "expr": "tado_activity_heating_power_percentage",
+              "format": "time_series",
+              "hide": true,
+              "instant": true,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "exemplar": false,
+              "expr": "tado_sensor_humidity_percentage",
+              "hide": true,
+              "instant": true,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "B"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "exemplar": false,
+              "expr": "tado_sensor_temperature_value{unit=\"celsius\"}",
+              "hide": false,
+              "instant": true,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "C"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "exemplar": false,
+              "expr": "tado_setting_temperature_value{unit=\"celsius\"}",
+              "hide": true,
+              "instant": true,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "D"
+            }
+          ],
+          "timeFrom": "5m",
+          "title": "Temperature",
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "valueLabel": "zone"
+              }
+            },
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true,
+                  "instance": true,
+                  "job": true,
+                  "unit": true
+                },
+                "indexByName": {},
+                "renameByName": {
+                  "Bad": "",
+                  "Time": "",
+                  "instance": "",
+                  "job": "awefe"
+                }
+              }
+            }
+          ],
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 0,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 19
+                  },
+                  {
+                    "color": "orange",
+                    "value": 25
+                  },
+                  {
+                    "color": "red",
+                    "value": 30
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 3,
+            "x": 21,
+            "y": 40
+          },
+          "id": 29,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "min"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_temperature_value{unit=\"$temperatureScale\"}",
+              "format": "table",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "Min:",
+              "refId": "A"
+            }
+          ],
+          "title": "Min:",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 19
+                  },
+                  {
+                    "color": "orange",
+                    "value": 25
+                  },
+                  {
+                    "color": "red",
+                    "value": 30
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 3,
+            "x": 21,
+            "y": 42
+          },
+          "id": 27,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "max"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_temperature_value{unit=\"$temperatureScale\"}",
+              "format": "table",
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "Max:",
+              "refId": "A"
+            }
+          ],
+          "title": "Max:",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 19
+                  },
+                  {
+                    "color": "orange",
+                    "value": 25
+                  },
+                  {
+                    "color": "red",
+                    "value": 30
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 3,
+            "x": 21,
+            "y": 44
+          },
+          "id": 28,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_temperature_value{unit=\"$temperatureScale\"}",
+              "format": "table",
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "Avg:",
+              "refId": "A"
+            }
+          ],
+          "title": "Avg:",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 50,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 0,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 12,
+            "x": 0,
+            "y": 46
+          },
+          "id": 35,
+          "options": {
+            "legend": {
+              "calcs": [
+                "mean",
+                "lastNotNull",
+                "max",
+                "min"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_temperature_value{unit=\"celsius\"}",
+              "hide": true,
+              "instant": false,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_setting_temperature_value{unit=\"celsius\"}",
+              "format": "time_series",
+              "hide": true,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "",
+              "refId": "B"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_humidity_percentage",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "",
+              "refId": "C"
+            }
+          ],
+          "title": "Humidity: All Zones",
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "valueLabel": "zone"
+              }
+            },
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": false,
+                  "instance": true,
+                  "job": true
+                },
+                "indexByName": {},
+                "renameByName": {}
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 1,
+              "mappings": [],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "orange",
+                    "value": null
+                  },
+                  {
+                    "color": "dark-blue",
+                    "value": 40
+                  },
+                  {
+                    "color": "orange",
+                    "value": 70
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 9,
+            "x": 12,
+            "y": 46
+          },
+          "hideTimeOverride": true,
+          "id": 4,
+          "options": {
+            "minVizHeight": 200,
+            "minVizWidth": 200,
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "last"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto",
+            "text": {}
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "exemplar": false,
+              "expr": "tado_activity_heating_power_percentage",
+              "format": "time_series",
+              "hide": true,
+              "instant": true,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "exemplar": false,
+              "expr": "tado_sensor_humidity_percentage",
+              "hide": false,
+              "instant": true,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "B"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "exemplar": false,
+              "expr": "tado_sensor_temperature_value{unit=\"celsius\"}",
+              "hide": true,
+              "instant": true,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "C"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "exemplar": false,
+              "expr": "tado_setting_temperature_value{unit=\"celsius\"}",
+              "hide": true,
+              "instant": true,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "D"
+            }
+          ],
+          "timeFrom": "5m",
+          "title": "Humidity",
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "valueLabel": "zone"
+              }
+            },
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true,
+                  "instance": true,
+                  "job": true,
+                  "unit": true
+                },
+                "indexByName": {},
+                "renameByName": {
+                  "Bad": "",
+                  "Time": "",
+                  "instance": "",
+                  "job": "awefe"
+                }
+              }
+            }
+          ],
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "orange",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 40
+                  },
+                  {
+                    "color": "blue",
+                    "value": 70
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 3,
+            "x": 21,
+            "y": 46
+          },
+          "id": 32,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "min"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_humidity_percentage{zone=\"$zone\"}",
+              "format": "table",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "Min:",
+              "refId": "A"
+            }
+          ],
+          "title": "Min:",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "orange",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 40
+                  },
+                  {
+                    "color": "blue",
+                    "value": 70
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 3,
+            "x": 21,
+            "y": 48
+          },
+          "id": 26,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "max"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_humidity_percentage{zone=\"$zone\"}",
+              "format": "table",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "Max:",
+              "refId": "A"
+            }
+          ],
+          "title": "Max:",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "Prometheus"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "orange",
+                    "value": null
+                  },
+                  {
+                    "color": "green",
+                    "value": 40
+                  },
+                  {
+                    "color": "blue",
+                    "value": 70
+                  }
+                ]
+              },
+              "unit": "humidity"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 3,
+            "x": 21,
+            "y": 50
+          },
+          "id": 31,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "Prometheus"
+              },
+              "expr": "tado_sensor_humidity_percentage{zone=\"$zone\"}",
+              "format": "table",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "Avg:",
+              "refId": "A"
+            }
+          ],
+          "title": "Avg:",
+          "type": "stat"
+        }
+      ],
+      "refresh": "",
+      "schemaVersion": 40,
+      "tags": [
+        "tado"
+      ],
+      "templating": {
+        "list": [
+          {
+            "current": {},
+            "datasource": {
+              "type": "prometheus",
+              "uid": "Prometheus"
+            },
+            "definition": "tado_activity_heating_power_percentage",
+            "includeAll": false,
+            "label": "Zones",
+            "name": "zone",
+            "options": [],
+            "query": {
+              "query": "tado_activity_heating_power_percentage",
+              "refId": "Prometheus-zone-Variable-Query"
+            },
+            "refresh": 1,
+            "regex": ".*zone=\"(.*)\".",
+            "type": "query"
+          },
+          {
+            "current": {},
+            "datasource": {
+              "type": "prometheus",
+              "uid": "Prometheus"
+            },
+            "definition": "tado_sensor_temperature_value",
+            "hide": 2,
+            "includeAll": false,
+            "label": "Temperature Scale",
+            "name": "temperatureScale",
+            "options": [],
+            "query": {
+              "query": "tado_sensor_temperature_value",
+              "refId": "StandardVariableQuery"
+            },
+            "refresh": 1,
+            "regex": ".*unit=\"(\\S*)\",(\\S*).",
+            "type": "query"
+          }
+        ]
+      },
+      "time": {
+        "from": "now-90d",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "browser",
+      "title": "tado° Dashboard",
+      "uid": "umzs8YZRk",
+      "version": 2,
+      "weekStart": "",
+      "gnetId": 13847
+    }

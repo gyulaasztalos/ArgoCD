@@ -27,3 +27,4 @@ resources:
   - homebridge/application.yaml
   - paperless-ngx/application.yaml
   - netatmo-exporter/application.yaml
+  - tado-exporter/application.yaml

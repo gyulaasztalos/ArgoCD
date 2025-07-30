@@ -10,47 +10,14 @@ metadata:
 data:
   app-grafana-dashboard.json: |
     {
-      "__inputs": [
-        {
-          "name": "DS_PROMETHEUS",
-          "label": "Prometheus",
-          "description": "",
-          "type": "datasource",
-          "pluginId": "prometheus",
-          "pluginName": "Prometheus"
-        }
-      ],
-      "__requires": [
-        {
-          "type": "panel",
-          "id": "gauge",
-          "name": "Gauge",
-          "version": ""
-        },
-        {
-          "type": "grafana",
-          "id": "grafana",
-          "name": "Grafana",
-          "version": "7.3.6"
-        },
-        {
-          "type": "panel",
-          "id": "graph",
-          "name": "Graph",
-          "version": ""
-        },
-        {
-          "type": "datasource",
-          "id": "prometheus",
-          "name": "Prometheus",
-          "version": "1.0.0"
-        }
-      ],
       "annotations": {
         "list": [
           {
             "builtIn": 1,
-            "datasource": "-- Grafana --",
+            "datasource": {
+              "type": "datasource",
+              "uid": "grafana"
+            },
             "enable": true,
             "hide": true,
             "iconColor": "rgba(0, 211, 255, 1)",
@@ -59,602 +26,3452 @@ data:
           }
         ]
       },
+      "description": "Netatmo Weather Station dashboard for Grafana",
       "editable": true,
-      "gnetId": 13672,
+      "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": null,
+      "id": 10,
       "links": [],
       "panels": [
         {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "Prometheus",
           "description": "",
           "fieldConfig": {
-            "defaults": {
-              "custom": {}
-            },
+            "defaults": {},
             "overrides": []
           },
-          "fill": 1,
-          "fillGradient": 0,
           "gridPos": {
-            "h": 6,
-            "w": 12,
+            "h": 3,
+            "w": 3,
             "x": 0,
             "y": 0
           },
-          "hiddenSeries": false,
-          "id": 2,
-          "legend": {
-            "alignAsTable": false,
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "rightSide": true,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "nullPointMode": "null",
+          "id": 119,
           "options": {
-            "alertThreshold": true
-          },
-          "percentage": false,
-          "pluginVersion": "7.3.6",
-          "pointradius": 2,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "expr": "netatmo_sensor_temperature_celsius",
-              "instant": false,
-              "interval": "",
-              "legendFormat": "{{module}}",
-              "refId": "A"
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeRegions": [],
-          "timeShift": null,
-          "title": "Temperature",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "celsius",
-              "label": "",
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
+            "bgColor": "rgba(14, 7, 7, 0)",
+            "clockType": "24 hour",
+            "countdownSettings": {
+              "endCountdownTime": "2021-12-30T06:17:47+01:00",
+              "endText": "00:00:00"
             },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": false
+            "countupSettings": {
+              "beginCountupTime": "2023-11-10T21:28:15+01:00",
+              "beginText": "00:00:00"
+            },
+            "dateSettings": {
+              "dateFormat": "YYYY.MM.DD",
+              "fontSize": "8",
+              "fontWeight": "bold",
+              "locale": "hu",
+              "showDate": true
+            },
+            "fontMono": false,
+            "mode": "time",
+            "refresh": "sec",
+            "timeSettings": {
+              "fontSize": "12px",
+              "fontWeight": "normal"
+            },
+            "timezone": "",
+            "timezoneSettings": {
+              "fontSize": "12px",
+              "fontWeight": "normal",
+              "showTimezone": false,
+              "zoneFormat": "offsetAbbv"
             }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": null
-          }
+          },
+          "pluginVersion": "2.1.3",
+          "title": "",
+          "type": "grafana-clock-panel"
         },
         {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "Prometheus",
-          "description": "",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
           "fieldConfig": {
             "defaults": {
-              "custom": {}
+              "color": {
+                "mode": "thresholds"
+              },
+              "decimals": 1,
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "color": "orange",
+                      "index": 0,
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "none"
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byFrameRefID",
+                  "options": "A"
+                },
+                "properties": [
+                  {
+                    "id": "mappings",
+                    "value": [
+                      {
+                        "options": {
+                          "from": 0,
+                          "result": {
+                            "color": "red",
+                            "index": 0,
+                            "text": "OFFLINE"
+                          },
+                          "to": 0
+                        },
+                        "type": "range"
+                      },
+                      {
+                        "options": {
+                          "from": 1,
+                          "result": {
+                            "color": "green",
+                            "index": 1,
+                            "text": "ONLINE"
+                          },
+                          "to": 1
+                        },
+                        "type": "range"
+                      },
+                      {
+                        "options": {
+                          "match": "null+nan",
+                          "result": {
+                            "color": "yellow",
+                            "index": 2,
+                            "text": "UNKNOWN"
+                          }
+                        },
+                        "type": "special"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
           },
-          "fill": 1,
-          "fillGradient": 0,
           "gridPos": {
-            "h": 6,
-            "w": 12,
-            "x": 12,
+            "h": 3,
+            "w": 3,
+            "x": 3,
             "y": 0
           },
-          "hiddenSeries": false,
-          "id": 4,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "rightSide": true,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "nullPointMode": "null",
+          "id": 77,
+          "maxDataPoints": 100,
           "options": {
-            "alertThreshold": true
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
           },
-          "percentage": false,
-          "pluginVersion": "7.3.6",
-          "pointradius": 2,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
+          "pluginVersion": "12.2.0-16557133545",
           "targets": [
             {
-              "expr": "netatmo_sensor_humidity_percent",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "netatmo_up{job=\"netatmo\"}",
               "interval": "",
-              "legendFormat": "{{module}}",
+              "legendFormat": "",
+              "range": true,
               "refId": "A"
             }
           ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeRegions": [],
-          "timeShift": null,
-          "title": "Relative humidity",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "decimals": null,
-              "format": "humidity",
-              "label": null,
-              "logBase": 1,
-              "max": "100",
-              "min": "0",
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": null
-          }
+          "title": "WEATHER STATION",
+          "type": "stat"
         },
         {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "Prometheus",
-          "description": "",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
           "fieldConfig": {
             "defaults": {
-              "custom": {}
+              "decimals": 0,
+              "mappings": [
+                {
+                  "options": {
+                    "0": {
+                      "text": "OFF"
+                    }
+                  },
+                  "type": "value"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "grey",
+                    "value": 0
+                  },
+                  {
+                    "color": "green",
+                    "value": 1
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Heating"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Dining Room"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 11,
+            "x": 6,
+            "y": 0
+          },
+          "id": 128,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": false,
+            "sizing": "auto"
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "expr": "tado_activity_heating_power_percentage",
+              "format": "time_series",
+              "instant": true,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "title": "HEATING POWER",
+          "transformations": [
+            {
+              "id": "labelsToFields",
+              "options": {
+                "valueLabel": "zone"
+              }
+            },
+            {
+              "id": "merge",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true,
+                  "instance": true,
+                  "job": true,
+                  "unit": true
+                },
+                "indexByName": {},
+                "renameByName": {
+                  "Bad": "",
+                  "Time": "",
+                  "instance": "",
+                  "job": "awefe"
+                }
+              }
+            }
+          ],
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "max": 50,
+              "min": -20,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": 0
+                  },
+                  {
+                    "color": "green",
+                    "value": 18
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 22
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 25
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 30
+                  }
+                ]
+              },
+              "unit": "celsius"
             },
             "overrides": []
           },
-          "fill": 1,
-          "fillGradient": 0,
+          "gridPos": {
+            "h": 3,
+            "w": 4,
+            "x": 17,
+            "y": 0
+          },
+          "id": 123,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "exemplar": true,
+              "expr": "netatmo_sensor_temperature_celsius{module=\"Outdoor Module\"}",
+              "format": "time_series",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "interval": "",
+              "legendFormat": "Netatmo {{module}}",
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "OUTDOOR",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "dark-green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 0
+                  },
+                  {
+                    "color": "orange",
+                    "value": 40
+                  },
+                  {
+                    "color": "green",
+                    "value": 45
+                  },
+                  {
+                    "color": "orange",
+                    "value": 60
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 70
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 3,
+            "x": 21,
+            "y": 0
+          },
+          "id": 124,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": false,
+            "sizing": "auto",
+            "text": {}
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "exemplar": true,
+              "expr": "netatmo_sensor_humidity_percent{module=\"Outdoor Module\"}",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "interval": "",
+              "legendFormat": "Netatmo {{module}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "down": {
+                      "text": "⇣"
+                    },
+                    "up": {
+                      "text": "⇡"
+                    }
+                  },
+                  "type": "value"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "super-light-green",
+                    "value": 0
+                  },
+                  {
+                    "color": "blue",
+                    "value": 925
+                  },
+                  {
+                    "color": "red",
+                    "value": 1070
+                  }
+                ]
+              },
+              "unit": "pressurekpa"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 6,
+            "x": 0,
+            "y": 3
+          },
+          "id": 15,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "editorMode": "code",
+              "exemplar": false,
+              "expr": "netatmo_sensor_pressure_mb{instance=\"netatmo-exporter:9210\",job=\"netatmo\",module=\"Weather Station\",station=\"Cseresznyés út (Weather Station)\"}",
+              "instant": false,
+              "interval": "",
+              "legendFormat": "",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "PREASSURE",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "right",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "graph": false,
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "smooth",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 2,
+                "pointSize": 2,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "area"
+                }
+              },
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": 0
+                  },
+                  {
+                    "color": "green",
+                    "value": 22
+                  },
+                  {
+                    "color": "orange",
+                    "value": 24
+                  },
+                  {
+                    "color": "red",
+                    "value": 25
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 4,
+            "x": 17,
+            "y": 3
+          },
+          "id": 130,
+          "options": {
+            "graph": {},
+            "legend": {
+              "calcs": [
+                "min",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "exemplar": true,
+              "expr": "netatmo_sensor_temperature_celsius{module=\"Outdoor Module\"}",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "interval": "",
+              "legendFormat": "Netatmo {{module}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "right",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "graph": false,
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "smooth",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 2,
+                "pointSize": 2,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "area"
+                }
+              },
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 0
+                  },
+                  {
+                    "color": "orange",
+                    "value": 40
+                  },
+                  {
+                    "color": "green",
+                    "value": 45
+                  },
+                  {
+                    "color": "orange",
+                    "value": 60
+                  },
+                  {
+                    "color": "red",
+                    "value": 70
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 3,
+            "x": 21,
+            "y": 3
+          },
+          "id": 131,
+          "options": {
+            "graph": {},
+            "legend": {
+              "calcs": [
+                "min",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "exemplar": true,
+              "expr": "netatmo_sensor_humidity_percent{module=\"Outdoor Module\"}",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "interval": "",
+              "legendFormat": "Netatmo {{module}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "scaleDistribution": {
+                  "type": "linear"
+                }
+              }
+            },
+            "overrides": []
+          },
           "gridPos": {
             "h": 6,
-            "w": 12,
+            "w": 11,
+            "x": 6,
+            "y": 4
+          },
+          "id": 132,
+          "options": {
+            "calculate": false,
+            "cellGap": 0,
+            "cellValues": {
+              "unit": "percent"
+            },
+            "color": {
+              "exponent": 0.5,
+              "fill": "dark-orange",
+              "max": 100,
+              "min": 0,
+              "mode": "scheme",
+              "reverse": true,
+              "scale": "exponential",
+              "scheme": "Oranges",
+              "steps": 64
+            },
+            "exemplars": {
+              "color": "rgba(255,0,255,0.7)"
+            },
+            "filterValues": {
+              "le": 1e-9
+            },
+            "legend": {
+              "show": false
+            },
+            "rowsFrame": {
+              "layout": "auto"
+            },
+            "tooltip": {
+              "mode": "single",
+              "showColorScale": false,
+              "yHistogram": false
+            },
+            "yAxis": {
+              "axisPlacement": "left",
+              "reverse": false,
+              "unit": "percent"
+            }
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "tado_activity_heating_power_percentage{}",
+              "interval": "",
+              "legendFormat": "{{zone}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "",
+          "type": "heatmap"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "mbar",
+                "axisPlacement": "right",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 56,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "graph": false,
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "smooth",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 2,
+                "pointSize": 1,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "always",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 6,
             "x": 0,
             "y": 6
           },
-          "hiddenSeries": false,
-          "id": 8,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "rightSide": true,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "nullPointMode": "null",
+          "id": 10,
           "options": {
-            "alertThreshold": true
+            "graph": {},
+            "legend": {
+              "calcs": [
+                "mean",
+                "lastNotNull",
+                "max",
+                "min",
+                "sum"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
           },
-          "percentage": false,
-          "pluginVersion": "7.3.6",
-          "pointradius": 2,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
+          "pluginVersion": "12.2.0-16557133545",
           "targets": [
             {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "exemplar": true,
+              "expr": "netatmo_sensor_pressure_mb",
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "title": "",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "from": 348.76,
+                    "result": {
+                      "index": 0,
+                      "text": "NORTH"
+                    },
+                    "to": 365
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 326.26,
+                    "result": {
+                      "index": 1,
+                      "text": "North-Northwest"
+                    },
+                    "to": 348.75
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 303.76,
+                    "result": {
+                      "index": 2,
+                      "text": "Northwest"
+                    },
+                    "to": 326.25
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 281.26,
+                    "result": {
+                      "index": 3,
+                      "text": "West-Northwest"
+                    },
+                    "to": 303.75
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 258.76,
+                    "result": {
+                      "index": 4,
+                      "text": "WEST"
+                    },
+                    "to": 281.25
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 236.26,
+                    "result": {
+                      "index": 5,
+                      "text": "West-Southwest"
+                    },
+                    "to": 258.75
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 213.76,
+                    "result": {
+                      "index": 6,
+                      "text": "Southwest\t"
+                    },
+                    "to": 236.25
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 191.26,
+                    "result": {
+                      "index": 7,
+                      "text": "South-Southwest"
+                    },
+                    "to": 213.75
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 168.76,
+                    "result": {
+                      "index": 8,
+                      "text": "SOUTH"
+                    },
+                    "to": 191.25
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 146.26,
+                    "result": {
+                      "index": 9,
+                      "text": "South-Southeast"
+                    },
+                    "to": 168.75
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 123.76,
+                    "result": {
+                      "index": 10,
+                      "text": "Southeast"
+                    },
+                    "to": 146.25
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 101.26,
+                    "result": {
+                      "index": 11,
+                      "text": "East-Southeast"
+                    },
+                    "to": 123.75
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 78.76,
+                    "result": {
+                      "index": 12,
+                      "text": "EAST"
+                    },
+                    "to": 101.25
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 56.26,
+                    "result": {
+                      "index": 13,
+                      "text": "East-Northeast"
+                    },
+                    "to": 78.75
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 33.76,
+                    "result": {
+                      "index": 14,
+                      "text": "Northeast"
+                    },
+                    "to": 56.25
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 11.26,
+                    "result": {
+                      "index": 15,
+                      "text": "North-Northeast"
+                    },
+                    "to": 33.75
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 0,
+                    "result": {
+                      "index": 16,
+                      "text": "NORTH"
+                    },
+                    "to": 11.25
+                  },
+                  "type": "range"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": 0
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 45
+                  },
+                  {
+                    "color": "red",
+                    "value": 135
+                  },
+                  {
+                    "color": "orange",
+                    "value": 225
+                  },
+                  {
+                    "color": "blue",
+                    "value": 315
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 4,
+            "x": 17,
+            "y": 8
+          },
+          "id": 94,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "exemplar": true,
+              "expr": "netatmo_sensor_wind_direction_degrees",
+              "format": "time_series",
+              "instant": false,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "title": "WIND DIRECTION",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "from": 0,
+                    "result": {
+                      "index": 0,
+                      "text": "NO WIND"
+                    },
+                    "to": 1
+                  },
+                  "type": "range"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "super-light-green",
+                    "value": 0
+                  },
+                  {
+                    "color": "light-orange",
+                    "value": 10
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 20
+                  },
+                  {
+                    "color": "#6ED0E0",
+                    "value": 30
+                  },
+                  {
+                    "color": "#EF843C",
+                    "value": 40
+                  },
+                  {
+                    "color": "#E24D42",
+                    "value": 50
+                  }
+                ]
+              },
+              "unit": "velocitykmh"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 3,
+            "x": 21,
+            "y": 8
+          },
+          "id": 79,
+          "maxDataPoints": 100,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "last"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "exemplar": true,
+              "expr": "netatmo_sensor_wind_strength_kph",
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "title": "",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": 0
+                  },
+                  {
+                    "color": "green",
+                    "value": 22
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 24
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 25
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Tado Heating"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Tado Dining Room"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Netatmo Weather Station"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Netatmo Dining Room"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 11,
+            "x": 6,
+            "y": 10
+          },
+          "id": 70,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "exemplar": true,
+              "expr": "netatmo_sensor_temperature_celsius{module!=\"Outdoor Module\"}",
+              "format": "time_series",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "interval": "",
+              "legendFormat": "Netatmo {{module}}",
+              "refId": "A",
+              "useBackend": false
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "exemplar": false,
+              "expr": "tado_sensor_temperature_value{unit=\"celsius\"}",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "Tado {{zone}}",
+              "range": true,
+              "refId": "B",
+              "useBackend": false
+            }
+          ],
+          "title": "TEMPERATURE",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "right",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "graph": false,
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "smooth",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 2,
+                "pointSize": 2,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "always",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "velocitykmh"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 7,
+            "x": 17,
+            "y": 10
+          },
+          "id": 73,
+          "options": {
+            "graph": {},
+            "legend": {
+              "calcs": [
+                "mean",
+                "lastNotNull",
+                "max",
+                "min",
+                "sum"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "exemplar": true,
+              "expr": "netatmo_sensor_wind_strength_kph",
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "title": "",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "max": 120,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "rgba(237, 129, 40, 0.89)",
+                    "value": 60
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "dB"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 6,
+            "x": 0,
+            "y": 14
+          },
+          "id": 6,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "last"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "exemplar": true,
+              "expr": "netatmo_sensor_noise_db",
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "title": "NOISE",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "right",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "graph": false,
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "smooth",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 2,
+                "pointSize": 2,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "area"
+                }
+              },
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": 0
+                  },
+                  {
+                    "color": "green",
+                    "value": 22
+                  },
+                  {
+                    "color": "orange",
+                    "value": 24
+                  },
+                  {
+                    "color": "red",
+                    "value": 25
+                  }
+                ]
+              },
+              "unit": "celsius"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Tado Heating"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Tado Dining Room"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Netatmo Weather Station"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Netatmo Dining Room"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 11,
+            "x": 6,
+            "y": 16
+          },
+          "id": 2,
+          "options": {
+            "graph": {},
+            "legend": {
+              "calcs": [
+                "min",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "exemplar": true,
+              "expr": "netatmo_sensor_temperature_celsius{module!=\"Outdoor Module\"}",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "interval": "",
+              "legendFormat": "Netatmo {{module}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "tado_sensor_temperature_value{unit=\"celsius\"}",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "Tado {{zone}}",
+              "range": true,
+              "refId": "B",
+              "useBackend": false
+            }
+          ],
+          "title": "",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "0": {
+                      "color": "green",
+                      "index": 4,
+                      "text": "NO RAIN"
+                    }
+                  },
+                  "type": "value"
+                },
+                {
+                  "options": {
+                    "from": 50,
+                    "result": {
+                      "color": "purple",
+                      "index": 0,
+                      "text": "VIOLENT RAIN"
+                    },
+                    "to": 100
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 7.6,
+                    "result": {
+                      "color": "red",
+                      "index": 1,
+                      "text": "HEAVY RAIN"
+                    },
+                    "to": 50
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 2.6,
+                    "result": {
+                      "color": "orange",
+                      "index": 2,
+                      "text": "MODERATE RAIN"
+                    },
+                    "to": 7.5
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 0.01,
+                    "result": {
+                      "color": "yellow",
+                      "index": 3,
+                      "text": "LIGHT RAIN"
+                    },
+                    "to": 2.5
+                  },
+                  "type": "range"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  }
+                ]
+              },
+              "unit": "lengthmm"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 7,
+            "x": 17,
+            "y": 16
+          },
+          "id": 117,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "exemplar": true,
+              "expr": "netatmo_sensor_rain_amount_mm",
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "title": "",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "dB",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 66,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "graph": false,
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "smooth",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 2,
+                "pointSize": 3,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "always",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 0,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 17
+          },
+          "id": 69,
+          "options": {
+            "graph": {},
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "exemplar": true,
+              "expr": "netatmo_sensor_noise_db",
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "title": "",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "blue",
+                "mode": "fixed"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "right",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "bars",
+                "fillOpacity": 100,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "graph": false,
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "smooth",
+                "lineWidth": 0,
+                "pointSize": 2,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "always",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "blue",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "mm / h"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 7,
+            "x": 17,
+            "y": 18
+          },
+          "id": 129,
+          "options": {
+            "graph": {},
+            "legend": {
+              "calcs": [
+                "mean",
+                "lastNotNull",
+                "max",
+                "min",
+                "sum"
+              ],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "netatmo_sensor_rain_amount_mm{}",
+              "interval": "",
+              "legendFormat": "{{module}}",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "RAIN",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "fixed"
+              },
+              "links": [],
+              "mappings": [
+                {
+                  "options": {
+                    "from": 2001,
+                    "result": {
+                      "color": "red",
+                      "index": 0,
+                      "text": "VERY BAD"
+                    },
+                    "to": 10000
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 1001,
+                    "result": {
+                      "color": "orange",
+                      "index": 1,
+                      "text": "BAD"
+                    },
+                    "to": 2000
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 801,
+                    "result": {
+                      "color": "yellow",
+                      "index": 2,
+                      "text": "MODERATE"
+                    },
+                    "to": 1000
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 501,
+                    "result": {
+                      "color": "green",
+                      "index": 3,
+                      "text": "GOOD"
+                    },
+                    "to": 800
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 0,
+                    "result": {
+                      "color": "blue",
+                      "index": 4,
+                      "text": "VERY GOOD"
+                    },
+                    "to": 500
+                  },
+                  "type": "range"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "light-blue",
+                    "value": 0
+                  },
+                  {
+                    "color": "light-yellow",
+                    "value": 501
+                  },
+                  {
+                    "color": "dark-orange",
+                    "value": 1000
+                  },
+                  {
+                    "color": "dark-red",
+                    "value": 1400
+                  }
+                ]
+              },
+              "unit": "ppm"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 4,
+            "x": 17,
+            "y": 24
+          },
+          "id": 89,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "exemplar": true,
+              "expr": "netatmo_sensor_co2_ppm{module=\"Office Module\"}",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "interval": "",
+              "legendFormat": "",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "Office",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "light-blue",
+                    "value": 0
+                  },
+                  {
+                    "color": "light-yellow",
+                    "value": 501
+                  },
+                  {
+                    "color": "dark-orange",
+                    "value": 1000
+                  },
+                  {
+                    "color": "dark-red",
+                    "value": 1400
+                  }
+                ]
+              },
+              "unit": "ppm"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 3,
+            "x": 21,
+            "y": 24
+          },
+          "id": 95,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "editorMode": "builder",
+              "exemplar": true,
+              "expr": "netatmo_sensor_co2_ppm{module=\"Office Module\",station=\"Cseresznyés út (Weather Station)\"}",
+              "interval": "",
+              "legendFormat": "",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "description": "",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red",
+                    "value": 0
+                  },
+                  {
+                    "color": "green",
+                    "value": 10
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 13,
+            "w": 6,
+            "x": 0,
+            "y": 25
+          },
+          "id": 88,
+          "options": {
+            "displayMode": "lcd",
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "maxVizHeight": 300,
+            "minVizHeight": 10,
+            "minVizWidth": 0,
+            "namePlacement": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "mean"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showUnfilled": true,
+            "sizing": "auto",
+            "text": {},
+            "valueMode": "color"
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "expr": "netatmo_sensor_battery_percent",
+              "interval": "",
+              "legendFormat": "{{module}}",
+              "refId": "A"
+            }
+          ],
+          "title": "BATTERY STATE",
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "fixed"
+              },
+              "links": [],
+              "mappings": [
+                {
+                  "options": {
+                    "from": 2001,
+                    "result": {
+                      "color": "red",
+                      "index": 0,
+                      "text": "VERY BAD"
+                    },
+                    "to": 10000
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 1001,
+                    "result": {
+                      "color": "orange",
+                      "index": 1,
+                      "text": "BAD"
+                    },
+                    "to": 2000
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 801,
+                    "result": {
+                      "color": "yellow",
+                      "index": 2,
+                      "text": "MODERATE"
+                    },
+                    "to": 1000
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 501,
+                    "result": {
+                      "color": "green",
+                      "index": 3,
+                      "text": "GOOD"
+                    },
+                    "to": 800
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 0,
+                    "result": {
+                      "color": "blue",
+                      "index": 4,
+                      "text": "VERY GOOD"
+                    },
+                    "to": 500
+                  },
+                  "type": "range"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "light-blue",
+                    "value": 0
+                  },
+                  {
+                    "color": "light-yellow",
+                    "value": 501
+                  },
+                  {
+                    "color": "dark-orange",
+                    "value": 1000
+                  },
+                  {
+                    "color": "dark-red",
+                    "value": 1400
+                  }
+                ]
+              },
+              "unit": "ppm"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 4,
+            "x": 17,
+            "y": 26
+          },
+          "id": 125,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "exemplar": true,
+              "expr": "netatmo_sensor_co2_ppm{module=\"Kid’s Room Module\"}",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "interval": "",
+              "legendFormat": "",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "Kid's Room",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "light-blue",
+                    "value": 0
+                  },
+                  {
+                    "color": "light-yellow",
+                    "value": 501
+                  },
+                  {
+                    "color": "dark-orange",
+                    "value": 1000
+                  },
+                  {
+                    "color": "dark-red",
+                    "value": 1400
+                  }
+                ]
+              },
+              "unit": "ppm"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 3,
+            "x": 21,
+            "y": 26
+          },
+          "id": 114,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "netatmo_sensor_co2_ppm{module=\"Kid’s Room Module\",station=\"Cseresznyés út (Weather Station)\"}",
+              "interval": "",
+              "legendFormat": "",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "fixed"
+              },
+              "links": [],
+              "mappings": [
+                {
+                  "options": {
+                    "from": 2001,
+                    "result": {
+                      "color": "red",
+                      "index": 0,
+                      "text": "VERY BAD"
+                    },
+                    "to": 10000
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 1001,
+                    "result": {
+                      "color": "orange",
+                      "index": 1,
+                      "text": "BAD"
+                    },
+                    "to": 2000
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 801,
+                    "result": {
+                      "color": "yellow",
+                      "index": 2,
+                      "text": "MODERATE"
+                    },
+                    "to": 1000
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 501,
+                    "result": {
+                      "color": "green",
+                      "index": 3,
+                      "text": "GOOD"
+                    },
+                    "to": 800
+                  },
+                  "type": "range"
+                },
+                {
+                  "options": {
+                    "from": 0,
+                    "result": {
+                      "color": "blue",
+                      "index": 4,
+                      "text": "VERY GOOD"
+                    },
+                    "to": 500
+                  },
+                  "type": "range"
+                }
+              ],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "light-blue",
+                    "value": 0
+                  },
+                  {
+                    "color": "light-yellow",
+                    "value": 501
+                  },
+                  {
+                    "color": "dark-orange",
+                    "value": 1000
+                  },
+                  {
+                    "color": "dark-red",
+                    "value": 1400
+                  }
+                ]
+              },
+              "unit": "ppm"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 4,
+            "x": 17,
+            "y": 28
+          },
+          "id": 126,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "exemplar": true,
+              "expr": "netatmo_sensor_co2_ppm{module=\"Weather Station\"}",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "interval": "",
+              "legendFormat": "",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            }
+          ],
+          "title": "Dining Room",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "links": [],
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "light-blue",
+                    "value": 0
+                  },
+                  {
+                    "color": "light-yellow",
+                    "value": 501
+                  },
+                  {
+                    "color": "dark-orange",
+                    "value": 1000
+                  },
+                  {
+                    "color": "dark-red",
+                    "value": 1400
+                  }
+                ]
+              },
+              "unit": "ppm"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 3,
+            "x": 21,
+            "y": 28
+          },
+          "id": 121,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "justifyMode": "center",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "text": {},
+            "textMode": "value",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "editorMode": "code",
+              "exemplar": true,
+              "expr": "netatmo_sensor_co2_ppm{module=\"Weather Station\",station=\"Cseresznyés út (Weather Station)\"}",
+              "interval": "",
+              "legendFormat": "",
+              "range": true,
+              "refId": "A"
+            }
+          ],
+          "title": "",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "text": "N/A"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "dark-green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 0
+                  },
+                  {
+                    "color": "orange",
+                    "value": 40
+                  },
+                  {
+                    "color": "green",
+                    "value": 45
+                  },
+                  {
+                    "color": "orange",
+                    "value": 60
+                  },
+                  {
+                    "color": "#d44a3a",
+                    "value": 70
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Tado Heating"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Tado Dining Room"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Netatmo Weather Station"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Netatmo Dining Room"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 6,
+            "w": 11,
+            "x": 6,
+            "y": 29
+          },
+          "id": 7,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto",
+            "text": {}
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "exemplar": true,
+              "expr": "netatmo_sensor_humidity_percent{module!=\"Outdoor Module\"}",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
+              "interval": "",
+              "legendFormat": "Netatmo {{module}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "tado_sensor_humidity_percentage",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "Tado {{zone}}",
+              "range": true,
+              "refId": "B",
+              "useBackend": false
+            }
+          ],
+          "title": "HUMIDITY",
+          "type": "gauge"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "right",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 2,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "line+area"
+                }
+              },
+              "mappings": [],
+              "min": 300,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "rgba(255, 100, 10, 0.26)",
+                    "value": 1000
+                  },
+                  {
+                    "color": "rgba(198, 35, 35, 0.31)",
+                    "value": 1500
+                  }
+                ]
+              },
+              "unit": "ppm"
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Weather Station"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Dining Room"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 7,
+            "x": 17,
+            "y": 30
+          },
+          "id": 90,
+          "maxDataPoints": 6000,
+          "options": {
+            "legend": {
+              "calcs": [
+                "min",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "12.2.0-16557133545",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "editorMode": "code",
+              "exemplar": true,
               "expr": "netatmo_sensor_co2_ppm",
               "interval": "",
               "legendFormat": "{{module}}",
+              "range": true,
               "refId": "A"
             }
           ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeRegions": [],
-          "timeShift": null,
-          "title": "CO2",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "ppm",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": "0",
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": null
-          }
+          "title": "",
+          "type": "timeseries"
         },
         {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
           "fieldConfig": {
             "defaults": {
-              "custom": {}
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "right",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "opacity",
+                "hideFrom": {
+                  "graph": false,
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "smooth",
+                "lineStyle": {
+                  "fill": "solid"
+                },
+                "lineWidth": 2,
+                "pointSize": 2,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": true,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "area"
+                }
+              },
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 0
+                  },
+                  {
+                    "color": "orange",
+                    "value": 40
+                  },
+                  {
+                    "color": "green",
+                    "value": 45
+                  },
+                  {
+                    "color": "orange",
+                    "value": 60
+                  },
+                  {
+                    "color": "red",
+                    "value": 70
+                  }
+                ]
+              },
+              "unit": "percent"
             },
-            "overrides": []
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Tado Heating"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Tado Dining Room"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Netatmo Weather Station"
+                },
+                "properties": [
+                  {
+                    "id": "displayName",
+                    "value": "Netatmo Dining Room"
+                  }
+                ]
+              }
+            ]
           },
-          "fill": 1,
-          "fillGradient": 0,
           "gridPos": {
-            "h": 6,
-            "w": 12,
-            "x": 12,
-            "y": 6
+            "h": 9,
+            "w": 11,
+            "x": 6,
+            "y": 35
           },
-          "hiddenSeries": false,
-          "id": 18,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "rightSide": true,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "nullPointMode": "null",
+          "id": 122,
           "options": {
-            "alertThreshold": true
+            "graph": {},
+            "legend": {
+              "calcs": [
+                "min",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "hideZeros": false,
+              "mode": "multi",
+              "sort": "desc"
+            }
           },
-          "percentage": false,
-          "pluginVersion": "7.3.6",
-          "pointradius": 2,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
+          "pluginVersion": "12.2.0-16557133545",
           "targets": [
             {
-              "expr": "netatmo_sensor_pressure_mb",
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "exemplar": true,
+              "expr": "netatmo_sensor_humidity_percent{module!=\"Outdoor Module\"}",
+              "fullMetaSearch": false,
+              "includeNullMetadata": true,
               "interval": "",
-              "legendFormat": "{{module}}",
-              "refId": "A"
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeRegions": [],
-          "timeShift": null,
-          "title": "Atmospheric pressure",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "pressurembar",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
+              "legendFormat": "Netatmo {{module}}",
+              "range": true,
+              "refId": "A",
+              "useBackend": false
             },
             {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "disableTextWrap": false,
+              "editorMode": "builder",
+              "expr": "tado_sensor_humidity_percentage",
+              "fullMetaSearch": false,
+              "hide": false,
+              "includeNullMetadata": true,
+              "instant": false,
+              "legendFormat": "Tado {{zone}}",
+              "range": true,
+              "refId": "B",
+              "useBackend": false
             }
           ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": null
-          }
+          "title": "",
+          "type": "timeseries"
         },
         {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "Prometheus",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+          },
           "description": "",
           "fieldConfig": {
             "defaults": {
-              "custom": {}
-            },
-            "overrides": []
-          },
-          "fill": 1,
-          "fillGradient": 0,
-          "gridPos": {
-            "h": 6,
-            "w": 12,
-            "x": 0,
-            "y": 12
-          },
-          "hiddenSeries": false,
-          "id": 10,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "rightSide": true,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "nullPointMode": "null",
-          "options": {
-            "alertThreshold": true
-          },
-          "percentage": false,
-          "pluginVersion": "7.3.6",
-          "pointradius": 2,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "expr": "netatmo_sensor_noise_db",
-              "interval": "",
-              "legendFormat": "{{module}}",
-              "refId": "A"
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeRegions": [],
-          "timeShift": null,
-          "title": "Noise",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "dB",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": "0",
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": null
-          }
-        },
-        {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "Prometheus",
-          "description": "",
-          "fieldConfig": {
-            "defaults": {
-              "custom": {}
-            },
-            "overrides": []
-          },
-          "fill": 1,
-          "fillGradient": 0,
-          "gridPos": {
-            "h": 6,
-            "w": 12,
-            "x": 12,
-            "y": 12
-          },
-          "hiddenSeries": false,
-          "id": 20,
-          "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "rightSide": true,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "nullPointMode": "null",
-          "options": {
-            "alertThreshold": true
-          },
-          "percentage": false,
-          "pluginVersion": "7.3.6",
-          "pointradius": 2,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "expr": "netatmo_sensor_rain_amount_mm",
-              "interval": "",
-              "legendFormat": "{{module}}",
-              "refId": "A"
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeRegions": [],
-          "timeShift": null,
-          "title": "Rain amount",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "lengthmm",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": null
-          }
-        },
-        {
-          "datasource": "Prometheus",
-          "description": "",
-          "fieldConfig": {
-            "defaults": {
-              "custom": {},
               "mappings": [],
               "max": 0,
               "min": -100,
@@ -663,7 +3480,7 @@ data:
                 "steps": [
                   {
                     "color": "red",
-                    "value": null
+                    "value": 0
                   },
                   {
                     "color": "#EAB839",
@@ -681,176 +3498,329 @@ data:
           },
           "gridPos": {
             "h": 6,
-            "w": 8,
+            "w": 6,
             "x": 0,
-            "y": 18
+            "y": 38
           },
-          "id": 16,
+          "id": 84,
           "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "auto",
             "reduceOptions": {
               "calcs": [
-                "mean"
+                "lastNotNull"
               ],
               "fields": "",
               "values": false
             },
             "showThresholdLabels": false,
-            "showThresholdMarkers": true
+            "showThresholdMarkers": false,
+            "sizing": "auto",
+            "text": {}
           },
-          "pluginVersion": "7.3.6",
+          "pluginVersion": "12.2.0-16557133545",
           "targets": [
             {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
               "expr": "-netatmo_sensor_rf_signal_strength",
               "interval": "",
               "legendFormat": "{{module}}",
               "refId": "A"
-            }
-          ],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "RF signal strength",
-          "type": "gauge"
-        },
-        {
-          "datasource": "Prometheus",
-          "description": "",
-          "fieldConfig": {
-            "defaults": {
-              "custom": {},
-              "mappings": [],
-              "max": 0,
-              "min": -100,
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "red",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": -86
-                  },
-                  {
-                    "color": "#EAB839",
-                    "value": -71
-                  },
-                  {
-                    "color": "green",
-                    "value": -56
-                  }
-                ]
-              },
-              "unit": "dB"
             },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 6,
-            "w": 8,
-            "x": 8,
-            "y": 18
-          },
-          "id": 14,
-          "options": {
-            "reduceOptions": {
-              "calcs": [
-                "mean"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showThresholdLabels": false,
-            "showThresholdMarkers": true
-          },
-          "pluginVersion": "7.3.6",
-          "targets": [
             {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+              },
+              "editorMode": "code",
               "expr": "-netatmo_sensor_wifi_signal_strength",
+              "hide": false,
+              "instant": false,
               "interval": "",
-              "legendFormat": "{{module}}",
-              "refId": "A"
+              "legendFormat": "{{module}} WiFi",
+              "range": true,
+              "refId": "B"
             }
           ],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "Wifi signal strength",
+          "title": "SIGNAL",
           "type": "gauge"
         },
         {
-          "datasource": "Prometheus",
-          "description": "",
+          "collapsed": false,
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 44
+          },
+          "id": 24,
+          "panels": [],
+          "repeat": "Module",
+          "title": "",
+          "type": "row"
+        },
+        {
           "fieldConfig": {
-            "defaults": {
-              "custom": {},
-              "mappings": [],
-              "max": 100,
-              "min": 0,
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "red",
-                    "value": null
-                  },
-                  {
-                    "color": "green",
-                    "value": 10
-                  }
-                ]
-              },
-              "unit": "percent"
-            },
+            "defaults": {},
             "overrides": []
           },
           "gridPos": {
-            "h": 6,
-            "w": 8,
-            "x": 16,
-            "y": 18
+            "h": 3,
+            "w": 24,
+            "x": 0,
+            "y": 45
           },
-          "id": 6,
+          "id": 116,
           "options": {
-            "reduceOptions": {
-              "calcs": [
-                "mean"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showThresholdLabels": false,
-            "showThresholdMarkers": true
+            "activeTheme": "Theme 7",
+            "disableThemePicker": true,
+            "themes": [
+              {
+                "name": "Night Theme",
+                "styles": [
+                  {
+                    "props": {
+                      "theme": "dark"
+                    },
+                    "type": "basetheme"
+                  },
+                  {
+                    "props": {
+                      "url": ""
+                    },
+                    "type": "bgimage"
+                  },
+                  {
+                    "props": {
+                      "text": "#https://cdn.thegeekfreaks.de/Download/TGF 9zu16.jpg"
+                    },
+                    "type": "style"
+                  }
+                ]
+              },
+              {
+                "name": "ALEX",
+                "styles": [
+                  {
+                    "props": {
+                      "theme": "default"
+                    },
+                    "type": "basetheme"
+                  },
+                  {
+                    "props": {
+                      "url": ""
+                    },
+                    "type": "bgimage"
+                  },
+                  {
+                    "props": {
+                      "url": "https://gilbn.github.io/theme.park/CSS/themes/grafana/space-gray.css"
+                    },
+                    "type": "url"
+                  },
+                  {
+                    "props": {
+                      "text": "\n:root {\n  --main-bg-color: radial-gradient(ellipse at center, #47918a 0%, #0b3161 100%) center center/cover no-repeat fixed;\n  --modal-bg-color: radial-gradient(ellipse at top, #47918a 0%, #0b3161 100%) center center/cover no-repeat fixed;\n  --button-color: #009688;\n  --button-color-hover: #12afa0;\n  --accent-color:  #009688;\n  --accent-color-hover: #12afa0;\n  --queue-color: #009688;\n}\n\nbody {\n    color: #FFFFFF !important;\n    background-color: transparent !important;\n}\n\n/* Loading page */\n.theme-dark, .theme-light, .preloader {\n    background: transparent !important;\n}\n\n/* login page */\n.login-branding {\n    border-right: none !important;\n}\n\n/* sidemenu */\n.sidemenu-open .sidemenu {\n    background: rgba(0, 0, 0, .25) !important;\n}\n.sidemenu__logo:hover {\n    background: rgba(0, 0, 0, .25) !important;\n}\n.sidemenu-item.active, .sidemenu-item:hover {\n    background-color: rgba(0, 0, 0, .25) !important;\n}\n@media (max-width: 768px) {\n.sidemenu .sidemenu__logo_small_breakpoint {\n    background: var(--main-bg-color);\n}\n}\n\n/* Dashboard dropdown menu */\n.search-dropdown__col_1 {\n    background: transparent !important;\n}\n.search-container {\n    left: 0px !important;\n}\n.navbar-page-btn {\n    color: #FFF !important;\n}\n\n/* Panel fullscreen navbar */\n.panel-in-fullscreen .navbar {\n    background: linear-gradient(90deg,rgba(0, 0, 0, .15),rgba(0, 0, 0, 0.25)) !important;\n}\n\n/* Dashboard search menu */\n.search-field-wrapper {\n\tbackground-color: #1f1f1f !important;\n\tbox-shadow: none !important;\n}\n.search-field-wrapper>input {\n\theight: 55px !important;\n    background-color: rgba(0, 0, 0, 0.25) !important;\n}\n.search-field-icon {\n    background-color: rgba(0, 0, 0, .25) !important;\n}\n\n/* Dashboard settings menu */\n.dashboard-settings__aside {\n    background: rgba(0, 0, 0, .25) !important;\n}\n.dashboard-page--settings-open .navbar {\n    background: linear-gradient(90deg,rgba(0, 0, 0, .15),rgba(0, 0, 0, 0.25)) !important;\n}\n.navbar-button--primary {\n    border-color: #ffffff00 !important;\n}\n.dashboard-settings__aside-header {\n    color: #ffffff !important;\n}\n.dashboard-settings__nav-item {\n    color: #ffffff !important;\n}\n.bootstrap-tagsinput {\n    background-color: #09090b !important;\n}\n.gf-form-select-wrapper .gf-form-input {\n    background-color: #393a3b !important;\n}\n\n/*Datasources Menu*/\n\n.add-data-source-item {\n    background: rgba(255, 255, 255, 0.08);\n    -webkit-box-shadow: none;\n    box-shadow: none;\n}\n.add-data-source-item:hover {\n    -webkit-box-shadow: none;\n    box-shadow: none;\n    background: rgba(255, 255, 255, 0.15);\n    border: 1px solid #00000000;\n    color: #fff;\n}\n/* Variable label color */\n.template-variable {\n    color: #f79520 !important;\n}\n\n/* Variable label box */\n.gf-form-label {\n    background-color: rgba(0, 0, 0, 0.25) !important;\n\t   border: none !important;\n     color: #FFF;\n}\n.gf-form-input:focus {\n    color: #FFF !important;\n    background-color: #262626 !important;\n    border: none !important;\n    box-shadow: none !important;\n}\n.variable-option.highlighted, .variable-option:hover {\n    background-color: hsla(0,0%,100%,.1) !important;\n}\n\n/* Variable dashboard dropdown */\n.variable-value-link {\n    padding: 7.4px 10px !important;\n    background-color: rgba(0, 0, 0, 0.25) !important;\n    border: none !important;\n    color: #FFFFFF !important;\n}\n\n/* Variable input box */\n.gf-form-input {\n\tcolor: #FFFFFF !important;\n    background-color: rgba(255, 255, 255, 0.15) !important;\n    border: 0px solid #262628 !important;\n\n}\n\n/* NAVBAR BUTTONS */\n.navbar-button {\n    color: #FFF !important;\n    background-color: rgba(0, 0, 0, 0.25) !important;\n    background-image: linear-gradient(180deg,rgba(0, 0, 0, 0.25),rgba(0, 0, 0, 0.25)) !important;\n    border: none !important;\n}\n\n/* Custom Range Refreshing every X Dropdown */\n.gf-timepicker-absolute-section select {\n    background-color: #393a3b !important;\n}\n\n/* PANEL BACKGROUND COLOR*/\n.panel-container {\n    background-color: rgba(0, 0, 0, .25);\n    border: transparent;\n    box-shadow: none !important;\n}\n.panel-container.panel-transparent, .panel-container--transparent {\nbackground-color: transparent;\n  border: transparent;\n}\n.panel-header:hover {\n    background-color: rgba(0, 0, 0, 0.25) !important;\n}\n.panel-loading {\n    color: transparent;\n}\n/* ////PANEL BACKGROUND COLOR//// */\n\n.graph-legend-table .graph-legend-series:nth-child(odd) {\n    background: transparent !important;\n}\n\n/* Panel text color*/\ndiv.flot-text {\n    color: #FFF !important;\n}\n\n/* panel loading circle*/\n.panel-loading {\n    color: #FFF !important;\n}\n\n/* panel resize arrow */\n.theme-dark .react-grid-item>.react-resizable-handle:after {\n    border-right: 2px solid #fff !important;\n    border-bottom: 2px solid #fff !important;\n}\n\n/* table panel background color */\n.table-panel-container {\n    background-color: rgba(0, 0, 0, .25) !important;\n}\n/* table panel border size */\n.table-panel-table td {\n    padding: .45em 0 .45em 1.1em;\n    border-bottom: 1px solid #171819;\n    border-right: 1px solid #171819;\n}\n/* Edit panel tabs  */\n.tabbed-view-header {\n    box-shadow: none;\n    background: rgba(0, 0, 0, 0.25);\n    border-bottom: none;\n}\n.tabbed-view-panel-title {\n    padding-left: 10px;\n}\n/* worldmap zoom buttons and leaflet  */\n.leaflet-bar a, .leaflet-bar a:hover {\n    background-color: #1f1f1f !important;\n    border-bottom: 1px solid #1f1f1f !important;\n    color: white !important;\n}\n.leaflet-bar a:hover {\n    background-color: #1b1b1b !important;\n}\n.leaflet-control-attribution {\n    display: none;\n}\n/* New Dashboard */\n.add-panel__item {\n    background: linear-gradient(135deg,rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.25));\n    box-shadow: -1px -1px 0 0 hsla(0,0%,100%,.1), 1px 1px 0 0 rgba(0, 0, 0, 0);\n}\n.add-panel__item.active, .add-panel__item:hover {\n    background: linear-gradient(135deg,rgba(0, 0, 0, 0.25),rgba(0, 0, 0, 0.25));\n}\n.add-panel__header {\n    background: rgba(0, 0, 0, 0.25);\n    box-shadow: none;\n    border-bottom: 0px;\n}\n\n@import url(https://gilbn.github.io/theme.park/CSS/themes/grafana/grafana-base.css);\n:root {\n  --main-bg-color: radial-gradient(ellipse at center, #47918a 0%, #0b3161 100%) center center/cover no-repeat fixed;\n  --modal-bg-color: radial-gradient(ellipse at top, #47918a 0%, #0b3161 100%) center center/cover no-repeat fixed;\n  --button-color: #009688;\n  --button-color-hover: #12afa0;\n  --accent-color:  #009688;\n  --accent-color-hover: #12afa0;\n  --queue-color: #009688;\n}\n\n\n\n/*V7*/\n\n/*LOGIN*/\n.css-bnbqsv {background: var(--main-bg-color)}\n.css-3iwqj4 { background: transparent;}\n#login-view > div > form > div:nth-child(1) > div:nth-child(2) > div > div > input, #login-view > div > form > div:nth-child(2) > div:nth-child(2) > div > div > input {\n    height: 38px;\n}\n/*Buttons*/\n.css-y3nv3e-button,\n.css-cc7c9f-button,\n.css-1vlnne-button,\n.css-1ihbihm-button,\n.css-14zdxje-button,\n.css-179z9yx-button,\n.css-370vzt-button,\n.css-msayan-button,\n.css-19kbjxc-button,\n.gf-form-button-row a, .gf-form-button-row button,\n.page-action-bar>a, .page-action-bar>button,\n.btn-primary{ \nbackground: var(--button-color) !important;\nbackground-color: var(--button-color) !important;\nborder-color: var(--button-color);\n}\n.css-y3nv3e-button:hover, \n.css-y3nv3e-button:focus, \n.css-cc7c9f-button:hover,\n.css-cc7c9f-button:focus,\n.css-1vlnne-button:hover,\n.css-1vlnne-button:focus,\n.css-1ihbihm-button:hover,\n.css-1ihbihm-button:focus,\n.css-14zdxje-button:hover,\n.css-14zdxje-button:focus,\n.css-179z9yx-button:hover,\n.css-179z9yx-button:focus,\n.css-370vzt-button:hover,\n.css-370vzt-button:focus,\n.css-msayan-button:hover,\n.css-msayan-button:focus,\n.css-19kbjxc-button:hover,\n.css-19kbjxc-button:focus,\n.gf-form-button-row a, .gf-form-button-row button:hover,\n.btn-primary:hover{\ncolor: rgb(255, 255, 255);\nbackground: var(--button-color-hover) !important;\nbackground-color: var(--button-color-hover) !important;\nbox-shadow: none !important;\n} \n.css-1d9e5zy-button {color: #fff; background: var(--button-color)}\n.css-1d9e5zy-button:hover {color: #fff; background: var(--button-color-hover)}\n\n/*INPUT*/\ninput:focus {box-shadow: none !important;}\n.css-17rc2pp-input-wrapper:focus, .css-1i9is3t:focus {\nbox-shadow:none;\ncolor: transparent;\n}\n.gf-form-select-box__control--is-focused {\nborder-color: transparent;\noutline: none;\n-webkit-box-shadow: none !important;\nbox-shadow: none !important;\n}\n\n.css-1bjepp-input-input {\nbackground-color: hsla(0,0%,100%,.25);\nborder-radius: 3px;\nborder-color: transparent;\n-webkit-transition: background-color .15s ease-in-out,box-shadow .15s ease-in-out !important;\ntransition: background-color .15s ease-in-out,box-shadow .15s ease-in-out !important;\n}\n\n.css-1bjepp-input-input:focus {\nbox-shadow: none !important;\nbackground-color: white;\ncolor: black;\ntransition: background-color .2s;\n-webkit-transition: background-color .2s;\nborder-radius: 3px;\n}\n.css-14hvfbu-input-wrapper:focus { \nborder-color:transparent !important;\nbox-shadow: none !important;    \n}\n.css-1w5c5dq-input-inputWrapper input:not(:last-child) {\n    height: 100%\n}\n/*Disabled input*/\n.css-1bjepp-input-input:disabled {\n    background-color: rgba(0, 0, 0, .5);\n    color: rgb(159, 167, 179);\n}\n.css-1bjepp-input-input:hover {border-color: transparent;}\nbody > grafana-app > div > div > react-container > div > div > div.view > div > div.page-container.page-body > div:nth-child(2) > form > div > div > div > div.css-1w5c5dq-input-inputWrapper > input {height: 100%;}\n\n\n/* SEARCH */\n.css-x9mxj5 {\nbackground: var(--main-bg-color);\n}\n.css-1m6pigl:focus + label {\noutline-offset: 2px;\nbox-shadow: rgba(20, 22, 25, 0) 0px 0px 0px 2px, rgba(31, 97, 196, 0) 0px 0px 0px 4px !important;\nz-index: 3;\noutline: transparent dotted 2px;\ntransition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1) 0s;\n}\n.css-1m6pigl:checked + label {\ncolor: var(--accent-color) !important;\nborder-color: rgba(255, 255, 255, .1);\nbackground: rgba(0, 0, 0, .5);\n}\n.css-b40tk8:focus + label {\nbox-shadow: rgba(20, 22, 25, 0) 0px 0px 0px 2px, rgba(31, 97, 196, 0) 0px 0px 0px 4px !important;\n\n}\n.css-y0yg3l {\nbackground: var(--main-bg-color);\nborder-color: transparent;\n}\n.css-y0yg3l {\nbackground: rgba(0, 0, 0, .25) !important;\nborder-color: transparent;\n}\n\n.css-1je3bh6 {\nbackground: transparent;\nborder-bottom: 1px solid rgba(0, 0, 0, 0);\n}\n\n/*Folder bars*/\n.css-1umfglk {\nbackground: rgba(0, 0, 0, .25);\n}\n.css-1umfglk:hover {\nbackground: rgba(0, 0, 0, .35);\n}\n\n/* Login Error message*/\n.css-1ow9mne-input-input {\nline-height: 1.5;\nheight: 38px;\nbackground-color: hsla(0,0%,100%,.25);\nborder-radius: 3px;\nborder-color: transparent;\n-webkit-transition: background-color .15s ease-in-out,box-shadow .15s ease-in-out !important;\ntransition: background-color .15s ease-in-out,box-shadow .15s ease-in-out !important;\n}\n.css-1ow9mne-input-input {\nbox-shadow: none !important;\nbackground-color: white;\ncolor: black;\ntransition: background-color .2s;\n-webkit-transition: background-color .2s;\nheight: 38px;\nborder-radius: 3px;\n}\n.css-13o428a {\nmargin: 10px 0px 0px;\n}\n\n/*Welcome to Grafana*/\n.css-15xxblz,.css-1ld19yb {background: rgba(0, 0, 0, .25);}\n\n.css-1as70ku, .css-u5zjuh {\nbackground: rgba(0, 0, 0, .25);}\n.css-17abkeq, .css-5ak73y  {\ncolor: #fff;\n}\n\n\n/* Import */\nbody > grafana-app > div > div > react-container > div > div > div.view > div > div.page-container.page-body > form > div:nth-child(4) > div:nth-child(2) > div > div.css-1w5c5dq-input-inputWrapper > input {height:100%}\n\n\n/*PANEL EDIT*/\n\n/*Header*/\n.css-1marj6o {\ndisplay: flex;\n-webkit-box-pack: justify;\njustify-content: space-between;\npadding: 8px;\nbackground: transparent;\nborder-bottom: 1px solid transparent;\n}\n/*Background*/\n.css-azp59k {\nbackground: var(--main-bg-color);\n}\n/*Query box*/\n.css-hz0utb {\nbackground: rgba(0, 0, 0, .35);\nborder-right: 1px solid rgba(0, 0, 0, 0);\n}\n.query-keyword, .css-wvxxxy, .css-fpnw35   {\n    font-weight: 500;\n    color: var(--accent-color);\n}\n.css-lvafs5 {\n    background: rgba(0, 0, 0, .5);\n}\n\n.css-ui3sz4-activeTabStyle {\nmargin-right: 16px;\nposition: relative;\ndisplay: block;\ncolor: rgb(216, 217, 218);\ncursor: default;\nlist-style: none;\npadding: 11px 15px 9px;\nborder-style: solid;\nborder-image: initial;\nborder-width: 0px 1px 1px;\nborder-radius: 3px 3px 0px 0px;\nborder-color: transparent !important;\nbackground: rgba(0, 0, 0, .5);\noverflow: hidden;\n}\n.css-1awj6q7-counter {\nbackground-color: rgba(0, 0, 0, .5);\ncolor: rgb(255, 255, 255);\n}\n/*Transform tab*/\n.css-y2f54e {\nbackground: rgba(0, 0, 0, .25);\n}\n.css-y2f54e:hover {\nbackground: rgba(0, 0, 0, .35);\n}\n.css-1e8invk::before {\nbackground:rgba(0, 0, 0, .35) !important;\n}\n\n/* Right side menu*/\n.css-1xj5tuf {\nbackground: rgba(0, 0, 0, .35);\nborder-left: 1px solid transparent;\n}\n/*Dropdown bottom borders*/\n.css-1majipf {\nborder-bottom: 1px solid rgba(255, 255, 255, .08);\n}\n/*Settings text input*/\n.css-1f38lle:focus {\n    box-shadow: none !important;\n}\n.css-1gokw4e input:checked + label, .css-1gokw4e input:checked + label:hover {\nbackground: var(--accent-color);\n}\n.css-1gokw4e label {\n    background: white;\n}\n/*Visualization*/\n.css-1lemfi9 {\n    background: rgba(0, 0, 0, .25);\n    border-color: transparent;\n}\n.css-1fsv7gr:hover > div:first-child {\n    border-color: var(--accent-color);\n}\n.css-1emhacm-currentVisualizationItem > div:first-child {\n    outline-offset: 2px;\n    box-shadow: rgb(20, 22, 25) 0px 0px 0px 2px, var(--accent-color) 0px 0px 0px 4px;\n}\n/*Old stat panel unit dropdown */\nbody > grafana-app > div > div > react-container > div > div.css-azp59k > div.css-1bd2u9 > div > div.Pane.vertical.Pane2 > div > div > div.css-1xj5tuf > div > div.view > div:nth-child(3) > div:nth-child(1) > div.panel-options-group__body > panel-editor-tab > panel-editor-tab-singlestatoptions > div > div:nth-child(2) > div:nth-child(6) > unit-picker > div > div > div > div > input {\nheight: 100%;\n}\n/*Buttons*/\n.css-m58wdd:hover {\n    color: rgba(255, 255, 255, .94);\n    z-index: 2;\n    border-width: 1px;\n    border-style: solid;\n    border-color: rgba(255, 255, 255, .1);\n    border-image: initial;\n    background: rgba(255, 255, 255, .15)\n}\n.css-m58wdd {\n    color: rgba(255, 255, 255, .94);\n    z-index: 2;\n    border-width: 1px;\n    border-style: solid;\n    border-color: rgba(255, 255, 255, 0);\n    border-image: initial;\n    background: rgba(255, 255, 255, .08)\n}\ninput:checked+.gf-form-switch__slider {\nbackground: var(--accent-color);\n}\n/* RuPaul Drag Line*/\n.css-pii3u7:hover {\nborder-color: rgba(255, 255, 255, .25);\n}\n\n.css-1t13ra6 {\nborder-color: rgba(255, 255, 255, .09);\n}\n.css-1t13ra6:hover {\n    border-color: rgba(255, 255, 255, .25); \n}\n\n/*SETTINGS*/\n/*Teams*/\n.css-1w9m9al-call-to-action-card {\n    background: rgba(0, 0, 0, .25);\n    }\n\n\n/*DASHBOARD SETINGS*/\n.dashboard-settings,.dashboard-settings__body2 {\n    background: var(--main-bg-color);\n}\n.navbar--edit {\n    background: rgba(0, 0, 0, .25);\n    border-bottom: 1px solid transparent;\n    -webkit-box-shadow: 0 0 10px transparent;\n    box-shadow: 0 0 10px transparent;\n}\n.grafana-info-box {\nbackground-color: rgba(0, 0, 0, .5);\nborder-top: 3px solid var(--accent-color);\n}\n/* Variables*/\n.filter-table--hover tbody tr:hover {\n    background: hsla(0,0%,100%,.15);\n}\n.filter-table tbody tr:nth-child(odd):hover {\nbackground: hsla(0,0%,100%,.15) !important;\n}\n/*Placeholder text*/\n::placeholder {color: #fff !important;}\n:-ms-input-placeholder {color: #fff !important;}\n::-webkit-input-placeholder {color: #fff !important;}\n/*DASHBOARD SETINGS*/\n.dashboard-settings,.dashboard-settings__body2 {\n    background: var(--main-bg-color);\n}\n.navbar--edit {\n    background: rgba(0, 0, 0, .25);\n    border-bottom: 1px solid transparent;\n    -webkit-box-shadow: 0 0 10px transparent;\n    box-shadow: 0 0 10px transparent;\n}\n.grafana-info-box {\nbackground-color: rgba(0, 0, 0, .5);\nborder-top: 3px solid var(--accent-color);\n}\n\n:root {\n  --main-bg-color: radial-gradient(ellipse at center, #47918a 0%, #0b3161 100%) center center/cover no-repeat fixed;\n  --modal-bg-color: radial-gradient(ellipse at top, #47918a 0%, #0b3161 100%) center center/cover no-repeat fixed;\n  --button-color: #009688;\n  --button-color-hover: #12afa0;\n  --accent-color:  #009688;\n  --accent-color-hover: #12afa0;\n  --queue-color: #009688;\n}\n"
+                    },
+                    "type": "style"
+                  }
+                ]
+              },
+              {
+                "name": "Alex2",
+                "styles": [
+                  {
+                    "props": {
+                      "theme": "dark"
+                    },
+                    "type": "basetheme"
+                  },
+                  {
+                    "props": {
+                      "url": ""
+                    },
+                    "type": "bgimage"
+                  },
+                  {
+                    "props": {
+                      "url": "https://gilbn.github.io/theme.park/CSS/themes/grafana/plex.css"
+                    },
+                    "type": "url"
+                  },
+                  {
+                    "props": {
+                      "text": "/*    dP   dP                                                                  dP        */\n/*    88   88                                                                  88        */\n/*  d8888P 88d888b. .d8888b. 88d8b.d8b. .d8888b.    88d888b. .d8888b. 88d888b. 88  .dP   */\n/*    88   88'  `88 88ooood8 88'`88'`88 88ooood8    88'  `88 88'  `88 88'  `88 88888\"    */\n/*    88   88    88 88.  ... 88  88  88 88.  ...    88.  .88 88.  .88 88       88  `8b.  */\n/*    dP   dP    dP `88888P' dP  dP  dP `88888P' 88 88Y888P' `88888P8 dP       dP   `YP  */\n/*                                                  88                                   */\n/*                                                  dP\t\t\t\t\t */\n\n/*\t\t   \t\t        Made by @gilbN\t\t\t\t\t */\n/*\t\t\t      https://github.com/gilbN/theme.park\t\t\t */\n\nbody {\n    color: var(--text) !important;\n    background: var(--main-bg-color) !important;\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n}\n\n.theme-dark,\n.theme-light,\n.preloader {\n    background: var(--main-bg-color) !important;\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n}\n\nh1,\nh2,\nh3,\nh4,\nh5,\nh6,\nlabel,\nlegend {\n    color: var(--text-hover);\n}\n\ndiv>aria-label>span,\n#reactRoot>div>div.main-view>div>div:nth-child(1)>div>div:nth-child(10)>div>div.button-group.css-1uxatfi>div>div>div>div>div>div>span {\n    color: var(--text-hover) !important;\n}\n\np {\n    color: var(--text);\n}\n\n.page-header-canvas,\n.page-toolbar[class*=\"css-\"] {\n    background: rgba(0, 0, 0, 0.25) !important;\n    box-shadow: none !important;\n    border-bottom: none !important;\n}\n\n.main-view {\n    background: linear-gradient(180deg, #ffffff00 10px, #ffffff00 100px) !important;\n}\n\n/* Scrollbar */\n.no-overlay-scrollbar ::-webkit-scrollbar-thumb:vertical {\n    min-height: 50px;\n    border: 3px solid transparent;\n    border-radius: 8px;\n    background: hsla(0, 0%, 100%, .2) !important;\n}\n\n/* Variable Dropdown Menu */\n.variable-value-dropdown {\n    background: var(--modal-bg-color);\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n    border: 1px solid #00000000;\n}\n\n.variable-value-dropdown.single .selected {\n    background-color: rgba(0, 0, 0, 0.25);\n}\n\n.css-0.gf-form-select-box__menu {\n    background: #09090b !important;\n    -webkit-box-shadow: 5px 5px 20px -5px #000;\n    box-shadow: 5px 5px 20px -5px #000;\n    position: absolute;\n    z-index: 1000;\n    min-width: 100%\n}\n\n/* time picker Menu */\n.time-picker-popover {\n    border: 1px solid #00000000;\n    background: var(--modal-bg-color);\n}\n\n.time-picker-calendar .react-calendar__navigation,\n.time-picker-calendar .react-calendar__navigation__arrow,\n.time-picker-calendar .react-calendar__navigation__label {\n    background-color: rgba(0, 0, 0, 0.25);\n}\n\n.time-picker-calendar .react-calendar__month-view__weekdays {\n    background-color: rgba(0, 0, 0, 0.6);\n}\n\n.time-picker-calendar .react-calendar__tile--active,\n.time-picker-calendar .react-calendar__tile--active:hover {\n    background: rgba(255, 255, 255, 0.08);\n    border: 1px solid rgba(0, 0, 0, 0);\n}\n\n.time-picker-calendar .time-picker-calendar-tile:hover {\n    -webkit-box-shadow: 0 0 4px rgba(255, 255, 255, 0.08);\n    box-shadow: 0 0 4px #ffffff00;\n    background: rgba(255, 255, 255, 0.08);\n    border: 1px solid rgba(255, 255, 255, 0.08);\n}\n\n.time-picker-calendar .react-calendar__month-view__days {\n    background-color: rgba(0, 0, 0, 0.15);\n}\n\n.time-picker-calendar .time-picker-calendar-tile {\n    border-radius: 0px;\n}\n\n.time-picker-calendar {\n    border: 1px solid #00000000;\n}\n\n/* login page */\n.login {\n    background-image: var(--main-bg-color) !important;\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n    background-color: rgba(0, 0, 0, .0) !important;\n    color: #FFFFFF !important;\n}\n\n.login-branding {\n    border-right: none !important;\n}\n\n/* Configuration menu */\n.card-item {\n    background: rgba(0, 0, 0, .25) !important;\n}\n\n.card-item:hover {\n    background: hsla(0, 0%, 100%, .08) !important;\n}\n\n.card-item-sub-name,\n.card-item-type {\n    color: #FFF !important;\n}\n\n.gf-form--has-input-icon .gf-form-input-icon {\n    color: #fff !important;\n}\n\n.gf-tabs-link.active,\n.gf-tabs-link.active:focus,\n.gf-tabs-link.active:hover {\n    background: rgba(0, 0, 0, 0.25) !important;\n}\n\n.filter-table tbody tr:nth-child(odd) {\n    background: hsla(0, 0%, 100%, .08) !important;\n}\n\n.cta-form {\n    background-color: rgba(0, 0, 0, 0.25) !important;\n}\n\n.empty-list-cta {\n    background-color: rgba(0, 0, 0, .25) !important;\n}\n\n.layout-selector button {\n    background: rgba(0, 0, 0, 0.25);\n    color: #ffffff;\n}\n\n.layout-selector button.active {\n    background-color: rgba(0, 0, 0, 0.45);\n    color: #ffffff;\n}\n\n/* Configuration menu - Teams */\n.css-1ph0cdx-call-to-action-card {\n    background: rgba(0, 0, 0, .25) !important;\n}\n\n.grafana-info-box {\n    background-color: rgba(0, 0, 0, 0.45);\n}\n\n/* sidemenu */\n.sidemenu-open,\n.sidemenu {\n    background: rgba(0, 0, 0, .25) !important;\n}\n\n.sidemenu__logo:hover {\n    background: rgba(0, 0, 0, .25) !important;\n}\n\n.sidemenu-item.active,\n.sidemenu-item:hover {\n    background-color: rgba(0, 0, 0, .25) !important;\n    color: rgb(var(--accent-color)) !important;\n    border-image: none;\n    border-color: rgb(var(--accent-color));\n}\n\n.sidemenu-link {\n    color: var(--text) !important;\n}\n\n.sidemenu-link:hover {\n    color: rgb(var(--accent-color)) !important;\n}\n\n.side-menu-header,\n.dropdown-menu--menu,\n.dropdown-menu--navbar,\n.dropdown-menu--sidemenu,\n\n#reactRoot>div>div.main-view>div[class*=\"css-\"]>div:nth-child(1)>div>div:nth-child(10)>div>div.button-group[class*=\"css-\"]>div>div {\n    background: var(--drop-down-menu-bg);\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n}\n\n#reactRoot>div>div.main-view>div[class*=\"css-\"]>div:nth-child(1)>div>div:nth-child(10)>div>div.button-group[class*=\"css-\"]>div>div>div>span {\n    color: var(--text-hover);\n}\n\n.dropdown-menu .divider {\n    border-bottom: 1px solid #d8d9da;\n}\n\n.dropdown-menu--sidemenu>li>.side-menu-header-link:hover {\n    color: var(--text-hover) !important;\n    background: var(--drop-down-menu-bg) !important;\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n}\n\n.dropdown-menu--menu>li>a:hover,\n.dropdown-menu--navbar>li>a:hover,\n.dropdown-menu--sidemenu>li>a:hover {\n    background: rgba(0, 0, 0, 0.25) !important;\n    color: var(--text-hover) !important;\n}\n\n.dropdown-menu>li>a {\n    color: var(--text) !important;\n}\n\n.dropdown-menu-item-shortcut {\n    color: var(--text) !important;\n}\n\n.dropdown-menu {\n    border: 1px solid transparent;\n}\n\n.dropdown-submenu:hover>a {\n    Background-color: rgba(0, 0, 0, 0.25) !important;\n}\n\n.icon-circle:hover .fa:hover,\n.icon-circle:hover .gicon:hover,\n.icon-circle:hover .icon-gf:hover {\n    color: #ffffff;\n    opacity: 1;\n}\n\n/* Dashboard dropdown menu */\n.search-dropdown__col_1 {\n    background: var(--modal-bg-color) !important;\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n}\n\n.search-container {\n    left: 0px !important;\n}\n\n.navbar-page-btn {\n    color: #FFFFFF !important;\n}\n\n/* dropdown menu */\n.css-n9566h,\n.css-1m7hyr {\n    background: var(--modal-bg-color) !important;\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n}\n\n.search-filter-box {\n    background: var(--modal-bg-color);\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n}\n\n.search-filter-box__header {\n    border-bottom: 1px solid rgba(255, 255, 255, 0.2);\n}\n\n/* Dashboard row  */\n.dashboard-row--collapsed {\n    background: rgba(0, 0, 0, 0.25);\n}\n\n.search-section {\n    background: rgba(255, 255, 255, 0.08);\n    border: none;\n}\n\n.search-item {\n    background: rgba(0, 0, 0, 0.15);\n}\n\n.search-item.selected,\n.search-item:hover {\n    background: rgba(0, 0, 0, 0.25);\n}\n\n.search-section__header {\n    color: #ffffff !important;\n}\n\n.navbar-page-btn__folder {\n    color: #d8d9da;\n}\n\n/* Panel fullscreen navbar */\n.panel-in-fullscreen .navbar {\n    background: linear-gradient(90deg, rgba(0, 0, 0, .15), rgba(0, 0, 0, 0.25)) !important;\n}\n\n/* Dashboard search menu */\n.search-field-wrapper>input {\n    height: 55px !important;\n}\n\n/* Dashboard settings menu */\n.dashboard-settings__aside {\n    background: rgba(0, 0, 0, .25) !important;\n}\n\n.dashboard-page--settings-open .navbar {\n    background: linear-gradient(90deg, rgba(0, 0, 0, .15), rgba(0, 0, 0, 0.25)) !important;\n}\n\n.navbar-button--primary {\n    border-color: #ffffff00 !important;\n}\n\n.dashboard-settings__aside-header {\n    color: #ffffff !important;\n}\n\n.dashboard-settings__nav-item {\n    color: #ffffff !important;\n}\n\n.bootstrap-tagsinput {\n    background-color: #09090b !important;\n}\n\n.gf-form-switch--table-cell {\n    background-color: transparent !important;\n}\n\n.gf-form-select-wrapper {\n    background-color: hsla(0, 0%, 100%, .08) !important;\n}\n\n.dashboard-settings__nav-item.active {\n    background: rgba(255, 255, 255, 0.08);\n}\n\n.gf-form-checkbox {\n    background: rgba(0, 0, 0, 0.25);\n    border: none;\n}\n\n.gf-form-switch__checkbox {\n    border: none;\n    background: #ffffff;\n}\n\n.gf-form-select-box__option {\n    background: var(--modal-bg-color) !important;\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n}\n\n.gf-form-select-box__option.gf-form-select-box__option--is-focused {\n    color: #fff;\n    -o-border-image: -o-linear-gradient(rgb(var(--accent-color)) 30%, rgb(var(--accent-color)) 99%);\n    border-image: -webkit-gradient(linear, left top, left bottom, color-stop(30%, rgb(var(--accent-color))), color-stop(99%, rgb(var(--accent-color))));\n    border-image: -webkit-linear-gradient(rgb(var(--accent-color)) 30%, rgb(var(--accent-color)) 99%);\n}\n\n.filter-table td.filter-table__switch-cell {\n    border-right: none;\n}\n\n/* Variable label color  */\n.template-variable,\n.gf-form-label--variable {\n    color: rgb(var(--accent-color)) !important;\n}\n\n/* Variable label box */\n.gf-form-label {\n    background: rgba(0, 0, 0, 0.25) !important;\n    border: none !important;\n}\n\n.gf-form-label>button[class*=\"css-\"] {\n    background: transparent !important;\n}\n\n.gf-form-label--btn:hover {\n    background: rgba(0, 0, 0, 0.45) !important;\n}\n\n.variable-option.highlighted,\n.variable-option:hover {\n    background-color: hsla(0, 0%, 100%, .1) !important;\n}\n\n/* Variable dashboard dropdown */\n.variable-value-link {\n    padding: 7.4px 10px !important;\n    background-color: rgba(0, 0, 0, 0.25) !important;\n    border: none !important;\n    color: #FFFFFF !important;\n}\n\n/* Variable input box */\n.gf-form-input {\n    color: #FFFFFF !important;\n    border: none !important;\n}\n\n.gf-form-input:focus {\n    color: #FFF !important;\n    box-shadow: none !important;\n}\n\n.gf-form-select-box-button-select {\n    background: transparent;\n    border: none;\n}\n\n.gf-form-select-wrapper .gf-form-select-icon+.gf-form-input option {\n    color: #fff;\n    background: #1f1f1f;\n}\n\n.css-0>.gf-form-input {\n    background-color: transparent !important;\n}\n\n/* NAVBAR BUTTONS */\n.navbar-button {\n    color: #FFF !important;\n    background-color: rgba(0, 0, 0, 0.25) !important;\n    background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25)) !important;\n    border: none !important;\n}\n\n/* Custom Range Refreshing every X Dropdown */\n.gf-timepicker-absolute-section select {\n    background-color: #393a3b !important;\n}\n\n/* PANEL BACKGROUND COLOR*/\n.panel-container {\n    background-color: rgba(0, 0, 0, .25);\n    border: transparent;\n    box-shadow: none !important;\n}\n\n.panel-container.panel-transparent,\n.panel-container--transparent {\n    background-color: transparent;\n    border: transparent;\n}\n\n.panel-header:hover {\n    background-color: rgba(0, 0, 0, 0.25) !important;\n}\n\n.panel-title-text:hover {\n    color: var(--text-hover);\n}\n\n/* ////PANEL BACKGROUND COLOR//// */\n\n.graph-legend-table .graph-legend-series:nth-child(odd),\n.graph-legend-table .graph-legend-series:nth-child(2n) {\n    background: transparent !important;\n}\n\n/* Panel text color*/\ndiv.flot-text {\n    color: #FFF !important;\n}\n\n/* panel loading circle*/\n.panel-loading {\n    color: #FFF !important;\n}\n\n/* panel resize arrow */\n.theme-dark .react-grid-item>.react-resizable-handle:after {\n    border-right: 2px solid #fff !important;\n    border-bottom: 2px solid #fff !important;\n}\n\n/* table panel background color */\n.table-panel-container {\n    background-color: rgba(0, 0, 0, .25) !important;\n}\n\n/* table panel border size */\n.table-panel-table td {\n    padding: .45em 0 .45em 1.1em;\n    border-bottom: 1px solid #171819;\n    border-right: 1px solid #171819;\n}\n\n.table-panel-header-bg {\n    background: rgba(0, 0, 0, 0.25);\n    border-top: 2px solid transparent;\n    border-bottom: 2px solid transparent;\n\n}\n\n/* Panel tables */\n.css-58bavm-thead {\n    background: rgba(0, 0, 0, .25);\n}\n\n.css-sq6g4h-row {\n    border-bottom: 1px solid rgb(255 255 255 / 10%);\n}\n\n.css-11m63ae {\n    border-right: 1px solid rgb(255 255 255 / 10%);\n}\n\n.css-2n373z {\n    border-right: 1px solid rgb(255 255 255 / 25%);\n}\n\n.css-sq6g4h-row:hover {\n    background-color: rgb(255 255 255 / 0.08);\n}\n\n.css-3o5ryu {\n    background: rgb(0 0 0 / 45%);\n}\n\n.css-1n8kpcb-activeTabStyle,\n.css-dnqfjg-activeTabStyle {\n    background: rgb(0 0 0 / 35%);\n}\n\n.css-1n8kpcb-activeTabStyle::before,\n.css-dnqfjg-activeTabStyle::before {\n    background: rgb(var(--accent-color));\n}\n\n/* Edit panel tabs  */\n[aria-label=\"Panel editor content\"] {\n    background: var(--main-bg-color);\n}\n\ndiv>.scrollbar-view>div>[class*=\"css-\"],\n#reactRoot>div>div.main-view>div.css-1mwktlb>div[class*=\"css-\"]>div[class*=\"css-\"]>div>div.Pane.vertical.Pane1>div>div.Pane.horizontal.Pane2>div>div>div[class*=\"css-\"],\n.css-v2fjpc,\n.css-ld7ft6 {\n    background: rgba(0, 0, 0, .25) !important;\n}\n\n.tabbed-view-header {\n    box-shadow: none;\n    background: rgba(0, 0, 0, 0.25);\n    border-bottom: none;\n}\n\n.tabbed-view-panel-title {\n    padding-left: 10px;\n}\n\n/* panel query settings  */\n.panel-editor__right,\n.toolbar {\n    background: rgba(0, 0, 0, 0.25);\n}\n\n.query-editor-row__header {\n    background: rgba(0, 0, 0, 0.25);\n}\n\n.query-editor-row__body {\n    background: rgba(0, 0, 0, 0.15);\n}\n\n.panel-options-group {\n    background: rgba(0, 0, 0, 0.15);\n}\n\n.gf-form-switch {\n    background: rgba(0, 0, 0, 0.25);\n    border: transparent;\n}\n\n.viz-picker__item {\n    background: rgba(0, 0, 0, 0.25);\n    border: transparent;\n}\n\n.viz-picker__item--current {\n    box-shadow: 0 0 6px #eb7b18 !important;\n    border: 1px solid #eb7b18 !important;\n    background: rgba(0, 0, 0, 0.4) !important;\n}\n\n.viz-picker__item:hover {\n    box-shadow: 0 0 6px #eb7b18 !important;\n    background: rgba(0, 0, 0, 0.4);\n    border: 1px solid #eb7b18 !important;\n}\n\n.panel-options-group__header {\n    background: rgba(0, 0, 0, 0.25);\n}\n\n.custom-scrollbar .thumb-vertical,\n.custom-scrollbar .thumb-horizontal {\n    background-color: rgba(255, 255, 255, 0);\n    background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(255, 255, 255, 0.25)), to(rgba(255, 255, 255, 0.25)));\n    background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25));\n    background-image: -o-linear-gradient(top, #404357, #424345);\n    background-image: linear-gradient(180deg, rgba(249, 249, 249, 0.25), rgba(251, 251, 251, 0.25));\n}\n\n.toolbar__main {\n    color: #ffffff;\n    background-color: rgba(0, 0, 0, 0.15);\n    border: transparent;\n}\n\n/* worldmap zoom buttons and leaflet  */\n.leaflet-bar a,\n.leaflet-bar a:hover {\n    background-color: #1f1f1f !important;\n    border-bottom: 1px solid #1f1f1f !important;\n    color: white !important;\n}\n\n.leaflet-bar a:hover {\n    background-color: #1b1b1b !important;\n}\n\n.leaflet-control-attribution {\n    display: none;\n}\n\n/* buttons  \n.btn-inverse {\nborder-color: #b56d16 !important;\n    color: #fff !important;\n    background-color: #cc7b19 !important;\n    -webkit-transition: background-color .1s !important;\n    transition: background-color .1s !important;\n\t}\n\t.btn-inverse.active, .btn-inverse.disabled, .btn-inverse:active, .btn-inverse:focus, .btn-inverse:hover, .btn-inverse[disabled] {\n\t\tcolor: #fff;\n    background-color: #e59029 !important;\n}\n.btn-outline-disabled {\n    color: #fff;\n}*/\n\n.btn-inverse {\n    background: rgba(0, 0, 0, 0.25);\n    -webkit-box-shadow: 0px 0px 5px 1px hsla(0, 0%, 0%, 0.45), 1px 1px 0 0 rgba(0, 0, 0, .3);\n    box-shadow: 0px 0px 5px 1px hsla(0, 0%, 0%, 0.45), 1px 1px 0 0 rgba(0, 0, 0, .3);\n}\n\n.btn-primary,\n.btn-success {\n    -webkit-box-shadow: 0px 0px 5px 1px hsla(0, 0%, 0%, 0.45), 1px 1px 0 0 rgba(0, 0, 0, .3);\n    box-shadow: 0px 0px 5px 1px hsla(0, 0%, 0%, 0.45), 1px 1px 0 0 rgba(0, 0, 0, .3);\n}\n\n.btn-inverse.active,\n.btn-inverse.disabled,\n.btn-inverse:active,\n.btn-inverse:focus,\n.btn-inverse:hover,\n.btn-inverse[disabled] {\n    background-color: rgba(255, 255, 255, 0.08);\n}\n\n/* New Dashboard */\n.add-panel__item {\n    background: linear-gradient(135deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.25));\n    box-shadow: -1px -1px 0 0 hsla(0, 0%, 100%, .1), 1px 1px 0 0 rgba(0, 0, 0, 0);\n}\n\n.add-panel__item.active,\n.add-panel__item:hover {\n    background: linear-gradient(135deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.25));\n}\n\n.add-panel__header {\n    background: rgba(0, 0, 0, 0.25);\n    box-shadow: none;\n    border-bottom: 0px;\n}\n\n/* Explore */\n.query-transaction {\n    color: #fff;\n}\n\n.query-type-toggle .btn.active {\n    background-color: rgba(0, 0, 0, 0.45);\n    border: none;\n    border-radius: 3px;\n}\n\n.toggle-button-group .btn {\n    background-color: rgba(0, 0, 0, 0.25);\n    background-image: none;\n    border-color: #00000000;\n    border-radius: 3px !important;\n    border-right: 1px;\n}\n\n.toggle-button-group .btn:hover {\n    background-color: rgba(0, 0, 0, 0.45);\n}\n\n.logs-panel-options {\n    background-color: transparent;\n    border: none;\n}\n\n/* JSON Model */\n.gf-code-dark {\n    background-color: rgba(0, 0, 0, 0.25);\n    color: #e0e0e0;\n}\n\n.gf-code-editor.ace_editor {\n    border: none;\n}\n\n.modal-header,\n.css-1z13zsv-modalHeader {\n    background: var(--modal-bg-color);\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n    -webkit-box-shadow: none;\n    box-shadow: none;\n    border-bottom: 1px solid #d8d9da;\n    color: #eee;\n}\n\n.modal-body,\n.css-111908g {\n    background: var(--modal-bg-color);\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n    color: #eee;\n}\n\n\n\n/*V7*/\n\n/*LOGIN*/\n.css-bnbqsv {\n    background: var(--main-bg-color);\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n}\n\n.css-3iwqj4 {\n    background: transparent;\n}\n\n#login-view>div>form>div:nth-child(1)>div:nth-child(2)>div>div>input,\n#login-view>div>form>div:nth-child(2)>div:nth-child(2)>div>div>input {\n    height: 38px;\n}\n\n/*Buttons*/\nbutton[class$=\"-button\"]:not(button[aria-label=\"toggle-viz-picker\"]),\n.gf-form-button-row a,\n.gf-form-button-row button,\n.page-action-bar>a,\n.page-action-bar>button,\n.btn-primary,\nbutton.toolbar-button {\n    background: var(--button-color) !important;\n    background-color: var(--button-color) !important;\n    border-color: var(--button-color) !important;\n    color: var(--button-text) !important;\n}\n\nbutton[class$=\"-button\"]:hover,\nbutton[class$=\"-button\"]:focus,\nbutton[class$=\"-button\"]:active,\n.gf-form-button-row a,\n.gf-form-button-row button:hover,\n.btn-primary:hover {\n    color: rgb(255, 255, 255);\n    background: var(--button-color-hover) !important;\n    background-color: var(--button-color-hover) !important;\n    border-color: var(--button-color-hover) !important;\n    color: var(--button-text-hover) !important;\n    box-shadow: none !important;\n}\n\n.css-1d9e5zy-button {\n    color: #fff;\n    background: var(--button-color)\n}\n\n.css-1d9e5zy-button:hover {\n    color: #fff;\n    background: var(--button-color-hover)\n}\n\n/*INPUT*/\ninput:focus {\n    box-shadow: none !important;\n}\n\n.css-17rc2pp-input-wrapper:focus,\n.css-1i9is3t:focus {\n    box-shadow: none;\n    color: transparent;\n}\n\n.gf-form-select-box__control--is-focused {\n    border-color: transparent;\n    outline: none;\n    -webkit-box-shadow: none !important;\n    box-shadow: none !important;\n}\n\n.css-1bjepp-input-input {\n    background-color: hsla(0, 0%, 100%, .25);\n    border-radius: 3px;\n    border-color: transparent;\n    -webkit-transition: background-color .15s ease-in-out, box-shadow .15s ease-in-out !important;\n    transition: background-color .15s ease-in-out, box-shadow .15s ease-in-out !important;\n}\n\n.css-1bjepp-input-input:focus {\n    box-shadow: none !important;\n    background-color: white;\n    color: black;\n    transition: background-color .2s;\n    -webkit-transition: background-color .2s;\n    border-radius: 3px;\n}\n\n.css-14hvfbu-input-wrapper:focus {\n    border-color: transparent !important;\n    box-shadow: none !important;\n}\n\n.css-1w5c5dq-input-inputWrapper input:not(:last-child) {\n    height: 100%\n}\n\n/*Disabled input*/\n.css-1bjepp-input-input:disabled {\n    background-color: rgba(0, 0, 0, .5);\n    color: rgb(159, 167, 179);\n}\n\n.css-1bjepp-input-input:hover {\n    border-color: transparent;\n}\n\nbody>grafana-app>div>div>react-container>div>div>div.view>div>div.page-container.page-body>div:nth-child(2)>form>div>div>div>div.css-1w5c5dq-input-inputWrapper>input {\n    height: 100%;\n}\n\n\n/* SEARCH */\n.css-x9mxj5 {\n    background: var(--main-bg-color);\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n}\n\n.css-1m6pigl:focus+label {\n    outline-offset: 2px;\n    box-shadow: rgba(20, 22, 25, 0) 0px 0px 0px 2px, rgba(31, 97, 196, 0) 0px 0px 0px 4px !important;\n    z-index: 3;\n    outline: transparent dotted 2px;\n    transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1) 0s;\n}\n\n.css-1m6pigl:checked+label {\n    color: #eee !important;\n    border-color: rgba(255, 255, 255, .1);\n    background: var(--button-color);\n}\n\n.css-b40tk8:focus+label {\n    box-shadow: rgba(20, 22, 25, 0) 0px 0px 0px 2px, rgba(31, 97, 196, 0) 0px 0px 0px 4px !important;\n\n}\n\n.css-y0yg3l {\n    background: var(--main-bg-color);\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n    border-color: transparent;\n}\n\n.css-y0yg3l {\n    background: rgba(0, 0, 0, .25) !important;\n    border-color: transparent;\n}\n\n.css-1je3bh6 {\n    background: transparent;\n    border-bottom: 1px solid rgba(0, 0, 0, 0);\n}\n\n/*Folder bars*/\n.css-1umfglk {\n    background: rgba(0, 0, 0, .25);\n}\n\n.css-1umfglk:hover {\n    background: rgba(0, 0, 0, .35);\n}\n\n/* Login Error message*/\n.css-1ow9mne-input-input {\n    line-height: 1.5;\n    height: 38px;\n    background-color: hsla(0, 0%, 100%, .25);\n    border-radius: 3px;\n    border-color: transparent;\n    -webkit-transition: background-color .15s ease-in-out, box-shadow .15s ease-in-out !important;\n    transition: background-color .15s ease-in-out, box-shadow .15s ease-in-out !important;\n}\n\n.css-1ow9mne-input-input {\n    box-shadow: none !important;\n    background-color: white;\n    color: black;\n    transition: background-color .2s;\n    -webkit-transition: background-color .2s;\n    height: 38px;\n    border-radius: 3px;\n}\n\n.css-13o428a {\n    margin: 10px 0px 0px;\n}\n\n/*Welcome to Grafana*/\n.css-15xxblz,\n.css-1ld19yb {\n    background: rgba(0, 0, 0, .25);\n}\n\n.css-1as70ku,\n.css-u5zjuh {\n    background: rgba(0, 0, 0, .25);\n}\n\n.css-17abkeq,\n.css-5ak73y {\n    color: #fff;\n}\n\n\n/* Import */\nbody>grafana-app>div>div>react-container>div>div>div.view>div>div.page-container.page-body>form>div:nth-child(4)>div:nth-child(2)>div>div.css-1w5c5dq-input-inputWrapper>input {\n    height: 100%\n}\n\n\n/*PANEL EDIT*/\n\n.css-cxwxzk-Label-description,\n.css-n370st {\n    color: #eee;\n}\n\n.css-10pj50r,\n.css-15rfc12 {\n    background: rgb(0 0 0 / 50%);\n}\n\n/*Header*/\n.css-1marj6o {\n    display: flex;\n    -webkit-box-pack: justify;\n    justify-content: space-between;\n    padding: 8px;\n    background: transparent;\n    border-bottom: 1px solid transparent;\n}\n\n/*Background*/\n.css-azp59k {\n    background: var(--main-bg-color);\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n}\n\n/*Query box*/\n.css-hz0utb {\n    background: rgba(0, 0, 0, .35);\n    border-right: 1px solid rgba(0, 0, 0, 0);\n}\n\n.query-keyword,\n.css-wvxxxy,\n.css-fpnw35 {\n    font-weight: 500;\n    color: rgb(var(--accent-color));\n}\n\n.css-lvafs5 {\n    background: rgba(0, 0, 0, .5);\n}\n\n.css-ui3sz4-activeTabStyle {\n    margin-right: 16px;\n    position: relative;\n    display: block;\n    color: rgb(216, 217, 218);\n    cursor: default;\n    list-style: none;\n    padding: 11px 15px 9px;\n    border-style: solid;\n    border-image: initial;\n    border-width: 0px 1px 1px;\n    border-radius: 3px 3px 0px 0px;\n    border-color: transparent !important;\n    background: rgba(0, 0, 0, .5);\n    overflow: hidden;\n}\n\n.css-1awj6q7-counter {\n    background-color: rgba(0, 0, 0, .5);\n    color: rgb(255, 255, 255);\n}\n\n/*Transform tab*/\n.css-y2f54e {\n    background: rgba(0, 0, 0, .25);\n}\n\n.css-y2f54e:hover {\n    background: rgba(0, 0, 0, .35);\n}\n\n.css-1e8invk::before {\n    background: rgba(0, 0, 0, .35) !important;\n}\n\n/* Right side menu*/\n.css-1xj5tuf {\n    background: rgba(0, 0, 0, .35);\n    border-left: 1px solid transparent;\n}\n\n/*Dropdown bottom borders*/\n.css-1majipf {\n    border-bottom: 1px solid rgba(255, 255, 255, .08);\n}\n\n/*Settings text input*/\n.css-1f38lle:focus {\n    box-shadow: none !important;\n}\n\n.css-1gokw4e input:checked+label,\n.css-1gokw4e input:checked+label:hover {\n    background: rgb(var(--accent-color));\n}\n\n.css-1gokw4e label {\n    background: white;\n}\n\n/*Visualization*/\n.css-1lemfi9 {\n    background: rgba(0, 0, 0, .25);\n    border-color: transparent;\n}\n\n.css-1fsv7gr:hover>div:first-child {\n    border-color: rgb(var(--accent-color));\n}\n\n.css-1emhacm-currentVisualizationItem>div:first-child {\n    outline-offset: 2px;\n    box-shadow: rgb(20, 22, 25) 0px 0px 0px 2px, rgb(var(--accent-color)) 0px 0px 0px 4px;\n}\n\n.css-mgq0xs-currentVisualizationItem>div:first-child {\n    outline: transparent dotted 2px;\n    outline-offset: 1px;\n    box-shadow: rgb(var(--accent-color)) 0px 0px 0px 2px, #607D8B 0px 0px 0px 2px;\n    transition: all 0.2s cubic-bezier(0.19, 1, 0.22, 1) 0s;\n}\n\n/*Old stat panel unit dropdown */\nbody>grafana-app>div>div>react-container>div>div.css-azp59k>div.css-1bd2u9>div>div.Pane.vertical.Pane2>div>div>div.css-1xj5tuf>div>div.view>div:nth-child(3)>div:nth-child(1)>div.panel-options-group__body>panel-editor-tab>panel-editor-tab-singlestatoptions>div>div:nth-child(2)>div:nth-child(6)>unit-picker>div>div>div>div>input {\n    height: 100%;\n}\n\n/*Buttons*/\n.css-m58wdd:hover {\n    color: rgba(255, 255, 255, .94);\n    z-index: 2;\n    border-width: 1px;\n    border-style: solid;\n    border-color: rgba(255, 255, 255, .1);\n    border-image: initial;\n    background: rgba(255, 255, 255, .15)\n}\n\n.css-m58wdd {\n    color: rgba(255, 255, 255, .94);\n    z-index: 2;\n    border-width: 1px;\n    border-style: solid;\n    border-color: rgba(255, 255, 255, 0);\n    border-image: initial;\n    background: rgba(255, 255, 255, .08)\n}\n\ninput:checked+.gf-form-switch__slider {\n    background: rgb(var(--accent-color));\n}\n\n/* RuPaul Drag Line*/\n.css-pii3u7:hover {\n    border-color: rgba(255, 255, 255, .25);\n}\n\n.css-1t13ra6 {\n    border-color: rgba(255, 255, 255, .09);\n}\n\n.css-1t13ra6:hover {\n    border-color: rgba(255, 255, 255, .25);\n}\n\n/*SETTINGS*/\n/*Teams*/\n.css-1w9m9al-call-to-action-card {\n    background: rgba(0, 0, 0, .25);\n}\n\n/*DASHBOARD SETINGS*/\n.dashboard-settings,\n.dashboard-settings__body2 {\n    background: var(--main-bg-color);\n    background-repeat: repeat, no-repeat !important;\n    background-attachment: fixed, fixed !important;\n    background-position: center center, center center !important;\n    background-size: auto, cover !important;\n    -webkit-background-size: auto, cover !important;\n    -moz-background-size: auto, cover !important;\n    -o-background-size: auto, cover !important;\n}\n\n.navbar--edit {\n    background: rgba(0, 0, 0, .25);\n    border-bottom: 1px solid transparent;\n    -webkit-box-shadow: 0 0 10px transparent;\n    box-shadow: 0 0 10px transparent;\n}\n\n.grafana-info-box {\n    background-color: rgba(0, 0, 0, .5);\n    border-top: 3px solid rgb(var(--accent-color));\n}\n\n/* Variables*/\n.filter-table--hover tbody tr:hover {\n    background: hsla(0, 0%, 100%, .15);\n}\n\n.filter-table tbody tr:nth-child(odd):hover {\n    background: hsla(0, 0%, 100%, .15) !important;\n}\n\n/*Placeholder text*/\n::placeholder {\n    color: #fff !important;\n}\n\n:-ms-input-placeholder {\n    color: #fff !important;\n}\n\n::-webkit-input-placeholder {\n    color: #fff !important;\n}"
+                    },
+                    "type": "style"
+                  }
+                ]
+              },
+              {
+                "name": "Alex3",
+                "styles": [
+                  {
+                    "props": {
+                      "theme": "default"
+                    },
+                    "type": "basetheme"
+                  },
+                  {
+                    "props": {
+                      "url": ""
+                    },
+                    "type": "bgimage"
+                  },
+                  {
+                    "props": {
+                      "url": "https://gilbn.github.io/theme.park/CSS/themes/grafana/hotline.css"
+                    },
+                    "type": "url"
+                  },
+                  {
+                    "props": {
+                      "text": ""
+                    },
+                    "type": "style"
+                  }
+                ]
+              },
+              {
+                "name": "Alex4",
+                "styles": [
+                  {
+                    "props": {
+                      "theme": "dark"
+                    },
+                    "type": "basetheme"
+                  },
+                  {
+                    "props": {
+                      "url": ""
+                    },
+                    "type": "bgimage"
+                  },
+                  {
+                    "props": {
+                      "url": "https://gilbn.github.io/theme.park/CSS/themes/grafana/organizr-dark.css"
+                    },
+                    "type": "url"
+                  },
+                  {
+                    "props": {
+                      "text": ""
+                    },
+                    "type": "style"
+                  }
+                ]
+              },
+              {
+                "name": "Theme 6",
+                "styles": [
+                  {
+                    "props": {
+                      "theme": "light"
+                    },
+                    "type": "basetheme"
+                  },
+                  {
+                    "props": {
+                      "url": ""
+                    },
+                    "type": "bgimage"
+                  },
+                  {
+                    "props": {
+                      "url": ""
+                    },
+                    "type": "url"
+                  },
+                  {
+                    "props": {
+                      "text": "/*    dP   dP                                                                  dP        */\n/*    88   88                                                                  88        */\n/*  d8888P 88d888b. .d8888b. 88d8b.d8b. .d8888b.    88d888b. .d8888b. 88d888b. 88  .dP   */\n/*    88   88'  `88 88ooood8 88'`88'`88 88ooood8    88'  `88 88'  `88 88'  `88 88888\"    */\n/*    88   88    88 88.  ... 88  88  88 88.  ...    88.  .88 88.  .88 88       88  `8b.  */\n/*    dP   dP    dP `88888P' dP  dP  dP `88888P' 88 88Y888P' `88888P8 dP       dP   `YP  */\n/*                                                  88                                   */\n/*                                                  dP\t\t\t\t\t */\n\n/*\t\t   \t\t        Made by @gilbN\t\t\t\t\t */\n/*\t\t\t      https://github.com/gilbN/theme.park\t\t\t */\n\n/* GRAFANA SPACE GRAY THEME */\n@import url(https://gilbn.github.io/theme.park/CSS/themes/grafana/grafana-base.css);\n:root {\n  --main-bg-color:  radial-gradient( ellipse at center,  rgba(87,108,117,1) 0%, rgba(37,50,55,1) 100.2% ) center center/cover no-repeat fixed;\n  --modal-bg-color: radial-gradient( ellipse at top,  rgba(87,108,117,1) 0%, rgba(37,50,55,1) 100.2% ) center center/cover no-repeat fixed; \n  --button-color: #607D8B;\n  --button-color-hover: #81a6b7;\n  --accent-color: #607D8B;\n  --accent-color-hover: #81a6b7;\n}"
+                    },
+                    "type": "style"
+                  }
+                ]
+              },
+              {
+                "name": "Theme 7",
+                "styles": [
+                  {
+                    "props": {
+                      "theme": "default"
+                    },
+                    "type": "basetheme"
+                  },
+                  {
+                    "props": {
+                      "url": ""
+                    },
+                    "type": "bgimage"
+                  },
+                  {
+                    "props": {
+                      "url": ""
+                    },
+                    "type": "url"
+                  },
+                  {
+                    "props": {
+                      "text": "/* NAVBAR BUTTONS */\n/* Import */\nbody > grafana-app > div > div > react-container > div > div > div.view > div > div.page-container.page-body > form > div:nth-child(4) > div:nth-child(2) > div > div.css-1w5c5dq-input-inputWrapper > input {height:100%}\n\n\n/*PANEL EDIT*/\n\n/*Header*/\n.css-1marj6o {\ndisplay: flex;\n-webkit-box-pack: justify;\njustify-content: space-between;\npadding: 8px;\nborder-bottom: 1px solid transparent;\n}\n.navbar-button {\n    color: #FFF !important;\n    background-color: rgba(0, 0, 0, 0.25) !important;\n    background-image: linear-gradient(180deg,rgba(0, 0, 0, 0.25),rgba(0, 0, 0, 0.25)) !important;\n    border: none !important;\n}\n\n/* Custom Range Refreshing every X Dropdown */\n.gf-timepicker-absolute-section select {\n    background-color: #393a3b !important;\n}\n\n/* PANEL BACKGROUND COLOR*/\n.panel-container {\n    background-color: rgba(0, 0, 0, .25);\n    border: transparent;\n    box-shadow: none !important;\n}\n.panel-container.panel-transparent, .panel-container--transparent {\nbackground-color: transparent;\n  border: transparent;\n}\n.panel-header:hover {\n    background-color: rgba(0, 0, 0, 0.25) !important;\n}\n.panel-loading {\n    color: transparent;\n}\n/* ////PANEL BACKGROUND COLOR//// */\n\n.graph-legend-table .graph-legend-series:nth-child(odd) {\n    background: transparent !important;\n}\n\n/* Panel text color*/\ndiv.flot-text {\n    color: #FFF !important;\n}\n\n/* panel loading circle*/\n.panel-loading {\n    color: #FFF !important;\n}\n\n/* panel resize arrow */\n.theme-dark .react-grid-item>.react-resizable-handle:after {\n    border-right: 2px solid #fff !important;\n    border-bottom: 2px solid #fff !important;\n}\n\n/* table panel background color */\n.table-panel-container {\n    background-color: rgba(0, 0, 0, .25) !important;\n}\n/* table panel border size */\n.table-panel-table td {\n    padding: .45em 0 .45em 1.1em;\n    border-bottom: 1px solid #171819;\n    border-right: 1px solid #171819;\n}\n/* Edit panel tabs  */\n.tabbed-view-header {\n    box-shadow: none;\n    background: rgba(0, 0, 0, 0.25);\n    border-bottom: none;\n}\n.tabbed-view-panel-title {\n    padding-left: 10px;\n}\n/* worldmap zoom buttons and leaflet  */\n.leaflet-bar a, .leaflet-bar a:hover {\n    background-color: #1f1f1f !important;\n    border-bottom: 1px solid #1f1f1f !important;\n    color: white !important;\n}\n.leaflet-bar a:hover {\n    background-color: #1b1b1b !important;\n}\n.leaflet-control-attribution {\n    display: none;\n}\n/* New Dashboard */\n.add-panel__item {\n    background: linear-gradient(135deg,rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.25));\n    box-shadow: -1px -1px 0 0 hsla(0,0%,100%,.1), 1px 1px 0 0 rgba(0, 0, 0, 0);\n}\n.add-panel__item.active, .add-panel__item:hover {\n    background: linear-gradient(135deg,rgba(0, 0, 0, 0.25),rgba(0, 0, 0, 0.25));\n}\n.add-panel__header {\n    background: rgba(0, 0, 0, 0.25);\n    box-shadow: none;\n    border-bottom: 0px;\n}\n\n@import url(https://gilbn.github.io/theme.park/CSS/themes/grafana/grafana-base.css);\n:root {\n  --main-bg-color: radial-gradient(ellipse at center, #47918a 0%, #0b3161 100%) center center/cover no-repeat fixed;\n  --modal-bg-color: radial-gradient(ellipse at top, #47918a 0%, #0b3161 100%) center center/cover no-repeat fixed;\n  --button-color: #009688;\n  --button-color-hover: #12afa0;\n  --accent-color:  #009688;\n  --accent-color-hover: #12afa0;\n  --queue-color: #009688;\n}\n/*DASHBOARD SETINGS*/\n.dashboard-settings,.dashboard-settings__body2 {\n    background: var(--main-bg-color);\n}\n.navbar--edit {\n    background: rgba(0, 0, 0, .25);\n    border-bottom: 1px solid transparent;\n    -webkit-box-shadow: 0 0 10px transparent;\n    box-shadow: 0 0 10px transparent;\n}\n.grafana-info-box {\nbackground-color: rgba(0, 0, 0, .5);\nborder-top: 3px solid var(--accent-color);\n}\nbody {\n    color: #FFFFFF !important;\n    background-color: transparent !important;\n}"
+                    },
+                    "type": "style"
+                  },
+                  {
+                    "props": {
+                      "color": ""
+                    },
+                    "type": "panel-container-bg-color"
+                  }
+                ]
+              }
+            ]
           },
-          "pluginVersion": "7.3.6",
-          "targets": [
-            {
-              "expr": "netatmo_sensor_battery_percent",
-              "interval": "",
-              "legendFormat": "{{module}}",
-              "refId": "A"
-            }
-          ],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "Battery remaining life",
-          "type": "gauge"
+          "pluginVersion": "0.2.1",
+          "title": "",
+          "transparent": true,
+          "type": "yesoreyeram-boomtheme-panel"
         }
       ],
-      "refresh": "30s",
-      "schemaVersion": 26,
-      "style": "dark",
-      "tags": [],
+      "preload": false,
+      "refresh": "5m",
+      "schemaVersion": 41,
+      "tags": [
+        "Prometheus",
+        "Netatmo",
+        "Tado"
+      ],
       "templating": {
         "list": []
       },
       "time": {
-        "from": "now-6h",
+        "from": "now-12h",
         "to": "now"
       },
-      "timepicker": {},
+      "timepicker": {
+        "nowDelay": "",
+        "refresh_intervals": [
+          "10s",
+          "30s",
+          "1m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "1d"
+        ]
+      },
       "timezone": "",
-      "title": "Netatmo Weather Station for Prometheus",
-      "uid": "fTGbYI-Gk",
-      "version": 22,
-      "description": "This dashboard is meant to be used with the Prometheus output from xperimental/netatmo-exporter\r\nhttps://github.com/xperimental/netatmo-exporter\r\nhttps://hub.docker.com/r/xperimental/netatmo-exporter"
+      "title": "Climate",
+      "uid": "TGF-NETATMO",
+      "version": 42
     }
