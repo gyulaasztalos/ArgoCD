@@ -13,4 +13,5 @@ resources:
   - deployment.yaml
   - service.yaml
   - servicemonitor.yaml
+  - ingressroute.yaml
   - grafana-dashboard.yaml

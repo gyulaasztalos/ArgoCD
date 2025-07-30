@@ -12,7 +12,7 @@ spec:
   endpoints:
     - path: /metrics
       interval: 30s
-      targetPort: metrics
+      targetPort: http
       honorLabels: true
   namespaceSelector:
     matchNames:

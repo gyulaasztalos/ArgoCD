@@ -1,0 +1,26 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: netatmo-exporter
+  namespace: netatmo-exporter
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      match: Host(`netatmo-exporter.local.asztalos.net`)
+      priority: 10
+      middlewares:
+        - name: authentik
+          namespace: traefik
+        - name: default-headers
+          namespace: traefik
+      services:
+        - name: netatmo-exporter
+          namespace: netatmo-exporter
+          port: 9120
+  tls:
+    secretName: local-asztalos-net-tls
