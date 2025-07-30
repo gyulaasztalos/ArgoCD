@@ -86,7 +86,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -204,7 +204,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "editorMode": "code",
               "exemplar": true,
@@ -221,7 +221,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -295,7 +295,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "expr": "tado_activity_heating_power_percentage",
               "format": "time_series",
@@ -341,7 +341,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -420,7 +420,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -442,7 +442,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -523,7 +523,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -544,7 +544,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -616,7 +616,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "editorMode": "code",
               "exemplar": false,
@@ -634,7 +634,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -734,7 +734,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -755,7 +755,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -863,7 +863,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -884,7 +884,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -953,7 +953,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "editorMode": "code",
               "exemplar": true,
@@ -970,7 +970,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1060,7 +1060,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "exemplar": true,
               "expr": "netatmo_sensor_pressure_mb",
@@ -1075,7 +1075,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1330,7 +1330,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "exemplar": true,
               "expr": "netatmo_sensor_wind_direction_degrees",
@@ -1347,7 +1347,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1431,7 +1431,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "exemplar": true,
               "expr": "netatmo_sensor_wind_strength_kph",
@@ -1446,7 +1446,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1541,7 +1541,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -1559,7 +1559,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -1581,7 +1581,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1677,7 +1677,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "exemplar": true,
               "expr": "netatmo_sensor_wind_strength_kph",
@@ -1692,7 +1692,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1753,7 +1753,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "exemplar": true,
               "expr": "netatmo_sensor_noise_db",
@@ -1768,7 +1768,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -1893,7 +1893,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -1910,7 +1910,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -1931,7 +1931,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2041,7 +2041,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "exemplar": true,
               "expr": "netatmo_sensor_rain_amount_mm",
@@ -2056,7 +2056,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2145,7 +2145,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "exemplar": true,
               "expr": "netatmo_sensor_noise_db",
@@ -2160,7 +2160,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2253,7 +2253,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "editorMode": "code",
               "exemplar": true,
@@ -2270,7 +2270,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2395,7 +2395,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -2416,7 +2416,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2480,7 +2480,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "editorMode": "builder",
               "exemplar": true,
@@ -2497,7 +2497,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "description": "",
           "fieldConfig": {
@@ -2562,7 +2562,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "expr": "netatmo_sensor_battery_percent",
               "interval": "",
@@ -2576,7 +2576,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2701,7 +2701,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -2722,7 +2722,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2786,7 +2786,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "editorMode": "code",
               "exemplar": true,
@@ -2803,7 +2803,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -2928,7 +2928,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -2949,7 +2949,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -3013,7 +3013,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "editorMode": "code",
               "exemplar": true,
@@ -3030,7 +3030,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -3136,7 +3136,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -3153,7 +3153,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -3174,7 +3174,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -3279,7 +3279,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "editorMode": "code",
               "exemplar": true,
@@ -3296,7 +3296,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -3429,7 +3429,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -3446,7 +3446,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "disableTextWrap": false,
               "editorMode": "builder",
@@ -3467,7 +3467,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+            "uid": "Prometheus"
           },
           "description": "",
           "fieldConfig": {
@@ -3524,7 +3524,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "expr": "-netatmo_sensor_rf_signal_strength",
               "interval": "",
@@ -3534,7 +3534,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "b0ae3c1f-71c3-4e3f-a38c-6e68f083b8ef"
+                "uid": "Prometheus"
               },
               "editorMode": "code",
               "expr": "-netatmo_sensor_wifi_signal_strength",
