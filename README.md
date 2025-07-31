@@ -45,7 +45,7 @@ This repository contains Kubernetes manifests for managing my HomeLab infrastruc
 #### Core Infrastructure
 - **Base System:** Debian 12 Bookworm
 - **Kubernetes:** HA K3s v1.33.1+k3s1
-  - MetalLB (service load balancer)
+  - MetalLB (service load balancer in BGP mode)
   - KubeVIP (control plane LB)
 - **GitOps:** ArgoCD
 - **Storage:** HA Longhorn
@@ -106,6 +106,23 @@ Use the WebUI or the argocd CLI tool!
 `kubectl apply -f bootstrap/app-of-apps.yaml`
 7. **Create EndpointSlice for the unifi-router service:**
 `kubectl apply -f apps/traefik/post-install/unifi-redirect.yaml`
+
+---
+
+### BGP routing
+On the UDM-PRO:
+  - Settings/Policy Engine/BGP -> Create new
+  - Load resources/frr.conf (custom)
+
+**Troubleshooting**
+  - ssh into the UDM-PRO
+  - vtysh
+    - show running-config
+    - show ip bgp summary
+    - show ip bgp neighbors
+    - show ip route
+    - exit
+  - The VIP won't ping!
 
 ---
 
