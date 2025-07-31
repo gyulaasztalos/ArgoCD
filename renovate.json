@@ -33,6 +33,11 @@
     }
   ],
   "platformAutomerge": true,
+  "ansible": {
+    "managerFilePatterns": [
+      "/\\.yml$/"
+    ]
+  },
   "argocd": {
     "managerFilePatterns": [
       "/application\\.yaml$/"
@@ -46,11 +51,6 @@
   "kubernetes": {
     "managerFilePatterns": [
       "/\\.yaml$/"
-    ]
-  },
-  "ansible": {
-    "managerFilePatterns": [
-      "/group_vars/.*\\.ya?ml$/"
     ]
   }
 }
