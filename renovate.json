@@ -50,7 +50,7 @@
   },
   "regexManagers": [
     {
-      "fileMatch": ["/group_vars\/.*\\.ya?ml$/"],
+      "fileMatch": ["/\\.yml$/"],
       "matchStrings": [
         "k3s_version:\\s+(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+\\+k3s[0-9]+)"
       ],
@@ -58,7 +58,7 @@
       "depNameTemplate": "k3s-io/k3s"
     },
     {
-      "fileMatch": ["/group_vars\/.*\\.ya?ml$/"],
+      "fileMatch": ["/\\.yml$/"],
       "matchStrings": [
         "calico_tag:\\s+(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+)"
       ],
@@ -66,7 +66,7 @@
       "depNameTemplate": "projectcalico/calico"
     },
     {
-      "fileMatch": ["/group_vars\/.*\\.ya?ml$/"],
+      "fileMatch": ["/\\.yml$/"],
       "matchStrings": [
         "cilium_tag:\\s+(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+)"
       ],
@@ -74,7 +74,7 @@
       "depNameTemplate": "cilium/cilium"
     },
     {
-      "fileMatch": ["/group_vars\/.*\\.ya?ml$/"],
+      "fileMatch": ["/\\.yml$/"],
       "matchStrings": [
         "kube_vip_tag_version:\\s+(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+)"
       ],
@@ -82,7 +82,7 @@
       "depNameTemplate": "kube-vip/kube-vip"
     },
     {
-      "fileMatch": ["/group_vars\/.*\\.ya?ml$/"],
+      "fileMatch": ["/\\.yml$/"],
       "matchStrings": [
         "metal_lb_(?:speaker|controller)_tag_version:\\s+(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+)"
       ],
