@@ -1241,6 +1241,10 @@ grafana:
       mountPath: /etc/secrets/grafana-secrets
       readOnly: true
 
+  plugins:
+    - grafana-clock-panel
+    - yesoreyeram-boomtheme-panel
+
   grafana.ini:
     auth:
         signout_redirect_url: "https://auth.local.asztalos.net/application/o/grafana/end-session/"
