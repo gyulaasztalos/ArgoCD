@@ -47,5 +47,10 @@
     "managerFilePatterns": [
       "/\\.yaml$/"
     ]
+  },
+  "ansible": {
+    "managerFilePatterns": [
+      "/group_vars/.*\\.ya?ml$/"
+    ]
   }
 }
