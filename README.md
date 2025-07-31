@@ -72,13 +72,15 @@ This repository contains Kubernetes manifests for managing my HomeLab infrastruc
   - Mailrise
 
 #### Deployed Applications
-- Rancher (read-only access)
+- Rancher (use it only for read-only access or ephemeral changes)
 - Nginx (testing)
 - Pi-Hole + Unbound (DNS with TLS forwarding to Cloudflare DNS) + nebula-sync
 - Transmission
 - Flexget
 - Homebridge (with multus macvlan interface)
 - Paperless-NGX
+- netatmo-exporter
+- tado-exporter
 
 ### Bootstrap Process
 1. **Host Preparation:**
