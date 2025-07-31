@@ -47,52 +47,5 @@
     "managerFilePatterns": [
       "/\\.yaml$/"
     ]
-  },
-  "customManagers": [
-    {
-      "customType": "regex",
-      "fileMatch": ["/\\.yml$"],
-      "matchStrings": [
-        "k3s_version:\\s+(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+\\+k3s[0-9]+)"
-      ],
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "k3s-io/k3s"
-    },
-    {
-      "customType": "regex",
-      "fileMatch": ["/\\.yml$"],
-      "matchStrings": [
-        "calico_tag:\\s+(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+)"
-      ],
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "projectcalico/calico"
-    },
-    {
-      "customType": "regex",
-      "fileMatch": ["/\\.yml$"],
-      "matchStrings": [
-        "cilium_tag:\\s+(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+)"
-      ],
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "cilium/cilium"
-    },
-    {
-      "customType": "regex",
-      "fileMatch": ["/\\.yml$"],
-      "matchStrings": [
-        "kube_vip_tag_version:\\s+(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+)"
-      ],
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "kube-vip/kube-vip"
-    },
-    {
-      "customType": "regex",
-      "fileMatch": ["/\\.yml$"],
-      "matchStrings": [
-        "metal_lb_(?:speaker|controller)_tag_version:\\s+(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+)"
-      ],
-      "datasourceTemplate": "github-releases",
-      "depNameTemplate": "metallb/metallb"
-    }
-  ]
+  }
 }
