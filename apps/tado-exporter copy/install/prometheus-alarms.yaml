@@ -1,0 +1,47 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    prometheus: nut-exporter
+    role: alert-rules
+  name: prometheus-nut-exporter-rules
+  namespace: monitoring
+spec:
+  groups:
+  - name: nut-exporter.rules
+    rules:
+      - alert: UPSBatteryNeedsReplacement
+        annotations:
+          message: '{{ $labels.ups }} is indicating a need for a battery replacement.'
+        expr: network_ups_tools_ups_status{flag="RB"} != 0
+        for: 60s
+        labels:
+          severity: high
+      - alert: UPSLowBattery
+        annotations:
+          message: '{{ $labels.ups }} has low battery and is running on backup. Expect shutdown soon'
+        expr: network_ups_tools_ups_status{flag="LB"} == 0 and network_ups_tools_ups_status{flag="OL"} == 0
+        for: 60s
+        labels:
+          severity: critical
+      - alert: UPSRuntimeShort
+        annotations:
+          message: '{{ $labels.ups }} has only {{ $value | humanizeDuration}} of battery autonomy'
+        expr: network_ups_tools_battery_runtime < 300
+        for: 30s
+        labels:
+          severity: high
+      - alert: UPSMainPowerOutage
+        annotations:
+          message: '{{ $labels.ups }} has no main power and is running on backup.'
+        expr: network_ups_tools_ups_status{flag="OL"} == 0
+        for: 60s
+        labels:
+          severity: critical
+      - alert: UPSIndicatesWarningStatus
+        annotations:
+          message: '{{ $labels.ups }} is indicating a need for a battery replacement.'
+        expr: network_ups_tools_ups_status{flag="HB"} != 0
+        for: 60s
+        labels:
+          severity: warning

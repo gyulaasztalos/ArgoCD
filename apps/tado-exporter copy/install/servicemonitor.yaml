@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: nut-exporter-exporter
+  namespace: nut-exporter  # or the namespace where your exporter runs
+  labels:
+    release: prometheus-operator  # match your Prometheus Operator’s selector if needed
+spec:
+  selector:
+    matchLabels:
+      app: nut-exporter  # or the label used by your exporter service
+  endpoints:
+    - path: /ups_metrics
+      interval: 30s
+      targetPort: http
+      honorLabels: true
+  namespaceSelector:
+    matchNames:
+      - nut-exporter
