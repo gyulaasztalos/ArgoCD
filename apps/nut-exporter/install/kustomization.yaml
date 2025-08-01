@@ -13,3 +13,5 @@ resources:
   - service.yaml
   - servicemonitor.yaml
   - grafana-dashboard.yaml
+  - ingressroute.yaml
+  - prometheus-alarms.yaml
