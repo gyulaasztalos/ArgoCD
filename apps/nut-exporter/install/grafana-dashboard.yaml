@@ -765,8 +765,8 @@ data:
                }
              },
              "mappings": [],
-             "max": 140,
-             "min": 90,
+             "max": 250,
+             "min": 200,
              "thresholds": {
                "mode": "absolute",
                "steps": [
@@ -776,7 +776,7 @@ data:
                  },
                  {
                    "color": "red",
-                   "value": 80
+                   "value": 245
                  }
                ]
              },
