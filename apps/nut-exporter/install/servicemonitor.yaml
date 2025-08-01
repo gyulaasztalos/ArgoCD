@@ -10,11 +10,11 @@ spec:
     matchLabels:
       app: nut-exporter  # or the label used by your exporter service
   endpoints:
-    - path: /ups_metrics?ups=keor
+    - path: '/ups_metrics?ups=keor'
       interval: 30s
       targetPort: http
       honorLabels: true
-    - path: /ups_metrics?ups=apc
+    - path: '/ups_metrics?ups=apc'
       interval: 30s
       targetPort: http
       honorLabels: true
