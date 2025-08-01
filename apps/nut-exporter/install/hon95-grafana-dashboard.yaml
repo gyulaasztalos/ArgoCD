@@ -70,68 +70,26 @@ data:
           "datasource": null,
           "description": "",
           "fieldConfig": {
-            "defaults": {
-              "mappings": [
-                {
-                  "from": "",
-                  "id": 0,
-                  "operator": "",
-                  "text": "Unknown",
-                  "to": "",
-                  "type": 1,
-                  "value": "0"
-                },
-                {
-                  "from": "",
-                  "id": 1,
-                  "operator": "",
-                  "text": "Online",
-                  "to": "",
-                  "type": 1,
-                  "value": "1"
-                },
-                {
-                  "from": "",
-                  "id": 2,
-                  "operator": "",
-                  "text": "On battery",
-                  "to": "",
-                  "type": 1,
-                  "value": "2"
-                },
-                {
-                  "from": "",
-                  "id": 3,
-                  "operator": "",
-                  "text": "Low battery",
-                  "to": "",
-                  "type": 1,
-                  "value": "3"
-                }
-              ],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "red",
-                    "value": null
-                  },
-                  {
-                    "color": "green",
-                    "value": 1
-                  },
-                  {
-                    "color": "orange",
-                    "value": 2
-                  },
-                  {
-                    "color": "red",
-                    "value": 3
-                  }
-                ]
-              }
-            },
-            "overrides": []
+           "defaults": {
+             "color": {
+               "mode": "fixed"
+             },
+             "mappings": [],
+             "thresholds": {
+               "mode": "absolute",
+               "steps": [
+                 {
+                   "color": "green",
+                   "value": null
+                 },
+                 {
+                   "color": "red",
+                   "value": 80
+                 }
+               ]
+             }
+           },
+           "overrides": []
           },
           "gridPos": {
             "h": 4,
@@ -145,6 +103,7 @@ data:
             "graphMode": "none",
             "justifyMode": "auto",
             "orientation": "auto",
+            "percentChangeColorMode": "standard",
             "reduceOptions": {
               "calcs": [
                 "lastNotNull"
@@ -152,8 +111,9 @@ data:
               "fields": "",
               "values": false
             },
-            "text": {},
-            "textMode": "auto"
+           "showPercentChange": false,
+           "textMode": "name",
+           "wideLayout": true
           },
           "pluginVersion": "7.5.5",
           "targets": [
