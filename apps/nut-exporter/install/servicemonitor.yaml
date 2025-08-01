@@ -15,13 +15,9 @@ spec:
       targetPort: http
       honorLabels: true
       params:
-        ups: [keor]
-    - path: /ups_metrics
-      interval: 30s
-      targetPort: http
-      honorLabels: true
-      params:
-        ups: [apc]
+        ups:
+          - keor
+          - apc
   namespaceSelector:
     matchNames:
       - nut-exporter
