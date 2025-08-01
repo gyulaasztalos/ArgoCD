@@ -147,7 +147,7 @@ data:
             "orientation": "auto",
             "reduceOptions": {
               "calcs": [
-                "mean"
+                "lastNotNull"
               ],
               "fields": "",
               "values": false
@@ -162,7 +162,7 @@ data:
               "expr": "network_ups_tools_ups_status{ups=~\"${ups:pipe}\"} == 1",
               "instant": true,
               "interval": "",
-              "legendFormat": "{{ups}}",
+              "legendFormat": "{{flag}}",
               "refId": "A"
             }
           ],
