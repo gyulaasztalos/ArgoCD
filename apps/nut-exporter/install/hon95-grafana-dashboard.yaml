@@ -244,15 +244,15 @@ data:
                   },
                   {
                     "color": "#EAB839",
-                    "value": 0.5
+                    "value": 50
                   },
                   {
                     "color": "red",
-                    "value": 0.75
+                    "value": 75
                   }
                 ]
               },
-              "unit": "percentunit"
+              "unit": "percent"
             },
             "overrides": []
           },
@@ -372,7 +372,7 @@ data:
                   "text": "Unknown",
                   "to": "",
                   "type": 1,
-                  "value": "0"
+                  "value": "3"
                 },
                 {
                   "from": "",
@@ -390,16 +390,7 @@ data:
                   "text": "Beeper disabled",
                   "to": "",
                   "type": 1,
-                  "value": "2"
-                },
-                {
-                  "from": "",
-                  "id": 3,
-                  "operator": "",
-                  "text": "Beeper muted",
-                  "to": "",
-                  "type": 1,
-                  "value": "3"
+                  "value": "0"
                 }
               ],
               "noValue": "0",
@@ -753,7 +744,7 @@ data:
             {
               "$$hashKey": "object:153",
               "decimals": null,
-              "format": "percentunit",
+              "format": "percent",
               "label": "",
               "logBase": 1,
               "max": null,
