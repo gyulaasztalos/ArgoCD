@@ -159,7 +159,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "network_ups_tools_ups_status{ups=~\"${ups:pipe}\"}",
+              "expr": "network_ups_tools_ups_status{ups=~\"${ups:pipe}\"} == 1",
               "instant": true,
               "interval": "",
               "legendFormat": "{{ups}}",
