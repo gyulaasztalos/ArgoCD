@@ -159,7 +159,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "nut_status{ups=~\"${ups:pipe}\"}",
+              "expr": "network_ups_tools_ups_status{ups=~\"${ups:pipe}\"}",
               "instant": true,
               "interval": "",
               "legendFormat": "{{ups}}",
@@ -216,7 +216,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "nut_input_voltage_volts{ups=~\"${ups:pipe}\"}",
+              "expr": "network_ups_tools_input_voltage{ups=~\"${ups:pipe}\"}",
               "instant": true,
               "interval": "",
               "legendFormat": "{{ups}}",
@@ -282,7 +282,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "nut_load{ups=~\"${ups:pipe}\"}",
+              "expr": "network_ups_tools_ups_load{ups=~\"${ups:pipe}\"}",
               "instant": true,
               "interval": "",
               "legendFormat": "{{ups}}",
@@ -347,7 +347,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "nut_battery_runtime_seconds{ups=~\"${ups:pipe}\"}",
+              "expr": "network_ups_tools_battery_runtime{ups=~\"${ups:pipe}\"}",
               "instant": true,
               "interval": "",
               "legendFormat": "{{ups}}",
@@ -453,7 +453,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "nut_beeper_status{ups=~\"${ups:pipe}\"}",
+              "expr": "network_ups_tools_ups_beeper_status{ups=~\"${ups:pipe}\"}",
               "instant": true,
               "interval": "",
               "legendFormat": "{{ups}}",
@@ -518,7 +518,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "100 * avg_over_time(nut_battery_charge{ups=~\"${ups:pipe}\"}[$smoothing_interval])",
+              "expr": "100 * avg_over_time(network_ups_tools_battery_charge{ups=~\"${ups:pipe}\"}[$smoothing_interval])",
               "interval": "",
               "legendFormat": "{{ups}}",
               "refId": "A"
@@ -621,7 +621,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "avg_over_time(nut_battery_runtime_seconds{ups=~\"${ups:pipe}\"}[$smoothing_interval])",
+              "expr": "avg_over_time(network_ups_tools_battery_runtime{ups=~\"${ups:pipe}\"}[$smoothing_interval])",
               "interval": "",
               "legendFormat": "{{ups}}",
               "refId": "A"
@@ -724,7 +724,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "avg_over_time(nut_load{ups=~\"${ups:pipe}\"}[$smoothing_interval])",
+              "expr": "avg_over_time(network_ups_tools_ups_load{ups=~\"${ups:pipe}\"}[$smoothing_interval])",
               "hide": false,
               "interval": "",
               "legendFormat": "{{ups}}",
@@ -829,7 +829,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "avg_over_time(nut_battery_voltage_volts{ups=~\"${ups:pipe}\"}[$smoothing_interval])",
+              "expr": "avg_over_time(network_ups_tools_battery_voltage{ups=~\"${ups:pipe}\"}[$smoothing_interval])",
               "interval": "",
               "legendFormat": "{{ups}}",
               "refId": "A"
@@ -932,7 +932,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "avg_over_time(nut_input_voltage_volts{ups=~\"${ups:pipe}\"}[$smoothing_interval])",
+              "expr": "avg_over_time(network_ups_tools_input_voltage{ups=~\"${ups:pipe}\"}[$smoothing_interval])",
               "interval": "",
               "legendFormat": "{{ups}}",
               "refId": "A"
@@ -1035,7 +1035,7 @@ data:
           "targets": [
             {
               "exemplar": true,
-              "expr": "avg_over_time(nut_output_voltage_volts{ups=~\"${ups:pipe}\"}[$smoothing_interval])",
+              "expr": "avg_over_time(network_ups_tools_output_voltage{ups=~\"${ups:pipe}\"}[$smoothing_interval])",
               "interval": "",
               "legendFormat": "{{ups}}",
               "refId": "A"
@@ -1096,7 +1096,7 @@ data:
             "allValue": null,
             "current": {},
             "datasource": "Prometheus",
-            "definition": "nut_ups_info",
+            "definition": "network_ups_tools_device_info",
             "description": null,
             "error": null,
             "hide": 0,
@@ -1106,7 +1106,7 @@ data:
             "name": "ups",
             "options": [],
             "query": {
-              "query": "nut_ups_info",
+              "query": "network_ups_tools_device_info",
               "refId": "StandardVariableQuery"
             },
             "refresh": 1,
