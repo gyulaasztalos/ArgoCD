@@ -655,8 +655,8 @@ data:
          "fieldConfig": {
            "defaults": {
              "mappings": [],
-             "max": 140,
-             "min": 90,
+             "max": 250,
+             "min": 200,
              "thresholds": {
                "mode": "absolute",
                "steps": [
@@ -666,15 +666,15 @@ data:
                  },
                  {
                    "color": "dark-green",
-                   "value": 95
+                   "value": 220
                  },
                  {
                    "color": "dark-yellow",
-                   "value": 125
+                   "value": 240
                  },
                  {
                    "color": "dark-red",
-                   "value": 135
+                   "value": 245
                  }
                ]
              }
