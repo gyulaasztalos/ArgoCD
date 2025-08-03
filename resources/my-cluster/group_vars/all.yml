@@ -41,10 +41,11 @@ kube_vip_arp: true
 kube_vip_bgp: false
 
 # bgp parameters for kube-vip
-kube_vip_bgp_routerid: "127.0.0.1"  # Defines the router ID for the BGP server
-kube_vip_bgp_as: "64513"  # Defines the AS for the BGP server
-kube_vip_bgp_peeraddress: "192.168.30.1"  # Defines the address for the BGP peer
-kube_vip_bgp_peeras: "64512"  # Defines the AS for the BGP peer
+kube_vip_bgp_routerid: "127.0.0.1"  # Defines the router ID for the Control Plane node (should be unique on each node)
+kube_vip_bgp_routerinterface: "eth0"
+kube_vip_bgp_as: "65001"  # Defines the AS for the Control Plane node
+kube_vip_bgp_peeraddress: "10.10.50.1"  # Defines the address for the external router
+kube_vip_bgp_peeras: "65000"  # Defines the AS for the external router
 
 # apiserver_endpoint is virtual ip-address which will be configured on each master
 apiserver_endpoint: 10.10.50.20
