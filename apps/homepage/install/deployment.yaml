@@ -64,6 +64,8 @@ spec:
             - configMapRef:
                 name: homepage-env
           volumeMounts:
+            - mountPath: /app/config
+              name: config
             - mountPath: /app/config/bookmarks.yaml
               name: homepage-config
               subPath: bookmarks.yaml
@@ -91,6 +93,8 @@ spec:
             - mountPath: /app/config/logs
               name: logs
       volumes:
+        - name: config
+          emptyDir: {}
         - name: homepage-config
           configMap:
             name: homepage-config
