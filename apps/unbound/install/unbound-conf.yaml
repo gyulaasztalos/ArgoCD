@@ -332,7 +332,7 @@ data:
         # FORWARD ZONE
         ###########################################################################
 
-        include: /etc/unbound/forward-records.conf
+        # include: /etc/unbound/forward-records.conf
 
     remote-control:
         control-enable: yes
