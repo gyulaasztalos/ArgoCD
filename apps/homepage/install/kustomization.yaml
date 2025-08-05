@@ -21,6 +21,7 @@ configMapGenerator:
       - telekom.png=./images/telekom.png
 
 resources:
+  - homepage-secret.yaml
   - serviceaccount.yaml
   - rbac.yaml
   - deployment.yaml
