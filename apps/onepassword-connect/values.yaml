@@ -23,6 +23,7 @@ connect:
         memory: 128Mi
       requests:
         cpu: 0.2
+        memory: 64Mi
     httpPort: 8080
     httpsPort: 8443
     logLevel: info

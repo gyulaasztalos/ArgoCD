@@ -398,7 +398,7 @@ server:
       memory: 2Gi
       cpu: 1000m
     requests:
-      memory: 512Mi
+      memory: 768Mi
       cpu: 500m
 
   # authentik server container ports

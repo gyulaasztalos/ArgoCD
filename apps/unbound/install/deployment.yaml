@@ -38,10 +38,10 @@ spec:
               add: [NET_BIND_SERVICE]  # Only if using privileged ports (e.g., 53)
           resources:
             requests:
-              memory: "128Mi"
+              memory: "64Mi"
               cpu: "100m"
             limits:
-              memory: "256Mi"
+              memory: "128Mi"
               cpu: "250m"
           ports:
             - name: "dns-udp"

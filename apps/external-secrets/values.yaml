@@ -194,7 +194,7 @@ resources:
     memory: 256Mi
   requests:
     cpu: 10m
-    memory: 64Mi
+    memory: 128Mi
 
 serviceMonitor:
   # -- Specifies whether to create a ServiceMonitor resource for collecting Prometheus metrics
@@ -452,10 +452,10 @@ webhook:
   resources:
     limits:
       cpu: 50m
-      memory: 128Mi
+      memory: 256Mi
     requests:
       cpu: 5m
-      memory: 32Mi
+      memory: 128Mi
 
   # -- Manage the service through which the webhook is reached.
   service:
