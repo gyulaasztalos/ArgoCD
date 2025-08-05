@@ -1,0 +1,26 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: homepage
+  namespace: homepage
+  annotations:
+    kubernetes.io/ingress.class: traefik-external
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - kind: Rule
+      middlewares:
+        - name: authentik
+          namespace: traefik
+        - name: default-headers
+          namespace: traefik
+      match: Host(`homepage.local.asztalos.net`)
+      priority: 10
+      services:
+        - name: homepage
+          namespace: homepage
+          port: 3000
+  tls:
+    secretName: local-asztalos-net-tls

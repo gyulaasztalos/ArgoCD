@@ -30,3 +30,4 @@ resources:
   - netatmo-exporter/application.yaml
   - tado-exporter/application.yaml
   - nut-exporter/application.yaml
+  - homepage/application.yaml

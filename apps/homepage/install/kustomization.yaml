@@ -1,0 +1,28 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+configMapGenerator:
+  - name: homepage-env
+    namespace: homepage
+    env: homepage-config.env
+  - name: homepage-config
+    namespace: homepage
+    files:
+      - bookmarks.yaml=./config/bookmarks.yaml
+      - kubernetes.yaml=./config/kubernetes.yaml
+      - settings.yaml=./config/settings.yaml
+      - widgets.yaml=./config/widgets.yaml
+  - name: homepage-images
+    namespace: homepage
+    files:
+      - nostromo.jpg=./images/nostromo.jpg
+      - nut.png=./images/nut.png
+      - telekom.png=./images/telekom.png
+
+resources:
+  - serviceaccount.yaml
+  - rbac.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingressroute.yaml

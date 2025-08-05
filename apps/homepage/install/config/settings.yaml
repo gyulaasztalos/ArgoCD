@@ -1,0 +1,62 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/latest/configs/settings
+
+providers:
+  openweathermap: openweathermapapikey
+  weatherapi: weatherapiapikey
+
+title: Nostromo Homepage
+startUrl: https://homepage.local.asztalos.net
+favicon: favicon-32x32.png
+color: slate
+background: /images/nostromo.jpg
+theme: dark # or light
+
+headerStyle: clean
+
+target: _blank
+cardBlur: xl # sm, "", md, etc... see https://tailwindcss.com/docs/backdrop-blur
+
+layout:
+  Misc 1:
+    style: row
+    columns: 3
+    header: false
+  Line 0A:
+    header: false
+  Line 0B:
+    header: false
+  Line 0C:
+    header: false
+  Line 0D:
+    header: false
+  Line 1:
+    style: row
+    columns: 4
+    header: false
+  Line 2:
+    style: row
+    columns: 4
+    header: false
+  Line 3:
+    style: row
+    columns: 4
+    header: false
+  Line 4:
+    style: row
+    columns: 4
+    header: false
+  Line 5:
+    style: row
+    columns: 4
+    header: false
+
+
+quicklaunch:
+  searchDescriptions: true
+  hideInternetSearch: true
+  hideVisitURL: true
+
+# showStats: true
+# statusStyle: "dot"

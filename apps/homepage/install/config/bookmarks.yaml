@@ -1,0 +1,15 @@
+---
+
+- Misc 1:
+  - Telekom:
+    - icon: /images/telekom.png
+      href: https://192.168.0.1
+      description: ""
+  - Printer:
+    - icon: printer
+      href: http://printer.local.asztalos.net
+      description: ""
+  - NUT:
+    - icon: /images/nut.png
+      href: http://raspberrypi.local.asztalos.net:8080/cgi-bin/nut/upsstats.cgi
+      description: ""

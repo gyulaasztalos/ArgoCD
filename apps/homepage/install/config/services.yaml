@@ -1,0 +1,137 @@
+---
+# For configuration options and examples, please see:
+# https://gethomepage.dev/en/configs/services
+
+- Line 0A:
+    - Unifi:
+        icon: unifi
+        href: https://unifi.local.asztalos.net
+        widget:
+            type: unifi
+            url: https://unifi.local.asztalos.net
+            username: homepage
+            password: jTVJYnUBbEtT2tB88dPgHZ3CpWwJWwu9puffUQZZcJFWk3szCL
+
+- Line 0B:
+    - UNVR-PRO:
+        icon: unifi
+        href: https://unvr-pro.local.asztalos.net
+        ping: https://unvr-pro.local.asztalos.net
+    - Apprise:
+        icon: apprise
+        href: https://apprise.local.asztalos.net/cfg/apprise
+        ping: https://apprise.local.asztalos.net/cfg/apprise
+        app: apprise
+        namespace: apprise
+
+- Line 0C:
+    - FlexGet:
+        icon: flexget
+        href: https://flexget.local.asztalos.net
+        ping: https://flexget.local.asztalos.net
+        app: flexget
+        namespace: flexget
+    - ddns-updater:
+        icon: ddns-updater
+        href: https://ddns-updater.local.asztalos.net
+        ping: https://ddns-updater.local.asztalos.net
+        app: ddns-updater
+        namespace: ddns-updater
+
+- Line 1:
+    - Traefik:
+        icon: traefik
+        href: https://traefik-archer.local.asztalos.net
+        ping: https://traefik-archer.local.asztalos.net
+        app: traefik
+        namespace: traefik
+        widget:
+            type: traefik
+            url: http://traefik:8080
+            username: red # optional
+            password: red:$$2y$$05$$Hc76uVPRRNXzjOrr6u/GzevStnCax.D4bVCi2loRoTo9ODbHR.n96 # optional
+
+- Line 2:
+    - Homebridge:
+        icon: homebridge
+        href: https://homebridge.local.asztalos.net
+        ping: https://homebridge.local.asztalos.net
+        app: homebridge
+        namespace: homebridge
+        widget:
+            type: homebridge
+            url: https://homebridge.local.asztalos.net
+            username: homepage
+            password: 4V7gGhEnXiF2n3j2Rj7MNtRs98Jmcc23kA*o6EbpwoRBAVhrr@
+
+    - Pi-Hole Raspberry Pi:
+        icon: pi-hole
+        href: https://pihole-rpi.local.asztalos.net/admin/
+        ping: https://pihole-rpi.local.asztalos.net/admin/
+        widget:
+            type: pihole
+            version: 6
+            url: https://pihole-rpi.local.asztalos.net
+            key: USF+PfF/BY/Ke0/MRcQpP0a6E0aw5wwFmIhAnsjrcww= # optional
+
+    - Pi-Hole Archer:
+        icon: pi-hole
+        href: https://pihole.local.asztalos.net/admin/
+        ping: https://pihole.local.asztalos.net/admin/
+        app: pihole
+        namespace: pihole
+        widget:
+            type: pihole
+            version: 6
+            url: https://pihole.local.asztalos.net
+            key: USF+PfF/BY/Ke0/MRcQpP0a6E0aw5wwFmIhAnsjrcww= # optional
+
+    - Transmission:
+#        description: Torrent client
+        icon: transmission
+        href: http://transmission.local.asztalos.net:9091/transmission/web/
+        ping: http://transmission.local.asztalos.net:9091/transmission/web/
+        app: transmission
+        namespace: transmission
+        widget:
+            type: transmission
+            url: http://archer.local.asztalos.net:9091
+            username: transmission
+            password: 4378beaNXT0fUhQ
+            rpcUrl: /transmission/ # Optional. Matches the value of "rpc-url" in your Transmission's settings.json file
+
+- Line 4:
+    - Prometheus:
+#        description: Metrics scraper
+        icon: prometheus
+        href: https://prometheus.local.asztalos.net
+        ping: https://prometheus.local.asztalos.net
+        app: prometheus
+        namespace: monitoring
+        widget:
+            type: prometheus
+            url: http://prometheus:9090
+
+    - Grafana:
+        icon: grafana
+        href: https://grafana-docker.local.asztalos.net
+        ping: https://grafana-docker.local.asztalos.net
+        app: grafana
+        namespace: monitoring
+        widget:
+          type: grafana
+          url: http://grafana:3000
+          username: admin
+          password: sHFQRHWfVgJL2-XhEFJv6wAFmU3Zje6e9T9KeHM3QQ_xrNdBZo
+
+    - Paperless-ngx:
+        icon: paperless-ngx
+        href: https://paperless-docker.local.asztalos.net
+        ping: https://paperless-docker.local.asztalos.net
+        app: paperless-ngx
+        namespace: paperless-ngx
+        widget:
+            type: paperlessngx
+            url: http://paperless:8000
+            username: homepage
+            password: 4V7gGhEnXiF2n3j2Rj7MNtRs98Jmcc23kA*o6EbpwoRBAVhrr@
