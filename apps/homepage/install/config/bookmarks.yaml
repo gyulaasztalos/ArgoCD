@@ -11,5 +11,5 @@
       description: ""
   - NUT:
     - icon: /images/nut.png
-      href: http://raspberrypi.local.asztalos.net:8080/cgi-bin/nut/upsstats.cgi
+      href: http://raspberrypi.local.asztalos.net:8085/cgi-bin/nut/upsstats.cgi
       description: ""
