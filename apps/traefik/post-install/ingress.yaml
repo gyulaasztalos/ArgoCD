@@ -9,8 +9,15 @@ spec:
   entryPoints:
     - websecure
   routes:
+    - kind: Rule
+      match: Host(`traefik.local.asztalos.net`) && PathPrefix(`/api/`)
+      priority: 25  # Higher than your main route
+      services:
+        - name: api@internal
+          kind: TraefikService
     - match: Host(`traefik.local.asztalos.net`)
       kind: Rule
+      priority: 20
       middlewares:
         - name: authentik
           namespace: traefik
