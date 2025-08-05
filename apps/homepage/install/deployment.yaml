@@ -70,9 +70,6 @@ spec:
             - mountPath: /app/config/kubernetes.yaml
               name: homepage-config
               subPath: kubernetes.yaml
-            - mountPath: /app/config/services.yaml
-              name: homepage-config
-              subPath: services.yaml
             - mountPath: /app/config/settings.yaml
               name: homepage-config
               subPath: settings.yaml
@@ -88,12 +85,21 @@ spec:
             - mountPath: /app/public/images/telekom.png
               name: homepage-images
               subPath: telekom.png
+            - mountPath: /app/config/services.yaml
+              name: homepage-secret
+              subPath: services.yaml
             - mountPath: /app/config/logs
               name: logs
       volumes:
         - name: homepage-config
           configMap:
-            name: homepage
+            name: homepage-config
+        - name: homepage-images
+          configMap:
+            name: homepage-images
+        - name: homepage-secret
+          secret:
+            secretName: homepage-secret
         - name: logs
           emptyDir: {}
       restartPolicy: Always
