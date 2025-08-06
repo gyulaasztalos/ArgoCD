@@ -21,6 +21,7 @@ spec:
   template:
     metadata:
       labels:
+        app.kubernetes.io/name: ddns-updater
         app: ddns-updater
     spec:
       containers:

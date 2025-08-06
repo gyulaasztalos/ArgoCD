@@ -25,6 +25,7 @@ spec:
   template:
     metadata:
       labels:
+        app.kubernetes.io/name: apprise
         app: apprise
     spec:
       containers:

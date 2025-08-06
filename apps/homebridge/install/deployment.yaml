@@ -24,6 +24,7 @@ spec:
   template:
     metadata:
       labels:
+        app.kubernetes.io/name: homebridge
         app: homebridge
       annotations:
         k8s.v1.cni.cncf.io/networks: |
