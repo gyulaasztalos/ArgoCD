@@ -16,7 +16,7 @@ configMapGenerator:
   - name: homepage-images
     namespace: homepage
     files:
-      - nostromo.jpg=./images/nostromo.jpg
+      - custom_background.jpg=./images/custom_background.jpg
       - telekom.png=./images/telekom.png
 
 resources:

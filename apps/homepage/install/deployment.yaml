@@ -79,9 +79,9 @@ spec:
             - mountPath: /app/config/widgets.yaml
               name: homepage-config
               subPath: widgets.yaml
-            - mountPath: /app/public/images/nostromo.jpg
+            - mountPath: /app/public/images/custom_background.jpg
               name: homepage-images
-              subPath: nostromo.jpg
+              subPath: custom_background.jpg
             - mountPath: /app/public/images/telekom.png
               name: homepage-images
               subPath: telekom.png

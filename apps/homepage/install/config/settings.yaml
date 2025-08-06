@@ -6,11 +6,11 @@ providers:
   openweathermap: openweathermapapikey
   weatherapi: weatherapiapikey
 
-title: Nostromo Homepage
+title: Homelab Homepage
 startUrl: https://homepage.local.asztalos.net
 favicon: favicon-32x32.png
 color: slate
-background: /images/nostromo.jpg
+background: /images/custom_background.jpg
 theme: dark # or light
 
 headerStyle: clean
