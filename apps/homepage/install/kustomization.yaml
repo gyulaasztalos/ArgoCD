@@ -17,7 +17,6 @@ configMapGenerator:
     namespace: homepage
     files:
       - nostromo.jpg=./images/nostromo.jpg
-      - nut.png=./images/nut.png
       - telekom.png=./images/telekom.png
 
 resources:

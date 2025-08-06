@@ -81,9 +81,6 @@ spec:
             - mountPath: /app/public/images/nostromo.jpg
               name: homepage-images
               subPath: nostromo.jpg
-            - mountPath: /app/public/images/nut.png
-              name: homepage-images
-              subPath: nut.png
             - mountPath: /app/public/images/telekom.png
               name: homepage-images
               subPath: telekom.png
