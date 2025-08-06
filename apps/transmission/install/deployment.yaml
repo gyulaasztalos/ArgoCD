@@ -24,6 +24,7 @@ spec:
   template:
     metadata:
       labels:
+        app.kubernetes.io/name: transmission
         app: transmission
     spec:
       initContainers:
