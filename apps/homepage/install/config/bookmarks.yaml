@@ -10,6 +10,6 @@
       href: http://printer.local.asztalos.net
       description: ""
   - NUT:
-    - icon: /images/nut.png
+    - icon: nut
       href: http://raspberrypi.local.asztalos.net:8085/cgi-bin/nut/upsstats.cgi
       description: ""
