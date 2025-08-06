@@ -8,6 +8,7 @@
     "before 4pm every weekday",
     "every weekend"
   ],
+  "timezone": "Europe/Budapest",
   "packageRules": [
     {
       "matchUpdateTypes": [
