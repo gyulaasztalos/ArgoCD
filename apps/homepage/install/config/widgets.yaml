@@ -2,10 +2,21 @@
 - logo:
     icon: homepage
 
-- search:
-    provider: duckduckgo # google, duckduckgo, bing, baidu, brave or custom
-    focus: true # Optional, will set focus to the search bar on page load
-    target: _blank # One of _self, _blank, _parent or _top
+- datetime:
+    locale: hu
+    text_size: md
+    format:
+        dateStyle: short
+        timeStyle: short
+        hourCycle: h23
+
+- openmeteo:
+    label: Szentendre #optional
+    latitude: 47.69
+    longitude: 19.08
+    timezone: Europe/Budapest # optional
+    units: metric # or imperial
+    cache: 5 # Time in minutes to cache API responses, to stay within limits
 
 - kubernetes:
     cluster:
@@ -28,6 +39,11 @@
       # Shows the label, which is always the node name
       showLabel: true
 
+- search:
+    provider: duckduckgo # google, duckduckgo, bing, baidu, brave or custom
+    focus: true # Optional, will set focus to the search bar on page load
+    target: _blank # One of _self, _blank, _parent or _top
+
 # - resources:
 #    label: System
 #    cpu: true
@@ -36,19 +52,3 @@
 #- resources:
 #    label: Storage
 #    disk: /mnt/storage
-
-- openmeteo:
-    label: Szentendre #optional
-    latitude: 47.69
-    longitude: 19.08
-    timezone: Europe/Budapest # optional
-    units: metric # or imperial
-    cache: 5 # Time in minutes to cache API responses, to stay within limits
-
-- datetime:
-    locale: hu
-    text_size: md
-    format:
-        dateStyle: short
-        timeStyle: short
-        hourCycle: h23
