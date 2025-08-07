@@ -23,7 +23,7 @@ spec:
       maxUnavailable: 1
   selector:
     matchLabels:
-      app: paperless-ngx
+      app.kubernetes.io/name: paperless-ngx
   template:
     metadata:
       labels:

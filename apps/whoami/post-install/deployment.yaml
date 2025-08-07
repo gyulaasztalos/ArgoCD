@@ -20,7 +20,7 @@ spec:
       maxUnavailable: 1
   selector:
     matchLabels:
-      app: whoami
+      app.kubernetes.io/name: whoami
   template:
     metadata:
       labels:

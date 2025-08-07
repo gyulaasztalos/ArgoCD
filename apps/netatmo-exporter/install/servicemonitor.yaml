@@ -8,7 +8,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: netatmo-exporter  # or the label used by your exporter service
+      app.kubernetes.io/name: netatmo-exporter  # or the label used by your exporter service
   endpoints:
     - path: /metrics
       interval: 30s

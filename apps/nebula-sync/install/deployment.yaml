@@ -20,7 +20,7 @@ spec:
       maxUnavailable: 1
   selector:
     matchLabels:
-      app: nebula-sync
+      app.kubernetes.io/name: nebula-sync
   template:
     metadata:
       labels:

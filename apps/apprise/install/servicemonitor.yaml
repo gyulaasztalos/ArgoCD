@@ -8,7 +8,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: apprise
+      app.kubernetes.io/name: apprise
   endpoints:
     - port: http
       path: /metrics

@@ -8,7 +8,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: pihole  # or the label used by your exporter service
+      app.kubernetes.io/name: pihole  # or the label used by your exporter service
   endpoints:
     - port: prometheus  # or the port name used by your exporter service
       interval: 30s

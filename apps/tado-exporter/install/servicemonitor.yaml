@@ -8,7 +8,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: tado-exporter  # or the label used by your exporter service
+      app.kubernetes.io/name: tado-exporter  # or the label used by your exporter service
   endpoints:
     - path: /metrics
       interval: 30s

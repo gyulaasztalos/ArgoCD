@@ -8,7 +8,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: unbound  # or the label used by your exporter service
+      app.kubernetes.io/name: unbound  # or the label used by your exporter service
   endpoints:
     - path: /metrics
       interval: 30s

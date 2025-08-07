@@ -24,7 +24,7 @@ spec:
       maxUnavailable: 1
   selector:
     matchLabels:
-      app: apprise
+      app.kubernetes.io/name: apprise
   template:
     metadata:
       labels:

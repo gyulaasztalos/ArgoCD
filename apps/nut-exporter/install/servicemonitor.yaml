@@ -8,7 +8,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: nut-exporter  # or the label used by your exporter service
+      app.kubernetes.io/name: nut-exporter  # or the label used by your exporter service
   endpoints:
     - path: /ups_metrics
       interval: 30s

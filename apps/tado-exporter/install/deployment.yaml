@@ -20,7 +20,7 @@ spec:
       maxUnavailable: 1
   selector:
     matchLabels:
-      app: tado-exporter
+      app.kubernetes.io/name: tado-exporter
   template:
     metadata:
       labels:
