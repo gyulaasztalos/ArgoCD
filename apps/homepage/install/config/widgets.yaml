@@ -2,14 +2,6 @@
 - logo:
     icon: homepage
 
-- datetime:
-    locale: hu
-    text_size: md
-    format:
-        dateStyle: short
-        timeStyle: short
-        hourCycle: h23
-
 - openmeteo:
     label: Szentendre #optional
     latitude: 47.69
@@ -38,6 +30,14 @@
       memory: true
       # Shows the label, which is always the node name
       showLabel: true
+
+- datetime:
+    locale: hu
+    text_size: md
+    format:
+        dateStyle: short
+        timeStyle: short
+        hourCycle: h23
 
 - search:
     provider: duckduckgo # google, duckduckgo, bing, baidu, brave or custom
