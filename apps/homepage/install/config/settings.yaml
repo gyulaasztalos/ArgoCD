@@ -5,6 +5,8 @@
 providers:
   openweathermap: openweathermapapikey
   weatherapi: weatherapiapikey
+  longhorn:
+    url: http://longhorn-frontend.longhorn-system.svc.cluster.local
 
 title: Homelab Homepage
 startUrl: https://homepage.local.asztalos.net
