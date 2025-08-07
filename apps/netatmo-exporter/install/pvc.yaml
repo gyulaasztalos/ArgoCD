@@ -6,6 +6,9 @@ metadata:
   namespace: netatmo-exporter
   labels:
     app: netatmo-exporter
+    app.kubernetes.io/name: netatmo-exporter
+    app.kubernetes.io/part-of: netatmo-exporter
+    app.kubernetes.io/instance: netatmo-exporter
 spec:
   accessModes:
     - ReadWriteOnce

@@ -8,6 +8,9 @@ metadata:
     kubernetes.io/ingress.class: traefik-external
   labels:
     app: homebridge
+    app.kubernetes.io/name: homebridge
+    app.kubernetes.io/part-of: homebridge
+    app.kubernetes.io/instance: homebridge
 spec:
   entryPoints:
     - websecure

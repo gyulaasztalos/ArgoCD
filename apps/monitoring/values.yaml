@@ -1525,6 +1525,9 @@ grafana:
     # labels for the ServiceMonitor
     labels:
       app: grafana
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/part-of: grafana
+      app.kubernetes.io/instance: grafana
       prometheus: kube-prometheus-stack
 
     # Scrape interval. If not set, the Prometheus default scrape interval is used.

@@ -6,6 +6,9 @@ metadata:
   namespace: paperless-ngx
   labels:
     app: paperless-ngx
+    app.kubernetes.io/name: paperless-ngx
+    app.kubernetes.io/part-of: paperless-ngx
+    app.kubernetes.io/instance: paperless-ngx
   annotations:
     ignore-check.kube-linter.io/no-read-only-root-fs: "LinuxServer.io images do not require a read-only root filesystem"
     ignore-check.kube-linter.io/run-as-non-root: "LinuxServer.io images do not require a non-root user"
@@ -25,6 +28,8 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: paperless-ngx
+        app.kubernetes.io/part-of: paperless-ngx
+        app.kubernetes.io/instance: paperless-ngx
         app: paperless-ngx
     spec:
       containers:

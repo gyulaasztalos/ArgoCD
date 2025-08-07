@@ -6,6 +6,9 @@ metadata:
   namespace: homepage
   labels:
     app: homepage
+    app.kubernetes.io/name: homepage
+    app.kubernetes.io/part-of: homepage
+    app.kubernetes.io/instance: homepage
 spec:
   selector:
     app: homepage

@@ -8,6 +8,9 @@ metadata:
     kubernetes.io/ingress.class: traefik-external
   labels:
     app: whoami
+    app.kubernetes.io/name: whoami
+    app.kubernetes.io/part-of: whoami
+    app.kubernetes.io/instance: whoami
 spec:
   entryPoints:
     - websecure

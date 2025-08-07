@@ -8,6 +8,9 @@ metadata:
     kubernetes.io/ingress.class: traefik-external
   labels:
     app: nginx
+    app.kubernetes.io/name: nginx
+    app.kubernetes.io/part-of: nginx
+    app.kubernetes.io/instance: nginx
 spec:
   entryPoints:
     - websecure

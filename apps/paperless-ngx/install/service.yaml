@@ -5,6 +5,9 @@ metadata:
   namespace: paperless-ngx
   labels:
     app: paperless-ngx
+    app.kubernetes.io/name: paperless-ngx
+    app.kubernetes.io/part-of: paperless-ngx
+    app.kubernetes.io/instance: paperless-ngx
 spec:
   type: ClusterIP
   selector:

@@ -5,6 +5,9 @@ metadata:
   namespace: transmission
   labels:
     app: transmission
+    app.kubernetes.io/name: transmission
+    app.kubernetes.io/part-of: transmission
+    app.kubernetes.io/instance: transmission
   annotations:
     metallb.io/allow-shared-ip: "true"
 spec:
@@ -29,6 +32,9 @@ metadata:
   namespace: transmission
   labels:
     app: transmission
+    app.kubernetes.io/name: transmission
+    app.kubernetes.io/part-of: transmission
+    app.kubernetes.io/instance: transmission
   annotations:
     metallb.io/allow-shared-ip: "true"
 spec:

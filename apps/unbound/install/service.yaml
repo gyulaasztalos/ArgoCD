@@ -6,6 +6,9 @@ metadata:
   namespace: unbound
   labels:
     app: unbound
+    app.kubernetes.io/name: unbound
+    app.kubernetes.io/part-of: unbound
+    app.kubernetes.io/instance: unbound
 spec:
   selector:
     app: unbound

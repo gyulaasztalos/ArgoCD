@@ -5,6 +5,9 @@ metadata:
   name: homepage
   labels:
     app: homepage
+    app.kubernetes.io/name: homepage
+    app.kubernetes.io/part-of: homepage
+    app.kubernetes.io/instance: homepage
 rules:
   - apiGroups:
       - ""
@@ -53,6 +56,9 @@ metadata:
   name: homepage
   labels:
     app: homepage
+    app.kubernetes.io/name: homepage
+    app.kubernetes.io/part-of: homepage
+    app.kubernetes.io/instance: homepage
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

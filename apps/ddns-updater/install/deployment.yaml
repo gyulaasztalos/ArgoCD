@@ -6,6 +6,9 @@ metadata:
   namespace: ddns-updater
   labels:
     app: ddns-updater
+    app.kubernetes.io/name: ddns-updater
+    app.kubernetes.io/part-of: ddns-updater
+    app.kubernetes.io/instance: ddns-updater
 spec:
   replicas: 1
   progressDeadlineSeconds: 600
@@ -22,6 +25,8 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: ddns-updater
+        app.kubernetes.io/part-of: ddns-updater
+        app.kubernetes.io/instance: ddns-updater
         app: ddns-updater
     spec:
       containers:

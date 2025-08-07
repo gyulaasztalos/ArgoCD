@@ -6,6 +6,9 @@ metadata:
   namespace: default
   labels:
     app: whoami
+    app.kubernetes.io/name: whoami
+    app.kubernetes.io/part-of: whoami
+    app.kubernetes.io/instance: whoami
 spec:
   replicas: 4
   progressDeadlineSeconds: 600
@@ -22,6 +25,9 @@ spec:
     metadata:
       labels:
         app: whoami
+        app.kubernetes.io/name: whoami
+        app.kubernetes.io/part-of: whoami
+        app.kubernetes.io/instance: whoami
     spec:
       containers:
         - name: whoami

@@ -5,6 +5,9 @@ metadata:
   namespace: apprise
   labels:
     app: apprise
+    app.kubernetes.io/name: apprise
+    app.kubernetes.io/part-of: apprise
+    app.kubernetes.io/instance: apprise
 spec:
   groups:
     - name: apprise.rules

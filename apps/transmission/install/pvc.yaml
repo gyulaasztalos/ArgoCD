@@ -5,6 +5,9 @@ metadata:
   namespace: transmission
   labels:
     app: transmission
+    app.kubernetes.io/name: transmission
+    app.kubernetes.io/part-of: transmission
+    app.kubernetes.io/instance: transmission
 spec:
   accessModes:
     - ReadWriteMany
@@ -20,6 +23,9 @@ metadata:
   namespace: transmission
   labels:
     app: transmission
+    app.kubernetes.io/name: transmission
+    app.kubernetes.io/part-of: transmission
+    app.kubernetes.io/instance: transmission
 spec:
   accessModes:
     - ReadWriteOnce
