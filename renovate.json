@@ -3,7 +3,7 @@
   "extends": [
     "config:recommended"
   ],
-  "schedule": [
+  "automergeSchedule": [
     "after 5am every weekday",
     "before 4pm every weekday",
     "every weekend"
@@ -33,7 +33,7 @@
       "automerge": true
     }
   ],
-  "platformAutomerge": true,
+  "platformAutomerge": false,
   "argocd": {
     "managerFilePatterns": [
       "/application\\.yaml$/"
