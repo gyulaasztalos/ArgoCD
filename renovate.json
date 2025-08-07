@@ -48,5 +48,15 @@
     "managerFilePatterns": [
       "/\\.yaml$/"
     ]
-  }
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update versions in Ansible vars with renovate comments",
+      "fileMatch": ["resources/my-cluster/group_vars/all\\.yml$"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>.+?) packageName=(?<packageName>.+?)(?:\\s+versioning=(?<versioning>[a-z-]+?))?\\s*\\n.+?:\\s*(?<currentValue>.+?)\\s*$"
+      ]
+    }
+  ]
 }
