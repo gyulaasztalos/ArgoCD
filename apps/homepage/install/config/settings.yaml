@@ -21,6 +21,22 @@ target: _blank
 cardBlur: xl # sm, "", md, etc... see https://tailwindcss.com/docs/backdrop-blur
 
 layout:
+  Misc 0A:
+    style: row
+    columns: 3
+    header: false
+  Misc 0B:
+    style: row
+    columns: 1
+    header: false
+  Misc 0C:
+    style: row
+    columns: 1
+    header: false
+  Misc 0D:
+    style: row
+    columns: 1
+    header: false
   Misc 1:
     style: row
     columns: 3
