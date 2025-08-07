@@ -1,4 +1,6 @@
 ---
+playbook_version: 
+# renovate: datasource=github-releases depName=k3s packageName=k3s-io/k3s
 k3s_version: v1.33.3+k3s1
 # this is the user that has ssh access to these machines
 ansible_user: red
@@ -13,12 +15,14 @@ flannel_iface: eth0
 # uncomment calico_iface to use tigera operator/calico cni instead of flannel https://docs.tigera.io/calico/latest/about
 # calico_iface: "eth0"
 calico_ebpf: false # use eBPF dataplane instead of iptables
+# renovate: datasource=github-releases depName=calico packageName=projectcalico/calico versioning=semver
 calico_tag: v3.28.0 # calico version tag
 
 # uncomment cilium_iface to use cilium cni instead of flannel or calico
 # ensure v4.19.57, v5.1.16, v5.2.0 or more recent kernel
 # cilium_iface: "eth0"
 cilium_mode: native # native when nodes on same subnet or using bgp, else set routed
+# renovate: datasource=github-releases depName=cilium packageName=cilium/cilium versioning=semver
 cilium_tag: v1.16.0 # cilium version tag
 cilium_hubble: true # enable hubble observability relay and ui
 
@@ -86,6 +90,7 @@ extra_agent_args: >-
   {{ extra_args }}
 
 # image tag for kube-vip
+# renovate: datasource=github-releases depName=kube-vip packageName=kube-vip/kube-vip versioning=semver
 kube_vip_tag_version: v0.9.1
 # v0.8.2
 
@@ -108,7 +113,9 @@ metal_lb_bgp_peer_asn: "65000"
 metal_lb_bgp_peer_address: "10.10.50.1"
 
 # image tag for metal lb
+# renovate: datasource=github-releases depName=metallb packageName=metallb/metallb versioning=semver
 metal_lb_speaker_tag_version: v0.15.1
+# renovate: datasource=github-releases depName=metallb packageName=metallb/metallb versioning=semver
 metal_lb_controller_tag_version: v0.15.1
 
 # metallb ip range for load balancer
