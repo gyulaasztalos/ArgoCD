@@ -1,5 +1,6 @@
 ---
-playbook_version: 
+# renovate: datasource=github-releases depName=k3s-ansible packageName=techno-tim/k3s-ansible
+playbook_version: v1.30.2+k3s2+tt1
 # renovate: datasource=github-releases depName=k3s packageName=k3s-io/k3s
 k3s_version: v1.33.3+k3s1
 # this is the user that has ssh access to these machines
