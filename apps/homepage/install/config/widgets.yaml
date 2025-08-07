@@ -1,6 +1,4 @@
 ---
-- logo:
-    icon: homepage
 
 - kubernetes:
     nodes:
@@ -26,6 +24,9 @@
 - greeting:
     text_size: xl
     text: Praise the Omnissiah!
+
+- logo:
+    icon: homepage
 
 - longhorn:
     # Show the expanded view
