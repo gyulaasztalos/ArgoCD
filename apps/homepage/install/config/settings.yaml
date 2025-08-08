@@ -33,11 +33,13 @@ layout:
     header: false
   Line 0D:
     header: false
-  Line 1:
-    style: row
-    columns: 3
+  Line 1A:
     header: false
   Line 1B:
+    header: false
+  Line 1C:
+    header: false
+  Line 1D:
     header: false
   Line 2:
     style: row
