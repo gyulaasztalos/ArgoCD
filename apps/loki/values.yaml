@@ -831,6 +831,14 @@ singleBinary:
     annotations: {}
     # -- Labels for volume claim
     labels: {}
+
+
+chunksCache:
+  enabled: false
+
+resultsCache:
+  enabled: false
+
 ######################################################################################################################
 #
 # Simple Scalable Deployment (SSD) Mode
