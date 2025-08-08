@@ -216,7 +216,7 @@ data:
           {
             "allValue": null,
             "current": {},
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "Prometheus",
             "definition": "label_values(kube_pod_info, namespace)",
             "hide": 0,
             "includeAll": false,
@@ -238,7 +238,7 @@ data:
           {
             "allValue": ".*",
             "current": {},
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "Prometheus",
             "definition": "label_values(mixin_pod_workload{namespace=\"$namespace\"}, workload)",
             "hide": 0,
             "includeAll": false,
@@ -260,7 +260,7 @@ data:
           {
             "allValue": ".*",
             "current": {},
-            "datasource": "${DS_PROMETHEUS}",
+            "datasource": "Prometheus",
             "definition": "label_values(mixin_pod_workload{namespace=\"$namespace\", workload=\"$workload\"}, pod)",
             "hide": 0,
             "includeAll": true,
