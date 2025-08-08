@@ -8,6 +8,7 @@ metadata:
     app.kubernetes.io/name: apprise
     app.kubernetes.io/part-of: apprise
     app.kubernetes.io/instance: apprise
+    app.kubernetes.io/component: apprise
 spec:
   groups:
     - name: apprise.rules

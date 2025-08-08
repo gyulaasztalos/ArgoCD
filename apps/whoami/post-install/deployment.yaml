@@ -9,6 +9,7 @@ metadata:
     app.kubernetes.io/name: whoami
     app.kubernetes.io/part-of: whoami
     app.kubernetes.io/instance: whoami
+    app.kubernetes.io/component: whoami
 spec:
   replicas: 4
   progressDeadlineSeconds: 600
@@ -28,6 +29,7 @@ spec:
         app.kubernetes.io/name: whoami
         app.kubernetes.io/part-of: whoami
         app.kubernetes.io/instance: whoami
+        app.kubernetes.io/component: whoami
     spec:
       containers:
         - name: whoami

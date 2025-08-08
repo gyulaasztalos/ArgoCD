@@ -9,6 +9,7 @@ metadata:
     app.kubernetes.io/name: tado-exporter
     app.kubernetes.io/part-of: tado-exporter
     app.kubernetes.io/instance: tado-exporter
+    app.kubernetes.io/component: tado-exporter
 spec:
   replicas: 1
   progressDeadlineSeconds: 600
@@ -28,6 +29,7 @@ spec:
         app.kubernetes.io/name: tado-exporter
         app.kubernetes.io/part-of: tado-exporter
         app.kubernetes.io/instance: tado-exporter
+        app.kubernetes.io/component: tado-exporter
     spec:
       containers:
         - name: tado-exporter

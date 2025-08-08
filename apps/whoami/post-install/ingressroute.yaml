@@ -11,6 +11,7 @@ metadata:
     app.kubernetes.io/name: whoami
     app.kubernetes.io/part-of: whoami
     app.kubernetes.io/instance: whoami
+    app.kubernetes.io/component: whoami
 spec:
   entryPoints:
     - websecure

@@ -9,6 +9,7 @@ metadata:
     app.kubernetes.io/name: homepage
     app.kubernetes.io/part-of: homepage
     app.kubernetes.io/instance: homepage
+    app.kubernetes.io/component: homepage
 spec:
   replicas: 1
   progressDeadlineSeconds: 600
@@ -28,6 +29,7 @@ spec:
         app.kubernetes.io/name: homepage
         app.kubernetes.io/part-of: homepage
         app.kubernetes.io/instance: homepage
+        app.kubernetes.io/component: homepage
     spec:
       serviceAccountName: homepage
       containers:

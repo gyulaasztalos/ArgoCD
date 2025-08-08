@@ -9,6 +9,7 @@ metadata:
     app.kubernetes.io/name: nginx
     app.kubernetes.io/part-of: nginx
     app.kubernetes.io/instance: nginx
+    app.kubernetes.io/component: nginx
 spec:
   replicas: 0
   progressDeadlineSeconds: 600
@@ -28,6 +29,7 @@ spec:
         app.kubernetes.io/name: nginx
         app.kubernetes.io/part-of: nginx
         app.kubernetes.io/instance: nginx
+        app.kubernetes.io/component: nginx
     spec:
       containers:
         - name: nginx

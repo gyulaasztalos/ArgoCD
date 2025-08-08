@@ -11,6 +11,7 @@ metadata:
     app.kubernetes.io/name: homebridge
     app.kubernetes.io/part-of: homebridge
     app.kubernetes.io/instance: homebridge
+    app.kubernetes.io/component: homebridge
 spec:
   entryPoints:
     - websecure

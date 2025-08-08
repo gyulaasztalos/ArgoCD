@@ -8,6 +8,7 @@ metadata:
     app.kubernetes.io/name: transmission
     app.kubernetes.io/part-of: transmission
     app.kubernetes.io/instance: transmission
+    app.kubernetes.io/component: transmission
 spec:
   accessModes:
     - ReadWriteMany
@@ -26,6 +27,7 @@ metadata:
     app.kubernetes.io/name: transmission
     app.kubernetes.io/part-of: transmission
     app.kubernetes.io/instance: transmission
+    app.kubernetes.io/component: transmission
 spec:
   accessModes:
     - ReadWriteOnce

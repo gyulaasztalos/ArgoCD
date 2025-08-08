@@ -9,6 +9,7 @@ metadata:
     app.kubernetes.io/name: nebula-sync
     app.kubernetes.io/part-of: nebula-sync
     app.kubernetes.io/instance: nebula-sync
+    app.kubernetes.io/component: nebula-sync
 spec:
   replicas: 1
   progressDeadlineSeconds: 600
@@ -28,6 +29,7 @@ spec:
         app.kubernetes.io/name: nebula-sync
         app.kubernetes.io/part-of: nebula-sync
         app.kubernetes.io/instance: nebula-sync
+        app.kubernetes.io/component: nebula-sync
     spec:
       containers:
         - name: nebula-sync

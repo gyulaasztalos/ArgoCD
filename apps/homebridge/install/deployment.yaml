@@ -9,6 +9,7 @@ metadata:
     app.kubernetes.io/name: homebridge
     app.kubernetes.io/part-of: homebridge
     app.kubernetes.io/instance: homebridge
+    app.kubernetes.io/component: homebridge
   annotations:
     ignore-check.kube-linter.io/no-read-only-root-fs: "LinuxServer.io images do not require a read-only root filesystem"
     ignore-check.kube-linter.io/run-as-non-root: "LinuxServer.io images do not require a non-root user"
@@ -30,6 +31,7 @@ spec:
         app.kubernetes.io/name: homebridge
         app.kubernetes.io/part-of: homebridge
         app.kubernetes.io/instance: homebridge
+        app.kubernetes.io/component: homebridge
         app: homebridge
       annotations:
         k8s.v1.cni.cncf.io/networks: |

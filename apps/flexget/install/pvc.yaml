@@ -9,6 +9,7 @@ metadata:
     app.kubernetes.io/name: flexget
     app.kubernetes.io/part-of: flexget
     app.kubernetes.io/instance: flexget
+    app.kubernetes.io/component: flexget
 spec:
   accessModes:
     - ReadWriteOnce

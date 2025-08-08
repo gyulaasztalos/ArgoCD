@@ -8,6 +8,7 @@ metadata:
     app.kubernetes.io/name: paperless-ngx
     app.kubernetes.io/part-of: paperless-ngx
     app.kubernetes.io/instance: paperless-ngx
+    app.kubernetes.io/component: paperless-ngx
 spec:
   accessModes:
     - ReadWriteMany
@@ -26,6 +27,7 @@ metadata:
     app.kubernetes.io/name: paperless-ngx
     app.kubernetes.io/part-of: paperless-ngx
     app.kubernetes.io/instance: paperless-ngx
+    app.kubernetes.io/component: paperless-ngx
 spec:
   accessModes:
     - ReadWriteOnce

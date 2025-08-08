@@ -8,6 +8,7 @@ metadata:
     app.kubernetes.io/name: transmission
     app.kubernetes.io/part-of: transmission
     app.kubernetes.io/instance: transmission
+    app.kubernetes.io/component: transmission
   annotations:
     metallb.io/allow-shared-ip: "true"
 spec:
@@ -35,6 +36,7 @@ metadata:
     app.kubernetes.io/name: transmission
     app.kubernetes.io/part-of: transmission
     app.kubernetes.io/instance: transmission
+    app.kubernetes.io/component: transmission
   annotations:
     metallb.io/allow-shared-ip: "true"
 spec:

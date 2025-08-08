@@ -9,6 +9,7 @@ metadata:
     app.kubernetes.io/name: nut-exporter
     app.kubernetes.io/part-of: nut-exporter
     app.kubernetes.io/instance: nut-exporter
+    app.kubernetes.io/component: nut-exporter
 spec:
   replicas: 1
   progressDeadlineSeconds: 600
@@ -28,6 +29,7 @@ spec:
         app.kubernetes.io/name: nut-exporter
         app.kubernetes.io/part-of: nut-exporter
         app.kubernetes.io/instance: nut-exporter
+        app.kubernetes.io/component: nut-exporter
     spec:
       containers:
         - name: nut-exporter

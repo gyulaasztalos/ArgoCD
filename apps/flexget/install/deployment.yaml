@@ -9,6 +9,7 @@ metadata:
     app.kubernetes.io/name: flexget
     app.kubernetes.io/part-of: flexget
     app.kubernetes.io/instance: flexget
+    app.kubernetes.io/component: flexget
   annotations:
     ignore-check.kube-linter.io/no-read-only-root-fs: "LinuxServer.io images do not require a read-only root filesystem"
     ignore-check.kube-linter.io/run-as-non-root: "LinuxServer.io images do not require a non-root user"
@@ -30,6 +31,7 @@ spec:
         app.kubernetes.io/name: flexget
         app.kubernetes.io/part-of: flexget
         app.kubernetes.io/instance: flexget
+        app.kubernetes.io/component: flexget
         app: flexget
     spec:
       containers:

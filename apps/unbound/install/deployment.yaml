@@ -9,6 +9,7 @@ metadata:
     app.kubernetes.io/name: unbound
     app.kubernetes.io/part-of: unbound
     app.kubernetes.io/instance: unbound
+    app.kubernetes.io/component: unbound
   annotations:
     ignore-check.kube-linter.io/no-read-only-root-fs: "Unbound requires a writable root filesystem for /var/unbound"
 spec:
@@ -30,6 +31,7 @@ spec:
         app.kubernetes.io/name: unbound
         app.kubernetes.io/part-of: unbound
         app.kubernetes.io/instance: unbound
+        app.kubernetes.io/component: unbound
     spec:
       containers:
         - name: "unbound"
