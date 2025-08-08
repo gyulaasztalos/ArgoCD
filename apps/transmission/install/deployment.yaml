@@ -101,42 +101,10 @@ spec:
             failureThreshold: 3
             successThreshold: 1
             timeoutSeconds: 10
+          envFrom:
+            - configMapRef:
+                name: transmission-config
           env:
-            - name: PUID
-              valueFrom:
-                configMapKeyRef:
-                  name: transmission-config
-                  key: PUID
-            - name: PGID
-              valueFrom:
-                configMapKeyRef:
-                  name: transmission-config
-                  key: PGID
-            - name: TZ
-              valueFrom:
-                configMapKeyRef:
-                  name: transmission-config
-                  key: TZ
-            - name: WHITELIST
-              valueFrom:
-                configMapKeyRef:
-                  name: transmission-config
-                  key: WHITELIST
-            - name: PEERPORT
-              valueFrom:
-                configMapKeyRef:
-                  name: transmission-config
-                  key: PEERPORT
-            - name: HOST_WHITELIST
-              valueFrom:
-                configMapKeyRef:
-                  name: transmission-config
-                  key: HOST_WHITELIST
-            - name: TRANSMISSION_WEB_HOME
-              valueFrom:
-                configMapKeyRef:
-                  name: transmission-config
-                  key: TRANSMISSION_WEB_HOME
             - name: USER
               valueFrom:
                 secretKeyRef:

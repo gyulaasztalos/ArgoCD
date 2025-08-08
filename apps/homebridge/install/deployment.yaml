@@ -76,27 +76,9 @@ spec:
             failureThreshold: 3
             successThreshold: 1
             timeoutSeconds: 10
-          env:
-            - name: PUID
-              valueFrom:
-                configMapKeyRef:
-                  name: homebridge-config
-                  key: PUID
-            - name: PGID
-              valueFrom:
-                configMapKeyRef:
-                  name: homebridge-config
-                  key: PGID
-            - name: TZ
-              valueFrom:
-                configMapKeyRef:
-                  name: homebridge-config
-                  key: TZ
-            - name: ENABLE_AVAHI
-              valueFrom:
-                configMapKeyRef:
-                  name: homebridge-config
-                  key: ENABLE_AVAHI
+          envFrom:
+            - configMapRef:
+                name: homebridge-config
           volumeMounts:
             - name: homebridge-secret
               mountPath: /homebridge/auth.json
