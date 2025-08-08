@@ -1,0 +1,861 @@
+# -- Overrides the version used to determine compatibility of resources with the target Kubernetes cluster.
+# This is useful when using `helm template`, because then helm will use the client version of kubectl as the Kubernetes version,
+# which may or may not match your cluster's server version. Example: 'v1.24.4'. Set to null to use the version that helm
+# devises.
+kubeVersionOverride: null
+
+global:
+  image:
+    # -- Overrides the Docker registry globally for all images
+    registry: null
+  # -- Overrides the priorityClassName for all pods
+  priorityClassName: null
+  # -- configures cluster domain ("cluster.local" by default)
+  clusterDomain: "cluster.local"
+  # -- configures DNS service name
+  dnsService: "kube-dns"
+  # -- configures DNS service namespace
+  dnsNamespace: "kube-system"
+  # -- Common additional CLI arguments for all jobs (that is, -log.level debug, -config.expand-env=true or -log-config-reverse-order)
+  # scope: admin-api, backend, bloom-builder, bloom-gateway, bloom-planner, compactor, distributor, index-gateway, ingester, overrides-exporter, pattern-ingester, querier, query-frontend, query-scheduler, read, ruler, write.
+  extraArgs: []
+  # -- Common environment variables to add to all pods directly managed by this chart.
+  # scope: admin-api, backend, bloom-builder, bloom-gateway, bloom-planner, compactor, distributor, index-gateway, ingester, overrides-exporter, pattern-ingester, querier, query-frontend, query-scheduler, read, ruler, write.
+  extraEnv: []
+  # -- Common source of environment injections to add to all pods directly managed by this chart.
+  # scope: admin-api, backend, bloom-builder, bloom-gateway, bloom-planner, compactor, distributor, index-gateway, ingester, overrides-exporter, pattern-ingester, querier, query-frontend, query-scheduler, read, ruler, write.
+  # For example to inject values from a Secret, use:
+  # extraEnvFrom:
+  #   - secretRef:
+  #       name: mysecret
+  extraEnvFrom: []
+  # -- Common volumes to add to all pods directly managed by this chart.
+  # scope: admin-api, backend, bloom-builder, bloom-gateway, bloom-planner, compactor, distributor, index-gateway, ingester, overrides-exporter, pattern-ingester, querier, query-frontend, query-scheduler, read, ruler, write.
+  extraVolumes: []
+  # -- Common mount points to add to all pods directly managed by this chart.
+  # scope: admin-api, backend, bloom-builder, bloom-gateway, bloom-planner, compactor, distributor, index-gateway, ingester, overrides-exporter, pattern-ingester, querier, query-frontend, query-scheduler, read, ruler, write.
+  extraVolumeMounts: []
+# -- Overrides the chart's name
+nameOverride: null
+# -- Overrides the chart's computed fullname
+fullnameOverride: null
+# -- Overrides the chart's cluster label
+clusterLabelOverride: null
+# -- Image pull secrets for Docker images
+imagePullSecrets: []
+# -- Deployment mode lets you specify how to deploy Loki.
+# There are 3 options:
+# - SingleBinary: Loki is deployed as a single binary, useful for small installs typically without HA, up to a few tens of GB/day.
+# - SimpleScalable: Loki is deployed as 3 targets: read, write, and backend. Useful for medium installs easier to manage than distributed, up to a about 1TB/day.
+# - Distributed: Loki is deployed as individual microservices. The most complicated but most capable, useful for large installs, typically over 1TB/day.
+# There are also 2 additional modes used for migrating between deployment modes:
+# - SingleBinary<->SimpleScalable: Migrate from SingleBinary to SimpleScalable (or vice versa)
+# - SimpleScalable<->Distributed: Migrate from SimpleScalable to Distributed (or vice versa)
+# Note: SimpleScalable and Distributed REQUIRE the use of object storage.
+deploymentMode: SingleBinary
+######################################################################################################################
+#
+# Base Loki Configs including kubernetes configurations and configurations for Loki itself,
+# see below for more specifics on Loki's configuration.
+#
+######################################################################################################################
+# -- Configuration for running Loki
+# @default -- See values.yaml
+loki:
+  # Configures the liveness probe for all of the Loki pods
+  livenessProbe: {}
+  # Configures the readiness probe for all of the Loki pods
+  readinessProbe:
+    httpGet:
+      path: /ready
+      port: http-metrics
+    initialDelaySeconds: 30
+    timeoutSeconds: 1
+  image:
+    # -- The Docker registry
+    registry: docker.io
+    # -- Docker image repository
+    repository: grafana/loki
+    # -- Overrides the image tag whose default is the chart's appVersion
+    tag: 3.5.3
+    # -- Overrides the image tag with an image digest
+    digest: null
+    # -- Docker image pull policy
+    pullPolicy: IfNotPresent
+  # -- Common annotations for all deployments/StatefulSets
+  annotations: {}
+  # -- Common annotations for all pods
+  podAnnotations: {}
+  # -- Common labels for all pods
+  podLabels: {}
+  # -- Common annotations for all services
+  serviceAnnotations: {}
+  # -- Common labels for all services
+  serviceLabels: {}
+  # -- The number of old ReplicaSets to retain to allow rollback
+  revisionHistoryLimit: 10
+  # -- The SecurityContext for Loki pods
+  podSecurityContext:
+    fsGroup: 10001
+    runAsGroup: 10001
+    runAsNonRoot: true
+    runAsUser: 10001
+  # -- The SecurityContext for Loki containers
+  containerSecurityContext:
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+    allowPrivilegeEscalation: false
+  # -- Should enableServiceLinks be enabled. Default to enable
+  enableServiceLinks: true
+  ######################################################################################################################
+  #
+  # Loki Configuration
+  #
+  # There are several ways to pass configuration to Loki, listing them here in order of our preference for how
+  # you should use this chart.
+  # 1. Use the templated value of loki.config below and the corresponding override sections which follow.
+  #    This allows us to set a lot of important Loki configurations and defaults and also allows us to maintain them
+  #    over time as Loki changes and evolves.
+  # 2. Use the loki.structuredConfig section.
+  #    This will completely override the templated value of loki.config, so you MUST provide the entire Loki config
+  #    including any configuration that we set in loki.config unless you explicitly are trying to change one of those
+  #    values and are not able to do so with the templated sections.
+  #    If you choose this approach the burden is on you to maintain any changes we make to the templated config.
+  # 3. Use an existing secret or configmap to provide the configuration.
+  #    This option is mostly provided for folks who have external processes which provide or modify the configuration.
+  #    When using this option you can specify a different name for loki.generatedConfigObjectName and configObjectName
+  #    if you have a process which takes the generated config and modifies it, or you can stop the chart from generating
+  #    a config entirely by setting loki.generatedConfigObjectName to
+  #
+  ######################################################################################################################
+
+  # -- Defines what kind of object stores the configuration, a ConfigMap or a Secret.
+  # In order to move sensitive information (such as credentials) from the ConfigMap/Secret to a more secure location (e.g. vault), it is possible to use [environment variables in the configuration](https://grafana.com/docs/loki/latest/configuration/#use-environment-variables-in-the-configuration).
+  # Such environment variables can be then stored in a separate Secret and injected via the global.extraEnvFrom value. For details about environment injection from a Secret please see [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/#use-case-as-container-environment-variables).
+  configStorageType: ConfigMap
+  # -- The name of the object which Loki will mount as a volume containing the config.
+  # If the configStorageType is Secret, this will be the name of the Secret, if it is ConfigMap, this will be the name of the ConfigMap.
+  # The value will be passed through tpl.
+  configObjectName: '{{ include "loki.name" . }}'
+  # -- The name of the Secret or ConfigMap that will be created by this chart.
+  # If empty, no configmap or secret will be created.
+  # The value will be passed through tpl.
+  generatedConfigObjectName: '{{ include "loki.name" . }}'
+  # -- Config file contents for Loki
+  # @default -- See values.yaml
+  config: |
+    {{- if .Values.enterprise.enabled}}
+    {{- tpl .Values.enterprise.config . }}
+    {{- else }}
+    auth_enabled: {{ .Values.loki.auth_enabled }}
+    {{- end }}
+
+    {{- with .Values.loki.server }}
+    server:
+      {{- toYaml . | nindent 2}}
+    {{- end}}
+
+    {{- with .Values.loki.pattern_ingester }}
+    pattern_ingester:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    memberlist:
+    {{- if .Values.loki.memberlistConfig }}
+      {{- toYaml .Values.loki.memberlistConfig | nindent 2 }}
+    {{- else }}
+    {{- if .Values.loki.extraMemberlistConfig}}
+    {{- toYaml .Values.loki.extraMemberlistConfig | nindent 2}}
+    {{- end }}
+      join_members:
+        - {{ include "loki.memberlist" . }}
+        {{- with .Values.migrate.fromDistributed }}
+        {{- if .enabled }}
+        - {{ .memberlistService }}
+        {{- end }}
+        {{- end }}
+    {{- end }}
+
+    {{- with .Values.loki.ingester }}
+    ingester:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    {{- with .Values.loki.ingester_client }}
+    ingester_client:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    {{- with .Values.loki.block_builder }}
+    block_builder:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    {{- if .Values.loki.commonConfig}}
+    common:
+    {{- toYaml .Values.loki.commonConfig | nindent 2}}
+      storage:
+      {{- include "loki.commonStorageConfig" . | nindent 4}}
+    {{- end}}
+
+    {{- with .Values.loki.limits_config }}
+    limits_config:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    runtime_config:
+      file: /etc/loki/runtime-config/runtime-config.yaml
+
+    {{- if .Values.chunksCache.enabled }}
+    {{- with .Values.chunksCache }}
+    chunk_store_config:
+      chunk_cache_config:
+        default_validity: {{ .defaultValidity }}
+        background:
+          writeback_goroutines: {{ .writebackParallelism }}
+          writeback_buffer: {{ .writebackBuffer }}
+          writeback_size_limit: {{ .writebackSizeLimit }}
+        memcached:
+          batch_size: {{ .batchSize }}
+          parallelism: {{ .parallelism }}
+        memcached_client:
+          addresses: {{ .addresses }}
+          consistent_hash: true
+          timeout: {{ .timeout }}
+          max_idle_conns: 72
+      {{- end }}
+      {{- with .Values.chunksCache.l2 }}
+      {{- if .enabled }}
+      l2_chunk_cache_handoff: {{ .l2ChunkCacheHandoff }}
+      chunk_cache_config_l2:
+        default_validity: {{ .defaultValidity }}
+        background:
+          writeback_goroutines: {{ .writebackParallelism }}
+          writeback_buffer: {{ .writebackBuffer }}
+          writeback_size_limit: {{ .writebackSizeLimit }}
+        memcached:
+          batch_size: {{ .batchSize }}
+          parallelism: {{ .parallelism }}
+        memcached_client:
+          addresses: {{ .addresses }}
+          consistent_hash: true
+          timeout: {{ .timeout }}
+          max_idle_conns: 72
+      {{- end }}
+      {{- end }}
+    {{- end }}
+
+    {{- if .Values.loki.schemaConfig }}
+    schema_config:
+    {{- toYaml .Values.loki.schemaConfig | nindent 2}}
+    {{- end }}
+
+    {{- if .Values.loki.useTestSchema }}
+    schema_config:
+    {{- toYaml .Values.loki.testSchemaConfig | nindent 2}}
+    {{- end }}
+
+    {{- if .Values.ruler.enabled }}
+    {{ include "loki.rulerConfig" . }}
+    {{- end }}
+
+    {{- if and .Values.loki.storage.use_thanos_objstore .Values.ruler.enabled}}
+    ruler_storage:
+      {{- include "loki.rulerThanosStorageConfig" . | nindent 2 }}
+    {{- end }}
+
+    {{- if or .Values.tableManager.retention_deletes_enabled .Values.tableManager.retention_period }}
+    table_manager:
+      retention_deletes_enabled: {{ .Values.tableManager.retention_deletes_enabled }}
+      retention_period: {{ .Values.tableManager.retention_period }}
+    {{- end }}
+
+    query_range:
+      align_queries_with_step: true
+      {{- with .Values.loki.query_range }}
+      {{- tpl (. | toYaml) $ | nindent 2 }}
+      {{- end }}
+      {{- if .Values.resultsCache.enabled }}
+      {{- with .Values.resultsCache }}
+      cache_results: true
+      results_cache:
+        cache:
+          default_validity: {{ .defaultValidity }}
+          background:
+            writeback_goroutines: {{ .writebackParallelism }}
+            writeback_buffer: {{ .writebackBuffer }}
+            writeback_size_limit: {{ .writebackSizeLimit }}
+          memcached_client:
+            addresses: {{ .addresses }}
+            consistent_hash: true
+            timeout: {{ .timeout }}
+            update_interval: 1m
+      {{- end }}
+      {{- end }}
+
+    {{- with .Values.loki.storage_config }}
+    storage_config:
+        {{- if not (hasKey $.Values.loki.storage_config "use_thanos_objstore") }}
+        use_thanos_objstore: {{ $.Values.loki.storage.use_thanos_objstore }}
+        {{- end }}
+        {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    {{- with .Values.loki.query_scheduler }}
+    query_scheduler:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    {{- with .Values.loki.compactor }}
+    compactor:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    {{- with .Values.loki.compactor_grpc_client }}
+    compactor_grpc_client:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    {{- with .Values.loki.analytics }}
+    analytics:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    {{- if .Values.loki.ui.enabled }}
+    ui:
+      enabled: true
+      discovery:
+        join_peers:
+          - '{{ include "loki.queryFrontendFullname" . }}.{{ $.Release.Namespace }}.svc.{{ .Values.global.clusterDomain }}'
+    {{- end }}
+    {{- with .Values.loki.querier }}
+    querier:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    {{- with .Values.loki.index_gateway }}
+    index_gateway:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    {{- with .Values.loki.frontend }}
+    frontend:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    {{- with .Values.loki.frontend_worker }}
+    frontend_worker:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    {{- with .Values.loki.distributor }}
+    distributor:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    tracing:
+      enabled: {{ .Values.loki.tracing.enabled }}
+
+    {{- with .Values.loki.bloom_build }}
+    bloom_build:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    {{- with .Values.loki.bloom_gateway }}
+    bloom_gateway:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+
+    {{- with .Values.loki.operational_config }}
+    operational_config:
+      {{- tpl (. | toYaml) $ | nindent 4 }}
+    {{- end }}
+  # Should authentication be enabled
+  auth_enabled: true
+  # -- memberlist configuration (overrides embedded default)
+  memberlistConfig: {}
+  # -- Extra memberlist configuration
+  extraMemberlistConfig: {}
+  # -- Tenants list to be created on nginx htpasswd file, with name and password or passwordHash keys<br><br>
+  # Example:
+  # <pre>
+  # tenants:<br>
+  #   - name: "test-user-1"<br>
+  #     password: "test-password-1"<br>
+  #   - name: "test-user-2"<br>
+  #     passwordHash: "$2y$10$7O40CaY1yz7fu9O24k2/u.ct/wELYHRBsn25v/7AyuQ8E8hrLqpva" # generated using `htpasswd -nbBC10 test-user-2 test-password-2`
+  # </pre>
+  tenants: []
+  # -- Check https://grafana.com/docs/loki/latest/configuration/#server for more info on the server configuration.
+  server:
+    http_listen_port: 3100
+    grpc_listen_port: 9095
+    http_server_read_timeout: 600s
+    http_server_write_timeout: 600s
+  # -- Limits config
+  limits_config:
+    reject_old_samples: true
+    reject_old_samples_max_age: 168h
+    max_cache_freshness_per_query: 10m
+    split_queries_by_interval: 15m
+    query_timeout: 300s
+    volume_enabled: true
+  # -- Provides a reloadable runtime configuration file for some specific configuration
+  runtimeConfig: {}
+  # -- Check https://grafana.com/docs/loki/latest/configuration/#common_config for more info on how to provide a common configuration
+  commonConfig:
+    path_prefix: /var/loki
+    replication_factor: 1
+    # -- The gRPC address of the compactor. The use of compactor_grpc_address is prefered over compactor_address.
+    # If a customized compactor_address is set, compactor_grpc_address should be set to an empty string.
+    compactor_grpc_address: '{{ include "loki.compactorAddress" . }}'
+  # -- Storage config. Providing this will automatically populate all necessary storage configs in the templated config.
+  # -- In case of using thanos storage, enable use_thanos_objstore and the configuration should be done inside the object_store section.
+  storage:
+    # Loki requires a bucket for chunks and the ruler. GEL requires a third bucket for the admin API.
+    # Please provide these values if you are using object storage.
+    # bucketNames:
+    #   chunks: FIXME
+    #   ruler: FIXME
+    #   admin: FIXME
+    type: filesystem
+    s3:
+      s3: null
+      endpoint: null
+      region: null
+      secretAccessKey: null
+      accessKeyId: null
+      signatureVersion: null
+      s3ForcePathStyle: false
+      insecure: false
+      http_config: {}
+      # -- Check https://grafana.com/docs/loki/latest/configure/#s3_storage_config for more info on how to provide a backoff_config
+      backoff_config: {}
+      disable_dualstack: false
+    gcs:
+      chunkBufferSize: 0
+      requestTimeout: "0s"
+      enableHttp2: true
+    azure:
+      accountName: null
+      accountKey: null
+      connectionString: null
+      useManagedIdentity: false
+      useFederatedToken: false
+      userAssignedId: null
+      requestTimeout: null
+      endpointSuffix: null
+      chunkDelimiter: null
+    swift:
+      auth_version: null
+      auth_url: null
+      internal: null
+      username: null
+      user_domain_name: null
+      user_domain_id: null
+      user_id: null
+      password: null
+      domain_id: null
+      domain_name: null
+      project_id: null
+      project_name: null
+      project_domain_id: null
+      project_domain_name: null
+      region_name: null
+      container_name: null
+      max_retries: null
+      connect_timeout: null
+      request_timeout: null
+    filesystem:
+      chunks_directory: /var/loki/chunks
+      rules_directory: /var/loki/rules
+
+    # Loki now supports using thanos storage clients for connecting to object storage backend.
+    # This will become the default way to configure storage in a future releases.
+    use_thanos_objstore: false
+
+    object_store:
+      # Type of object store. Valid options are: s3, gcs, azure
+      type: s3
+      # Optional prefix for storage keys
+      storage_prefix: null
+      # S3 configuration (when type is "s3")
+      s3:
+        # S3 endpoint URL
+        endpoint: null
+        # Optional region
+        region: null
+        # Optional access key
+        access_key_id: null
+        # Optional secret key
+        secret_access_key: null
+        # Optional. Enable if using self-signed TLS
+        insecure: false
+        # Optional server-side encryption configuration
+        sse: {}
+        # Optional HTTP client configuration
+        http: {}
+
+      # GCS configuration (when type is "gcs")
+      gcs:
+        # Name of the bucket
+        bucket_name: null
+        # Optional service account JSON
+        service_account: null
+
+      # Azure configuration (when type is "azure")
+      azure:
+        # Storage account name
+        account_name: null
+        # Optional storage account key
+        account_key: null
+
+  # -- Check https://grafana.com/docs/loki/latest/configuration/#schema_config for more info on how to configure schemas
+  schemaConfig:
+    configs:
+      - from: "2024-08-01"
+        store: tsdb
+        object_store: filesystem
+        schema: v13
+        index:
+          prefix: loki_index_
+          period: 24h
+  # -- a real Loki install requires a proper schemaConfig defined above this, however for testing or playing around
+  # you can enable useTestSchema
+  useTestSchema: false
+  testSchemaConfig:
+    configs:
+      - from: 2024-04-01
+        store: tsdb
+        object_store: '{{ include "loki.testSchemaObjectStore" . }}'
+        schema: v13
+        index:
+          prefix: index_
+          period: 24h
+  # -- Check https://grafana.com/docs/loki/latest/configuration/#ruler for more info on configuring ruler
+  rulerConfig:
+    wal:
+      dir: /var/loki/ruler-wal
+    # -- Storage for the ruler. If defining rules in `ruler.directories`, this must be configured to use local storage as shown below.
+    # storage:
+    #   type: local
+    #   local:
+    #     directory: /etc/loki/rules
+  # -- Structured loki configuration, takes precedence over `loki.config`, `loki.schemaConfig`, `loki.storageConfig`
+  structuredConfig: {}
+  # -- Additional query scheduler config
+  query_scheduler: {}
+  # -- Additional storage config
+  storage_config:
+    boltdb_shipper:
+      index_gateway_client:
+        server_address: '{{ include "loki.indexGatewayAddress" . }}'
+    tsdb_shipper:
+      index_gateway_client:
+        server_address: '{{ include "loki.indexGatewayAddress" . }}'
+    bloom_shipper:
+      working_directory: /var/loki/data/bloomshipper
+    hedging:
+      at: "250ms"
+      max_per_second: 20
+      up_to: 3
+  # --  Optional compactor configuration
+  compactor: {}
+  # --  Optional compactor grpc client configuration
+  compactor_grpc_client: {}
+  # --  Optional pattern ingester configuration
+  pattern_ingester:
+    enabled: false
+  # --  Optional analytics configuration
+  analytics: {}
+  # --  Optional Loki UI: Provides access to a operators UI for Loki distributed. When enabled UI will be available at /ui/ of loki-gateway
+  ui:
+    # Disabled by default for backwards compatibility. Enable to use the Loki UI.
+    enabled: false
+    gateway:
+      # enable gateway proxying to UI under /ui
+      enabled: false
+  # --  Optional querier configuration
+  query_range: {}
+  # --  Optional querier configuration
+  querier: {}
+  # --  Optional ingester configuration
+  ingester: {}
+  # --  Optional ingester client configuration
+  ingester_client: {}
+  # --  Optional block builder configuration
+  block_builder: {}
+  # --  Optional index gateway configuration
+  index_gateway:
+    mode: simple
+  frontend:
+    scheduler_address: '{{ include "loki.querySchedulerAddress" . }}'
+    tail_proxy_url: '{{ include "loki.querierAddress" . }}'
+  frontend_worker:
+    scheduler_address: '{{ include "loki.querySchedulerAddress" . }}'
+  # -- Optional distributor configuration
+  distributor: {}
+  # -- Enable tracing
+  tracing:
+    enabled: false
+  bloom_build:
+    enabled: false
+    builder:
+      planner_address: '{{ include "loki.bloomPlannerAddress" . }}'
+  bloom_gateway:
+    enabled: false
+    client:
+      addresses: '{{ include "loki.bloomGatewayAddresses" . }}'
+  # -- Optional operational configuration
+  operational_config: {}
+
+######################################################################################################################
+#
+# Chart Testing
+#
+######################################################################################################################
+
+# -- Section for configuring optional Helm test
+test:
+  enabled: false
+  # -- Used to directly query the metrics endpoint of the canary for testing, this approach avoids needing prometheus for testing.
+  # This in a newer approach to using prometheusAddress such that tests do not have a dependency on prometheus
+  canaryServiceAddress: "http://loki-canary:3500/metrics"
+  # -- Address of the prometheus server to query for the test. This overrides any value set for canaryServiceAddress.
+  # This is kept for backward compatibility and may be removed in future releases. Previous value was 'http://prometheus:9090'
+  prometheusAddress: ""
+  # -- Number of times to retry the test before failing
+  timeout: 1m
+  # -- Additional labels for the test pods
+  labels: {}
+  # -- Additional annotations for test pods
+  annotations: {}
+  # -- Image to use for loki canary
+  image:
+    # -- The Docker registry
+    registry: docker.io
+    # -- Docker image repository
+    repository: grafana/loki-helm-test
+    # -- Overrides the image tag whose default is the chart's appVersion
+    tag: "ewelch-distributed-helm-chart-17db5ee"
+    # -- Overrides the image tag with an image digest
+    digest: null
+    # -- Docker image pull policy
+    pullPolicy: IfNotPresent
+# The Loki canary pushes logs to and queries from this loki installation to test
+# that it's working correctly
+lokiCanary:
+  enabled: true
+  # -- The type of the loki canary k8s rollout. This can be a DaemonSet or Deployment.
+  kind: DaemonSet
+  # -- If true, the canary will send directly to Loki via the address configured for verification --
+  # -- If false, it will write to stdout and an Agent will be needed to scrape and send the logs --
+  push: true
+  # -- If set overwrites the default value set by loki.host helper function. Use this if gateway not enabled.
+  lokiurl: null
+  # -- The name of the label to look for at loki when doing the checks.
+  labelname: pod
+  # -- Additional annotations for the `loki-canary` Daemonset
+  annotations: {}
+  # -- Additional labels for each `loki-canary` pod
+  podLabels: {}
+  service:
+    # -- Annotations for loki-canary Service
+    annotations: {}
+    # -- Additional labels for loki-canary Service
+    labels: {}
+  # -- Additional CLI arguments for the `loki-canary' command
+  extraArgs: []
+  # -- Environment variables to add to the canary pods
+  extraEnv: []
+  # -- Environment variables from secrets or configmaps to add to the canary pods
+  extraEnvFrom: []
+  # -- Volume mounts to add to the canary pods
+  extraVolumeMounts: []
+  # -- Volumes to add to the canary pods
+  extraVolumes: []
+  # -- Resource requests and limits for the canary
+  resources: {}
+  # -- DNS config for canary pods
+  dnsConfig: {}
+  # -- Node selector for canary pods
+  nodeSelector: {}
+  # -- Tolerations for canary pods
+  tolerations: []
+  # -- Affinity for canary pods
+  affinity: {}
+  # -- The name of the PriorityClass for loki-canary pods
+  priorityClassName: null
+  # -- Image to use for loki canary
+  image:
+    # -- The Docker registry
+    registry: docker.io
+    # -- Docker image repository
+    repository: grafana/loki-canary
+    # -- Overrides the image tag whose default is the chart's appVersion
+    tag: null
+    # -- Overrides the image tag with an image digest
+    digest: null
+    # -- Docker image pull policy
+    pullPolicy: IfNotPresent
+  # -- Update strategy for the `loki-canary` Daemonset pods
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+######################################################################################################################
+#
+# Global memberlist configuration
+#
+######################################################################################################################
+
+# Configuration for the memberlist service
+memberlist:
+  service:
+    publishNotReadyAddresses: false
+    annotations: {}
+
+###########################################################################################
+#
+# Gateway and Ingress
+#
+# By default this chart will deploy a Nginx container to act as a gateway which handles routing of traffic
+# and can also do auth.
+#
+# If you would prefer you can optionally disable this and enable using k8s ingress to do the incoming routing.
+#
+######################################################################################################################
+
+# Configuration for the gateway
+gateway:
+  # -- Enable the gateway
+  enabled: false
+######################################################################################################################
+#
+# Single Binary Deployment
+#
+# For small Loki installations up to a few 10's of GB per day, or for testing and development.
+#
+######################################################################################################################
+
+# Configuration for the single binary node(s)
+singleBinary:
+  # -- Number of replicas for the single binary
+  replicas: 1
+  autoscaling:
+    # -- Enable autoscaling
+    enabled: false
+    # -- Minimum autoscaling replicas for the single binary
+    minReplicas: 1
+    # -- Maximum autoscaling replicas for the single binary
+    maxReplicas: 3
+    # -- Target CPU utilisation percentage for the single binary
+    targetCPUUtilizationPercentage: 60
+    # -- Target memory utilisation percentage for the single binary
+    targetMemoryUtilizationPercentage:
+  image:
+    # -- The Docker registry for the single binary image. Overrides `loki.image.registry`
+    registry: null
+    # -- Docker image repository for the single binary image. Overrides `loki.image.repository`
+    repository: null
+    # -- Docker image tag for the single binary image. Overrides `loki.image.tag`
+    tag: null
+  # -- The name of the PriorityClass for single binary pods
+  priorityClassName: null
+  # -- Annotations for single binary StatefulSet
+  annotations: {}
+  # -- Annotations for single binary pods
+  podAnnotations: {}
+  # -- Additional labels for each `single binary` pod
+  podLabels: {}
+  # -- Additional selector labels for each `single binary` pod
+  selectorLabels: {}
+  service:
+    # -- Annotations for single binary Service
+    annotations: {}
+    # -- Additional labels for single binary Service
+    labels: {}
+  # -- Comma-separated list of Loki modules to load for the single binary
+  targetModule: "all"
+  # -- Labels for single binary service
+  extraArgs: []
+  # -- Environment variables to add to the single binary pods
+  extraEnv: []
+  # -- Environment variables from secrets or configmaps to add to the single binary pods
+  extraEnvFrom: []
+  # -- Extra containers to add to the single binary loki pod
+  extraContainers: []
+  # -- Init containers to add to the single binary pods
+  initContainers: []
+  # -- Volume mounts to add to the single binary pods
+  extraVolumeMounts: []
+  # -- Volumes to add to the single binary pods
+  extraVolumes: []
+  # -- Resource requests and limits for the single binary
+  resources: {}
+  # -- Grace period to allow the single binary to shutdown before it is killed
+  terminationGracePeriodSeconds: 30
+  # -- Affinity for single binary pods.
+  # @default -- Hard node anti-affinity
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/component: single-binary
+          topologyKey: kubernetes.io/hostname
+  # -- DNS config for single binary pods
+  dnsConfig: {}
+  # -- Node selector for single binary pods
+  nodeSelector: {}
+  # -- Tolerations for single binary pods
+  tolerations: []
+  persistence:
+    # -- Enable StatefulSetAutoDeletePVC feature
+    enableStatefulSetAutoDeletePVC: true
+    # -- Enable persistent disk
+    enabled: true
+    # -- Size of persistent disk
+    size: 10Gi
+    # -- Storage class to be used.
+    # If defined, storageClassName: <storageClass>.
+    # If set to "-", storageClassName: "", which disables dynamic provisioning.
+    # If empty or set to null, no storageClassName spec is
+    # set, choosing the default provisioner (gp2 on AWS, standard on GKE, AWS, and OpenStack).
+    storageClass: longhorn
+    # -- Selector for persistent disk
+    selector: null
+    # -- Annotations for volume claim
+    annotations: {}
+    # -- Labels for volume claim
+    labels: {}
+######################################################################################################################
+#
+# Simple Scalable Deployment (SSD) Mode
+#
+# For small to medium size Loki deployments up to around 1 TB/day, this is the default mode for this helm chart
+#
+######################################################################################################################
+
+read:
+  replicas: 0
+backend:
+  replicas: 0
+write:
+  replicas: 0
+
+
+# Use the deprecated but still working monitoring section
+# until meta-monitoring becomes production-ready [2][5]
+monitoring:
+  serviceMonitor:
+    enabled: true
+    labels:
+      prometheus.io/service-monitor: "true"
+    interval: 30s
+  prometheusRule:
+    enabled: true
+    labels:
+      prometheus.io/rule: "true"

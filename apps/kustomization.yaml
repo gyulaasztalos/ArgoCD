@@ -31,3 +31,4 @@ resources:
   - tado-exporter/application.yaml
   - nut-exporter/application.yaml
   - homepage/application.yaml
+  - loki/application.yaml
