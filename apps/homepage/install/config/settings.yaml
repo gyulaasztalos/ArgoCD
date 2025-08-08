@@ -35,7 +35,9 @@ layout:
     header: false
   Line 1:
     style: row
-    columns: 4
+    columns: 3
+    header: false
+  Line 1B:
     header: false
   Line 2:
     style: row
