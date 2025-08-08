@@ -27,11 +27,11 @@
     # Show the expanded view
     expanded: true
     # Shows a node representing the aggregate values
-    total: true
+    total: false
     # Shows the node names as labels
     labels: true
     # Show the nodes
-    nodes: false
+    nodes: true
 
 - search:
     provider: duckduckgo # google, duckduckgo, bing, baidu, brave or custom
