@@ -1,4 +1,6 @@
 ---
+- logo:
+    icon: homepage
 
 - kubernetes:
     nodes:
@@ -12,7 +14,7 @@
       showLabel: true
     cluster:
       # Shows cluster-wide statistics
-      show: true
+      show: false
       # Shows the aggregate CPU stats
       cpu: true
       # Shows the aggregate memory stats
@@ -20,13 +22,6 @@
       # Shows a custom label
       showLabel: true
       label: "cluster"
-
-- greeting:
-    text_size: xl
-    text: Praise the Omnissiah!
-
-- logo:
-    icon: homepage
 
 - longhorn:
     # Show the expanded view
@@ -36,7 +31,7 @@
     # Shows the node names as labels
     labels: true
     # Show the nodes
-    nodes: true
+    nodes: false
 
 - search:
     provider: duckduckgo # google, duckduckgo, bing, baidu, brave or custom
