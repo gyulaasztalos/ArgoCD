@@ -373,7 +373,7 @@ loki:
       {{- tpl (. | toYaml) $ | nindent 4 }}
     {{- end }}
   # Should authentication be enabled
-  auth_enabled: true
+  auth_enabled: false
   # -- memberlist configuration (overrides embedded default)
   memberlistConfig: {}
   # -- Extra memberlist configuration
@@ -406,7 +406,6 @@ loki:
   runtimeConfig: {}
   # -- Check https://grafana.com/docs/loki/latest/configuration/#common_config for more info on how to provide a common configuration
   commonConfig:
-    single_tenant: true
     path_prefix: /var/loki
     replication_factor: 1
     # -- The gRPC address of the compactor. The use of compactor_grpc_address is prefered over compactor_address.
