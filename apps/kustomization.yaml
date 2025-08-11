@@ -32,3 +32,4 @@ resources:
   - nut-exporter/application.yaml
   - homepage/application.yaml
   - loki/application.yaml
+  - smartctl-exporter/application.yaml
