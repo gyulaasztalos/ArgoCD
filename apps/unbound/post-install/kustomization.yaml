@@ -1,0 +1,23 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+configMapGenerator:
+  - name: unbound-grafana-dashboard
+    namespace: unbound
+    files:
+      - unbound-grafana-dashboard1.json=11705_rev1.json
+      - unbound-grafana-dashboard2.json=18077_rev6.json
+
+resources:
+  - prometheus-alarms.yaml
+
+generatorOptions:
+  labels:
+    app.kubernetes.io/name: unbound
+    app.kubernetes.io/instance: unbound
+    app.kubernetes.io/part-of: unbound
+    app.kubernetes.io/component: unbound
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "/tmp/dashboards/Tools"
