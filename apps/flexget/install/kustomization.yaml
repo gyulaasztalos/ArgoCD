@@ -13,3 +13,10 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingressroute.yaml
+
+generatorOptions:
+  labels:
+    app.kubernetes.io/name: flexget
+    app.kubernetes.io/part-of: flexget
+    app.kubernetes.io/instance: flexget
+    app.kubernetes.io/component: flexget

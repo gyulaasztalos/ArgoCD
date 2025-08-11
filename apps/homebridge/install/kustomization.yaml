@@ -13,3 +13,10 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingressroute.yaml
+
+generatorOptions:
+  labels:
+    app.kubernetes.io/name: homebridge
+    app.kubernetes.io/part-of: homebridge
+    app.kubernetes.io/instance: homebridge
+    app.kubernetes.io/component: homebridge

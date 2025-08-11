@@ -105,7 +105,7 @@ prometheusRules:
         severity: warning
 
 image:
-  repository: quay.io/prometheuscommunity/smartctl-exporter
+  repository: ghcr.io/home-operations/smartctl-exporter:0.14.0
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
   pullPolicy: IfNotPresent

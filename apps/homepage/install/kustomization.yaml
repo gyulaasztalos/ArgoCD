@@ -26,3 +26,10 @@ resources:
   - deployment.yaml
   - service.yaml
   - ingressroute.yaml
+
+generatorOptions:
+  labels:
+    app.kubernetes.io/name: homepage
+    app.kubernetes.io/part-of: homepage
+    app.kubernetes.io/instance: homepage
+    app.kubernetes.io/component: homepage

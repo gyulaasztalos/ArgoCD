@@ -18,6 +18,9 @@ spec:
         valueFiles:
           - $config/apps/smartctl-exporter/values.yaml
       chart: prometheus-smartctl-exporter
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/smartctl-exporter/post-install
   project: default
   syncPolicy:
     automated:

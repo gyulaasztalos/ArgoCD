@@ -17,3 +17,10 @@ resources:
   - pvc.yaml
   - deployment.yaml
   - service.yaml
+
+generatorOptions:
+  labels:
+    app.kubernetes.io/name: transmission
+    app.kubernetes.io/part-of: transmission
+    app.kubernetes.io/instance: transmission
+    app.kubernetes.io/component: transmission

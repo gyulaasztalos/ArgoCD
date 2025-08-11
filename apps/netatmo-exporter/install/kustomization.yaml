@@ -15,3 +15,10 @@ resources:
   - servicemonitor.yaml
   - ingressroute.yaml
   - grafana-dashboard.yaml
+
+generatorOptions:
+  labels:
+    app.kubernetes.io/name: netatmo-exporter
+    app.kubernetes.io/part-of: netatmo-exporter
+    app.kubernetes.io/instance: netatmo-exporter
+    app.kubernetes.io/component: netatmo-exporter

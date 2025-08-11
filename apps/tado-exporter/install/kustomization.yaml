@@ -13,3 +13,10 @@ resources:
   - service.yaml
   - servicemonitor.yaml
   - grafana-dashboard.yaml
+
+generatorOptions:
+  labels:
+    app.kubernetes.io/name: tado-exporter
+    app.kubernetes.io/part-of: tado-exporter
+    app.kubernetes.io/instance: tado-exporter
+    app.kubernetes.io/component: tado-exporter
