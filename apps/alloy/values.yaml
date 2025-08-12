@@ -72,6 +72,20 @@ alloy:
 
       loki.source.file "containerd_pods" {
         targets   = local.file_match.containerd_pods.targets
+        forward_to = [loki.process.get_labels.receiver]
+      }
+
+      loki.process "get_labels" {
+        stage.regex {
+          source = "filename"
+          expression  = ".*/(?P<pod>[^/_]+)_(?P<namespace>[^/_]+)_(?P<container>[^/_-]+)-[^/]+\.log$"
+          labels_from_groups = true
+        }
+        stage.regex {
+          source = "log"
+          expression  = "^level= (?P<level>.*)$"
+          labels_from_groups = true
+        }
         forward_to = [loki.relabel.add_hostname.receiver]
       }
 
@@ -79,7 +93,7 @@ alloy:
         forward_to = [loki.write.default.receiver]
         rule {
           target_label = "hostname"
-          replacement = constants.hostname
+          replacement = sys.env("HOSTNAME", "unknown")
         }
       }
 
