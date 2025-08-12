@@ -84,9 +84,14 @@ alloy:
 
         stage.cri {}
 
+        stage.json {
+          source = "message"
+          expressions = { level = "level" }
+        }
+
         stage.regex {
           source = "message"
-          expression  = ".*level=(?P<level>[^ ]+)"
+          expression = ".*level[=:]\\\"?(?P<level>[^ \"']+)\\\"?"
           labels_from_groups = true
         }
         forward_to = [loki.relabel.add_hostname.receiver]
