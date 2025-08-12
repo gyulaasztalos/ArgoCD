@@ -82,8 +82,8 @@ alloy:
       loki.relabel "add_hostname" {
         forward_to = [loki.write.default.receiver]
         rule {
-          target_label = "hostname",
-          replacement = constants.hostname,
+          target_label = "hostname"
+          replacement = constants.hostname
         }
       }
 
