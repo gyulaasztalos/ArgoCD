@@ -39,10 +39,6 @@ alloy:
         format = "logfmt"
       }
 
-      discovery.kubernetes "pods" {
-        role = "pod"
-      }
-
       local.file_match "node_logs" {
         path_targets = [
           {
