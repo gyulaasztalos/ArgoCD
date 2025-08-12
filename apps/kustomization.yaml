@@ -33,3 +33,4 @@ resources:
   - homepage/application.yaml
   - loki/application.yaml
   - smartctl-exporter/application.yaml
+  - alloy/application.yaml
