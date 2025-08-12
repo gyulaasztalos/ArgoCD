@@ -51,27 +51,26 @@ alloy:
           { __path__ = "/var/log/*.log" },
           { __path__ = "/var/log/syslog" },
           { __path__ = "/var/log/kern.log" },
-          { __path__ = "/var/log/messages" }
+          { __path__ = "/var/log/messages" },
         ]
         labels = {
-          job   = "node-logs"
-          host  = sys.host
+          job   = "node-logs",
+          host  = sys.host,
         }
       }
 
       loki.source.file "containerd_pods" {
         targets = [
           { __path__ = "/var/log/containers/*.log" },
-          { __path__ = "/var/lib/containerd/io.containerd.grpc.v1.cri/sandboxes/*/log" }
         ]
         labels = {
-          job = "kubernetes-pods"
+          job = "kubernetes-pods",
         }
       }
 
       loki.write "default" {
         endpoint {
-          url = "http://loki.loki.svc.cluster.local:3100/loki/api/v1/push"
+          url = "http://loki.loki.svc.cluster.local:3100/loki/api/v1/push",
         }
       }
 
