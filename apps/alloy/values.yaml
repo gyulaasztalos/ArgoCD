@@ -105,6 +105,44 @@ alloy:
         }
       }
 
+      // Collect logs from systemd journal for node_exporter integration
+      loki.source.journal "journalctl_to_loki" {
+        // Only collect logs from the last 24 hours
+        max_age       = "24h0m0s"
+        // Apply relabeling rules to the logs
+        relabel_rules = discovery.relabel.journalctl_to_loki.rules
+        // Send logs to the local Loki instance
+        forward_to    = [loki.write.local.receiver]
+      }
+
+      discovery.relabel "journalctl_to_loki" {
+        targets = []
+
+        rule {
+          // Extract systemd unit information into a label
+          source_labels = ["__journal__systemd_unit"]
+          target_label  = "unit"
+        }
+
+        rule {
+          // Extract boot ID information into a label
+          source_labels = ["__journal__boot_id"]
+          target_label  = "boot_id"
+        }
+
+        rule {
+          // Extract transport information into a label
+          source_labels = ["__journal__transport"]
+          target_label  = "transport"
+        }
+
+        rule {
+          // Extract log priority into a level label
+          source_labels = ["__journal_priority_keyword"]
+          target_label  = "level"
+        }
+      }
+
       loki.write "default" {
         endpoint {
           url = "http://loki.loki.svc.cluster.local:3100/loki/api/v1/push"
