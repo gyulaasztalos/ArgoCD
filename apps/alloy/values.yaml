@@ -93,7 +93,7 @@ alloy:
         forward_to = [loki.write.default.receiver]
         rule {
           target_label = "hostname"
-          replacement = sys.env("HOSTNAME", "unknown")
+          replacement = sys.env("HOSTNAME")
         }
       }
 
