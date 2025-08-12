@@ -46,45 +46,45 @@ alloy:
       local.file_match "node_logs" {
         path_targets = [
           {
-            __address__ = "localhost",
             __path__ = "/var/log/*.log",
             job = "node-logs",
-            host = sys.env["HOSTNAME"],
           },
           {
-            __address__ = "localhost",
             __path__ = "/var/log/syslog",
             job = "node-logs",
-            host = sys.env["HOSTNAME"],
           },
           {
-            __address__ = "localhost",
             __path__ = "/var/log/messages",
             job = "node-logs",
-            host = sys.env["HOSTNAME"],
           },
         ]
       }
 
       loki.source.file "node_logs" {
         targets   = local.file_match.node_logs.targets
-        forward_to = [loki.write.default.receiver]
+        forward_to = [loki.relabel.add_hostname.receiver]
       }
 
       local.file_match "containerd_pods" {
         path_targets = [
           {
-            __address__ = "localhost",
             __path__ = "/var/log/containers/*.log",
             job = "containerd-pods",
-            host = sys.env["HOSTNAME"],
           },
         ]
       }
 
       loki.source.file "containerd_pods" {
         targets   = local.file_match.containerd_pods.targets
+        forward_to = [loki.relabel.add_hostname.receiver]
+      }
+
+      loki.relabel "add_hostname" {
         forward_to = [loki.write.default.receiver]
+        rule {
+          target_label = "hostname",
+          replacement = constants.hostname,
+        }
       }
 
       loki.write "default" {
