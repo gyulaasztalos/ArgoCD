@@ -100,7 +100,6 @@ alloy:
       loki.relabel "normalize_labels" {
         forward_to = [loki.write.default.receiver]
 
-        # Step 1 — Normalize to lowercase
         rule {
           source_labels = ["level"]
           target_label  = "level"
@@ -109,13 +108,12 @@ alloy:
           replacement   = "{{ .level | lower }}"
         }
 
-        # Step 2 — Set default if missing
         rule {
           source_labels = ["level"]
           target_label  = "level"
           action        = "replace"
           replacement   = "info"
-          regex         = "^$"  # Match empty or unset
+          regex         = "^$"
         }
 
         rule {
