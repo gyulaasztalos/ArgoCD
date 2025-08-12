@@ -112,7 +112,7 @@ alloy:
         // Apply relabeling rules to the logs
         relabel_rules = discovery.relabel.journalctl_to_loki.rules
         // Send logs to the local Loki instance
-        forward_to    = [loki.write.local.receiver]
+        forward_to    = [loki.write.default.receiver]
       }
 
       discovery.relabel "journalctl_to_loki" {
