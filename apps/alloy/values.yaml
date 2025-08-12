@@ -71,7 +71,7 @@ alloy:
       }
 
       local.file_match "containerd_pods" {
-        targets = [
+        path_targets = [
           {__path__ = "/var/log/containers/*.log"},
         ]
       }
