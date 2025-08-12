@@ -64,8 +64,8 @@ alloy:
         forward_to = [loki.write.default.receiver]
         stage.labels {
           values = {
-            job = "node-logs"
-            host = sys.host
+            job = "node-logs",
+            host = sys.host,
           }
         }
       }
@@ -85,8 +85,8 @@ alloy:
         forward_to = [loki.write.default.receiver]
         stage.labels {
           values = {
-            job = "containerd-pods"
-            host = sys.host
+            job = "containerd-pods",
+            host = sys.host,
           }
         }
       }
