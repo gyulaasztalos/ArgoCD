@@ -157,13 +157,7 @@ alloy:
 
     # -- Extra volume mounts to add into the Grafana Alloy container. Does not
     # affect the watch container.
-    extra:
-      - name: varlibcontainers
-        mountPath: /var/lib/containerd
-        readOnly: true
-        hostPath:
-          path: /var/lib/containerd
-          type: Directory
+    extra: []
 
   # -- Security context to apply to the Grafana Alloy container.
   securityContext:
