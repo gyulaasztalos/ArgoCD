@@ -107,6 +107,7 @@ alloy:
 
       // Collect logs from systemd journal for node_exporter integration
       loki.source.journal "journalctl_to_loki" {
+        path = /var/log/journal
         // Only collect logs from the last 24 hours
         max_age       = "24h0m0s"
         // Apply relabeling rules to the logs
