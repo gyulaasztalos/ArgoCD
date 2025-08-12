@@ -97,7 +97,7 @@ prometheusRules:
       enabled: true
       alert: SmartCTLDDeviceTemperature
       expr: smartctl_device_temperature{temperature_type="current"} > 65
-      for: 1m
+      for: 10m
       annotations:
         summary: Device has temperature higher than 65°C
         description: Device {{ $labels.device }} on instance {{ $labels.instance }} has temperature higher than 65°C
