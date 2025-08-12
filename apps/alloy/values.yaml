@@ -45,47 +45,46 @@ alloy:
 
       local.file_match "node_logs" {
         path_targets = [
-          { __path__ = "/var/log/*.log" },
-          { __path__ = "/var/log/syslog" },
-          { __path__ = "/var/log/kern.log" },
-          { __path__ = "/var/log/messages" },
+          {
+            __address__ = "localhost",
+            __path__ = "/var/log/*.log",
+            job = "node-logs",
+            host = sys.env["HOSTNAME"],
+          },
+          {
+            __address__ = "localhost",
+            __path__ = "/var/log/syslog",
+            job = "node-logs",
+            host = sys.env["HOSTNAME"],
+          },
+          {
+            __address__ = "localhost",
+            __path__ = "/var/log/messages",
+            job = "node-logs",
+            host = sys.env["HOSTNAME"],
+          },
         ]
       }
 
       loki.source.file "node_logs" {
         targets   = local.file_match.node_logs.targets
-        forward_to = [loki.process.add_node_labels.receiver]
-      }
-
-      loki.process "add_node_labels" {
         forward_to = [loki.write.default.receiver]
-        stage.labels {
-          values = {
-            job = "node-logs",
-            host = sys.env("HOSTNAME"),
-          }
-        }
       }
 
       local.file_match "containerd_pods" {
         path_targets = [
-          {__path__ = "/var/log/containers/*.log"},
+          {
+            __address__ = "localhost",
+            __path__ = "/var/log/containers/*.log",
+            job = "containerd-pods",
+            host = sys.env["HOSTNAME"],
+          },
         ]
       }
 
       loki.source.file "containerd_pods" {
         targets   = local.file_match.containerd_pods.targets
-        forward_to = [loki.process.add_container_labels.receiver]
-      }
-
-      loki.process "add_container_labels" {
         forward_to = [loki.write.default.receiver]
-        stage.labels {
-          values = {
-            job = "containerd-pods",
-            host = sys.env("HOSTNAME"),
-          }
-        }
       }
 
       loki.write "default" {

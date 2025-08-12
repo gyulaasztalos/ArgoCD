@@ -18,6 +18,9 @@ spec:
         valueFiles:
           - $config/apps/alloy/values.yaml
       chart: alloy
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/alloy/post-install
   project: default
   syncPolicy:
     automated:
