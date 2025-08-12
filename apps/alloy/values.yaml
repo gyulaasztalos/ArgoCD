@@ -58,7 +58,7 @@ alloy:
 
       loki.source.file "node_logs" {
         targets   = local.file_match.node_logs.targets
-        forward_to = [loki.relabel.add_hostname.receiver]
+        forward_to = [loki.relabel.normalize_labels.receiver]
       }
 
       local.file_match "containerd_pods" {
@@ -94,11 +94,30 @@ alloy:
           expression = ".*level[=:]\\\"?(?P<level>[^ \"']+)\\\"?"
           labels_from_groups = true
         }
-        forward_to = [loki.relabel.add_hostname.receiver]
+        forward_to = [loki.relabel.normalize_labels.receiver]
       }
 
-      loki.relabel "add_hostname" {
+      loki.relabel "normalize_labels" {
         forward_to = [loki.write.default.receiver]
+
+        # Step 1 — Normalize to lowercase
+        rule {
+          source_labels = ["level"]
+          target_label  = "level"
+          action        = "replace"
+          # This lowercases any existing value
+          replacement   = "{{ .level | lower }}"
+        }
+
+        # Step 2 — Set default if missing
+        rule {
+          source_labels = ["level"]
+          target_label  = "level"
+          action        = "replace"
+          replacement   = "info"
+          regex         = "^$"  # Match empty or unset
+        }
+
         rule {
           target_label = "hostname"
           replacement = sys.env("HOSTNAME")
