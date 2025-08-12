@@ -159,6 +159,8 @@ alloy:
     # affect the watch container.
     extra:
       - name: varlibcontainers
+        mountPath: /var/lib/containerd
+        readOnly: true
         hostPath:
           path: /var/lib/containerd
           type: Directory
@@ -422,11 +424,7 @@ controller:
 
   volumes:
     # -- Extra volumes to add to the Grafana Alloy pod.
-    extra:
-      - name: varlibcontainers
-        hostPath:
-          path: /var/lib/containerd
-          type: Directory
+    extra: []
 
   # -- volumeClaimTemplates to add when controller.type is 'statefulset'.
   volumeClaimTemplates: []
