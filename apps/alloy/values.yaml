@@ -110,6 +110,7 @@ alloy:
         path = /var/log/journal
         labels = {
           job = "systemd-journal"
+          hostname = sys.env("HOSTNAME")
         }
         // Only collect logs from the last 24 hours
         max_age       = "24h0m0s"
