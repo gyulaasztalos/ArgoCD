@@ -19,10 +19,7 @@ global:
     pullSecrets: []
 
   # -- Security context to apply to the Grafana Alloy pod.
-  podSecurityContext:
-    runAsUser: 10001
-    runAsGroup: 10001
-    fsGroup: 10001
+  podSecurityContext: {}
 
 crds:
   # -- Whether to install CRDs for monitoring.
@@ -182,8 +179,7 @@ alloy:
     extra: []
 
   # -- Security context to apply to the Grafana Alloy container.
-  securityContext:
-    runAsNonRoot: true
+  securityContext: {}
 
   # -- Resource requests and limits to apply to the Grafana Alloy container.
   resources: {}
@@ -252,8 +248,7 @@ configReloader:
       cpu: "10m"
       memory: "50Mi"
   # -- Security context to apply to the Grafana configReloader container.
-  securityContext:
-    runAsNonRoot: true
+  securityContext: {}
 
 controller:
   # -- Type of controller to use for deploying Grafana Alloy in the cluster.
