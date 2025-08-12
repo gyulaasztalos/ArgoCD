@@ -104,16 +104,16 @@ alloy:
           source_labels = ["level"]
           target_label  = "level"
           action        = "replace"
-          # This lowercases any existing value
-          replacement   = "{{ .level | lower }}"
+          replacement   = "info"
+          regex         = "^$"
         }
 
         rule {
           source_labels = ["level"]
           target_label  = "level"
           action        = "replace"
-          replacement   = "info"
-          regex         = "^$"
+          # This lowercases any existing value
+          replacement   = "{{ .level | lower }}"
         }
 
         rule {
