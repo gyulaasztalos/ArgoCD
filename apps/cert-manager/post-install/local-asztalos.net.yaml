@@ -9,9 +9,9 @@ spec:
   secretTemplate:
     annotations:
       reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,traefik,authentik,monitoring,argocd,cattle-system,longhorn-system,pihole,apprise,ddns-updater,flexget,homebridge,netatmo-exporter,paperless-ngx,nut-exporter,homepage"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "default,traefik,authentik,monitoring,argocd,cattle-system,longhorn-system,pihole,apprise,ddns-updater,flexget,homebridge,netatmo-exporter,paperless-ngx,nut-exporter,homepage,alloy"
       reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "default,traefik,authentik,monitoring,argocd,cattle-system,longhorn-system,pihole,apprise,ddns-updater,flexget,homebridge,netatmo-exporter,paperless-ngx,nut-exporter,homepage"
+      reflector.v1.k8s.emberstack.com/reflection-auto-namespaces: "default,traefik,authentik,monitoring,argocd,cattle-system,longhorn-system,pihole,apprise,ddns-updater,flexget,homebridge,netatmo-exporter,paperless-ngx,nut-exporter,homepage,alloy"
   issuerRef:
     name: letsencrypt-production
     kind: ClusterIssuer
