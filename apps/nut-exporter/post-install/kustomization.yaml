@@ -1,0 +1,23 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+configMapGenerator:
+  - name: nut-exporter-grafana-dashboard
+    namespace: nut-exporter
+    files:
+      - nut-exporter-grafana-dashboard1.json=14371_rev1.json
+      - nut-exporter-grafana-dashboard2.json=DRuggeri_dashboard.json
+
+resources:
+  - prometheus-alarms.yaml
+
+generatorOptions:
+  labels:
+    app.kubernetes.io/name: nut-exporter
+    app.kubernetes.io/instance: nut-exporter
+    app.kubernetes.io/part-of: nut-exporter
+    app.kubernetes.io/component: nut-exporter
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "/tmp/dashboards/Tools"

@@ -12,6 +12,9 @@ spec:
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       path: apps/nut-exporter/install
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/nut-exporter/post-install
   destination:
     server: https://kubernetes.default.svc
     namespace: nut-exporter
