@@ -109,14 +109,6 @@ alloy:
         }
 
         rule {
-          source_labels = ["level"]
-          target_label  = "level"
-          action        = "replace"
-          # This lowercases any existing value
-          replacement   = "{{ .level | lower }}"
-        }
-
-        rule {
           target_label = "hostname"
           replacement = sys.env("HOSTNAME")
         }
