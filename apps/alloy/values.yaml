@@ -81,8 +81,11 @@ alloy:
           expression  = ".*/(?P<pod>[^/_]+)_(?P<namespace>[^/_]+)_(?P<container>[^/_-]+)-[^/]+\\.log$"
           labels_from_groups = true
         }
+
+        stage.cri {}
+
         stage.regex {
-          source = "log"
+          source = "message"
           expression  = ".*level=(?P<level>[^ ]+)"
           labels_from_groups = true
         }
