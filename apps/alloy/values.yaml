@@ -65,7 +65,7 @@ alloy:
         stage.labels {
           values = {
             job = "node-logs",
-            host = sys.host,
+            host = sys.env("HOSTNAME"),
           }
         }
       }
@@ -86,7 +86,7 @@ alloy:
         stage.labels {
           values = {
             job = "containerd-pods",
-            host = sys.host,
+            host = sys.env("HOSTNAME"),
           }
         }
       }
