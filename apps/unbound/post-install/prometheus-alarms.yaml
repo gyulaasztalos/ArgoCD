@@ -3,7 +3,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: unbound-alerts
-  namespace: monitoring  # Must match your Prometheus Operator's namespace
+  namespace: unbound  # Must match your Prometheus Operator's namespace
 spec:
   groups:
   - name: unbound.rules

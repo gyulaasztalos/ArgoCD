@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: pihole-alerts
-  namespace: monitoring  # Must match your Prometheus Operator's namespace
+  namespace: pihole  # Must match your Prometheus Operator's namespace
 spec:
   groups:
   - name: pihole.rules

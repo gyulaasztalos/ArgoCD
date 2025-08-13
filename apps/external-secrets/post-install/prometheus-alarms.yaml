@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: external-secrets-alerts
-  namespace: monitoring
+  namespace: external-secrets
 spec:
   groups:
   - name: external-secrets

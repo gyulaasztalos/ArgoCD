@@ -5,7 +5,7 @@ metadata:
     prometheus: cnpg
     role: alert-rules
   name: prometheus-cnpg-rules
-  namespace: monitoring
+  namespace: databases
 spec:
   groups:
   - name: cnpg.rules

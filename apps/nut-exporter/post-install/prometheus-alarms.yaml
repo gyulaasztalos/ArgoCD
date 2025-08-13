@@ -5,7 +5,7 @@ metadata:
     prometheus: nut-exporter
     role: alert-rules
   name: prometheus-nut-exporter-rules
-  namespace: monitoring
+  namespace: nut-exporter
 spec:
   groups:
   - name: nut-exporter.rules

@@ -5,7 +5,7 @@ metadata:
     prometheus: longhorn
     role: alert-rules
   name: prometheus-longhorn-rules
-  namespace: monitoring
+  namespace: longhorn-system
 spec:
   groups:
   - name: longhorn.rules
