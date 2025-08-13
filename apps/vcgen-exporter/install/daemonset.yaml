@@ -9,6 +9,8 @@ metadata:
     app.kubernetes.io/instance: vcgen-exporter
     app.kubernetes.io/part-of: vcgen-exporter
     app.kubernetes.io/component: vcgen-exporter
+  annotations:
+    ignore-check.kube-linter.io/run-as-non-root: "Required for vcgen-exporter to run properly"
 spec:
   selector:
     matchLabels:
@@ -36,6 +38,7 @@ spec:
             privileged: true
             allowPrivilegeEscalation: true
             runAsUser: 0
+            readOnlyRootFilesystem: true
           resources:
             requests:
               cpu: 50m
