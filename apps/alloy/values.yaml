@@ -31,7 +31,7 @@ crds:
 alloy:
   configMap:
     # -- Create a new ConfigMap for the config file.
-    create: true
+    create: false
     # -- Content to assign to the new ConfigMap.  This is passed into `tpl` allowing for templating from values.
     content: |
       logging {
@@ -39,135 +39,10 @@ alloy:
         format = "logfmt"
       }
 
-      local.file_match "node_logs" {
-        path_targets = [
-          {
-            __path__ = "/var/log/*.log",
-            job = "node-logs",
-          },
-          {
-            __path__ = "/var/log/syslog",
-            job = "node-logs",
-          },
-          {
-            __path__ = "/var/log/messages",
-            job = "node-logs",
-          },
-        ]
-      }
-
-      loki.source.file "node_logs" {
-        targets   = local.file_match.node_logs.targets
-        forward_to = [loki.relabel.normalize_labels.receiver]
-      }
-
-      local.file_match "containerd_pods" {
-        path_targets = [
-          {
-            __path__ = "/var/log/containers/*.log",
-            job = "containerd-pods",
-          },
-        ]
-      }
-
-      loki.source.file "containerd_pods" {
-        targets   = local.file_match.containerd_pods.targets
-        forward_to = [loki.process.get_labels.receiver]
-      }
-
-      loki.process "get_labels" {
-        stage.regex {
-          source = "filename"
-          expression  = ".*/(?P<pod>[^/_]+)_(?P<namespace>[^/_]+)_(?P<container>[^/_-]+)-[^/]+\\.log$"
-          labels_from_groups = true
-        }
-
-        stage.cri {}
-
-        stage.json {
-          source = "message"
-          expressions = { level = "level" }
-        }
-
-        stage.regex {
-          source = "message"
-          expression = ".*level[=:]\\\"?(?P<level>[^ \"']+)\\\"?"
-          labels_from_groups = true
-        }
-        forward_to = [loki.relabel.normalize_labels.receiver]
-      }
-
-      loki.relabel "normalize_labels" {
-        forward_to = [loki.write.default.receiver]
-
-        rule {
-          source_labels = ["level"]
-          target_label  = "level"
-          action        = "replace"
-          replacement   = "info"
-          regex         = "^$"
-        }
-
-        rule {
-          target_label = "hostname"
-          replacement = sys.env("HOSTNAME")
-        }
-      }
-
-      // Collect logs from systemd journal for node_exporter integration
-      loki.source.journal "journalctl_to_loki" {
-        path = "/var/log/journal"
-        labels = {
-          job = "systemd-journal",
-          hostname = sys.env("HOSTNAME"),
-        }
-        // Only collect logs from the last 24 hours
-        max_age       = "24h0m0s"
-        // Apply relabeling rules to the logs
-        relabel_rules = discovery.relabel.journalctl_to_loki.rules
-        // Send logs to the local Loki instance
-        forward_to    = [loki.write.default.receiver]
-      }
-
-      discovery.relabel "journalctl_to_loki" {
-        targets = []
-
-        rule {
-          // Extract systemd unit information into a label
-          source_labels = ["__journal__systemd_unit"]
-          target_label  = "unit"
-        }
-
-        rule {
-          // Extract boot ID information into a label
-          source_labels = ["__journal__boot_id"]
-          target_label  = "boot_id"
-        }
-
-        rule {
-          // Extract transport information into a label
-          source_labels = ["__journal__transport"]
-          target_label  = "transport"
-        }
-
-        rule {
-          // Extract log priority into a level label
-          source_labels = ["__journal_priority_keyword"]
-          target_label  = "level"
-        }
-      }
-
-      loki.write "default" {
-        endpoint {
-          url = "http://loki.loki.svc.cluster.local:3100/loki/api/v1/push"
-        }
-      }
-
-
     # -- Name of existing ConfigMap to use. Used when create is false.
-    name: null
+    name: alloy
     # -- Key in ConfigMap to get config from.
-    key: null
+    key: config.alloy
 
   clustering:
     # -- Deploy Alloy in a cluster to allow for load distribution.

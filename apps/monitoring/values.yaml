@@ -2555,18 +2555,18 @@ kube-state-metrics:
 ## Deploy node exporter as a daemonset to all nodes
 ##
 nodeExporter:
-  enabled: true
+  enabled: false
   operatingSystems:
     linux:
       enabled: true
     aix:
-      enabled: true
+      enabled: false
     darwin:
-      enabled: true
+      enabled: false
 
   ## ForceDeployDashboard Create dashboard configmap even if nodeExporter deployment has been disabled
   ##
-  forceDeployDashboards: false
+  forceDeployDashboards: true
 
 ## Configuration for prometheus-node-exporter subchart
 ##
@@ -4089,7 +4089,7 @@ prometheus:
 
     ## enable --web.enable-remote-write-receiver flag on prometheus-server
     ##
-    enableRemoteWriteReceiver: false
+    enableRemoteWriteReceiver: true
 
     ## Name of the external label used to denote replica name
     ##

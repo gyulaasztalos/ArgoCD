@@ -11,6 +11,9 @@ spec:
   sources:
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
+      path: apps/alloy/pre-install
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
       ref: config
     - repoURL: https://grafana.github.io/helm-charts
       targetRevision: 1.2.1
@@ -18,9 +21,6 @@ spec:
         valueFiles:
           - $config/apps/alloy/values.yaml
       chart: alloy
-    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
-      targetRevision: main
-      path: apps/alloy/post-install
   project: default
   syncPolicy:
     automated:
