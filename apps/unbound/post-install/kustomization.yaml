@@ -6,8 +6,7 @@ configMapGenerator:
   - name: unbound-grafana-dashboard
     namespace: unbound
     files:
-      - unbound-grafana-dashboard1.json=11705_rev1.json
-      - unbound-grafana-dashboard2.json=18077_rev6.json
+      - unbound-grafana-dashboard.json=11705_rev1.json
 
 resources:
   - prometheus-alarms.yaml
