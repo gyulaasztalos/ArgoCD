@@ -13,7 +13,6 @@ configMapGenerator:
       - forward-records.conf=forward-records.conf
 
 resources:
-  - forward-records.yaml
   - deployment.yaml
   - service.yaml
   - servicemonitor.yaml
