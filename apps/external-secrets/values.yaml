@@ -201,7 +201,7 @@ serviceMonitor:
   enabled: true
 
   # -- namespace where you want to install ServiceMonitors
-  namespace: "monitoring"
+  namespace: "external-secrets"
 
   # -- Additional labels
   additionalLabels: {}
