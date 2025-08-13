@@ -133,7 +133,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_throttled{host=\"${host}\"}",
+          "expr": "rpi_throttled{host=~\"${host}\"}",
           "instant": false,
           "legendFormat": "{{state}}",
           "range": true,
@@ -234,7 +234,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rpi_temp{host=\"${host}\"}",
+          "expr": "rpi_temp{host=~\"${host}\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -330,7 +330,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_clock{host=\"${host}\"}",
+          "expr": "rpi_clock{host=~\"${host}\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -429,7 +429,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_pmic_adc{host=\"${host}\", component=~\"${pmic_adc_metric}\", type=\"a\"} * ignoring(type) rpi_pmic_adc{host=\"${host}\", component=~\"${pmic_adc_metric}\", type=\"v\"}",
+          "expr": "rpi_pmic_adc{host=~\"${host}\", component=~\"${pmic_adc_metric}\", type=\"a\"} * ignoring(type) rpi_pmic_adc{host=~\"${host}\", component=~\"${pmic_adc_metric}\", type=\"v\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -526,7 +526,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_volt{host=\"${host}\"}",
+          "expr": "rpi_volt{host=~\"${host}\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
