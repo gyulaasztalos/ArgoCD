@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: rpi-alerts
-  namespace: rpi  # Must match your Prometheus Operator's namespace
+  namespace: vcgen-exporter  # Must match your Prometheus Operator's namespace
 spec:
   groups:
   - name: rpi.rules
