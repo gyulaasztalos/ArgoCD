@@ -34,3 +34,4 @@ resources:
   - loki/application.yaml
   - smartctl-exporter/application.yaml
   - alloy/application.yaml
+  - vcgen-exporter/application.yaml
