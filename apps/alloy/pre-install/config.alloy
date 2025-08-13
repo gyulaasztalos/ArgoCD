@@ -19,7 +19,7 @@ discovery.relabel "integrations_node_exporter" {
   rule {
     // Set a standard job name for all node_exporter metrics
     target_label = "job"
-    replacement = "node_exporter"
+    replacement = "node-exporter"
   }
 }
 
