@@ -11,6 +11,7 @@ metadata:
     app.kubernetes.io/component: vcgen-exporter
   annotations:
     ignore-check.kube-linter.io/run-as-non-root: "Required for vcgen-exporter to run properly"
+    ignore-check.kube-linter.io/privileged-container: "Required for vcgen-exporter to run properly"
 spec:
   selector:
     matchLabels:
