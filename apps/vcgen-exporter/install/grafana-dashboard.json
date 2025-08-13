@@ -133,7 +133,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_throttled{instance=\"${instance}\"}",
+          "expr": "rpi_throttled{host=\"${host}\"}",
           "instant": false,
           "legendFormat": "{{state}}",
           "range": true,
@@ -234,7 +234,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rpi_temp{instance=\"${instance}\"}",
+          "expr": "rpi_temp{host=\"${host}\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -330,7 +330,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_clock{instance=\"${instance}\"}",
+          "expr": "rpi_clock{host=\"${host}\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -429,7 +429,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_pmic_adc{instance=\"${instance}\", component=~\"${pmic_adc_metric}\", type=\"a\"} * ignoring(type) rpi_pmic_adc{instance=\"${instance}\", component=~\"${pmic_adc_metric}\", type=\"v\"}",
+          "expr": "rpi_pmic_adc{host=\"${host}\", component=~\"${pmic_adc_metric}\", type=\"a\"} * ignoring(type) rpi_pmic_adc{host=\"${host}\", component=~\"${pmic_adc_metric}\", type=\"v\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -526,7 +526,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_volt{instance=\"${instance}\"}",
+          "expr": "rpi_volt{host=\"${host}\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -577,15 +577,15 @@
           "type": "prometheus",
           "uid": "Prometheus"
         },
-        "definition": "label_values(instance)",
+        "definition": "label_values(host)",
         "hide": 0,
         "includeAll": true,
         "multi": true,
-        "name": "instance",
+        "name": "host",
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(instance)",
+          "query": "label_values(host)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
