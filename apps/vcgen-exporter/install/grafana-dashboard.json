@@ -133,7 +133,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_throttled",
+          "expr": "rpi_throttled{instance=\"${instance}\"}",
           "instant": false,
           "legendFormat": "{{state}}",
           "range": true,
@@ -234,7 +234,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rpi_temp",
+          "expr": "rpi_temp{instance=\"${instance}\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -330,7 +330,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_clock",
+          "expr": "rpi_clock{instance=\"${instance}\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -429,7 +429,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_pmic_adc{component=~\"${pmic_adc_metric}\", type=\"a\"} * ignoring(type) rpi_pmic_adc{component=~\"${pmic_adc_metric}\", type=\"v\"}",
+          "expr": "rpi_pmic_adc{instance=\"${instance}\", component=~\"${pmic_adc_metric}\", type=\"a\"} * ignoring(type) rpi_pmic_adc{instance=\"${instance}\", component=~\"${pmic_adc_metric}\", type=\"v\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -526,7 +526,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_volt",
+          "expr": "rpi_volt{instance=\"${instance}\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -562,6 +562,30 @@
         "query": {
           "qryType": 1,
           "query": "label_values(component)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {},
+        "datasource": {
+          "type": "prometheus",
+          "uid": "Prometheus"
+        },
+        "definition": "label_values(instance)",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "instance",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(instance)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
