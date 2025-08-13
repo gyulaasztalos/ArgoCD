@@ -211,7 +211,7 @@ alloy:
 
   # -- Enables sending Grafana Labs anonymous usage stats to help improve Grafana
   # Alloy.
-  enableReporting: true
+  enableReporting: false
 
   # -- Extra environment variables to pass to the Alloy container.
   extraEnv: []
