@@ -7,6 +7,10 @@ configMapGenerator:
     namespace: unbound
     files:
       - unbound.conf=unbound.conf
+  - name: unbound-forward-records-conf
+    namespace: unbound
+    files:
+      - forward-records.conf=forward-records.conf
 
 resources:
   - forward-records.yaml
