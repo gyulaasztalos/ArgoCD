@@ -24,4 +24,3 @@ generatorOptions:
     app.kubernetes.io/instance: unbound
     app.kubernetes.io/part-of: unbound
     app.kubernetes.io/component: config
-  disableNameSuffixHash: true
