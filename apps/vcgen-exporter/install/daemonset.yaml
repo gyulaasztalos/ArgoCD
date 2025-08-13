@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: vcgen-exporter
+  namespace: vcgen-exporter
+  labels:
+    app: vcgen-exporter
+    app.kubernetes.io/name: vcgen-exporter
+    app.kubernetes.io/instance: vcgen-exporter
+    app.kubernetes.io/part-of: vcgen-exporter
+    app.kubernetes.io/component: vcgen-exporter
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vcgen-exporter
+      app.kubernetes.io/instance: vcgen-exporter
+  template:
+    metadata:
+      labels:
+        app: vcgen-exporter
+        app.kubernetes.io/name: vcgen-exporter
+        app.kubernetes.io/instance: vcgen-exporter
+        app.kubernetes.io/part-of: vcgen-exporter
+        app.kubernetes.io/component: vcgen-exporter
+    spec:
+      # Run as privileged as vcgen-exporter uses privileged commands (vcgencmd)
+      containers:
+        - name: vcgen-exporter
+          image: 2281995/vcgen-exporter:v1.0.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: metrics
+              protocol: TCP
+          securityContext:
+            privileged: true
+            allowPrivilegeEscalation: true
+            runAsUser: 0
+          resources:
+            requests:
+              cpu: 50m
+              memory: 50Mi
+            limits:
+              cpu: 200m
+              memory: 100Mi
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 8080
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+            periodSeconds: 15
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            periodSeconds: 20
+            failureThreshold: 5
+      hostNetwork: false
+      # Run on all nodes; no nodeSelectors or affinities needed since all are Raspberry Pi 5 SBCs in your cluster
+      serviceAccountName: vcgen-exporter
