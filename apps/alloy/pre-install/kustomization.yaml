@@ -18,3 +18,4 @@ generatorOptions:
     app.kubernetes.io/instance: alloy
     app.kubernetes.io/part-of: alloy
     app.kubernetes.io/component: config
+  disableNameSuffixHash: true
