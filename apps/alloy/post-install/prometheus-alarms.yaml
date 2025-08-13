@@ -1,7 +1,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  namespace: alloy
+  namespace: monitoring
   name: alloy-health
   labels:
     app: alloy
