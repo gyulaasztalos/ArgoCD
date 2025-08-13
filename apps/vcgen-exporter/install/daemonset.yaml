@@ -12,6 +12,7 @@ metadata:
   annotations:
     ignore-check.kube-linter.io/run-as-non-root: "Required for vcgen-exporter to run properly"
     ignore-check.kube-linter.io/privileged-container: "Required for vcgen-exporter to run properly"
+    ignore-check.kube-linter.io/privilege-escalation-container: "This container requires privileged mode for vcgencmd functionality"
 spec:
   selector:
     matchLabels:
@@ -37,7 +38,7 @@ spec:
               protocol: TCP
           securityContext:
             privileged: true
-            allowPrivilegeEscalation: false
+            allowPrivilegeEscalation: true
             runAsUser: 0
             readOnlyRootFilesystem: true
           resources:
