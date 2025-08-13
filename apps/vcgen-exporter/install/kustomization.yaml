@@ -13,6 +13,7 @@ resources:
   - daemonset.yaml
   - service.yaml
   - servicemonitor.yaml
+  - prometheus-alarms.yaml
 
 generatorOptions:
   labels:

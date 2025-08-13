@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: rpi-alerts
+  namespace: rpi  # Must match your Prometheus Operator's namespace
+spec:
+  groups:
+  - name: rpi.rules
+    rules:
+    # Critical: Pi-hole service is down
+      - alert: RaspberryPiHighTemperature
+        expr: rpi_temp > 70
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High temperature on Raspberry Pi {{ $labels.host }}"
+          description: "Temperature has exceeded 70°C for more than 10 minutes."
+      - alert: RaspberryPiCriticalTemperature
+        expr: rpi_temp > 80
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical temperature on Raspberry Pi {{ $labels.host }}"
+          description: "Temperature has exceeded 80°C for more than 5 minutes, immediate action recommended."
