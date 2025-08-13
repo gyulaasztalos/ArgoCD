@@ -9,10 +9,9 @@ spec:
     namespace: vcgen-exporter
     server: https://kubernetes.default.svc
   sources:
-
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/vcgen-exporter/post-install
+      path: apps/vcgen-exporter/install
   project: default
   syncPolicy:
     automated:
