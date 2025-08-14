@@ -133,7 +133,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_throttled{nodename~\"${nodename}\"}",
+          "expr": "rpi_throttled{nodename=~\"${nodename}\"}",
           "instant": false,
           "legendFormat": "{{state}}",
           "range": true,
@@ -234,7 +234,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rpi_temp{nodename~\"${nodename}\"}",
+          "expr": "rpi_temp{nodename=~\"${nodename}\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -330,7 +330,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_clock{nodename~\"${nodename}\"}",
+          "expr": "rpi_clock{nodename=~\"${nodename}\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -429,7 +429,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_pmic_adc{nodename~\"${nodename}\", component=~\"${pmic_adc_metric}\", type=\"a\"} * ignoring(type) rpi_pmic_adc{nodename~\"${nodename}\", component=~\"${pmic_adc_metric}\", type=\"v\"}",
+          "expr": "rpi_pmic_adc{nodename=~\"${nodename}\", component=~\"${pmic_adc_metric}\", type=\"a\"} * ignoring(type) rpi_pmic_adc{nodename=~\"${nodename}\", component=~\"${pmic_adc_metric}\", type=\"v\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -526,7 +526,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_volt{nodename~\"${nodename}\"}",
+          "expr": "rpi_volt{nodename=~\"${nodename}\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
