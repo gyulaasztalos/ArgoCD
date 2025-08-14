@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: vcgen-exporter
-  namespace: monitoring
+  namespace: vcgen-exporter
   labels:
     release: prometheus-operator
     app.kubernetes.io/name: vcgen-exporter
