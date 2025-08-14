@@ -138,7 +138,7 @@ loki.relabel "normalize_labels" {
   }
 
   rule {
-    target_label = "hostname"
+    target_label = "nodename"
     replacement = sys.env("HOSTNAME")
   }
 }
@@ -148,7 +148,7 @@ loki.source.journal "journalctl_to_loki" {
   path = "/var/log/journal"
   labels = {
     job = "systemd-journal",
-    hostname = sys.env("HOSTNAME"),
+    nodename = sys.env("HOSTNAME"),
   }
   // Only collect logs from the last 24 hours
   max_age       = "24h0m0s"

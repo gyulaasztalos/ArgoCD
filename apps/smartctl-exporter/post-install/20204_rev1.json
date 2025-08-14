@@ -426,7 +426,7 @@
           "disableTextWrap": false,
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "smartctl_device_power_on_seconds{instance=\"192.168.1.7:9633\"}",
+          "expr": "smartctl_device_power_on_seconds{nodename=\"archer\"}",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
