@@ -133,7 +133,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_throttled{nodename~\"${host}\"}",
+          "expr": "rpi_throttled{nodename~\"${nodename}\"}",
           "instant": false,
           "legendFormat": "{{state}}",
           "range": true,
@@ -234,7 +234,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "rpi_temp{nodename~\"${host}\"}",
+          "expr": "rpi_temp{nodename~\"${nodename}\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -330,7 +330,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_clock{nodename~\"${host}\"}",
+          "expr": "rpi_clock{nodename~\"${nodename}\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -429,7 +429,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_pmic_adc{nodename~\"${host}\", component=~\"${pmic_adc_metric}\", type=\"a\"} * ignoring(type) rpi_pmic_adc{nodename~\"${host}\", component=~\"${pmic_adc_metric}\", type=\"v\"}",
+          "expr": "rpi_pmic_adc{nodename~\"${nodename}\", component=~\"${pmic_adc_metric}\", type=\"a\"} * ignoring(type) rpi_pmic_adc{nodename~\"${nodename}\", component=~\"${pmic_adc_metric}\", type=\"v\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -526,7 +526,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "rpi_volt{nodename~\"${host}\"}",
+          "expr": "rpi_volt{nodename~\"${nodename}\"}",
           "instant": false,
           "legendFormat": "{{component}}",
           "range": true,
@@ -577,15 +577,15 @@
           "type": "prometheus",
           "uid": "Prometheus"
         },
-        "definition": "label_values({job=\"vcgen-exporter-metrics\"}, host)",
+        "definition": "label_values({job=\"vcgen-exporter-metrics\"}, nodename)",
         "hide": 0,
         "includeAll": true,
         "multi": true,
-        "name": "host",
+        "name": "nodename",
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values({job=\"vcgen-exporter-metrics\"}, host)",
+          "query": "label_values({job=\"vcgen-exporter-metrics\"}, nodename)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
