@@ -14,14 +14,6 @@ spec:
       interval: 30s
       targetPort: http
       honorLabels: true
-      relabelings:
-        - action: replace
-          regex: ^(.*)$
-          replacement: $1
-          separator: ;
-          sourceLabels:
-            - __meta_kubernetes_pod_node_name
-          targetLabel: nodename
   namespaceSelector:
     matchNames:
       - netatmo-exporter
