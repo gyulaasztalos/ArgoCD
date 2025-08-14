@@ -32,7 +32,14 @@ serviceMonitor:
   interval: 60s
   scrapeTimeout: 30s
   # Set relabel_configs as per https://prometheus.io/docs/prometheus/latest/configuration/configuration/#relabel_config
-  relabelings: []
+  relabelings:
+    - action: replace
+      regex: ^(.*)$
+      replacement: $1
+      separator: ;
+      sourceLabels:
+        - __meta_kubernetes_pod_node_name
+      targetLabel: nodename
   metricRelabelings: []
 
 prometheusRules:
