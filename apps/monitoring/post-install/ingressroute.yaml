@@ -11,7 +11,15 @@ spec:
     - websecure
   routes:
     - kind: Rule
+      match: Host(`prometheus.local.asztalos.net`) && PathPrefix(`/api/`)
+      priority: 25  # Higher than your main route
+      services:
+        - name: monitoring-kube-prometheus-prometheus
+          namespace: monitoring
+          port: 9090
+    - kind: Rule
       match: Host(`prometheus.local.asztalos.net`)
+      priority: 20
       middlewares:
         - name: authentik
           namespace: traefik
