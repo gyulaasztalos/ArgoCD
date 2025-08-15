@@ -366,7 +366,7 @@ logs:
     noColor: false
   access:
     # -- To enable access logs
-    enabled: false
+    enabled: true
     # -- Set [access log format](https://doc.traefik.io/traefik/observability/access-logs/#format)
     format:  # @schema enum:["common", "json", null]; type:[string, null]; default: "common"
     # filePath: "/var/log/traefik/access.log
@@ -381,7 +381,7 @@ logs:
       # -- Set minDuration, to keep access logs when requests take longer than the specified duration
       minduration: ""
     # -- Enables accessLogs for internal resources. Default: false.
-    addInternals: false
+    addInternals: true
     fields:
       general:
         # -- Set default mode for fields.names
@@ -396,7 +396,7 @@ logs:
 
 metrics:
   # -- Enable metrics for internal resources. Default: false
-  addInternals: false
+  addInternals: true
 
   ## Prometheus is enabled by default.
   ## It can be disabled by setting "prometheus: null"
