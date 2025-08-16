@@ -149,6 +149,7 @@ loki.relabel "normalize_labels" {
     regex = "^W$"
     replacement = "warning"
   }
+
   rule {
     source_labels = ["level"]
     target_label = "level"
@@ -182,7 +183,13 @@ loki.relabel "normalize_labels" {
     target_label = "level"
     action = "replace"
     regex = "^3$"
-    replacement = "info" }
+    replacement = "info"
+  }
+  rule {
+    source_labels = ["level"]
+    target_label = "level"
+    action = "lowercase"
+  }
   rule {
     source_labels = ["level"]
     target_label = "level"
