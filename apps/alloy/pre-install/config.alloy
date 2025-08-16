@@ -115,21 +115,39 @@ loki.process "get_labels" {
   stage.cri {}
 
   stage.regex {
-    source = "message"
-    expression = "(?i).*(?P<level>warning|error).*"
+    source = "log"
+    expression = "(?i).*(?P<level>warning|warn|err|error).*"
     labels_from_groups = true
   }
 
   stage.json {
-    source = "message"
+    source = "log"
     expressions = { level = "level" }
   }
 
   stage.regex {
-    source = "message"
+    source = "log"
     expression = ".*level[=:]\\\"?(?P<level>[^ \"']+)\\\"?"
     labels_from_groups = true
   }
+
+  stage.relabel {
+    rule {
+      source_labels = ["level"]
+      target_label  = "level"
+      action        = "replace"
+      regex         = "(?i)^warn$"
+      replacement   = "warning"
+    }
+    rule {
+      source_labels = ["level"]
+      target_label  = "level"
+      action        = "replace"
+      regex         = "(?i)^err$"
+      replacement   = "error"
+    }
+  }
+
   forward_to = [loki.relabel.normalize_labels.receiver]
 }
 
