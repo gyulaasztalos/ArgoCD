@@ -207,7 +207,7 @@ loki.relabel "normalize_labels" {
     source_labels = ["level"]
     target_label  = "level"
     action        = "replace"
-    replacement   = "unknown"
+    replacement   = "info"
     regex         = "^$"
   }
 
