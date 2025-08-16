@@ -120,21 +120,18 @@ loki.process "get_labels" {
   }
 
   stage.regex {
-    source = "log"
     expression = "(?i)(?:^|\\s)\\\"?(?:level|lvl|severity)\\\"?[=:]\\s*\\\"?(?P<level>.+)\\\"?\\s"
     labels_from_groups = true
   }
 
   // one-char levels
   stage.regex {
-    source = "log"
     expression = "(?:^|\\s)(?P<level>[EWI])\\s"
     labels_from_groups = true
   }
 
   // plain words anywhere (last resort), match whole word
   stage.regex {
-    source = "log"
     expression = "(?i)(?P<level>trace|debug|info|warning|warn|error|err|fatal)"
     labels_from_groups = true
   }
