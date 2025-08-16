@@ -135,7 +135,7 @@ loki.process "get_labels" {
   // plain words anywhere (last resort), match whole word
   stage.regex {
     source = "log"
-    expression = "(?i)(?P<level>trace|debug|info|warn|warning|err|error|fatal)"
+    expression = "(?i)(?P<level>trace|debug|info|warning|warn|error|err|fatal)"
     labels_from_groups = true
   }
 
@@ -149,7 +149,7 @@ loki.relabel "normalize_labels" {
     target_label = "level"
     action = "replace"
     regex = "^W$"
-    replacement = "warn"
+    replacement = "warning"
   }
   rule {
     source_labels = ["level"]
@@ -170,7 +170,7 @@ loki.relabel "normalize_labels" {
     target_label = "level"
     action = "replace"
     regex = "^2$"
-    replacement = "warn"
+    replacement = "warning"
   }
   rule {
     source_labels = ["level"]
@@ -202,7 +202,7 @@ loki.relabel "normalize_labels" {
     source_labels = ["level"]
     target_label  = "level"
     action        = "replace"
-    replacement   = "info"
+    replacement   = "unknown"
     regex         = "^$"
   }
 
