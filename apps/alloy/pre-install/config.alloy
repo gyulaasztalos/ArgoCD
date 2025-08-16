@@ -128,7 +128,7 @@ loki.process "get_labels" {
   // one-char levels
   stage.regex {
     source = "log"
-    expression = "(?:^|\\s)(?P<level>E|W|I)\\s"
+    expression = "(?:^|\\s)(?P<level>[EWI])\\s"
     labels_from_groups = true
   }
 
