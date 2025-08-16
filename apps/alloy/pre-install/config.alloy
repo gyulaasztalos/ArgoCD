@@ -119,18 +119,37 @@ loki.process "get_labels" {
     expressions = { level = "level" }
   }
 
-  stage.regex {     source = “log”     expression = “(?i)(?:^|\s)(?:level|lvl|severity)=:\s*\"?(?Pa-z+)\"?”     labels_from_groups = true   }
+  stage.regex {
+    source = "log"
+    expression = "(?i)(?:^|\\s)(?:level|lvl|severity)[=:]\\s*\\\"?(?P<level>[a-z]+)\\\"?"
+    labels_from_groups = true
+  }
 
-  // bracketed single-letter or word e.g. E, ERROR, warn
-  stage.regex {     source = “log”     expression = “(?i)(?P[a-z])\b|(?Ptrace|debug|info|warn|warning|err|error|fatal)$$”     labels_from_groups = true   }
+  // one-char levels
+  stage.regex {
+    source = "log"
+    expression = "(?:^|\\s)(?P<level>E|W|I)\\s"
+    labels_from_groups = true
+  }
 
   // plain words anywhere (last resort), match whole word
-  stage.regex {     source = “log”     expression = “(?i)(?Ptrace|debug|info|warn|warning|err|error|fatal)”     labels_from_groups = true   }
+  stage.regex {
+    source = "log"
+    expression = "(?i)(?P<level>trace|debug|info|warn|warning|err|error|fatal)"
+    labels_from_groups = true
+  }
 
   // Normalize short forms and alternate capture names into ‘level’
-  stage.relabel {     rule { source_labels = “level”;   target_label = “level”; action = “replace”; regex = “(?i)^w$”; replacement = “warn” }     rule { source_labels = “level”;   target_label = “level”; action = “replace”; regex = “(?i)^e$”; replacement = “error” }     rule { source_labels = “level”;   target_label = “level”; action = “replace”; regex = “(?i)^i$”; replacement = “info” }
-    rule { source_labels = “level”;   target_label = “level”; action = “replace”; regex = “^2$”; replacement = “warn” }     rule { source_labels = “level”;   target_label = “level”; action = “replace”; regex = “^1$”; replacement = “error” }     rule { source_labels = “level”;   target_label = “level”; action = “replace”; regex = “^3$”; replacement = “info” }
-    rule { source_labels = “level2”;  target_label = “level”; action = “replace”; regex = “.”;      replacement = “$1” }     rule { source_labels = “level3”;  target_label = “level”; action = “replace”; regex = “.”;      replacement = “$1” }     rule { source_labels = “level”;   target_label = “level”; action = “replace”; regex = “(?i)^warn$”; replacement = “warning” }     rule { source_labels = “level”;   target_label = “level”; action = “replace”; regex = “(?i)^err$”;  replacement = “error” }   }
+  stage.relabel {
+    rule { source_labels = "level";   target_label = "level"; action = "replace"; regex = "(?i)^w$"; replacement = "warn" }
+    rule { source_labels = "level";   target_label = "level"; action = "replace"; regex = "(?i)^e$"; replacement = "error" }
+    rule { source_labels = "level";   target_label = "level"; action = "replace"; regex = "(?i)^i$"; replacement = "info" }
+    rule { source_labels = "level";   target_label = "level"; action = "replace"; regex = "^2$"; replacement = "warn" }
+    rule { source_labels = "level";   target_label = "level"; action = "replace"; regex = "^1$"; replacement = "error" }
+    rule { source_labels = "level";   target_label = "level"; action = "replace"; regex = "^3$"; replacement = "info" }
+    rule { source_labels = "level";   target_label = "level"; action = "replace"; regex = "(?i)^warn$"; replacement = "warning" }
+    rule { source_labels = "level";   target_label = "level"; action = "replace"; regex = "(?i)^err$";  replacement = "error" }
+  }
 
   forward_to = [loki.relabel.normalize_labels.receiver]
 }
