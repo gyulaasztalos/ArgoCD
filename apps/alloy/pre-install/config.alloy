@@ -114,6 +114,12 @@ loki.process "get_labels" {
 
   stage.cri {}
 
+  stage.regex {
+    source = "message"
+    expression = "(?i).*(?P<level>warning|error).*"
+    labels_from_groups = true
+  }
+
   stage.json {
     source = "message"
     expressions = { level = "level" }
