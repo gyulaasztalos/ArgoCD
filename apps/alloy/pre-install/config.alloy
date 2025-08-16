@@ -121,7 +121,7 @@ loki.process "get_labels" {
 
   stage.regex {
     source = "log"
-    expression = "(?i)(?:^|\\s)(?:level|lvl|severity)[=:]\\s*\\\"?(?P<level>[a-z]+)\\\"?"
+    expression = "(?i)(?:^|\\s)\\\"?(?:level|lvl|severity)\\\"?[=:]\\s*\\\"?(?P<level>.+)\\\"?\\s"
     labels_from_groups = true
   }
 
