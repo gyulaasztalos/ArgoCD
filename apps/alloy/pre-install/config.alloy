@@ -145,54 +145,54 @@ loki.process "get_labels" {
 loki.relabel "normalize_labels" {
   forward_to = [loki.write.default.receiver]
   rule {
-    source_labels = "level"
+    source_labels = ["level"]
     target_label = "level"
     action = "replace"
     regex = "^W$"
     replacement = "warn"
   }
   rule {
-    source_labels = "level"
+    source_labels = ["level"]
     target_label = "level"
     action = "replace"
     regex = "^E$"
     replacement = "error"
   }
   rule {
-    source_labels = "level"
+    source_labels = ["level"]
     target_label = "level"
     action = "replace"
     regex = "^I$"
     replacement = "info"
   }
   rule {
-    source_labels = "level"
+    source_labels = ["level"]
     target_label = "level"
     action = "replace"
     regex = "^2$"
     replacement = "warn"
   }
   rule {
-    source_labels = "level"
+    source_labels = ["level"]
     target_label = "level"
     action = "replace"
     regex = "^1$"
     replacement = "error"
   }
   rule {
-    source_labels = "level"
+    source_labels = ["level"]
     target_label = "level"
     action = "replace"
     regex = "^3$"
     replacement = "info" }
   rule {
-    source_labels = "level"
+    source_labels = ["level"]
     target_label = "level"
     action = "replace"
     regex = "(?i)^warn$"
     replacement = "warning" }
   rule {
-    source_labels = "level"
+    source_labels = ["level"]
     target_label = "level"
     action = "replace"
     regex = "(?i)^err$"
