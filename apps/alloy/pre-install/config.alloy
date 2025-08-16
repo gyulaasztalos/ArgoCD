@@ -149,14 +149,6 @@ loki.relabel "normalize_labels" {
     regex = "^W$"
     replacement = "warning"
   }
-
-  rule {
-    source_labels = ["level"]
-    target_label = "level"
-    action = "replace"
-    regex = ".*"
-    replacement = {{ .Value | ToLower() }}
-  }
   rule {
     source_labels = ["level"]
     target_label = "level"
