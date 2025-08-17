@@ -8,7 +8,7 @@ metadata:
   annotations:
     grafana_folder: "/tmp/dashboards/Applications"
 data:
-  app-grafana-dashboard.json: |
+  netatmo-grafana-dashboard.json: |
     {
       "annotations": {
         "list": [
