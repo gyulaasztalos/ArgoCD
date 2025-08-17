@@ -71,6 +71,8 @@ This repository contains Kubernetes manifests for managing my HomeLab infrastruc
   - kube-prometheus-stack
     - Prometheus, Grafana, Alertmanager
     - ServiceMonitors, PrometheusRules, and custom dashboards
+  - Loki (single binary mode)
+  - Alloy
 - **Notifications:**
   - Apprise
   - Mailrise
