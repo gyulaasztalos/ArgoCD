@@ -73,6 +73,8 @@ This repository contains Kubernetes manifests for managing my HomeLab infrastruc
     - ServiceMonitors, PrometheusRules, and custom dashboards
   - Loki (single binary mode)
   - Alloy
+  - vcgen-exporter
+  - nut-exporter
 - **Notifications:**
   - Apprise
   - Mailrise
@@ -80,6 +82,7 @@ This repository contains Kubernetes manifests for managing my HomeLab infrastruc
 #### Deployed Applications
 - Rancher (use it only for read-only access or ephemeral changes)
 - Nginx (testing)
+- whoami (testing)
 - Pi-Hole + Unbound (DNS with TLS forwarding to Cloudflare DNS) + nebula-sync
 - Transmission
 - Flexget
