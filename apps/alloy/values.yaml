@@ -146,7 +146,7 @@ image:
   repository: grafana/alloy
   # -- (string) Grafana Alloy image tag. When empty, the Chart's appVersion is
   # used.
-  tag: v1.10.1
+  tag: v1.10.2
   # -- Grafana Alloy image's SHA256 digest (either in format "sha256:XYZ" or "XYZ"). When set, will override `image.tag`.
   digest: null
   # -- Grafana Alloy image pull policy.
