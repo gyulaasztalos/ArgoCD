@@ -53,6 +53,7 @@ This repository contains Kubernetes manifests for managing my HomeLab infrastruc
 - **GitOps:** ArgoCD
 - **Storage:** HA Longhorn
 - **Networking:**
+  - Flannel
   - Multus
   - Traefik (reverse proxy)
   - Cert-manager with Let's Encrypt wildcard certificates (Cloudflare DNS challenge)
