@@ -60,7 +60,7 @@ spec:
               mountPath: /config
       containers:
         - name: netatmo-exporter
-          image: ghcr.io/xperimental/netatmo-exporter:2.1.1
+          image: ghcr.io/xperimental/netatmo-exporter:2.1.2
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
