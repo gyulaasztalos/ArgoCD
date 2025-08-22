@@ -11,14 +11,14 @@ spec:
     - websecure
   routes:
     - kind: Rule
-      match: Host(`apprise.local.asztalos.net`) && PathPrefix(`/notify/`)
+      match: Host(`apprise.local.asztalos.net`) && PathPrefix(`/notify`)
       priority: 25  # Higher than your main route
       services:
         - name: apprise
           namespace: apprise
           port: 8000
     - kind: Rule
-      match: Host(`apprise.local.asztalos.net`) && PathPrefix(`/apprise/`)
+      match: Host(`apprise.local.asztalos.net`) && PathPrefix(`/apprise`)
       priority: 20  # Higher than your main route
       services:
         - name: apprise
