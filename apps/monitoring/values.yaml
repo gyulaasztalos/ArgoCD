@@ -558,8 +558,8 @@ alertmanager:
             require_tls: false
       - name: "iCloud"
         email_configs:
-          - to: "asztalos.gyula@icloud.com"
-            from: "alertmanager@local.asztalos.net"
+          - to: "gyula@asztalos.net"
+            from: "gyula@asztalos.net"
             smarthost: "smtp.mail.me.com:587"
             auth_username: "asztalos.gyula@icloud.com"
             auth_password_file: /etc/alertmanager/secrets/smtp_password
