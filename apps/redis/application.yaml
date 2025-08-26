@@ -18,7 +18,7 @@ spec:
       targetRevision: main
       ref: config
     - repoURL: registry-1.docker.io/bitnamicharts
-      targetRevision: 22.0.5
+      targetRevision: 22.0.6
       helm:
         valueFiles:
           - $config/apps/redis/values.yaml
