@@ -214,6 +214,10 @@ kind: Deployment
 metadata:
   name: system-upgrade-controller
   namespace: system-upgrade
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "images do not require a read-only root filesystem"
+    ignore-check.kube-linter.io/unset-cpu-requirements: "the container does not need cpu requests/limits"
+    ignore-check.kube-linter.io/unset-memory-requirements: "the container does not need memory requests/limits"
 spec:
   selector:
     matchLabels:
