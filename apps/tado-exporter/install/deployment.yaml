@@ -66,8 +66,8 @@ spec:
                 - |
                   wget -q -O - http://localhost:9898/metrics | awk '{if (NR>1) ok=1};END{if (ok==1) exit 0; else exit 1}'
             initialDelaySeconds: 30
-            periodSeconds: 20
-            failureThreshold: 3
+            periodSeconds: 30
+            failureThreshold: 6
             successThreshold: 1
             timeoutSeconds: 10
           envFrom:
