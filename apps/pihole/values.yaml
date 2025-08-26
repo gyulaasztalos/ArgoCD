@@ -516,9 +516,11 @@ hostNetwork: "false"
 privileged: "false"
 
 # linux capabilities container should run with
-capabilities: {}
-  # add:
+capabilities:
+  add:
   # - NET_ADMIN
+    - CAP_SYS_TIME
+    - CAP_SYS_NICE
 
 customVolumes:
   # -- set this to true to enable custom volumes
