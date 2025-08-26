@@ -11,16 +11,6 @@ metadata:
     app.kubernetes.io/component: apprise
 spec:
   groups:
-    - name: test-alert
-      rules:
-      - alert: TestAlertRoute
-        expr: vector(1)
-        labels:
-          severity: critical
-          namespace: apprise
-        annotations:
-          summary: "Test alert for new alert route"
-
     - name: apprise.rules
       rules:
         - alert: AppriseApiDown
