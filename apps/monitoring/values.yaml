@@ -542,6 +542,12 @@ alertmanager:
       - receiver: 'null'
         matchers:
           - alertname = "Watchdog"
+      - receiver: "iCloud"
+        matchers:
+          - namespace = "apprise"
+      - receiver: "iCloud"
+        matchers:
+          - severity = "critical"
     receivers:
       - name: 'null'
       - name: "mailrise"
@@ -550,6 +556,14 @@ alertmanager:
             from: "alertmanager@local.asztalos.net"
             smarthost: "apprise.apprise.svc.cluster.local:8025"
             require_tls: false
+      - name: "iCloud"
+        email_configs:
+          - to: "asztalos.gyula@icloud.com"
+            from: "alertmanager@local.asztalos.net"
+            smarthost: "smtp.mail.me.com:587"
+            auth_username: "asztalos.gyula@icloud.com"
+            auth_password_file: /etc/alertmanager/secrets/smtp_password
+            require_tls: true
     templates:
     - '/etc/alertmanager/config/*.tmpl'
 
@@ -1152,10 +1166,17 @@ alertmanager:
     #   resources: {}
 
     # Additional volumes on the output StatefulSet definition.
-    volumes: []
+    volumes:
+      - name: smtp-secret-volume
+        secret:
+          secretName: alertmanager-smtp-secret
+          defaultMode: 420
 
     # Additional VolumeMounts on the output StatefulSet definition.
-    volumeMounts: []
+    volumeMounts:
+      - name: smtp-secret-volume
+        mountPath: /etc/alertmanager/secrets
+        readOnly: true
 
     ## InitContainers allows injecting additional initContainers. This is meant to allow doing some changes
     ## (permissions, dir tree) on mounted volumes before starting prometheus
