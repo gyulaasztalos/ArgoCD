@@ -128,7 +128,13 @@ replicas: 1
 priorityClassName: rancher-critical
 
 # Set pod resource requests/limits for Rancher.
-resources: {}
+resources:
+  requests:
+    cpu: 200m
+    memory: 800Mi
+  limits:
+    cpu: 2000m
+    memory: 1500Mi
 
 #
 # tls
