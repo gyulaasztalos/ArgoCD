@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: tado-exporter-alerts
+  namespace: tado-exporter  # Must match your Prometheus Operator's namespace
+spec:
+  groups:
+  - name: tado-exporter.rules
+    rules:
+    # Critical: tado-exporter service is down
+    - alert: tado-exporter-down
+      expr: absent(up{job="tado-exporter"} == 1)
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "tado-exporter service is down"
+        description: "The tado-exporter service has not been up for the last 5 minutes."
+    - alert: tado-exporter-restart-loop
+      expr: increase(kube_pod_container_status_restarts_total{namespace="tado-exporter", pod=~"tado-exporter-.*"}[18m]) > 3
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "tado-exporter pod is restarting frequently"
+        description: "The tado-exporter pod has restarted more than 3 times in the last 18 minutes."

@@ -13,6 +13,7 @@ resources:
   - service.yaml
   - servicemonitor.yaml
   - grafana-dashboard.yaml
+  - prometheus-alarms.yaml
 
 generatorOptions:
   labels:
