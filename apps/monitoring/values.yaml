@@ -4394,11 +4394,11 @@ prometheus:
     storageSpec:
       volumeClaimTemplate:
         spec:
-          storageClassName: "longhorn"
+          storageClassName: "longhorn-temp"
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 75Gi
+              storage: 50Gi
      # selector: {}
     ## Using PersistentVolumeClaim
     ##

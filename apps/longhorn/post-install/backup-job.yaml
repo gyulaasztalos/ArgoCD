@@ -8,6 +8,8 @@ spec:
   name: daily-volume-backup
   cron: "0 2 * * *"
   task: "backup"
-  groups: ["default"]
+  groups:
+    - default
+    - temp
   retain: 3
   concurrency: 1

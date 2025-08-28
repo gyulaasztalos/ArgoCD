@@ -1,0 +1,12 @@
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: extra-filesystem-trim
+  namespace: longhorn-system
+spec:
+  concurrency: 1
+  cron: '0 5 * * 4'  # Weekly at 5 AM on Thursdays
+  groups: ["temp"]
+  name: extra-filesystem-trim
+  retain: 0
+  task: filesystem-trim
