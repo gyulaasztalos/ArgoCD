@@ -1,0 +1,2 @@
+- Rancher already includes this operator. (needs the plans to be added to cattle-system namespace)
+- Use this only if Rancher is not installed.
