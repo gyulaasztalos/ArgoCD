@@ -4435,7 +4435,7 @@ prometheus:
     ## port to 2379 and allow etcd scraping provided it is running on all Kubernetes master nodes
     ##
     additionalScrapeConfigs:
-      - job_name: 'node-exporter-raspberrypi'
+      - job_name: 'node-exporter'
         scrape_interval: 60s
         static_configs:
           - targets:
