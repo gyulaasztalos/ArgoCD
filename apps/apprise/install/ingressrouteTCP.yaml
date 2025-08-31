@@ -10,6 +10,7 @@ spec:
     - match: HostSNI(`*`)
       services:
         - name: apprise
+          namespace: apprise
           port: 8025
   tls:
     secretName: local-asztalos-net-tls
