@@ -8,9 +8,11 @@ spec:
     - mailsecure
   routes:
     - match: HostSNI(`*`)
+      kind: Rule
       services:
         - name: apprise
           namespace: apprise
           port: 8025
+          nativeLB: true
   tls:
     secretName: local-asztalos-net-tls

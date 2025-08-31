@@ -591,7 +591,7 @@ metrics:
 # -- https://doc.traefik.io/traefik/observability/tracing/overview/
 tracing:  # @schema additionalProperties: false
   # -- Enables tracing for internal resources. Default: false.
-  addInternals: true
+  addInternals: false
   # -- Service name used in selected backend. Default: traefik.
   serviceName:  # @schema type:[string, null]
   # -- Defines additional resource attributes to be sent to the collector.
