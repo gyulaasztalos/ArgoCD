@@ -806,6 +806,11 @@ ports:
       default: true
     exposedPort: 465
     protocol: TCP
+    tls:
+      enabled: true
+      options: ""
+      certResolver: ""
+      domains: []
 
 # -- TLS Options are created as [TLSOption CRDs](https://doc.traefik.io/traefik/https/tls/#tls-options)
 # When using `labelSelector`, you'll need to set labels on tlsOption accordingly.
