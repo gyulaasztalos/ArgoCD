@@ -10,8 +10,7 @@ spec:
   entryPoints:
     - mailsecure
   routes:
-    - kind: Rule
-      match: HostSNI(`*`)
+    - match: HostSNI(`*`)
       priority: 35
       services:
         - name: apprise
