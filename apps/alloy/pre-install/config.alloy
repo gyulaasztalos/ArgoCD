@@ -67,6 +67,53 @@ prometheus.remote_write "default" {
 }
 
 // LOGS
+// Remote syslog
+loki.source.syslog "remote_syslog" {
+  listener {
+    address   = "0.0.0.0:514"
+    protocol  = "tcp"
+    log_format = "rfc3164"
+  }
+  forward_to = [loki.process.syslog_proc.receiver]
+}
+
+loki.process "syslog_proc" {
+  # Forward parsed logs to Loki write stage
+  forward_to = [loki.relabel.normalize_labels.receiver]
+
+  # Extract timestamp (e.g., "Nov 14 15:04:05")
+  stage.regex {
+    expression = `^(?P<ts>[A-Z][a-z]{2}\s{1,2}\d{1,2}\s\d{2}:\d{2}:\d{2})\s(?P<host>[\w\.\-]+)\s(?P<log>.*)$`
+  }
+
+  # Label extracted hostname
+  stage.labels {
+    values = { nodename = "host" }
+  }
+
+  # Parse the timestamp using syslog's format
+  stage.timestamp {
+    source = "ts"
+    format = "Jan _2 15:04:05"
+  }
+
+  # Optionally extract fields from the log message (e.g., app or message)
+  stage.regex {
+    expression = `^(?P<application>[^:]+):\s(?P<message>.*)$`
+  }
+
+  # Promote application as label
+  stage.labels {
+    values = { application = "application" }
+  }
+
+  # Output the message content as 'log'
+  stage.output {
+    source = "message"
+  }
+}
+
+
 // Node Logs
 local.file_match "node_logs" {
   path_targets = [
@@ -91,7 +138,7 @@ local.file_match "node_logs" {
 
 loki.source.file "node_logs" {
   targets   = local.file_match.node_logs.targets
-  forward_to = [loki.relabel.normalize_labels.receiver]
+  forward_to = [loki.relabel.add_hostname.receiver]
 }
 
 // Container Logs
@@ -140,7 +187,15 @@ loki.process "get_labels" {
     labels_from_groups = true
   }
 
+  forward_to = [loki.relabel.add_hostname.receiver]
+}
+
+loki.relabel "add_hostname" {
   forward_to = [loki.relabel.normalize_labels.receiver]
+  rule {
+    target_label = "nodename"
+    replacement = sys.env("HOSTNAME")
+  }
 }
 
 loki.relabel "normalize_labels" {
@@ -213,11 +268,6 @@ loki.relabel "normalize_labels" {
     action        = "replace"
     replacement   = "info"
     regex         = "^$"
-  }
-
-  rule {
-    target_label = "nodename"
-    replacement = sys.env("HOSTNAME")
   }
 }
 

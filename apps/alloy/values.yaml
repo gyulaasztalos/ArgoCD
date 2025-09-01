@@ -98,11 +98,11 @@ alloy:
   extraArgs: []
 
   # -- Extra ports to expose on the Alloy container.
-  extraPorts: []
-  # - name: "faro"
-  #   port: 12347
-  #   targetPort: 12347
-  #   protocol: "TCP"
+  extraPorts:
+    - name: "alloy-syslog"
+      port: 1514
+      targetPort: 1514
+      protocol: "TCP"
   #   appProtocol: "h2c"
 
   # -- Host aliases to add to the Alloy container.

@@ -811,6 +811,13 @@ ports:
       options: ""
       certResolver: ""
       domains: []
+  syslog:
+    # -- The port for the mailsecure entrypoint
+    port: 514
+    expose:
+      default: true
+    exposedPort: 514
+    protocol: TCP
 
 # -- TLS Options are created as [TLSOption CRDs](https://doc.traefik.io/traefik/https/tls/#tls-options)
 # When using `labelSelector`, you'll need to set labels on tlsOption accordingly.
