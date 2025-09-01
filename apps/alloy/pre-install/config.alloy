@@ -70,7 +70,7 @@ prometheus.remote_write "default" {
 // Remote syslog
 loki.source.syslog "remote_syslog" {
   listener {
-    address   = "0.0.0.0:514"
+    address   = "127.0.0.1:514"
     protocol  = "tcp"
     syslog_format = "rfc3164"
   }
