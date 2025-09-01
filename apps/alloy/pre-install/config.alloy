@@ -75,6 +75,10 @@ local.file_match "node_logs" {
       job = "node-logs",
     },
     {
+      __path__ = "/var/log/unattended-upgrades/*.log",
+      job = "node-logs",
+    },
+    {
       __path__ = "/var/log/syslog",
       job = "node-logs",
     },
