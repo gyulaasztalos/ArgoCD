@@ -78,36 +78,36 @@ loki.source.syslog "remote_syslog" {
 }
 
 loki.process "syslog_proc" {
-  # Forward parsed logs to Loki write stage
+  // Forward parsed logs to Loki write stage
   forward_to = [loki.relabel.normalize_labels.receiver]
 
-  # Extract timestamp (e.g., "Nov 14 15:04:05")
+  // Extract timestamp (e.g., "Nov 14 15:04:05")
   stage.regex {
     expression = `^(?P<ts>[A-Z][a-z]{2}\s{1,2}\d{1,2}\s\d{2}:\d{2}:\d{2})\s(?P<host>[\w\.\-]+)\s(?P<log>.*)$`
   }
 
-  # Label extracted hostname
+  // Label extracted hostname
   stage.labels {
     values = { nodename = "host" }
   }
 
-  # Parse the timestamp using syslog's format
+  // Parse the timestamp using syslog's format
   stage.timestamp {
     source = "ts"
     format = "Jan _2 15:04:05"
   }
 
-  # Optionally extract fields from the log message (e.g., app or message)
+  // Optionally extract fields from the log message (e.g., app or message)
   stage.regex {
     expression = `^(?P<application>[^:]+):\s(?P<message>.*)$`
   }
 
-  # Promote application as label
+  // Promote application as label
   stage.labels {
     values = { application = "application" }
   }
 
-  # Output the message content as 'log'
+  // Output the message content as 'log'
   stage.output {
     source = "message"
   }
