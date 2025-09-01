@@ -10,7 +10,7 @@ spec:
   entryPoints:
     - syslog
   routes:
-    - match: HostSNI()
+    - match: HostSNI(`*`)
       priority: 35
       services:
         - name: alloy-syslog
