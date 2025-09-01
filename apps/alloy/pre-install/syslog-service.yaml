@@ -6,7 +6,8 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app: alloy
+    app.kubernetes.io/instance=alloy
+    app.kubernetes.io/name=alloy
   ports:
     - name: alloy-syslog
       protocol: TCP
