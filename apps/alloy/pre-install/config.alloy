@@ -79,13 +79,17 @@ loki.source.syslog "remote_syslog" {
 
 loki.process "syslog_proc" {
   forward_to = [loki.relabel.normalize_labels.receiver]
-
-  stage.labels {
-    values = { nodename = "hostname" }
+  
+  stage.static_labels {
+    job = "unifi-syslog"
   }
 
   stage.regex {
     expression = `^(?P<application>[^:]+):\s(?P<message>.*)$`
+  }
+
+  stage.labels {
+    values = { nodename = "hostname" }
   }
 
   stage.labels {
