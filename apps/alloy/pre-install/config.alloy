@@ -79,25 +79,25 @@ loki.source.syslog "remote_syslog" {
 
 loki.process "syslog_proc" {
   forward_to = [loki.relabel.normalize_labels.receiver]
-  
+
   stage.static_labels {
     values = { job = "unifi-syslog" }
   }
 
   stage.regex {
-    expression = `^(?P<application>[^:]+):\s(?P<message>.*)$`
+    expression = `^(?:<\d+>)?(?P<ts>[A-Z][a-z]{2}\s{1,2}\d{1,2}\s\d{2}:\d{2}:\d{2})\s+(?P<hostname>[^\s]+)\s+(?P<body>.*)$`
+  }
+
+  stage.regex {
+    source = "body"
+    expression = `^(?:<\d+>)?(?P<ts>[A-Z][a-z]{2}\s{1,2}\d{1,2}\s\d{2}:\d{2}:\d{2})\s+(?P<nodename>[^\s]+)\s+(?P<message>.*)$`
   }
 
   stage.labels {
-    values = { nodename = "__syslog_message_hostname" }
-  }
-
-  stage.labels {
-    values = { application = "__syslog_message_app_name" }
-  }
-
-  stage.labels {
-    values = { level = "__syslog_message_severity" }
+    values = {
+      nodename    = "hostname"
+      application = "tag"
+    }
   }
 
   stage.output {
