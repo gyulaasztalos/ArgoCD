@@ -10,6 +10,8 @@ configMapGenerator:
 
 resources:
   - ingressroute.yaml
+  - ingressrouteTCP.yaml
+  - syslog-service.yaml
   - prometheus-alarms.yaml
 
 generatorOptions:
