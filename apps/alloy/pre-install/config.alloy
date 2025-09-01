@@ -81,7 +81,7 @@ loki.process "syslog_proc" {
   forward_to = [loki.relabel.normalize_labels.receiver]
   
   stage.static_labels {
-    job = "unifi-syslog"
+    values = { job = "unifi-syslog" }
   }
 
   stage.regex {
