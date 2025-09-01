@@ -73,8 +73,6 @@ loki.source.syslog "remote_syslog" {
     address   = "0.0.0.0:514"
     protocol  = "udp"
     syslog_format = "rfc3164"
-    use_incoming_timestamp  = true
-    rfc3164_default_to_current_year = true
   }
   forward_to = [loki.process.syslog_proc.receiver]
 }
