@@ -89,11 +89,15 @@ loki.process "syslog_proc" {
   }
 
   stage.labels {
-    values = { nodename = "hostname" }
+    values = { nodename = "__syslog_message_hostname" }
   }
 
   stage.labels {
-    values = { application = "application" }
+    values = { application = "__syslog_message_app_name" }
+  }
+
+  stage.labels {
+    values = { level = "__syslog_message_severity" }
   }
 
   stage.output {
