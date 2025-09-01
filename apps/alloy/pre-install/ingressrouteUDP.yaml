@@ -10,9 +10,7 @@ spec:
   entryPoints:
     - syslog
   routes:
-    - match: HostSNI(`*`)
-      priority: 35
-      services:
+    - services:
         - name: alloy-syslog
           namespace: alloy
           port: 514
