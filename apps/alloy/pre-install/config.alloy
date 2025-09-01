@@ -96,7 +96,7 @@ loki.process "syslog_proc" {
   stage.labels {
     values = {
       nodename    = "hostname",
-      application = "tag"
+      application = "tag",
     }
   }
 
