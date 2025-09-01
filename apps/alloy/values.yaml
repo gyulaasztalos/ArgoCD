@@ -100,8 +100,8 @@ alloy:
   # -- Extra ports to expose on the Alloy container.
   extraPorts:
     - name: "alloy-syslog"
-      port: 1514
-      targetPort: 1514
+      port: 514
+      targetPort: 514
       protocol: "TCP"
   #   appProtocol: "h2c"
 
