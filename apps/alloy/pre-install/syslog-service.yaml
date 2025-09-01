@@ -10,6 +10,6 @@ spec:
     app.kubernetes.io/name: alloy
   ports:
     - name: alloy-syslog
-      protocol: TCP
+      protocol: UDP
       port: 514
       targetPort: 514

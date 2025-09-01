@@ -71,7 +71,7 @@ prometheus.remote_write "default" {
 loki.source.syslog "remote_syslog" {
   listener {
     address   = "127.0.0.1:514"
-    protocol  = "tcp"
+    protocol  = "udp"
     syslog_format = "rfc3164"
   }
   forward_to = [loki.process.syslog_proc.receiver]

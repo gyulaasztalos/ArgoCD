@@ -817,7 +817,7 @@ ports:
     expose:
       default: true
     exposedPort: 514
-    protocol: TCP
+    protocol: UDP
 
 # -- TLS Options are created as [TLSOption CRDs](https://doc.traefik.io/traefik/https/tls/#tls-options)
 # When using `labelSelector`, you'll need to set labels on tlsOption accordingly.

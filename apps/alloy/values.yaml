@@ -102,7 +102,7 @@ alloy:
     - name: "alloy-syslog"
       port: 514
       targetPort: 514
-      protocol: "TCP"
+      protocol: "UDP"
   #   appProtocol: "h2c"
 
   # -- Host aliases to add to the Alloy container.
