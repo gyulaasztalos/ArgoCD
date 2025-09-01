@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: alloy-syslog
   namespace: alloy
+  annotations:
+    ignore-check.kube-linter.io/dangling-service: "pod deployed by helm chart"
 spec:
   type: ClusterIP
   selector:
