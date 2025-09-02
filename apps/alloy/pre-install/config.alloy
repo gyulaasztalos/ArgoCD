@@ -68,7 +68,7 @@ prometheus.remote_write "default" {
 
 // LOGS
 // Syslog receiver for Unifi
-loki.source.syslog "unifi_syslog" {
+loki.source.syslog "remote_syslog" {
   listener {
     address   = "0.0.0.0:514"
     protocol  = "udp"
