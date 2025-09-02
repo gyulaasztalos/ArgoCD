@@ -67,18 +67,18 @@ prometheus.remote_write "default" {
 }
 
 // LOGS
-// Remote syslog
-loki.source.syslog "remote_syslog" {
+// Syslog receiver for Unifi
+loki.source.syslog "unifi_syslog" {
   listener {
     address   = "0.0.0.0:514"
     protocol  = "udp"
     syslog_format = "rfc3164"
   }
-  relabel_rules = loki.relabel.syslog_preserve.rules
-  forward_to = [loki.process.syslog_proc.receiver]
+  relabel_rules = loki.relabel.unifi_syslog_save_labels.rules
+  forward_to = [loki.process.unifi_syslog_get_labels.receiver]
 }
 
-loki.relabel "syslog_preserve" {
+loki.relabel "unifi_syslog_save_labels" {
   forward_to = []
   rule {
     source_labels = ["__syslog_message_hostname"]
@@ -90,7 +90,7 @@ loki.relabel "syslog_preserve" {
   }
 }
 
-loki.process "syslog_proc" {
+loki.process "unifi_syslog_get_labels" {
   forward_to = [loki.relabel.normalize_labels.receiver]
 
   stage.static_labels {
