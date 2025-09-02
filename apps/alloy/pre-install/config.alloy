@@ -203,6 +203,7 @@ loki.relabel "normalize_labels" {
 
   rule {
     source_labels = ["nodename_ext"]
+    regex = ".*"
     action = "labeldrop"
   }
 
