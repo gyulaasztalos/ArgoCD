@@ -98,7 +98,7 @@ loki.process "syslog_proc" {
   }
 
   stage.regex {
-    expression = "^(?P<nodename_ext>[A-Za-z0-9_.-]+\\s+)?(?:[A-Za-z0-9_.\\/()-]+:\\s)?(?P<application>[A-Za-z0-9_.\\/()-]+)(?:\\[\\d+\\])?:\\s(?:.*)$"
+    expression = "^(?:[A-Za-z0-9_.-]+\\s+)?(?:[A-Za-z0-9_.\\/()-]+:\\s)?(?P<application>[A-Za-z0-9_.\\/()-]+)(?:\\[\\d+\\])?:\\s(?:.*)$"
     labels_from_groups = true
   }
 }
@@ -189,18 +189,6 @@ loki.relabel "add_hostname" {
 
 loki.relabel "normalize_labels" {
   forward_to = [loki.write.default.receiver]
-
-  rule {
-    source_labels = ["nodename_ext"]
-    target_label = "debug_nodename"
-    regex = ".+"
-    action = "replace"
-  }
-
-  //rule {
-  //  regex = "^nodename_ext$"
-  //  action = "labeldrop"
-  //}
 
   rule {
     source_labels = ["level"]
