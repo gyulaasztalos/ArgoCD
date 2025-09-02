@@ -85,18 +85,20 @@ loki.process "syslog_proc" {
   }
 
   stage.regex {
-    expression = `^(?:<\d+>)?(?P<ts>[A-Z][a-z]{2}\s{1,2}\d{1,2}\s\d{2}:\d{2}:\d{2})\s+(?P<hostname>[^\s]+)\s+(?P<body>.*)$`
+    expression = `^(?:<\d+>)?(?P<ts>[A-Z][a-z]{2}\s{1,2}\d{1,2}\s\d{2}:\d{2}:\d{2})\s+(?P<nodename>[^\s]+)\s+(?P<body>.*)$`
+    labels_from_groups = true
   }
 
   stage.regex {
     source = "body"
-    expression = `^(?:<\d+>)?(?P<ts>[A-Z][a-z]{2}\s{1,2}\d{1,2}\s\d{2}:\d{2}:\d{2})\s+(?P<nodename>[^\s]+)\s+(?P<message>.*)$`
+    expression = `^(?:(?P<prefix>[^:]+):\s+)?(?P<application>[A-Za-z0-9_\-\.]+)(?:\[(?P<pid>\d+)\])?:\s(?P<message>.*)$`
+    labels_from_groups = true
   }
 
   stage.labels {
     values = {
-      nodename    = "hostname",
-      application = "tag",
+      nodename    = "nodename",
+      application = "application",
     }
   }
 
@@ -104,7 +106,6 @@ loki.process "syslog_proc" {
     source = "message"
   }
 }
-
 
 // Node Logs
 local.file_match "node_logs" {
