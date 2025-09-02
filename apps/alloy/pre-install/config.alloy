@@ -192,7 +192,7 @@ loki.relabel "normalize_labels" {
 
   rule {
     source_labels = ["nodename_ext"]
-    target_label = "nodename"
+    target_label = "debug_nodename"
     regex = ".+"
     action = "replace"
   }
