@@ -74,7 +74,19 @@ loki.source.syslog "remote_syslog" {
     protocol  = "udp"
     syslog_format = "rfc3164"
   }
+  relabel_rules = loki.relabel.syslog_preserve.rules
   forward_to = [loki.process.syslog_proc.receiver]
+}
+
+loki.relabel "syslog_preserve" {
+  rule {
+    source_labels = "__syslog_message_hostname"
+    target_label = "hostname"
+  }
+  rule {
+    source_labels = "__syslog_message_severity"
+    target_label = "level"
+  }
 }
 
 loki.process "syslog_proc" {
@@ -85,13 +97,13 @@ loki.process "syslog_proc" {
   }
 
   stage.regex {
-    expression = "^(?:(?P<prefix>[^:]+):\\s+)?(?P<application>[A-Za-z0-9_.-]+)(?:\\[(?P<pid>\\d+)\\])?:\\s(?P<message>.*)$"
+    expression = "^(?P<nodename_ext>[A-Za-z0-9_.-]+\\s+)?(?:[A-Za-z0-9_.-]+:\\s)?(?P<application_ext>[A-Za-z0-9_.\\(\\)-]+)(?:\\[\\d+\\])?:\\s(?P<message>.*)$"
   }
 
   stage.labels {
     values = {
-      nodename    = "__syslog_message_hostname",
-      application = "application",
+      nodename    = "nodename_ext",
+      application = "application_ext",
     }
   }
 
