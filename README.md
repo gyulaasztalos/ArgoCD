@@ -12,6 +12,7 @@ This repository contains Kubernetes manifests for managing my HomeLab infrastruc
 
 ### Prerequisites
 **Hardware:**
+![Description of the image](resources/server.jpeg)
 - 4 × Raspberry Pi 5 devices with:
   - 8 GB RAM
   - 256 GB NVMe SSD (primary storage)
@@ -74,6 +75,10 @@ This repository contains Kubernetes manifests for managing my HomeLab infrastruc
     - ServiceMonitors, PrometheusRules, and custom dashboards
   - Loki (single binary mode)
   - Alloy
+    - node logs
+    - journal logs
+    - container logs
+    - syslog receiver for Unifi
   - vcgen-exporter
   - nut-exporter
 - **Notifications:**
