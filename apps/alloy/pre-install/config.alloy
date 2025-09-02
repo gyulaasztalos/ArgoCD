@@ -79,6 +79,7 @@ loki.source.syslog "remote_syslog" {
 }
 
 loki.relabel "syslog_preserve" {
+  targets = []
   rule {
     source_labels = ["__syslog_message_hostname"]
     target_label = "nodename"
@@ -98,13 +99,7 @@ loki.process "syslog_proc" {
 
   stage.regex {
     expression = "^(?P<nodename_ext>[A-Za-z0-9_.-]+\\s+)?(?:[A-Za-z0-9_.-]+:\\s)?(?P<application_ext>[A-Za-z0-9_.()-]+)(?:\\[\\d+\\])?:\\s(?P<message>.*)$"
-  }
-
-  stage.labels {
-    values = {
-      nodename    = "nodename_ext",
-      application = "application_ext",
-    }
+    labels_from_groups = true
   }
 
   stage.output {
