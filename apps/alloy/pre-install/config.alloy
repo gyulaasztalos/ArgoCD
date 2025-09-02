@@ -80,11 +80,11 @@ loki.source.syslog "remote_syslog" {
 
 loki.relabel "syslog_preserve" {
   rule {
-    source_labels = "__syslog_message_hostname"
+    source_labels = ["__syslog_message_hostname"]
     target_label = "nodename"
   }
   rule {
-    source_labels = "__syslog_message_severity"
+    source_labels = ["__syslog_message_severity"]
     target_label = "level"
   }
 }
