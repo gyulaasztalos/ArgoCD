@@ -98,7 +98,7 @@ loki.process "syslog_proc" {
   }
 
   stage.regex {
-    expression = "^(?P<nodename_ext>[A-Za-z0-9_.-]+\\s+)?(?:[A-Za-z0-9_.-]+:\\s)?(?P<application_ext>[A-Za-z0-9_.()-]+)(?:\\[\\d+\\])?:\\s(?P<message>.*)$"
+    expression = "^(?P<nodename>[A-Za-z0-9_.-]+\\s+)?(?:[A-Za-z0-9_.-]+:\\s)?(?P<application>[A-Za-z0-9_.()-]+)(?:\\[\\d+\\])?:\\s(?P<message>.*)$"
     labels_from_groups = true
   }
 
