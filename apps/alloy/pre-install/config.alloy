@@ -197,10 +197,10 @@ loki.relabel "normalize_labels" {
     action = "replace"
   }
 
-  rule {
-    regex = "^nodename_ext$"
-    action = "labeldrop"
-  }
+  //rule {
+  //  regex = "^nodename_ext$"
+  //  action = "labeldrop"
+  //}
 
   rule {
     source_labels = ["level"]
