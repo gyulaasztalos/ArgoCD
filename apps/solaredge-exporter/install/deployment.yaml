@@ -10,8 +10,6 @@ metadata:
     app.kubernetes.io/part-of: solaredge-exporter
     app.kubernetes.io/instance: solaredge-exporter
     app.kubernetes.io/component: solaredge-exporter
-  annotations:
-    ignore-check.kube-linter.io/no-read-only-root-filesystem: "exporter needs to write a cache file"
 spec:
   replicas: 1
   progressDeadlineSeconds: 600
@@ -38,7 +36,7 @@ spec:
           image: asztalosgyula/solaredge-exporter:20250904
           imagePullPolicy: IfNotPresent
           securityContext:
-            readOnlyRootFilesystem: false
+            readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false # prevent sudo, etc.
             privileged: false               # prevent acting like host root
           resources:
