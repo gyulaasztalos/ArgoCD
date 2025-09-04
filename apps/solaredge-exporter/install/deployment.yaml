@@ -73,7 +73,13 @@ spec:
           envFrom:
             - configMapRef:
                 name: solaredge-exporter-config
+          volumeMounts:
+            - name: temp
+              mountPath: /tmp
       restartPolicy: Always
+      volumes:
+        - name: temp
+          emptyDir: {}
       securityContext:
         seccompProfile:
           type: RuntimeDefault
