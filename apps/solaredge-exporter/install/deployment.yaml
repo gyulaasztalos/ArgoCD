@@ -35,13 +35,8 @@ spec:
     spec:
       containers:
         - name: solaredge-exporter
-          command:
-            - sh
-            - -c
-            - |
-              while true; do sleep 30; done
           image: asztalosgyula/solaredge-exporter:20250904
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: false
             allowPrivilegeEscalation: false # prevent sudo, etc.
