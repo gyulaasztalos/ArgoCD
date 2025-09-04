@@ -33,6 +33,8 @@ spec:
     spec:
       containers:
         - name: solaredge-exporter
+          command:
+            - while true; do sleep 600; done
           image: asztalosgyula/solaredge-exporter:20250904
           imagePullPolicy: IfNotPresent
           securityContext:
