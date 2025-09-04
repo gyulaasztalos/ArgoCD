@@ -32,6 +32,7 @@ spec:
         app.kubernetes.io/component: solaredge-exporter
     spec:
       containers:
+        - name: solaredge-exporter
           image: asztalosgyula/solaredge-exporter:20250904
           imagePullPolicy: IfNotPresent
           securityContext:
