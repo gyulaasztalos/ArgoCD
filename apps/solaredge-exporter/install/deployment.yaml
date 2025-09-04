@@ -41,7 +41,7 @@ spec:
             - |
               while true; do sleep 30; done
           image: asztalosgyula/solaredge-exporter:20250904
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           securityContext:
             readOnlyRootFilesystem: false
             allowPrivilegeEscalation: false # prevent sudo, etc.
