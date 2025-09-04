@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: solaredge-exporter-exporter
+  namespace: solaredge-exporter  # or the namespace where your exporter runs
+  labels:
+    release: prometheus-operator  # match your Prometheus Operator’s selector if needed
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: solaredge-exporter  # or the label used by your exporter service
+  endpoints:
+    - path: /metrics
+      interval: 30s
+      targetPort: http
+      honorLabels: true
+  namespaceSelector:
+    matchNames:
+      - solaredge-exporter

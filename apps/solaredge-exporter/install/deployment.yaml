@@ -1,0 +1,93 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: solaredge-exporter
+  namespace: solaredge-exporter
+  labels:
+    app: solaredge-exporter
+    app.kubernetes.io/name: solaredge-exporter
+    app.kubernetes.io/part-of: solaredge-exporter
+    app.kubernetes.io/instance: solaredge-exporter
+    app.kubernetes.io/component: solaredge-exporter
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: solaredge-exporter
+  template:
+    metadata:
+      labels:
+        app: solaredge-exporter
+        app.kubernetes.io/name: solaredge-exporter
+        app.kubernetes.io/part-of: solaredge-exporter
+        app.kubernetes.io/instance: solaredge-exporter
+        app.kubernetes.io/component: solaredge-exporter
+    spec:
+      containers:
+        - name: solaredge-exporter
+          image: asztalosgyula/solaredge-exporter:20250904
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false # prevent sudo, etc.
+            privileged: false               # prevent acting like host root
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 1000m
+              memory: 128Mi
+          ports:
+            - containerPort: 2112
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 2112
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  wget -q -O - http://localhost:2112/metrics | awk '{if (NR>1) ok=1};END{if (ok==1) exit 0; else exit 1}'
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 6
+            successThreshold: 1
+            timeoutSeconds: 10
+          envFrom:
+            - configMapRef:
+                name: solaredge-exporter-config
+      restartPolicy: Always
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        fsGroup: 1000            # hardcode group to non-root if not set in Dockerfile
+        runAsUser: 1000          # hardcode user to non-root if not set in Dockerfile
+        runAsGroup: 1000         # hardcode group to non-root if not set in Dockerfile
+        runAsNonRoot: true       # hardcode to non-root. Redundant to above if Dockerfile is set USER 1000
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - solaredge-exporter
+              topologyKey: kubernetes.io/hostname

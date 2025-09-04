@@ -35,3 +35,4 @@ resources:
   - smartctl-exporter/application.yaml
   - alloy/application.yaml
   - vcgen-exporter/application.yaml
+  - solaredge-exporter/application.yaml

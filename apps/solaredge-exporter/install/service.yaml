@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: solaredge-exporter
+  namespace: solaredge-exporter
+  labels:
+    app: solaredge-exporter
+    app.kubernetes.io/name: solaredge-exporter
+    app.kubernetes.io/part-of: solaredge-exporter
+    app.kubernetes.io/instance: solaredge-exporter
+    app.kubernetes.io/component: solaredge-exporter
+spec:
+  selector:
+    app: solaredge-exporter
+  ports:
+    - name: http
+      protocol: TCP
+      port: 2112
+      targetPort: http
+  type: ClusterIP

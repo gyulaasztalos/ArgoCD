@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: solaredge-exporter-alerts
+  namespace: solaredge-exporter  # Must match your Prometheus Operator's namespace
+spec:
+  groups:
+  - name: solaredge-exporter.rules
+    rules:
+    # Critical: solaredge-exporter service is down
+    - alert: solaredge-exporter-down
+      expr: absent(up{job="solaredge-exporter"} == 1)
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "solaredge-exporter service is down"
+        description: "The solaredge-exporter service has not been up for the last 5 minutes."
+    - alert: solaredge-exporter-restart-loop
+      expr: increase(kube_pod_container_status_restarts_total{namespace="solaredge-exporter", pod=~"solaredge-exporter-.*"}[18m]) > 3
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "solaredge-exporter pod is restarting frequently"
+        description: "The solaredge-exporter pod has restarted more than 3 times in the last 18 minutes."
