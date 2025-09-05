@@ -185,19 +185,19 @@ data:
                 "mappings": [
                   {
                     "id": 1,
-                    "type": 1,
+                    "type": 0,
                     "value": 4,
                     "text": "Production"
                   },
                   {
                     "id": 2,
-                    "type": 1,
+                    "type": 0,
                     "value": 0,
                     "text": "Idle"
                   },
                   {
                     "id": 3,
-                    "type": 1,
+                    "type": 0,
                     "value": 5,
                     "text": "Inhibited"
                   }
@@ -439,19 +439,19 @@ data:
                 "mappings": [
                   {
                     "id": 1,
-                    "type": 1,
+                    "type": 0,
                     "value": 101,
                     "text": "Single Phase "
                   },
                   {
                     "id": 2,
-                    "type": 1,
+                    "type": 0,
                     "value": 102,
                     "text": "Split Phase1"
                   },
                   {
                     "id": 3,
-                    "type": 1,
+                    "type": 0,
                     "value": 103,
                     "text": "Three Phase"
                   }
