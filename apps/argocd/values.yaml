@@ -792,13 +792,13 @@ controller:
   podLabels: {}
 
   # -- Resource limits and requests for the application controller pods
-  resources: {}
+  resources:
   #  limits:
   #    cpu: 500m
   #    memory: 512Mi
-  #  requests:
+    requests:
   #    cpu: 250m
-  #    memory: 256Mi
+      memory: 512Mi
 
   # Application controller container ports
   containerPorts:
