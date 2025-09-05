@@ -178,9 +178,7 @@ data:
           "options": {
             "colorMode": "value",
             "fieldOptions": {
-              "calcs": [
-                "mean"
-              ],
+              "calcs": [],
               "defaults": {
                 "mappings": [
                   {
@@ -432,9 +430,7 @@ data:
           "options": {
             "colorMode": "value",
             "fieldOptions": {
-              "calcs": [
-                "mean"
-              ],
+              "calcs": [],
               "defaults": {
                 "mappings": [
                   {
