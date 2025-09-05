@@ -182,22 +182,33 @@ data:
               "defaults": {
                 "mappings": [
                   {
-                    "id": 1,
-                    "type": 0,
-                    "value": 4,
-                    "text": "Production"
-                  },
-                  {
-                    "id": 2,
-                    "type": 0,
-                    "value": 0,
-                    "text": "Idle"
-                  },
-                  {
-                    "id": 3,
-                    "type": 0,
-                    "value": 5,
-                    "text": "Inhibited"
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "Idle",
+                        "index": 0
+                      },
+                      "1": {
+                        "text": "Off",
+                        "index": 1
+                      },
+                      "2": {
+                        "text": "Sleep",
+                        "index": 2
+                      },
+                      "3": {
+                        "text": "Startup",
+                        "index": 3
+                      },
+                      "4": {
+                        "text": "Production",
+                        "index": 4
+                      },
+                      "5": {
+                        "text": "Inhibited",
+                        "index": 5
+                      }
+                    }
                   }
                 ],
                 "thresholds": {
@@ -434,22 +445,21 @@ data:
               "defaults": {
                 "mappings": [
                   {
-                    "id": 1,
-                    "type": 0,
-                    "value": 101,
-                    "text": "Single Phase "
-                  },
-                  {
-                    "id": 2,
-                    "type": 0,
-                    "value": 102,
-                    "text": "Split Phase1"
-                  },
-                  {
-                    "id": 3,
-                    "type": 0,
-                    "value": 103,
-                    "text": "Three Phase"
+                    "type": "value",
+                    "options": {
+                      "103": {
+                        "text": "Three Phase",
+                        "index": 0
+                      },
+                      "101": {
+                        "text": "Single Phase ",
+                        "index": 1
+                      },
+                      "102": {
+                        "text": "Split Phase1",
+                        "index": 2
+                      }
+                    }
                   }
                 ],
                 "thresholds": {
