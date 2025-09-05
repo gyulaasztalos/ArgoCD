@@ -184,31 +184,22 @@ data:
               "defaults": {
                 "mappings": [
                   {
-                    "from": "",
                     "id": 1,
-                    "operator": "",
-                    "text": "Production",
-                    "to": "",
                     "type": 1,
-                    "value": "4"
+                    "value": 4,
+                    "text": "Production"
                   },
                   {
-                    "from": "",
                     "id": 2,
-                    "operator": "",
-                    "text": "Idle",
-                    "to": "",
                     "type": 1,
-                    "value": "0"
+                    "value": 0,
+                    "text": "Idle"
                   },
                   {
-                    "from": "",
                     "id": 3,
-                    "operator": "",
-                    "text": "Inhibited",
-                    "to": "",
                     "type": 1,
-                    "value": "5"
+                    "value": 5,
+                    "text": "Inhibited"
                   }
                 ],
                 "thresholds": {
@@ -267,7 +258,7 @@ data:
                     },
                     {
                       "color": "red",
-                      "value": 80
+                      "value": 1
                     }
                   ]
                 }
@@ -404,7 +395,7 @@ data:
                     },
                     {
                       "color": "red",
-                      "value": 80
+                      "value": 51
                     }
                   ]
                 }
@@ -445,7 +436,26 @@ data:
                 "mean"
               ],
               "defaults": {
-                "mappings": [],
+                "mappings": [
+                  {
+                    "id": 1,
+                    "type": 1,
+                    "value": 101,
+                    "text": "Single Phase "
+                  },
+                  {
+                    "id": 2,
+                    "type": 1,
+                    "value": 102,
+                    "text": "Split Phase1"
+                  },
+                  {
+                    "id": 3,
+                    "type": 1,
+                    "value": 103,
+                    "text": "Three Phase"
+                  }
+                ],
                 "thresholds": {
                   "mode": "absolute",
                   "steps": [
@@ -455,7 +465,7 @@ data:
                     },
                     {
                       "color": "red",
-                      "value": 80
+                      "value": 120
                     }
                   ]
                 }
