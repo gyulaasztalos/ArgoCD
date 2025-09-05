@@ -10,8 +10,6 @@ metadata:
     app.kubernetes.io/part-of: solaredge-exporter
     app.kubernetes.io/instance: solaredge-exporter
     app.kubernetes.io/component: solaredge-exporter
-  annotations:
-    ignore-check.kube-linter.io/no-read-only-root-fs: "Required for logging to /tmp"
 spec:
   replicas: 1
   progressDeadlineSeconds: 600
@@ -35,10 +33,10 @@ spec:
     spec:
       containers:
         - name: solaredge-exporter
-          image: asztalosgyula/solaredge-exporter:20250904
+          image: asztalosgyula/solaredge-exporter:20250905
           imagePullPolicy: IfNotPresent
           securityContext:
-            readOnlyRootFilesystem: false
+            readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false # prevent sudo, etc.
             privileged: false               # prevent acting like host root
           resources:
@@ -72,10 +70,16 @@ spec:
             failureThreshold: 6
             successThreshold: 1
             timeoutSeconds: 10
+          volumeMounts:
+            - name: app
+              mountPath: /app
           envFrom:
             - configMapRef:
                 name: solaredge-exporter-config
       restartPolicy: Always
+      volumes:
+        - name: app
+          emptyDir: {}
       securityContext:
         seccompProfile:
           type: RuntimeDefault
