@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: nebula-sync
-          image: ghcr.io/lovelaze/nebula-sync:v0.11.0
+          image: ghcr.io/lovelaze/nebula-sync:v0.11.1
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
