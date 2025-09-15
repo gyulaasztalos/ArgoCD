@@ -46,7 +46,7 @@ spec:
     spec:
       containers:
         - name: homebridge
-          image: homebridge/homebridge:2025-07-21
+          image: homebridge/homebridge:2025-09-14
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false  # prevent sudo, etc.
