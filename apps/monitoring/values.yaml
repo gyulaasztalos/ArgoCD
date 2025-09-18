@@ -4398,7 +4398,7 @@ prometheus:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 50Gi
+              storage: 70Gi
      # selector: {}
     ## Using PersistentVolumeClaim
     ##
