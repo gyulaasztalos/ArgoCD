@@ -840,11 +840,11 @@ worker:
   # -- Resource limits and requests for the authentik worker
   resources:
     limits:
+      memory: 1500Mi
+      cpu: 750m
+    requests:
       memory: 1200Mi
       cpu: 500m
-    requests:
-      memory: 1Gi
-      cpu: 250m
 
   # -- Host Network for authentik worker pods
   hostNetwork: false
