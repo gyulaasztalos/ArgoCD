@@ -378,7 +378,7 @@ defaultSettings:
   # -- Setting that allows scheduling of empty disk selector volumes to any disk.
   allowEmptyDiskSelectorVolume: ~
   # -- Setting that allows Longhorn to periodically collect anonymous usage data for product improvement purposes. Longhorn sends collected data to the [Upgrade Responder](https://github.com/longhorn/upgrade-responder) server, which is the data source of the Longhorn Public Metrics Dashboard (https://metrics.longhorn.io). The Upgrade Responder server does not store data that can be used to identify clients, including IP addresses.
-  allowCollectingLonghornUsageMetrics: ~
+  allowCollectingLonghornUsageMetrics: false
   # -- Setting that temporarily prevents all attempts to purge volume snapshots.
   disableSnapshotPurge: ~
   # -- Maximum snapshot count for a volume. The value should be between 2 to 250
