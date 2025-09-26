@@ -240,7 +240,7 @@ defaultSettings:
   # -- Setting that allows scheduling on nodes with healthy replicas of the same volume. This setting is disabled by default.
   replicaSoftAntiAffinity: ~
   # -- Setting that automatically rebalances replicas when an available node is discovered.
-  replicaAutoBalance: ~
+  replicaAutoBalance: best-effort
   # -- Percentage of storage that can be allocated relative to hard drive capacity. The default value is "100".
   storageOverProvisioningPercentage: ~
   # -- Percentage of minimum available disk capacity. When the minimum available capacity exceeds the total available capacity, the disk becomes unschedulable until more space is made available for use. The default value is "25".
