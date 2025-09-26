@@ -168,7 +168,7 @@ persistence:
   # -- Data locality of the default Longhorn StorageClass. (Options: "disabled", "best-effort")
   defaultDataLocality: best-effort
   # -- Reclaim policy that provides instructions for handling of a volume after its claim is released. (Options: "Retain", "Delete")
-  reclaimPolicy: Delete
+  reclaimPolicy: Retain
   # -- VolumeBindingMode controls when volume binding and dynamic provisioning should occur. (Options: "Immediate", "WaitForFirstConsumer") (Defaults to "Immediate")
   volumeBindingMode: "Immediate"
   # -- Setting that allows you to enable live migration of a Longhorn volume from one node to another.
