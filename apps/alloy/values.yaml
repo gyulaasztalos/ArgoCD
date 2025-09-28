@@ -146,7 +146,7 @@ image:
   repository: grafana/alloy
   # -- (string) Grafana Alloy image tag. When empty, the Chart's appVersion is
   # used.
-  tag: v1.10.2
+  # tag: v1.10.2
   # -- Grafana Alloy image's SHA256 digest (either in format "sha256:XYZ" or "XYZ"). When set, will override `image.tag`.
   digest: null
   # -- Grafana Alloy image pull policy.
@@ -181,7 +181,7 @@ configReloader:
     # -- Repository to get config reloader image from.
     repository: prometheus-operator/prometheus-config-reloader
     # -- Tag of image to use for config reloading.
-    tag: v0.85.0
+    # tag: v0.85.0
     # -- SHA256 digest of image to use for config reloading (either in format "sha256:XYZ" or "XYZ"). When set, will override `configReloader.image.tag`
     digest: ""
   # -- Override the args passed to the container.
