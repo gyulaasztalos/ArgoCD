@@ -1060,7 +1060,7 @@ dex:
     # -- Dex image repository
     repository: ghcr.io/dexidp/dex
     # -- Dex image tag
-    tag: v2.44.0
+    # tag: v2.44.0
     # -- Dex imagePullPolicy
     # @default -- `""` (defaults to global.image.imagePullPolicy)
     imagePullPolicy: ""
@@ -1325,7 +1325,7 @@ redis:
     # -- Redis repository
     repository: public.ecr.aws/docker/library/redis
     # -- Redis tag
-    tag: 8.2.1-alpine
+    # tag: 8.2.1-alpine
     # -- Redis image pull policy
     # @default -- `""` (defaults to global.image.imagePullPolicy)
     imagePullPolicy: ""
@@ -1341,7 +1341,7 @@ redis:
       # -- Repository to use for the redis-exporter
       repository: ghcr.io/oliver006/redis_exporter
       # -- Tag to use for the redis-exporter
-      tag: v1.77.0
+      # tag: v1.77.0
       # -- Image pull policy for the redis-exporter
       # @default -- `""` (defaults to global.image.imagePullPolicy)
       imagePullPolicy: ""
@@ -1611,7 +1611,7 @@ redis-ha:
     # -- Redis repository
     repository: public.ecr.aws/docker/library/redis
     # -- Redis tag
-    tag: 8.2.1-alpine
+    # tag: 8.2.1-alpine
   ## Prometheus redis-exporter sidecar
   exporter:
     # -- Enable Prometheus redis-exporter sidecar
@@ -1619,7 +1619,7 @@ redis-ha:
     # -- Repository to use for the redis-exporter
     image: ghcr.io/oliver006/redis_exporter
     # -- Tag to use for the redis-exporter
-    tag: v1.69.0
+    # tag: v1.69.0
   persistentVolume:
     # -- Configures persistence on Redis nodes
     enabled: false
@@ -1896,7 +1896,7 @@ server:
       # -- Repository to use for extension installer image
       repository: "quay.io/argoprojlabs/argocd-extension-installer"
       # -- Tag to use for extension installer image
-      tag: "v0.0.8"
+      # tag: "v0.0.8"
       # -- Image pull policy for extensions
       # @default -- `""` (defaults to global.image.imagePullPolicy)
       imagePullPolicy: ""

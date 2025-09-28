@@ -114,7 +114,7 @@ prometheusRules:
 image:
   repository: ghcr.io/home-operations/smartctl-exporter
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0.14.0"
+  # tag: "0.14.0"
   pullPolicy: IfNotPresent
   pullSecrets: []
 

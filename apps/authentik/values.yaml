@@ -1002,7 +1002,7 @@ geoip:
     # -- If defined, a repository for GeoIP images
     repository: ghcr.io/maxmind/geoipupdate
     # -- If defined, a tag for GeoIP images
-    tag: v7.1.1
+    # tag: v7.1.1
     # -- If defined, an image digest for GeoIP images
     digest: ""
     # -- If defined, an imagePullPolicy for GeoIP images
@@ -1104,7 +1104,7 @@ postgresql:
   enabled: false
   image:
     repository: bitnami/postgresql
-    tag: 17.6.0-debian-12-r4
+    # tag: 17.6.0-debian-12-r4
   auth:
     username: authentik
     database: authentik
