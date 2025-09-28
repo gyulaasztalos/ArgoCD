@@ -43,19 +43,23 @@ spec:
           name: paperless-postgres-password
         login: true
   backup:
-    barmanObjectStore:
-      destinationPath: s3://homelab-cnpg-backup-production/cnpg-backup/
-      endpointURL: https://s3.eu-central-003.backblazeb2.com
-      data:
-        compression: bzip2
-      wal:
-        compression: bzip2
-        maxParallel: 4
-      s3Credentials:
-        accessKeyId:
-          name: cnpg-backblaze-secret
-          key: application_key_id
-        secretAccessKey:
-          name: cnpg-backblaze-secret
-          key: application_key
-    retentionPolicy: "7d" # keep 7 days of backups
+    externalObjects:
+      - name: barman-cloud
+        plugin:
+          name: barman-cloud
+          config:
+            destinationPath: s3://homelab-cnpg-backup-production/cnpg-backup/
+            endpointURL: https://s3.eu-central-003.backblazeb2.com
+            retentionPolicy: "7d"
+            data:
+              compression: bzip2
+            wal:
+              compression: bzip2
+              maxParallel: 4
+            s3Credentials:
+              accessKeyId:
+                name: cnpg-backblaze-secret
+                key: application_key_id
+              secretAccessKey:
+                name: cnpg-backblaze-secret
+                key: application_key
