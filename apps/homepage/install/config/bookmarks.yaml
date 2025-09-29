@@ -1,10 +1,6 @@
 ---
 
 - Misc 1:
-  - Telekom:
-    - icon: /images/telekom.png
-      href: https://192.168.0.1
-      description: ""
   - Printer:
     - icon: printer
       href: http://printer.local.asztalos.net
