@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - argocd/application.yaml
   - traefik/application.yaml
+  - multus/application.yaml
   - sealed-secrets/application.yaml
   - onepassword-connect/application.yaml
   - external-secrets/application.yaml
