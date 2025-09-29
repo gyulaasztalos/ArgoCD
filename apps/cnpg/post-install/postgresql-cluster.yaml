@@ -42,7 +42,6 @@ spec:
         passwordSecret:
           name: paperless-postgres-password
         login: true
-  method: plugin
   backup:
     barmanObjectStore:
       destinationPath: s3://homelab-cnpg-backup-production/cnpg-backup/
