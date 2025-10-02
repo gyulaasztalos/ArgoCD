@@ -9,3 +9,7 @@
     - icon: nut
       href: http://raspberrypi.local.asztalos.net:8085/cgi-bin/nut/upsstats.cgi
       description: ""
+  - rclone:
+    - icon: rclone
+      href: http://unvr-pro.local.asztalos.net:5572
+      description: ""
