@@ -13,7 +13,7 @@ spec:
       targetRevision: main
       ref: config
     - repoURL: https://prometheus-community.github.io/helm-charts
-      targetRevision: 0.15.4
+      targetRevision: 0.16.0
       helm:
         valueFiles:
           - $config/apps/smartctl-exporter/values.yaml
