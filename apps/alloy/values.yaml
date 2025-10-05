@@ -130,7 +130,7 @@ alloy:
     requests:
       memory: "128Mi"
     limits:
-      memory: "256Mi"
+      memory: "512Mi"
 
   # -- Set lifecycle hooks for the Grafana Alloy container.
   lifecycle: {}
