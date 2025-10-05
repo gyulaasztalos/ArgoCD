@@ -126,7 +126,11 @@ alloy:
   securityContext: {}
 
   # -- Resource requests and limits to apply to the Grafana Alloy container.
-  resources: {}
+  resources:
+    requests:
+      memory: "128Mi"
+    limits:
+      memory: "256Mi"
 
   # -- Set lifecycle hooks for the Grafana Alloy container.
   lifecycle: {}
