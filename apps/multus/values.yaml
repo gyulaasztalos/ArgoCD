@@ -38,7 +38,7 @@ serviceAccount:
 
 pod:
   resources:
-    enabled: false
+    enabled: true
     multus:
       requests:
         memory: "128Mi"
