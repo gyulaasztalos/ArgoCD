@@ -361,7 +361,6 @@ master:
     sysctls: []
     supplementalGroups: []
     fsGroup: 1001
-    oomScoreAdj: -900
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param master.containerSecurityContext.enabled Enabled Redis(R) master containers' Security Context
@@ -860,7 +859,6 @@ replica:
     sysctls: []
     supplementalGroups: []
     fsGroup: 1001
-    oomScoreAdj: -900
   ## Configure Container Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
   ## @param replica.containerSecurityContext.enabled Enabled Redis(R) replicas containers' Security Context
