@@ -16,5 +16,5 @@ spec:
       cpu: 500m
       memory: 1500Mi
     defaultRequest:
-      cpu: 300m
+      cpu: 100m
       memory: 256Mi
