@@ -323,7 +323,7 @@ resources:
   requests:
     memory: 32Mi
   limits:
-    memory: 128Mi
+    memory: 256Mi
 
 # Pod Security Context.
 # For more information, see [Configure a Security Context for a Pod or Container](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
