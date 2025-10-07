@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cattle-system-resource-limits
+  namespace: cattle-system
+spec:
+  limits:
+  - type: Container
+    max:
+      cpu: "1"
+      memory: 2Gi
+    min:
+      cpu: 100m
+      memory: 64Mi
+    default:
+      cpu: 300m
+      memory: 256Mi
+    defaultRequest:
+      cpu: 100m
+      memory: 64Mi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cattle-fleet-system-resource-limits
+  namespace: cattle-fleet-system
+spec:
+  limits:
+  - type: Container
+    max:
+      cpu: "1"
+      memory: 512Mi
+    min:
+      cpu: 100m
+      memory: 64Mi
+    default:
+      cpu: 300m
+      memory: 256Mi
+    defaultRequest:
+      cpu: 100m
+      memory: 64Mi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: cattle-provisioning-capi-system-resource-limits
+  namespace: cattle-provisioning-capi-system
+spec:
+  limits:
+  - type: Container
+    max:
+      cpu: "1"
+      memory: 512Mi
+    min:
+      cpu: 100m
+      memory: 64Mi
+    default:
+      cpu: 300m
+      memory: 256Mi
+    defaultRequest:
+      cpu: 100m
+      memory: 64Mi
