@@ -1151,10 +1151,10 @@ dex:
   # -- Resource limits and requests for dex
   resources:
     limits:
-      cpu: 50m
+      # cpu:50m
       memory: 256Mi
     requests:
-      cpu: 10m
+      # cpu:10m
       memory: 32Mi
 
   # Dex container ports
@@ -2004,10 +2004,10 @@ server:
   # -- Resource limits and requests for the Argo CD server
   resources:
     limits:
-      cpu: 100m
+      # cpu:100m
       memory: 256Mi
     requests:
-      cpu: 50m
+      # cpu:50m
       memory: 32Mi
 
   # Server container ports
@@ -2652,10 +2652,10 @@ repoServer:
   # -- Resource limits and requests for the repo server pods
   resources:
     limits:
-      cpu: 50m
+      # cpu:50m
       memory: 512Mi
     requests:
-      cpu: 10m
+      # cpu:10m
       memory: 192Mi
 
   # Repo server container ports
@@ -3027,10 +3027,10 @@ applicationSet:
   # -- Resource limits and requests for the ApplicationSet controller pods.
   resources:
     limits:
-      cpu: 100m
+      # cpu:100m
       memory: 256Mi
     requests:
-      cpu: 100m
+      # cpu:100m
       memory: 64Mi
 
   # ApplicationSet controller container ports
@@ -3409,10 +3409,10 @@ notifications:
   # -- Resource limits and requests for the notifications controller
   resources:
     limits:
-      cpu: 100m
+      # cpu:100m
       memory: 256Mi
     requests:
-      cpu: 100m
+      # cpu:100m
       memory: 32Mi
 
   # Notification controller container ports
