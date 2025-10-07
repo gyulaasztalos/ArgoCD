@@ -677,7 +677,13 @@ lokiCanary:
   # -- Volumes to add to the canary pods
   extraVolumes: []
   # -- Resource requests and limits for the canary
-  resources: {}
+  resources:
+    requests:
+      memory: 128Mi
+      cpu: 100m
+    limits:
+      memory: 256Mi
+      cpu: 200m
   # -- DNS config for canary pods
   dnsConfig: {}
   # -- Node selector for canary pods
