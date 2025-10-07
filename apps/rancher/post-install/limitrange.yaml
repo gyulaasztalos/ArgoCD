@@ -53,10 +53,10 @@ spec:
       memory: 512Mi
     min:
       cpu: 100m
-      memory: 64Mi
+      memory: 32Mi
     default:
-      cpu: 300m
-      memory: 256Mi
+      cpu: 200m
+      memory: 64Mi
     defaultRequest:
       cpu: 100m
-      memory: 64Mi
+      memory: 32Mi

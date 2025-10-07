@@ -68,10 +68,10 @@ spec:
           resources:
             requests:
               cpu: 100m
-              memory: 128Mi
+              memory: 64Mi
             limits:
               cpu: 1000m
-              memory: 1Gi
+              memory: 512Mi
           ports:
             - containerPort: 9091
               name: rpc

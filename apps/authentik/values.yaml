@@ -843,7 +843,7 @@ worker:
       memory: 1500Mi
       cpu: 750m
     requests:
-      memory: 1200Mi
+      memory: 768Mi
       cpu: 500m
 
   # -- Host Network for authentik worker pods

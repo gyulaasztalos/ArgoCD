@@ -679,7 +679,7 @@ lokiCanary:
   # -- Resource requests and limits for the canary
   resources:
     requests:
-      memory: 128Mi
+      memory: 64Mi
       cpu: 100m
     limits:
       memory: 256Mi

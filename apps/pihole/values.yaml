@@ -217,7 +217,7 @@ resources:
     memory: 1024Mi
   requests:
     cpu: 100m
-    memory: 128Mi
+    memory: 96Mi
 
 # -- `spec.PersitentVolumeClaim` configuration
 persistentVolumeClaim:
@@ -633,7 +633,7 @@ monitoring:
       pullPolicy: IfNotPresent
     resources:
       limits:
-        memory: 128Mi
+        memory: 64Mi
       # requests:
       #  cpu: 100m
       #  memory: 128Mi

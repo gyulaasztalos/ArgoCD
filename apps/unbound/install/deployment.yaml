@@ -46,11 +46,11 @@ spec:
               add: [NET_BIND_SERVICE]  # Only if using privileged ports (e.g., 53)
           resources:
             requests:
-              memory: "64Mi"
+              memory: "32Mi"
               cpu: "100m"
             limits:
               memory: "128Mi"
-              cpu: "250m"
+              cpu: "200m"
           ports:
             - name: "dns-udp"
               containerPort: 53
@@ -82,11 +82,11 @@ spec:
           imagePullPolicy: IfNotPresent
           resources:
             requests:
-              memory: "64Mi"
+              memory: "32Mi"
               cpu: "100m"
             limits:
               memory: "128Mi"
-              cpu: "250m"
+              cpu: "100m"
           securityContext:
             readOnlyRootFilesystem: false
             allowPrivilegeEscalation: false # prevent sudo, etc.

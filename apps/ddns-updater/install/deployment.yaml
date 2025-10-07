@@ -51,11 +51,11 @@ spec:
                 name: ddns-updater-env
           resources:
             requests:
-              memory: "64Mi"
+              memory: "32Mi"
               cpu: "100m"
             limits:
-              memory: "128Mi"
-              cpu: "500m"
+              memory: "64Mi"
+              cpu: "100m"
           readinessProbe:
             httpGet:
               path: /
