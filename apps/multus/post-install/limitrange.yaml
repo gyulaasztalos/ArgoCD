@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: kube-system-resource-limits
+  namespace: kube-system
+spec:
+  limits:
+  - type: Container
+    max:
+      cpu: "1"
+      memory: 256Mi
+    min:
+      cpu: 100m
+      memory: 32Mi
+    default:
+      cpu: 200m
+      memory: 128Mi
+    defaultRequest:
+      cpu: 100m
+      memory: 32Mi
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: metallb-system-resource-limits
+  namespace: metallb-system
+spec:
+  limits:
+  - type: Container
+    max:
+      cpu: "1"
+      memory: 256Mi
+    min:
+      cpu: 100m
+      memory: 64Mi
+    default:
+      cpu: 200m
+      memory: 128Mi
+    defaultRequest:
+      cpu: 100m
+      memory: 64Mi
