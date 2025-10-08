@@ -795,7 +795,7 @@ controller:
   resources:
     limits:
   #    cpu: 500m
-      memory: 1Gi
+      memory: 1500Mi
     requests:
   #    cpu: 250m
       memory: 512Mi
