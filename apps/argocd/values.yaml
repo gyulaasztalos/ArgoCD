@@ -2003,9 +2003,9 @@ server:
 
   # -- Resource limits and requests for the Argo CD server
   resources:
-    limits:
+    # limits:
       # cpu:100m
-      memory: 256Mi
+      # memory: 256Mi
     requests:
       # cpu:50m
       memory: 32Mi
@@ -2651,9 +2651,9 @@ repoServer:
 
   # -- Resource limits and requests for the repo server pods
   resources:
-    limits:
+    # limits:
       # cpu:50m
-      memory: 512Mi
+      # memory: 512Mi
     requests:
       # cpu:10m
       memory: 192Mi
@@ -3026,9 +3026,9 @@ applicationSet:
 
   # -- Resource limits and requests for the ApplicationSet controller pods.
   resources:
-    limits:
+   # limits:
       # cpu:100m
-      memory: 256Mi
+      # memory: 256Mi
     requests:
       # cpu:100m
       memory: 64Mi
@@ -3408,9 +3408,9 @@ notifications:
 
   # -- Resource limits and requests for the notifications controller
   resources:
-    limits:
+    # limits:
       # cpu:100m
-      memory: 256Mi
+      # memory: 256Mi
     requests:
       # cpu:100m
       memory: 32Mi
