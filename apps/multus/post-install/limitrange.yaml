@@ -31,11 +31,11 @@ spec:
       cpu: "1"
       memory: 256Mi
     min:
-      cpu: 100m
+      cpu: 10m
       memory: 64Mi
     default:
       cpu: 200m
       memory: 256Mi
     defaultRequest:
-      cpu: 100m
+      cpu: 10m
       memory: 64Mi
