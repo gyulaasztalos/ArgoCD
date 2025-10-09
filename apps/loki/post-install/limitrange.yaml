@@ -14,7 +14,7 @@ spec:
       memory: 32Mi
     default:
       cpu: 20m
-      memory: 550Mi
+      memory: 650Mi
     defaultRequest:
       cpu: 10m
       memory: 100Mi
