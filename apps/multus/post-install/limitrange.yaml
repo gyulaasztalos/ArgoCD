@@ -8,13 +8,13 @@ spec:
   - type: Container
     max:
       cpu: "1"
-      memory: 256Mi
+      memory: 512Mi
     min:
       cpu: 10m
       memory: 32Mi
     default:
       cpu: 200m
-      memory: 256Mi
+      memory: 512Mi
     defaultRequest:
       cpu: 10m
       memory: 32Mi
