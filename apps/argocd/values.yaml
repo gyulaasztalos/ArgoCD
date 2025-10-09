@@ -1150,9 +1150,9 @@ dex:
 
   # -- Resource limits and requests for dex
   resources:
-    limits:
+   # limits:
       # cpu:50m
-      memory: 256Mi
+      # memory: 256Mi
     requests:
       # cpu:10m
       memory: 32Mi
