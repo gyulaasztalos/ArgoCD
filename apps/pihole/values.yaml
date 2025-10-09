@@ -212,9 +212,9 @@ probes:
 # -- resources, such as Minikube. If you do want to specify resources, uncomment the following
 # -- lines, adjust them as necessary, and remove the curly braces after 'resources:'.
 resources:
-  limits:
+  # limits:
     # cpu: 200m
-    memory: 1024Mi
+    # memory: 1024Mi
   requests:
     # cpu: 10m
     memory: 96Mi
@@ -633,10 +633,10 @@ monitoring:
       pullPolicy: IfNotPresent
     resources:
       limits:
-        memory: 64Mi
-      # requests:
+        memory: 128Mi
+      requests:
       #  cpu: 100m
-      #  memory: 128Mi
+        memory: 32Mi
 
 podDnsConfig:
   enabled: true
