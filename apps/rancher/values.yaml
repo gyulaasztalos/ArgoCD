@@ -133,7 +133,7 @@ resources:
     cpu: 200m
     memory: 800Mi
   limits:
-    cpu: 2000m
+    cpu: 1000m
     memory: 1500Mi
 
 #
