@@ -213,10 +213,10 @@ probes:
 # -- lines, adjust them as necessary, and remove the curly braces after 'resources:'.
 resources:
   limits:
-    cpu: 200m
+    # cpu: 200m
     memory: 1024Mi
   requests:
-    cpu: 100m
+    # cpu: 10m
     memory: 96Mi
 
 # -- `spec.PersitentVolumeClaim` configuration
