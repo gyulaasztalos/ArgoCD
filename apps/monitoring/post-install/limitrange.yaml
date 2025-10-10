@@ -7,7 +7,7 @@ spec:
   limits:
   - type: Container
     max:
-      cpu: "1"
+      cpu: "2"
       memory: 3Gi
     min:
       cpu: 100m
