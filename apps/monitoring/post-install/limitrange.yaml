@@ -8,7 +8,7 @@ spec:
   - type: Container
     max:
       cpu: "1"
-      memory: 1Gi
+      memory: 3Gi
     min:
       cpu: 100m
       memory: 32Mi
