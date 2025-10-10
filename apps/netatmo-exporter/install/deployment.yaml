@@ -41,7 +41,7 @@ spec:
             privileged: false
           resources:
             requests:
-              cpu: 100m
+              cpu: 10m
               memory: 32Mi
             limits:
               cpu: 100m
@@ -68,7 +68,7 @@ spec:
             privileged: false               # prevent acting like host root
           resources:
             requests:
-              cpu: 100m
+              cpu: 10m
               memory: 32Mi
             limits:
               cpu: 100m

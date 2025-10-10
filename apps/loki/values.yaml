@@ -680,10 +680,8 @@ lokiCanary:
   resources:
     requests:
       memory: 64Mi
-      cpu: 10m
     limits:
       memory: 256Mi
-      cpu: 200m
   # -- DNS config for canary pods
   dnsConfig: {}
   # -- Node selector for canary pods
