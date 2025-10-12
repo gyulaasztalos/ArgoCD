@@ -17,7 +17,7 @@ This repository contains Kubernetes manifests for managing my HomeLab infrastruc
   - 8 GB RAM
   - 256 GB NVMe SSD (primary storage)
   - Fixed IP addresses
-  - Debian 12 Bookworm (latest)
+  - RaspberryPi OS Trixie (latest)
 - External NAS with NFS share for backups
 
 **Notes:**
@@ -47,7 +47,7 @@ This repository contains Kubernetes manifests for managing my HomeLab infrastruc
 - **NAS:** `unvr-pro.local.asztalos.net (10.10.50.2)`
 
 #### Core Infrastructure
-- **Base System:** Debian 12 Bookworm
+- **Base System:** RaspberryPi OS Trixie
 - **Kubernetes:** HA K3s v1.33.1+k3s1
   - MetalLB (service load balancer in BGP mode)
   - KubeVIP (control plane LB in ARP mode)
