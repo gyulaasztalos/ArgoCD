@@ -17,7 +17,7 @@ spec:
       ref: config
     - repoURL: https://charts.external-secrets.io
       chart: external-secrets
-      targetRevision: 0.20.2
+      targetRevision: 0.20.3
       helm:
         valueFiles:
           - $config/apps/external-secrets/values.yaml
