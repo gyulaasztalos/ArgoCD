@@ -7,3 +7,6 @@ metadata:
 spec:
   cluster:
     name: postgres
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io
