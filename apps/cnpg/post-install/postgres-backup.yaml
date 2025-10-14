@@ -8,3 +8,6 @@ spec:
     name: postgres
   schedule: "0 3 * * *" # daily at 03:00 UTC
   backupOwnerReference: self
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io

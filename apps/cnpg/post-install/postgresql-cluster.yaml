@@ -3,6 +3,28 @@ kind: Namespace
 metadata:
   name: databases
 ---
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: backblaze-b2
+  namespace: databases
+spec:
+  configuration:
+    destinationPath: s3://homelab-cnpg-backup-production/cnpg-backup/
+    endpointURL: https://s3.eu-central-003.backblazeb2.com
+    data:
+      compression: bzip2
+    wal:
+      compression: bzip2
+      maxParallel: 4
+    s3Credentials:
+      accessKeyId:
+        name: cnpg-backblaze-secret
+        key: application_key_id
+      secretAccessKey:
+        name: cnpg-backblaze-secret
+        key: application_key
+---
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
@@ -42,21 +64,11 @@ spec:
         passwordSecret:
           name: paperless-postgres-password
         login: true
-  backup:
-    barmanObjectStore:
-      destinationPath: s3://homelab-cnpg-backup-production/cnpg-backup/
-      endpointURL: https://s3.eu-central-003.backblazeb2.com
-      data:
-        compression: bzip2
-      wal:
-        compression: bzip2
-        maxParallel: 4
-      s3Credentials:
-        accessKeyId:
-          name: cnpg-backblaze-secret
-          key: application_key_id
-        secretAccessKey:
-          name: cnpg-backblaze-secret
-          key: application_key
-    retentionPolicy: "7d" # keep 7 days of backups
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: backblaze-b2
+        serverName: postgres
+        retentionPolicy: "7d"
 
