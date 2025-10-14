@@ -16,7 +16,7 @@ spec:
     name: postgresql
     major: 17
   storage:
-    size: 15Gi
+    size: 20Gi
     storageClass: longhorn-1r
   affinity:
     podAntiAffinityType: required  # Ensure pods are always on separate nodes
