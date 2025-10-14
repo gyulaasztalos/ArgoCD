@@ -66,6 +66,7 @@ spec:
         login: true
   plugins:
     - name: barman-cloud.cloudnative-pg.io
+      enabled: true
       isWALArchiver: true
       parameters:
         barmanObjectName: backblaze-b2
