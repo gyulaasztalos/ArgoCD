@@ -14,7 +14,7 @@ spec:
       ref: config
     - repoURL: https://rke2-charts.rancher.io
       chart: rke2-multus
-      targetRevision: v4.2.206
+      targetRevision: v4.2.207
       helm:
         valueFiles:
           - $config/apps/multus/values.yaml
