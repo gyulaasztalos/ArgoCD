@@ -262,7 +262,7 @@ loki.relabel "normalize_labels" {
 
 // Journal Logs
 loki.source.journal "journalctl_to_loki" {
-  path = "/var/log/journal"
+  path = "/run/log/journal"
   labels = {
     job = "systemd-journal",
     nodename = sys.env("HOSTNAME"),
