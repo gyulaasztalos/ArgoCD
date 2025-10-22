@@ -14,3 +14,12 @@
 5. **Restart Paperless-NGX:**
     * `kubectl delete pod -n paperless-ngx paperless-ngx-b6d6476dd-xfs5d`
 6. **Login with password and re-enable the Authentik SSO on your profile**
+
+### Grant permissions to paperless user in order to be able to migrate the DB during version upgrades
+1. **Connect with postgres user to the UNIX socket in the postgres-rw pod**
+   * `psql -U postgres -d paperless`
+2. **Run SQLs**
+    * `GRANT USAGE, CREATE ON SCHEMA public TO paperless;`
+    * `ALTER DEFAULT PRIVILEGES IN SCHEMA  public GRANT ALL ON TABLES TO paperless;`
+    * `GRANT ALL PRIVILEGES ON ALL TABLES IN   SCHEMA public TO paperless;`
+    * `GRANT ALL PRIVILEGES ON ALL SEQUENCES   IN SCHEMA public TO paperless;`
