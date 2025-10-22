@@ -35,7 +35,7 @@ spec:
     spec:
       containers:
         - name: "unbound"
-          image: klutchell/unbound:1.24.0
+          image: klutchell/unbound:1.24.1
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: false
