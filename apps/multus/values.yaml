@@ -91,6 +91,7 @@ config:
     binDir: /var/lib/rancher/k3s/data/cni/
     #namespaceIsolation: false
     #globalNamespaces: default,foo,bar
+    #skipConfigWatch: false
     #skipMultusBinaryCopy: false
     #readinessIndicatorFile: ""
     multusConfFile: auto #or specify a file to be copied on each node
@@ -100,8 +101,11 @@ config:
     #multusAutoconfigDir: /host/etc/cni/net.d
     kubeconfig: /var/lib/rancher/k3s/agent/etc/cni/net.d/multus.d/multus.kubeconfig
     #masterCniFilename:
+    #overrideNetworkName:
+    #renameConfFile:
     #logFile: /var/log/multus.log
     #logLevel: panic
+    #logToStderr: true
     #cniVersion: 1.0.0
     #cleanupConfigOnExit: true
     #additionalBinDir: /opt/multus/bin
