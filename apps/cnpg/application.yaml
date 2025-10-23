@@ -17,7 +17,7 @@ spec:
       ref: config
     - repoURL: https://cloudnative-pg.github.io/charts
       chart: cloudnative-pg
-      targetRevision: 0.26.0
+      targetRevision: 0.26.1
     - repoURL: https://cloudnative-pg.github.io/charts
       chart: plugin-barman-cloud
       targetRevision: 0.2.0
