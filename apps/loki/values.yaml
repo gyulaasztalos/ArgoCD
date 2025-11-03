@@ -5,8 +5,10 @@
 kubeVersionOverride: null
 
 global:
+  # -- Overrides the Docker registry globally for all images (standard format)
+  imageRegistry: null
   image:
-    # -- Overrides the Docker registry globally for all images
+    # -- Overrides the Docker registry globally for all images (deprecated, use global.imageRegistry)
     registry: null
   # -- Overrides the priorityClassName for all pods
   priorityClassName: null
@@ -39,6 +41,8 @@ global:
 nameOverride: null
 # -- Overrides the chart's computed fullname
 fullnameOverride: null
+# -- Overrides the chart's namespace
+namespaceOverride: null
 # -- Overrides the chart's cluster label
 clusterLabelOverride: null
 # -- Image pull secrets for Docker images
@@ -69,8 +73,13 @@ loki:
     httpGet:
       path: /ready
       port: http-metrics
+    periodSeconds: 10
     initialDelaySeconds: 30
+    successThreshold: 1
+    failureThreshold: 3
     timeoutSeconds: 1
+  # Configures the startup probe for all of the Loki pods
+  startupProbe: {}
   image:
     # -- The Docker registry
     registry: docker.io
@@ -109,6 +118,8 @@ loki:
     allowPrivilegeEscalation: false
   # -- Should enableServiceLinks be enabled. Default to enable
   enableServiceLinks: true
+  # -- DNS config for Loki pods
+  dnsConfig: {}
   ######################################################################################################################
   #
   # Loki Configuration
@@ -534,6 +545,10 @@ loki:
         index:
           prefix: index_
           period: 24h
+  ## A separate loki ruler storage configuration can be provided via rulerStorage.storage section:
+  ##  rulerConfig:
+  ##    storage:
+  ##      type: local
   # -- Check https://grafana.com/docs/loki/latest/configuration/#ruler for more info on configuring ruler
   rulerConfig:
     wal:
@@ -644,6 +659,8 @@ test:
     digest: null
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
+  # -- Use the host's user namespace in test pods
+  hostUsers: nil
 # The Loki canary pushes logs to and queries from this loki installation to test
 # that it's working correctly
 lokiCanary:
@@ -709,6 +726,97 @@ lokiCanary:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 1
+  # -- Replicas for `loki-canary` when using a Deployment
+  replicas: 1
+######################################################################################################################
+#
+# Service Accounts and Kubernetes RBAC
+#
+######################################################################################################################
+serviceAccount:
+  # -- Specifies whether a ServiceAccount should be created
+  create: true
+  # -- The name of the ServiceAccount to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: null
+  # -- Image pull secrets for the service account
+  imagePullSecrets: []
+  # -- Annotations for the service account
+  annotations: {}
+  # -- Labels for the service account
+  labels: {}
+  # -- Set this toggle to false to opt out of automounting API credentials for the service account
+  automountServiceAccountToken: true
+# RBAC configuration
+rbac:
+  # -- If pspEnabled true, a PodSecurityPolicy is created for K8s that use psp.
+  pspEnabled: false
+  # -- For OpenShift set pspEnabled to 'false' and sccEnabled to 'true' to use the SecurityContextConstraints.
+  sccEnabled: false
+  # -- Toggle this to true to allow the use of hostPath volumes on OpenShift
+  sccAllowHostDirVolumePlugin: false
+  # -- Specify PSP annotations
+  # Ref: https://kubernetes.io/docs/reference/access-authn-authz/psp-to-pod-security-standards/#podsecuritypolicy-annotations
+  pspAnnotations: {}
+  # seccomp.security.alpha.kubernetes.io/allowedProfileNames: '*'
+  # seccomp.security.alpha.kubernetes.io/defaultProfileName: 'docker/default'
+  # apparmor.security.beta.kubernetes.io/defaultProfileName: 'runtime/default'
+  # -- Whether to install RBAC in the namespace only or cluster-wide. Useful if you want to watch ConfigMap globally.
+  namespaced: false
+######################################################################################################################
+#
+# Network Policy configuration
+#
+######################################################################################################################
+networkPolicy:
+  # -- Specifies whether Network Policies should be created
+  enabled: false
+  # -- Specifies whether the policies created will be standard Network Policies (flavor: kubernetes)
+  # or Cilium Network Policies (flavor: cilium)
+  flavor: kubernetes
+  metrics:
+    # -- Specifies the Pods which are allowed to access the metrics port.
+    # As this is cross-namespace communication, you also need the namespaceSelector.
+    podSelector: {}
+    # -- Specifies the namespaces which are allowed to access the metrics port
+    namespaceSelector: {}
+    # -- Specifies specific network CIDRs which are allowed to access the metrics port.
+    # In case you use namespaceSelector, you also have to specify your kubelet networks here.
+    # The metrics ports are also used for probes.
+    cidrs: []
+  ingress:
+    # -- Specifies the Pods which are allowed to access the http port.
+    # As this is cross-namespace communication, you also need the namespaceSelector.
+    podSelector: {}
+    # -- Specifies the namespaces which are allowed to access the http port
+    namespaceSelector: {}
+  alertmanager:
+    # -- Specify the alertmanager port used for alerting
+    port: 9093
+    # -- Specifies the alertmanager Pods.
+    # As this is cross-namespace communication, you also need the namespaceSelector.
+    podSelector: {}
+    # -- Specifies the namespace the alertmanager is running in
+    namespaceSelector: {}
+  externalStorage:
+    # -- Specify the port used for external storage, e.g. AWS S3
+    ports: []
+    # -- Specifies specific network CIDRs you want to limit access to
+    cidrs: []
+  discovery:
+    # -- (int) Specify the port used for discovery
+    port: null
+    # -- Specifies the Pods labels used for discovery.
+    # As this is cross-namespace communication, you also need the namespaceSelector.
+    podSelector: {}
+    # -- Specifies the namespace the discovery Pods are running in
+    namespaceSelector: {}
+  egressWorld:
+    # -- Enable additional cilium egress rules to external world for write, read and backend.
+    enabled: false
+  egressKubeApiserver:
+    # -- Enable additional cilium egress rules to kube-apiserver for backend.
+    enabled: false
 ######################################################################################################################
 #
 # Global memberlist configuration
@@ -781,6 +889,8 @@ singleBinary:
     annotations: {}
     # -- Additional labels for single binary Service
     labels: {}
+    # -- Service Type for single binary Service
+    type: "ClusterIP"
   # -- Comma-separated list of Loki modules to load for the single binary
   targetModule: "all"
   # -- Labels for single binary service
@@ -807,14 +917,19 @@ singleBinary:
       memory: 1500Mi
   # -- Grace period to allow the single binary to shutdown before it is killed
   terminationGracePeriodSeconds: 30
+  # -- Use the host's user namespace in the single binary pods
+  hostUsers: nil
   # -- Affinity for single binary pods.
   # @default -- Hard node anti-affinity
+  # The value will be passed through tpl.
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
         - labelSelector:
             matchLabels:
               app.kubernetes.io/component: single-binary
+              app.kubernetes.io/name: '{{ include "loki.name" . }}'
+              app.kubernetes.io/instance: '{{ .Release.Name }}'
           topologyKey: kubernetes.io/hostname
   # -- DNS config for single binary pods
   dnsConfig: {}
@@ -825,8 +940,15 @@ singleBinary:
   persistence:
     # -- Enable StatefulSetAutoDeletePVC feature
     enableStatefulSetAutoDeletePVC: true
+    # -- Enable StatefulSetRecreation for changes to PVC size.
+    # This means that the StatefulSet will be deleted, recreated (with the same name) and rolled when a change to the
+    # PVC size is detected. That way the PVC can be resized without manual intervention.
+    enableStatefulSetRecreationForSizeChange: false
     # -- Enable persistent disk
     enabled: true
+    # -- Set access modes on the PersistentVolumeClaim
+    accessModes:
+      - ReadWriteOnce
     # -- Size of persistent disk
     size: 10Gi
     # -- Storage class to be used.
@@ -868,12 +990,119 @@ write:
 # Use the deprecated but still working monitoring section
 # until meta-monitoring becomes production-ready [2][5]
 monitoring:
-  serviceMonitor:
+  # Dashboards for monitoring Loki
+  dashboards:
+    # -- If enabled, create configmap with dashboards for monitoring Loki
     enabled: true
+    # -- Alternative namespace to create dashboards ConfigMap in
+    namespace: null
+    # -- Additional annotations for the dashboards ConfigMap
+    annotations: {}
+    # -- Labels for the dashboards ConfigMap
     labels:
-      prometheus.io/service-monitor: "true"
-    interval: 30s
-  prometheusRule:
+      grafana_dashboard: "1"
+  # -- Recording rules for monitoring Loki, required for some dashboards
+  rules:
+    # -- If enabled, create PrometheusRule resource with Loki recording rules
     enabled: true
+    # -- Include alerting rules
+    alerting: true
+    # -- Specify which individual alerts should be disabled
+    # -- Instead of turning off each alert one by one, set the .monitoring.rules.alerting value to false instead.
+    # -- If you disable all the alerts and keep .monitoring.rules.alerting set to true, the chart will fail to render.
+    #
+    # -- DEPRECATED: use monitoring.rules.configs.*.enabled instead
+    disabled: {}
+    #  LokiRequestErrors: true
+    #  LokiRequestPanics: true
+
+    configs:
+      LokiRequestErrors:
+        enabled: true
+        for: 15m
+        lookbackPeriod: 2m
+        severity: critical
+        threshold: 10
+      LokiRequestPanics:
+        enabled: true
+        lookbackPeriod: 10m
+        severity: critical
+        threshold: 0
+      LokiRequestLatency:
+        enabled: true
+        for: 15m
+        severity: critical
+        threshold: 1
+      LokiTooManyCompactorsRunning:
+        enabled: true
+        for: 5m
+        severity: warning
+      LokiCanaryLatency:
+        enabled: true
+        for: 15m
+        lookbackPeriod: 5m
+        severity: warning
+        threshold: 5
+
+    # -- Alternative namespace to create PrometheusRule resources in
+    namespace: null
+    # -- Additional annotations for the rules PrometheusRule resource
+    annotations: {}
+    # -- Additional labels for the rules PrometheusRule resource
     labels:
       prometheus.io/rule: "true"
+    # -- Additional annotations for PrometheusRule alerts
+    additionalRuleAnnotations: {}
+    # e.g.:
+    # additionalRuleAnnotations:
+    #   runbook_url: "https://runbooks.example.com/oncall/loki"
+    #   summary: "What this alert means and how to respond"
+    # -- Additional labels for PrometheusRule alerts
+    additionalRuleLabels: {}
+    # -- Additional groups to add to the rules file
+    additionalGroups: []
+    # - name: additional-loki-rules
+    #   rules:
+    #     - record: job:loki_request_duration_seconds_bucket:sum_rate
+    #       expr: sum(rate(loki_request_duration_seconds_bucket[1m])) by (le, job)
+    #     - record: job_route:loki_request_duration_seconds_bucket:sum_rate
+    #       expr: sum(rate(loki_request_duration_seconds_bucket[1m])) by (le, job, route)
+    #     - record: node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate
+    #       expr: sum(rate(container_cpu_usage_seconds_total[1m])) by (node, namespace, pod, container)
+  # -- ServiceMonitor configuration
+  serviceMonitor:
+    # -- If enabled, ServiceMonitor resources for Prometheus Operator are created
+    enabled: true
+    # -- Namespace selector for ServiceMonitor resources
+    namespaceSelector: {}
+    # -- ServiceMonitor annotations
+    annotations: {}
+    # -- Additional ServiceMonitor labels
+    labels:
+      prometheus.io/service-monitor: "true"
+    # -- ServiceMonitor scrape interval
+    # Default is 15s because included recording rules use a 1m rate, and scrape interval needs to be at
+    # least 1/4 rate interval.
+    interval: 30s
+    # -- ServiceMonitor scrape timeout in Go duration format (e.g. 15s)
+    scrapeTimeout: null
+    # -- ServiceMonitor relabel configs to apply to samples before scraping
+    # https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#relabelconfig
+    relabelings: []
+    # -- ServiceMonitor metric relabel configs to apply to samples before ingestion
+    # https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#endpoint
+    metricRelabelings: []
+    # -- ServiceMonitor will use http by default, but you can pick https as well
+    scheme: http
+    # -- ServiceMonitor will use these tlsConfig settings to make the health check requests
+    tlsConfig: null
+    # -- DEPRECATED If defined, will create a MetricsInstance for the Grafana Agent Operator.
+    metricsInstance:
+      # -- If enabled, MetricsInstance resources for Grafana Agent Operator are created
+      enabled: true
+      # -- MetricsInstance annotations
+      annotations: {}
+      # -- Additional MetricsInstance labels
+      labels: {}
+      # -- If defined a MetricsInstance will be created to remote write metrics.
+      remoteWrite: null
