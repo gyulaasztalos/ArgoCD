@@ -27,13 +27,13 @@ image:
   repository: cloudnative-pg/plugin-barman-cloud
   pullPolicy: IfNotPresent
   # -- Overrides the image tag whose default is the chart appVersion.
-  tag: "v0.9.0"
+  tag: ""
 
 sidecarImage:
   registry: ghcr.io
   repository: cloudnative-pg/plugin-barman-cloud-sidecar
   # -- Overrides the image tag whose default is the chart appVersion.
-  tag: "v0.9.0"
+  tag: ""
 
 # @schema
 # additionalProperties: true
