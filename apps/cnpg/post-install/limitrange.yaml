@@ -13,7 +13,7 @@ spec:
       cpu: 50m
       memory: 64Mi
     default:
-      cpu: 300m
+      cpu: 500m
       memory: 1024Mi
     defaultRequest:
       cpu: 100m
