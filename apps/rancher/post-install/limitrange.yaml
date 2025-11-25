@@ -43,8 +43,8 @@ spec:
 apiVersion: v1
 kind: LimitRange
 metadata:
-  name: cattle-provisioning-capi-system-resource-limits
-  namespace: cattle-provisioning-capi-system
+  name: cattle-capi-system-resource-limits
+  namespace: cattle-capi-system
 spec:
   limits:
   - type: Container
