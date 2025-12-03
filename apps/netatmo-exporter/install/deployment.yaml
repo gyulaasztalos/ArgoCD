@@ -33,7 +33,7 @@ spec:
     spec:
       initContainers:
         - name: add-netatmo-token
-          image: alpine:3.22
+          image: alpine:3.23
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
