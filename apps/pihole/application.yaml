@@ -17,7 +17,7 @@ spec:
       ref: config
     - repoURL: https://mojo2600.github.io/pihole-kubernetes/
       chart: pihole
-      targetRevision: 2.34.0
+      targetRevision: 2.35.0
       helm:
         valueFiles:
           - $config/apps/pihole/values.yaml
