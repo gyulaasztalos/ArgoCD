@@ -13,7 +13,7 @@ spec:
       targetRevision: main
       ref: config
     - repoURL: https://grafana.github.io/helm-charts
-      targetRevision: 6.48.0
+      targetRevision: 6.49.0
       helm:
         valueFiles:
           - $config/apps/loki/values.yaml
