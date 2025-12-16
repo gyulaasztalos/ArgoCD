@@ -17,7 +17,7 @@ spec:
       ref: config
     - repoURL: https://charts.goauthentik.io
       chart: authentik
-      targetRevision: 2025.10.2
+      targetRevision: 2025.10.3
       helm:
         valueFiles:
           - $config/apps/authentik/values.yaml
