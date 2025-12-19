@@ -13,7 +13,7 @@ spec:
       ref: config
     - repoURL: https://helm.traefik.io/traefik
       chart: traefik
-      targetRevision: 37.4.0
+      targetRevision: 38.0.1
       helm:
         valueFiles:
           - $config/apps/traefik/values.yaml
