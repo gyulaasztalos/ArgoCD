@@ -3,13 +3,25 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 configMapGenerator:
-  - name: unpoller-grafana-dashboards
+  - name: unpoller-uap-insights-dashboard
     namespace: unpoller
     files:
       - unpoller-uap-insights.json=unpoller-uap-insights.json
+  - name: unpoller-client-insights-dashboard
+    namespace: unpoller
+    files:
       - unpoller-client-insights.json=unpoller-client-insights.json
+  - name: unpoller-usw-insights-dashboard
+    namespace: unpoller
+    files:
       - unpoller-usw-insights.json=unpoller-usw-insights.json
+  - name: unpoller-network-sites-dashboard
+    namespace: unpoller
+    files:
       - unpoller-network-sites.json=unpoller-network-sites.json
+  - name: unpoller-usg-insights-dashboard
+    namespace: unpoller
+    files:
       - unpoller-usg-insights.json=unpoller-usg-insights.json
 
 resources:
