@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: unpoller-alerts
+  namespace: unpoller  # Must match your Prometheus Operator's namespace
+spec:
+  groups:
+  - name: unpoller.rules
+    rules:
+    # Critical: unpoller service is down
+    - alert: unpoller-down
+      expr: absent(up{job="unpoller"} == 1)
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "unpoller service is down"
+        description: "The unpoller service has not been up for the last 5 minutes."
+    - alert: unpoller-restart-loop
+      expr: increase(kube_pod_container_status_restarts_total{namespace="unpoller", pod=~"unpoller-.*"}[18m]) > 3
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "unpoller pod is restarting frequently"
+        description: "The unpoller pod has restarted more than 3 times in the last 18 minutes."

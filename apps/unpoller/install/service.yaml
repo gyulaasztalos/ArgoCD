@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: unpoller
+  namespace: unpoller
+  labels:
+    app: unpoller
+    app.kubernetes.io/name: unpoller
+    app.kubernetes.io/part-of: unpoller
+    app.kubernetes.io/instance: unpoller
+    app.kubernetes.io/component: unpoller
+spec:
+  selector:
+    app: unpoller
+  ports:
+    - name: http
+      protocol: TCP
+      port: 9130
+      targetPort: http
+  type: ClusterIP

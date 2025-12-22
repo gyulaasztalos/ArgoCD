@@ -1,0 +1,95 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unpoller
+  namespace: unpoller
+  labels:
+    app: unpoller
+    app.kubernetes.io/name: unpoller
+    app.kubernetes.io/part-of: unpoller
+    app.kubernetes.io/instance: unpoller
+    app.kubernetes.io/component: unpoller
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: unpoller
+  template:
+    metadata:
+      labels:
+        app: unpoller
+        app.kubernetes.io/name: unpoller
+        app.kubernetes.io/part-of: unpoller
+        app.kubernetes.io/instance: unpoller
+        app.kubernetes.io/component: unpoller
+    spec:
+      containers:
+        - name: unpoller
+          image: "ghcr.io/unpoller/unpoller:v2.19.0"
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false # prevent sudo, etc.
+            privileged: false               # prevent acting like host root
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          ports:
+            - containerPort: 9130
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 9130
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 9130
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 6
+            successThreshold: 1
+            timeoutSeconds: 10
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/unpoller/up.conf
+              subPath: up.conf
+      volumes:
+        - name: config-volume
+          secret:
+            secretName: unpoller-secret
+      restartPolicy: Always
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        fsGroup: 1000            # hardcode group to non-root if not set in Dockerfile
+        runAsUser: 1000          # hardcode user to non-root if not set in Dockerfile
+        runAsGroup: 1000         # hardcode group to non-root if not set in Dockerfile
+        runAsNonRoot: true       # hardcode to non-root. Redundant to above if Dockerfile is set USER 1000
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - unpoller
+              topologyKey: kubernetes.io/hostname
