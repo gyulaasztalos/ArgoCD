@@ -105,7 +105,7 @@
     },
     {
       "columns": [],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "description": "If you have access points and gateways they will also show up here because they have switch ports.",
       "editable": true,
       "error": false,
@@ -404,7 +404,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 1,
       "description": "",
       "fieldConfig": {
@@ -525,7 +525,7 @@
       "cacheTimeout": null,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 0,
       "description": "",
       "fieldConfig": {
@@ -631,7 +631,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "editable": true,
       "error": false,
       "fieldConfig": {
@@ -765,7 +765,7 @@
       "cacheTimeout": null,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 0,
       "description": "",
       "fieldConfig": {
@@ -866,7 +866,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "description": "Shows data transferred for selected switch ports.",
       "fieldConfig": {
         "defaults": {
@@ -977,7 +977,7 @@
     },
     {
       "columns": [],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "description": "This panel displays lifetime totals and current data as of now.",
       "fieldConfig": {
         "defaults": {
@@ -1521,7 +1521,7 @@
       "panels": [
         {
           "columns": [],
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "Prometheus",
           "description": "These are total \"lifetime\" counters.",
           "fieldConfig": {
             "defaults": {
@@ -1838,7 +1838,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "Prometheus",
           "description": "Shows data transfer rate per second for Switch $Port. TX on positive axis and RX on negative axis.",
           "fieldConfig": {
             "defaults": {
@@ -1952,7 +1952,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "Prometheus",
           "description": "Shows broadcast and multicast packets per second for Switch $Port. TX on positive axis and RX on negative axis.",
           "fieldConfig": {
             "defaults": {
@@ -2078,7 +2078,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "Prometheus",
           "decimals": null,
           "description": "Shows errors and dropped packets for Switch $Port. RX on negative axis.",
           "fieldConfig": {
@@ -2209,7 +2209,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "Prometheus",
           "description": "Shows packet counters for Switch $Port. TX on positive axis and RX on negative axis.",
           "fieldConfig": {
             "defaults": {
@@ -2323,7 +2323,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "Prometheus",
           "description": "Display POE Power for Switch $Port.",
           "fieldConfig": {
             "defaults": {
@@ -2426,7 +2426,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "Prometheus",
           "description": "Display POE Voltage for Switch $Port.",
           "fieldConfig": {
             "defaults": {
@@ -2530,7 +2530,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "Prometheus",
           "description": "Display POE Current for Switch $Port.",
           "fieldConfig": {
             "defaults": {
@@ -2661,7 +2661,7 @@
       {
         "allValue": ".*",
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "Prometheus",
         "definition": "label_values(unpoller_device_info,source)",
         "hide": 2,
         "includeAll": true,
@@ -2725,7 +2725,7 @@
       {
         "allValue": ".*",
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "Prometheus",
         "definition": "label_values(unpoller_device_info{source=~\"$Controller\"},site_name)",
         "hide": 0,
         "includeAll": true,
@@ -2747,7 +2747,7 @@
       {
         "allValue": "",
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "Prometheus",
         "definition": "label_values(unpoller_device_info{site_name=~\"$Site\", type=~\"$Devices\"},name)",
         "hide": 0,
         "includeAll": true,
@@ -2769,7 +2769,7 @@
       {
         "allValue": ".*",
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "Prometheus",
         "definition": "label_values(unpoller_device_port_port_speed_bps{site_name=~\"$Site\", name=~\"$Switch\"},port_id)",
         "hide": 0,
         "includeAll": true,

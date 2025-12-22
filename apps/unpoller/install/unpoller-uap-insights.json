@@ -149,7 +149,7 @@
         "label": "Others",
         "threshold": 0
       },
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 0,
       "description": "Visualize wireless channel usage w/ wired client counts.",
       "fieldConfig": {
@@ -210,7 +210,7 @@
         "label": "Others",
         "threshold": 0
       },
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 0,
       "description": "Visualize how many clients are connected to which radios/APs.",
       "fieldConfig": {
@@ -267,7 +267,7 @@
         "label": "Others",
         "threshold": "0.01"
       },
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 0,
       "description": "This shows an OUI breakdown from Unifi's perspective.",
       "fieldConfig": {
@@ -325,7 +325,7 @@
         "rgba(237, 129, 40, 0.89)",
         "rgba(50, 172, 45, 0.97)"
       ],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "description": "",
       "editable": true,
       "error": false,
@@ -409,7 +409,7 @@
         "rgba(237, 129, 40, 0.89)",
         "rgba(50, 172, 45, 0.97)"
       ],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "description": "",
       "editable": true,
       "error": false,
@@ -562,7 +562,7 @@
     },
     {
       "columns": [],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "editable": true,
       "error": false,
       "fieldConfig": {
@@ -856,7 +856,7 @@
     },
     {
       "columns": [],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "description": "The counters in this table represent uptime totals and do not change with the time range selector. ",
       "editable": true,
       "error": false,
@@ -1410,7 +1410,7 @@
       "cacheTimeout": null,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -1513,7 +1513,7 @@
       "cacheTimeout": null,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -1617,7 +1617,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "editable": true,
       "error": false,
       "fieldConfig": {
@@ -1742,7 +1742,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 0,
       "editable": true,
       "error": false,
@@ -1849,7 +1849,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "description": "Devices TX / RX bytes per second grouped by OUI. RX on negative axis.",
       "fieldConfig": {
         "defaults": {
@@ -1961,7 +1961,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 0,
       "editable": true,
       "error": false,
@@ -2086,7 +2086,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 0,
       "fieldConfig": {
         "defaults": {
@@ -2190,7 +2190,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 0,
       "fieldConfig": {
         "defaults": {
@@ -2294,7 +2294,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "editable": true,
       "error": false,
       "fieldConfig": {
@@ -2397,7 +2397,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "editable": true,
       "error": false,
       "fieldConfig": {
@@ -2501,7 +2501,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 0,
       "editable": true,
       "error": false,
@@ -2617,7 +2617,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 0,
       "description": "Displays 2.4GHz usage.",
       "editable": true,
@@ -2732,7 +2732,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "description": "RX is on the negative Axis.",
       "editable": true,
       "error": false,
@@ -2851,7 +2851,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "description": "RX is on the negative Axis.",
       "editable": true,
       "error": false,
@@ -2968,7 +2968,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 0,
       "description": "PPS on the na band. In is on the negative Axis.",
       "editable": true,
@@ -3085,7 +3085,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 0,
       "description": "PPS on the ng band calculated in 30 second buckets. In is on the negative Axis.",
       "editable": true,
@@ -3203,7 +3203,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 0,
       "description": "Visualize packet errors (several types)  per second in the 5GHz band.",
       "editable": true,
@@ -3358,7 +3358,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 0,
       "description": "In is on the negative axis.",
       "editable": true,
@@ -3522,7 +3522,7 @@
       {
         "allValue": ".*",
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "Prometheus",
         "definition": "label_values(unpoller_device_info{type=\"uap\"},source)",
         "hide": 2,
         "includeAll": true,
@@ -3544,7 +3544,7 @@
       {
         "allValue": "",
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "Prometheus",
         "definition": "label_values(unpoller_device_info{source=~\"$Controller\", type=\"uap\"},site_name)",
         "hide": 0,
         "includeAll": true,
@@ -3566,7 +3566,7 @@
       {
         "allValue": "",
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "Prometheus",
         "definition": "label_values(unpoller_device_info{site_name=~\"$Site\", type=~\"uap|udm\",model!=\"UDMPRO\"},name)",
         "hide": 0,
         "includeAll": true,

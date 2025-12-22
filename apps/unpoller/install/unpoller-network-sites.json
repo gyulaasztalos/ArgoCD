@@ -110,7 +110,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": null,
       "format": "none",
       "gauge": {
@@ -198,7 +198,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": null,
       "format": "none",
       "gauge": {
@@ -286,7 +286,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": null,
       "format": "none",
       "gauge": {
@@ -374,7 +374,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": null,
       "format": "none",
       "gauge": {
@@ -489,7 +489,7 @@
             "rgba(237, 129, 40, 0.89)",
             "#d44a3a"
           ],
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "Prometheus",
           "decimals": null,
           "format": "s",
           "gauge": {
@@ -580,7 +580,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "Prometheus",
           "decimals": 0,
           "description": "These are counters, totals, but they don't change much so the graph does not show rate.",
           "fill": 0,
@@ -725,7 +725,7 @@
         },
         {
           "cacheTimeout": null,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "Prometheus",
           "gridPos": {
             "h": 8,
             "w": 3,
@@ -806,7 +806,7 @@
         },
         {
           "cacheTimeout": null,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "Prometheus",
           "gridPos": {
             "h": 8,
             "w": 3,
@@ -888,7 +888,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "Prometheus",
           "decimals": null,
           "description": "Shows data transfer for each subsystem on the site. RX is on the negative axis.",
           "fill": 0,
@@ -1004,7 +1004,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "Prometheus",
           "decimals": 0,
           "description": "This graphs shows clients connected to the site.",
           "fill": 0,
@@ -1133,7 +1133,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "Prometheus",
           "decimals": 0,
           "description": "This graphs shows clients connected to the site.",
           "fill": 0,
@@ -1248,7 +1248,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_PROMETHEUS}",
+          "datasource": "Prometheus",
           "decimals": 0,
           "description": "This graph only works if DPI is enabled on the controller and DPI collection is enabled in UniFi Poller. Rx is on the negative axis.",
           "fill": 0,
@@ -1380,7 +1380,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "Prometheus",
         "definition": "label_values(unpoller_site_transmit_rate_bytes,source)",
         "hide": 0,
         "includeAll": true,
@@ -1402,7 +1402,7 @@
       {
         "allValue": ".*",
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "Prometheus",
         "definition": "label_values(unpoller_site_transmit_rate_bytes{source=~\"$Controller\"},site_name)",
         "hide": 2,
         "includeAll": true,
@@ -1424,7 +1424,7 @@
       {
         "allValue": ".*",
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "Prometheus",
         "definition": "label_values(subsystem)",
         "hide": 2,
         "includeAll": true,
