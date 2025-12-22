@@ -2,10 +2,29 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+configMapGenerator:
+  - name: unpoller-grafana-dashboards
+    namespace: unpoller
+    files:
+      - unpoller-uap-insights.json=unpoller-uap-insights.json
+      - unpoller-client-insights.json=unpoller-client-insights.json
+      - unpoller-usw-insights.json=unpoller-usw-insights.json
+      - unpoller-network-sites.json=unpoller-network-sites.json
+      - unpoller-usg-insights.json=unpoller-usg-insights.json
+
 resources:
   - unpoller-secret.yaml
   - deployment.yaml
   - service.yaml
   - servicemonitor.yaml
-  - grafana-dashboard.yaml
   - prometheus-alarms.yaml
+
+generatorOptions:
+  labels:
+    app.kubernetes.io/name: unpoller
+    app.kubernetes.io/instance: unpoller
+    app.kubernetes.io/part-of: unpoller
+    app.kubernetes.io/component: unpoller
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "/tmp/dashboards/Tools"
