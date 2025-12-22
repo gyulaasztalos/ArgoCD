@@ -397,7 +397,7 @@
     },
     {
       "collapsed": true,
-      "datasource": "${DS_UNIFI_POLLER}",
+      "datasource": "Prometheus",
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -2353,7 +2353,7 @@
     },
     {
       "collapsed": true,
-      "datasource": "${DS_UNIFI_POLLER}",
+      "datasource": "Prometheus",
       "gridPos": {
         "h": 1,
         "w": 24,
