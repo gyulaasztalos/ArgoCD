@@ -18,7 +18,7 @@ spec:
       targetRevision: main
       ref: config
     - repoURL: https://argoproj.github.io/argo-helm
-      targetRevision: 9.1.9
+      targetRevision: 9.1.10
       helm:
         valueFiles:
           - $config/apps/argocd/values.yaml
