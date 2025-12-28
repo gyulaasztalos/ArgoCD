@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: nut-exporter
-          image: druggeri/nut_exporter:3.2.2
+          image: druggeri/nut_exporter:3.2.3
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
