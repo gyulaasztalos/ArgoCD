@@ -20,7 +20,7 @@ spec:
       targetRevision: 0.27.0
     - repoURL: https://cloudnative-pg.github.io/charts
       chart: plugin-barman-cloud
-      targetRevision: 0.3.1
+      targetRevision: 0.4.0
       helm:
         valueFiles:
           - $config/apps/cnpg/barman-values.yaml
