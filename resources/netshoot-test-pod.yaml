@@ -19,7 +19,7 @@ metadata:
 spec:
   containers:
   - name: netshoot
-    image: nicolaka/netshoot:v0.14
+    image: nicolaka/netshoot:v0.15
     command: ["/bin/sh", "-c", "trap : TERM INT; sleep infinity & wait"]
     resources:
       requests:
