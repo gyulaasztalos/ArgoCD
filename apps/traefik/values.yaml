@@ -1046,11 +1046,12 @@ ports:
       default: true
     exposedPort: 465
     protocol: TCP
-    tls:
-      enabled: true
-      options: ""
-      certResolver: ""
-      domains: []
+    http:
+      tls:
+        enabled: true
+        options: ""
+        certResolver: ""
+        domains: []
     observability:  # @schema additionalProperties: false
       # -- Enables metrics for this entryPoint.
       metrics:  # @schema type:[boolean, null]; default: true
