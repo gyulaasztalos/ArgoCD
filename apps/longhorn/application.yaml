@@ -14,7 +14,7 @@ spec:
       ref: config
     - repoURL: https://charts.longhorn.io
       chart: longhorn
-      targetRevision: 1.10.2
+      targetRevision: 1.11.0
       helm:
         valueFiles:
           - $config/apps/longhorn/values.yaml
