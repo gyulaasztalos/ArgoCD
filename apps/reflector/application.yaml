@@ -14,7 +14,7 @@ spec:
       ref: config
     - repoURL: ghcr.io/emberstack/helm-charts
       chart: reflector
-      targetRevision: 10.0.2
+      targetRevision: 10.0.3
       helm:
         valueFiles:
           - $config/apps/reflector/values.yaml
