@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: unpoller
-          image: "ghcr.io/unpoller/unpoller:v2.30.0"
+          image: "ghcr.io/unpoller/unpoller:v2.32.0"
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
