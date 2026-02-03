@@ -19,25 +19,43 @@ spec:
   data:
     - secretKey: username            # key in the Kubernetes Secret
       remoteRef:
+        conversionStrategy: Default
+        decodingStrategy: None
         key: argocd-github-repo
+        metadataPolicy: None
         property: username
     - secretKey: password               # key in the Kubernetes Secret
       remoteRef:
+        conversionStrategy: Default
+        decodingStrategy: None
         key: argocd-github-repo
+        metadataPolicy: None
         property: password
     - secretKey: name                 # key in the Kubernetes Secret
       remoteRef:
+        conversionStrategy: Default
+        decodingStrategy: None
         key: argocd-github-repo
+        metadataPolicy: None
         property: name
     - secretKey: url                 # key in the Kubernetes Secret
       remoteRef:
+        conversionStrategy: Default
+        decodingStrategy: None
         key: argocd-github-repo
+        metadataPolicy: None
         property: url
     - secretKey: project                 # key in the Kubernetes Secret
       remoteRef:
+        conversionStrategy: Default
+        decodingStrategy: None
         key: argocd-github-repo
+        metadataPolicy: None
         property: project
     - secretKey: type                 # key in the Kubernetes Secret
       remoteRef:
+        conversionStrategy: Default
+        decodingStrategy: None
         key: argocd-github-repo
+        metadataPolicy: None
         property: type
