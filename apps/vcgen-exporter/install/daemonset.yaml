@@ -53,15 +53,15 @@ spec:
               path: /metrics
               port: 8080
             initialDelaySeconds: 5
-            timeoutSeconds: 5
-            periodSeconds: 15
-            failureThreshold: 3
+            timeoutSeconds: 10
+            periodSeconds: 20
+            failureThreshold: 5
           livenessProbe:
             httpGet:
               path: /metrics
               port: 8080
             initialDelaySeconds: 10
-            timeoutSeconds: 5
+            timeoutSeconds: 10
             periodSeconds: 20
             failureThreshold: 5
       hostNetwork: false

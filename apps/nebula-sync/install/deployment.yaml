@@ -65,8 +65,8 @@ spec:
               path: /health
               port: 8080
             initialDelaySeconds: 5
-            periodSeconds: 15
-            failureThreshold: 3
+            periodSeconds: 20
+            failureThreshold: 5
           volumeMounts:
             - name: config
               mountPath: /config

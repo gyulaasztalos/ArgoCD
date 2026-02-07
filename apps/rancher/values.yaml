@@ -188,8 +188,8 @@ bootstrapPassword: ""
 
 startupProbe:
   ## should be ready within 2 minutes
-  timeoutSeconds: 5
-  periodSeconds: 10
+  timeoutSeconds: 10
+  periodSeconds: 20
   failureThreshold: 12
 
 # Additional taints to tolerate
@@ -204,11 +204,11 @@ extraTolerations: {}
 extraNodeSelectorTerms: {}
 
 livenessProbe:
-  timeoutSeconds: 5
+  timeoutSeconds: 10
   periodSeconds: 30
   failureThreshold: 5
 readinessProbe:
-  timeoutSeconds: 5
+  timeoutSeconds: 10
   periodSeconds: 30
   failureThreshold: 5
 

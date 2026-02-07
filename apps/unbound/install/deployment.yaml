@@ -62,7 +62,7 @@ spec:
             tcpSocket:
               port: 53
             initialDelaySeconds: 5
-            periodSeconds: 10
+            periodSeconds: 20
           livenessProbe:
             tcpSocket:
               port: 53

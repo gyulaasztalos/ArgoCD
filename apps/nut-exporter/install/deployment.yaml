@@ -54,8 +54,8 @@ spec:
               path: /metrics
               port: 9199
             initialDelaySeconds: 10
-            periodSeconds: 15
-            failureThreshold: 3
+            periodSeconds: 20
+            failureThreshold: 5
             successThreshold: 1
             timeoutSeconds: 10
           livenessProbe:
@@ -64,7 +64,7 @@ spec:
               port: 9199
             initialDelaySeconds: 30
             periodSeconds: 20
-            failureThreshold: 3
+            failureThreshold: 5
             successThreshold: 1
             timeoutSeconds: 10
           envFrom:

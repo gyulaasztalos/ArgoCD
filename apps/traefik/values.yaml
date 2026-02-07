@@ -258,18 +258,18 @@ readinessProbe:  # @schema additionalProperties: false
   # -- The number of seconds to wait before starting the first probe.
   initialDelaySeconds: 2
   # -- The number of seconds to wait between consecutive probes.
-  periodSeconds: 10
+  periodSeconds: 20
   # -- The minimum consecutive successes required to consider the probe successful.
   successThreshold: 1
   # -- The number of seconds to wait for a probe response before considering it as failed.
   timeoutSeconds: 2
 livenessProbe:  # @schema additionalProperties: false
   # -- The number of consecutive failures allowed before considering the probe as failed.
-  failureThreshold: 3
+  failureThreshold: 5
   # -- The number of seconds to wait before starting the first probe.
   initialDelaySeconds: 2
   # -- The number of seconds to wait between consecutive probes.
-  periodSeconds: 10
+  periodSeconds: 20
   # -- The minimum consecutive successes required to consider the probe successful.
   successThreshold: 1
   # -- The number of seconds to wait for a probe response before considering it as failed.

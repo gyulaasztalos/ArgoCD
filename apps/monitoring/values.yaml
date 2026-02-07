@@ -542,7 +542,7 @@ alertmanager:
       - receiver: 'null'
         matchers:
           - alertname = "Watchdog"
-      - receiver: 'null' 
+      - receiver: 'null'
         matchers:
           - alertname = "InfoInhibitor"
       - receiver: "iCloud"
@@ -2713,20 +2713,20 @@ prometheusOperator:
   ##
   livenessProbe:
     enabled: true
-    failureThreshold: 3
+    failureThreshold: 5
     initialDelaySeconds: 0
-    periodSeconds: 10
+    periodSeconds: 20
     successThreshold: 1
-    timeoutSeconds: 1
+    timeoutSeconds: 10
   ## Readiness probe for the prometheusOperator deployment
   ##
   readinessProbe:
     enabled: true
-    failureThreshold: 3
+    failureThreshold: 5
     initialDelaySeconds: 0
-    periodSeconds: 10
+    periodSeconds: 20
     successThreshold: 1
-    timeoutSeconds: 1
+    timeoutSeconds: 10
 
   ## Admission webhook support for PrometheusRules resources added in Prometheus Operator 0.30 can be enabled to prevent incorrectly formatted
   ## rules from making their way into prometheus and potentially preventing the container from starting
@@ -2890,21 +2890,21 @@ prometheusOperator:
       ##
       livenessProbe:
         enabled: true
-        failureThreshold: 3
+        failureThreshold: 5
         initialDelaySeconds: 30
-        periodSeconds: 10
+        periodSeconds: 20
         successThreshold: 1
-        timeoutSeconds: 1
+        timeoutSeconds: 10
 
       ## Readiness probe
       ##
       readinessProbe:
         enabled: true
-        failureThreshold: 3
+        failureThreshold: 5
         initialDelaySeconds: 5
-        periodSeconds: 10
+        periodSeconds: 20
         successThreshold: 1
-        timeoutSeconds: 1
+        timeoutSeconds: 10
 
       ## Resource limits & requests
       ##

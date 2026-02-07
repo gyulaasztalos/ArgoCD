@@ -87,8 +87,8 @@ spec:
                 - |
                   curl -u "$USER:$PASS" -s -o /dev/null -w "%{http_code}" http://localhost:9091/transmission/rpc | grep -q 401 || exit 0
             initialDelaySeconds: 10
-            periodSeconds: 15
-            failureThreshold: 3
+            periodSeconds: 20
+            failureThreshold: 5
             successThreshold: 1
             timeoutSeconds: 10
           livenessProbe:
@@ -100,7 +100,7 @@ spec:
                   curl -u "$USER:$PASS" -s -o /dev/null -w "%{http_code}" http://localhost:9091/transmission/rpc | grep -q 401 || exit 0
             initialDelaySeconds: 30
             periodSeconds: 20
-            failureThreshold: 3
+            failureThreshold: 5
             successThreshold: 1
             timeoutSeconds: 10
           envFrom:

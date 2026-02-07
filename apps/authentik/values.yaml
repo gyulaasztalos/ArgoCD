@@ -443,15 +443,15 @@ server:
   ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
   livenessProbe:
     # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
-    failureThreshold: 3
+    failureThreshold: 5
     # -- Number of seconds after the container has started before [probe] is initiated
     initialDelaySeconds: 5
     # -- How often (in seconds) to perform the [probe]
-    periodSeconds: 10
+    periodSeconds: 20
     # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
     successThreshold: 1
     # -- Number of seconds after which the [probe] times out
-    timeoutSeconds: 3
+    timeoutSeconds: 10
     ## Probe configuration
     httpGet:
       path: "{{ .Values.authentik.web.path }}-/health/live/"
@@ -459,15 +459,15 @@ server:
 
   readinessProbe:
     # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
-    failureThreshold: 3
+    failureThreshold: 5
     # -- Number of seconds after the container has started before [probe] is initiated
     initialDelaySeconds: 5
     # -- How often (in seconds) to perform the [probe]
-    periodSeconds: 10
+    periodSeconds: 20
     # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
     successThreshold: 1
     # -- Number of seconds after which the [probe] times out
-    timeoutSeconds: 3
+    timeoutSeconds: 10
     ## Probe configuration
     httpGet:
       path: "{{ .Values.authentik.web.path }}-/health/ready/"
@@ -479,11 +479,11 @@ server:
     # -- Number of seconds after the container has started before [probe] is initiated
     initialDelaySeconds: 5
     # -- How often (in seconds) to perform the [probe]
-    periodSeconds: 10
+    periodSeconds: 20
     # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
     successThreshold: 1
     # -- Number of seconds after which the [probe] times out
-    timeoutSeconds: 1
+    timeoutSeconds: 10
     ## Probe configuration
     httpGet:
       path: "{{ .Values.authentik.web.path }}-/health/live/"
@@ -875,15 +875,15 @@ worker:
 
   livenessProbe:
     # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
-    failureThreshold: 3
+    failureThreshold: 5
     # -- Number of seconds after the container has started before [probe] is initiated
     initialDelaySeconds: 5
     # -- How often (in seconds) to perform the [probe]
-    periodSeconds: 10
+    periodSeconds: 20
     # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
     successThreshold: 1
     # -- Number of seconds after which the [probe] times out
-    timeoutSeconds: 3
+    timeoutSeconds: 10
     ## Probe configuration
     exec:
       command:
@@ -892,15 +892,15 @@ worker:
 
   readinessProbe:
     # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
-    failureThreshold: 3
+    failureThreshold: 5
     # -- Number of seconds after the container has started before [probe] is initiated
     initialDelaySeconds: 5
     # -- How often (in seconds) to perform the [probe]
-    periodSeconds: 10
+    periodSeconds: 20
     # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
     successThreshold: 1
     # -- Number of seconds after which the [probe] times out
-    timeoutSeconds: 3
+    timeoutSeconds: 10
     ## Probe configuration
     exec:
       command:
@@ -913,11 +913,11 @@ worker:
     # -- Number of seconds after the container has started before [probe] is initiated
     initialDelaySeconds: 30
     # -- How often (in seconds) to perform the [probe]
-    periodSeconds: 10
+    periodSeconds: 20
     # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
     successThreshold: 1
     # -- Number of seconds after which the [probe] times out
-    timeoutSeconds: 1
+    timeoutSeconds: 10
     ## Probe configuration
     exec:
       command:

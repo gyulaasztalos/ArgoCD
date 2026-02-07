@@ -65,7 +65,7 @@ spec:
             periodSeconds: 60
             timeoutSeconds: 10
             successThreshold: 1
-            failureThreshold: 3
+            failureThreshold: 5
           livenessProbe:
             httpGet:
               path: /
@@ -75,7 +75,7 @@ spec:
             periodSeconds: 60
             timeoutSeconds: 10
             successThreshold: 1
-            failureThreshold: 3
+            failureThreshold: 5
           volumeMounts:
             - name: ddns-updater-secret
               mountPath: /updater/config/config.json

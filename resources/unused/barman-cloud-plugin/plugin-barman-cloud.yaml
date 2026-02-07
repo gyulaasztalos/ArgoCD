@@ -1006,7 +1006,7 @@ spec:
           protocol: TCP
         readinessProbe:
           initialDelaySeconds: 10
-          periodSeconds: 10
+          periodSeconds: 20
           tcpSocket:
             port: 9090
         resources:

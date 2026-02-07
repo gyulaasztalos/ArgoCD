@@ -79,7 +79,7 @@ alloy:
   initialDelaySeconds: 10
 
   # -- Timeout for readiness probe.
-  timeoutSeconds: 1
+  timeoutSeconds: 10
 
   # --  Base path where the UI is exposed.
   uiPathPrefix: /

@@ -291,7 +291,7 @@ master:
     enabled: false
     initialDelaySeconds: 20
     periodSeconds: 5
-    timeoutSeconds: 5
+    timeoutSeconds: 10
     successThreshold: 1
     failureThreshold: 5
   ## @param master.livenessProbe.enabled Enable livenessProbe on Redis(R) master nodes
@@ -305,7 +305,7 @@ master:
     enabled: true
     initialDelaySeconds: 20
     periodSeconds: 5
-    timeoutSeconds: 5
+    timeoutSeconds: 10
     successThreshold: 1
     failureThreshold: 5
   ## @param master.readinessProbe.enabled Enable readinessProbe on Redis(R) master nodes
@@ -319,7 +319,7 @@ master:
     enabled: true
     initialDelaySeconds: 20
     periodSeconds: 5
-    timeoutSeconds: 1
+    timeoutSeconds: 10
     successThreshold: 1
     failureThreshold: 5
   ## @param master.customStartupProbe Custom startupProbe that overrides the default one
@@ -789,8 +789,8 @@ replica:
   startupProbe:
     enabled: true
     initialDelaySeconds: 10
-    periodSeconds: 10
-    timeoutSeconds: 5
+    periodSeconds: 20
+    timeoutSeconds: 10
     successThreshold: 1
     failureThreshold: 22
   ## @param replica.livenessProbe.enabled Enable livenessProbe on Redis(R) replicas nodes
@@ -804,7 +804,7 @@ replica:
     enabled: true
     initialDelaySeconds: 20
     periodSeconds: 5
-    timeoutSeconds: 5
+    timeoutSeconds: 10
     successThreshold: 1
     failureThreshold: 5
   ## @param replica.readinessProbe.enabled Enable readinessProbe on Redis(R) replicas nodes
@@ -818,7 +818,7 @@ replica:
     enabled: true
     initialDelaySeconds: 20
     periodSeconds: 5
-    timeoutSeconds: 1
+    timeoutSeconds: 10
     successThreshold: 1
     failureThreshold: 5
   ## @param replica.customStartupProbe Custom startupProbe that overrides the default one
@@ -1334,8 +1334,8 @@ sentinel:
   startupProbe:
     enabled: true
     initialDelaySeconds: 10
-    periodSeconds: 10
-    timeoutSeconds: 5
+    periodSeconds: 20
+    timeoutSeconds: 10
     successThreshold: 1
     failureThreshold: 22
   ## @param sentinel.livenessProbe.enabled Enable livenessProbe on Redis(R) Sentinel nodes
@@ -1348,8 +1348,8 @@ sentinel:
   livenessProbe:
     enabled: true
     initialDelaySeconds: 20
-    periodSeconds: 10
-    timeoutSeconds: 5
+    periodSeconds: 20
+    timeoutSeconds: 10
     successThreshold: 1
     failureThreshold: 6
  ## @param sentinel.readinessProbe.enabled Enable readinessProbe on Redis(R) Sentinel nodes
@@ -1363,7 +1363,7 @@ sentinel:
     enabled: true
     initialDelaySeconds: 20
     periodSeconds: 5
-    timeoutSeconds: 1
+    timeoutSeconds: 10
     successThreshold: 1
     failureThreshold: 6
   ## @param sentinel.customStartupProbe Custom startupProbe that overrides the default one
@@ -1862,8 +1862,8 @@ metrics:
   startupProbe:
     enabled: false
     initialDelaySeconds: 10
-    periodSeconds: 10
-    timeoutSeconds: 5
+    periodSeconds: 20
+    timeoutSeconds: 10
     successThreshold: 1
     failureThreshold: 5
   ## @param metrics.livenessProbe.enabled Enable livenessProbe on Redis(R) replicas nodes
@@ -1876,8 +1876,8 @@ metrics:
   livenessProbe:
     enabled: true
     initialDelaySeconds: 10
-    periodSeconds: 10
-    timeoutSeconds: 5
+    periodSeconds: 20
+    timeoutSeconds: 10
     successThreshold: 1
     failureThreshold: 5
   ## @param metrics.readinessProbe.enabled Enable readinessProbe on Redis(R) replicas nodes
@@ -1890,10 +1890,10 @@ metrics:
   readinessProbe:
     enabled: true
     initialDelaySeconds: 5
-    periodSeconds: 10
-    timeoutSeconds: 1
+    periodSeconds: 20
+    timeoutSeconds: 10
     successThreshold: 1
-    failureThreshold: 3
+    failureThreshold: 5
   ## @param metrics.customStartupProbe Custom startupProbe that overrides the default one
   ##
   customStartupProbe: {}

@@ -67,7 +67,7 @@ livenessProbe:
     port: http
   timeoutSeconds: 10
   initialDelaySeconds: 5
-  periodSeconds: 10
+  periodSeconds: 20
   failureThreshold: 5
 readinessProbe:
   httpGet:
@@ -75,7 +75,7 @@ readinessProbe:
     port: http
   timeoutSeconds: 10
   initialDelaySeconds: 5
-  periodSeconds: 10
+  periodSeconds: 20
   failureThreshold: 5
 startupProbe:
   httpGet:
@@ -83,7 +83,7 @@ startupProbe:
     port: http
   timeoutSeconds: 10
   initialDelaySeconds: 5
-  periodSeconds: 10
+  periodSeconds: 20
   failureThreshold: 5
 
 

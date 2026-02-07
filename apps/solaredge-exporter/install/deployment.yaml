@@ -54,8 +54,8 @@ spec:
               path: /metrics
               port: 2112
             initialDelaySeconds: 10
-            periodSeconds: 15
-            failureThreshold: 3
+            periodSeconds: 20
+            failureThreshold: 5
             successThreshold: 1
             timeoutSeconds: 10
           livenessProbe:
