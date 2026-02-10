@@ -325,7 +325,7 @@ operator:
   resources: {}
 
   # 1Password Operator Token Configuration
-  token:
+  serviceAccountToken:
     # The name of Kubernetes Secret containing the 1Password Connect API token
     name: onepassword-token
 
