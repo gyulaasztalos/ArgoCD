@@ -50,7 +50,7 @@ image:
       # -- Repository for the Longhorn Manager image.
       repository: longhornio/longhorn-manager
       # -- Tag for the Longhorn Manager image.
-      # tag: v1.8.1
+      tag: v1.11.0-hotfix-1
     ui:
       # -- Registry for the Longhorn UI image.
       registry: ""
@@ -64,7 +64,7 @@ image:
       # -- Repository for the Longhorn Instance Manager image.
       repository: longhornio/longhorn-instance-manager
       # -- Tag for the Longhorn Instance Manager image.
-      # tag: v1.8.1
+      tag: v1.11.0-hotfix-1
     shareManager:
       # -- Registry for the Longhorn Share Manager image.
       registry: ""
