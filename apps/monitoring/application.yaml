@@ -18,7 +18,7 @@ spec:
       targetRevision: main
       ref: config
     - repoURL: https://prometheus-community.github.io/helm-charts
-      targetRevision: 81.6.6
+      targetRevision: 81.6.7
       helm:
         valueFiles:
           - $config/apps/monitoring/values.yaml
