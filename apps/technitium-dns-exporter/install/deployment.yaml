@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: technitium-dns-exporter
-          image: ghcr.io/brioche-works/technitium-dns-prometheus-exporter:master
+          image: ghcr.io/guycalledseven/technitium-dns-prometheus-exporter:v1.1.0
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
@@ -47,12 +47,12 @@ spec:
               cpu: 100m
               memory: 64Mi
           ports:
-            - containerPort: 8080
+            - containerPort: 9105
               name: http
           readinessProbe:
             httpGet:
               path: /metrics
-              port: 8080
+              port: 9105
             initialDelaySeconds: 10
             periodSeconds: 20
             failureThreshold: 5
@@ -64,7 +64,7 @@ spec:
                 - sh
                 - -c
                 - |
-                  wget -q -O - http://localhost:8080/metrics | awk '{if (NR>1) ok=1};END{if (ok==1) exit 0; else exit 1}'
+                  wget -q -O - http://localhost:9105/metrics | awk '{if (NR>1) ok=1};END{if (ok==1) exit 0; else exit 1}'
             initialDelaySeconds: 30
             periodSeconds: 30
             failureThreshold: 6

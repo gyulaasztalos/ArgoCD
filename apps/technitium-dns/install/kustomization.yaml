@@ -3,16 +3,12 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 configMapGenerator:
-  - name: technitium-dns-exporter-config
-    namespace: technitium-dns-exporter
-    env: technitium-dns-exporter-config.env
-  - name: technitium-dns-exporter-grafana-dashboard
-    namespace: technitium-dns-exporter
-    files:
-      - technitium-dns-exporter-grafana-dashboard.json=24555_rev1.json
+  - name: technitium-dns-config
+    namespace: technitium-dns
+    env: technitium-dns-config.env
 
 resources:
-  - technitium-dns-exporter-secret.yaml
+  - technitium-dns-secret.yaml
   - deployment.yaml
   - service.yaml
   - servicemonitor.yaml
@@ -21,10 +17,8 @@ resources:
 
 generatorOptions:
   labels:
-    app.kubernetes.io/name: technitium-dns-exporter
-    app.kubernetes.io/part-of: technitium-dns-exporter
-    app.kubernetes.io/instance: technitium-dns-exporter
-    app.kubernetes.io/component: technitium-dns-exporter
-    grafana_dashboard: "1"
-  annotations:
-    grafana_folder: "/tmp/dashboards/Tools"
+    app.kubernetes.io/name: technitium-dns
+    app.kubernetes.io/part-of: technitium-dns
+    app.kubernetes.io/instance: technitium-dns
+    app.kubernetes.io/component: technitium-dns
+
