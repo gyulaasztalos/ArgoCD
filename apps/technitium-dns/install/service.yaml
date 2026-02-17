@@ -40,6 +40,7 @@ metadata:
 spec:
   selector:
     app: technitium-dns
+  externalTrafficPolicy: Local
   ports:
     - name: dns-tcp
       protocol: TCP
@@ -68,6 +69,7 @@ metadata:
 spec:
   selector:
     app: technitium-dns
+  externalTrafficPolicy: Local
   ports:
     - name: dns-udp
       protocol: UDP
