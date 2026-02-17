@@ -11,6 +11,13 @@ spec:
     - websecure
   routes:
     - kind: Rule
+      match: Host(`technitium-dns.local.asztalos.net`) && PathPrefix(`/api`)
+      priority: 20  # Higher than your main route
+      services:
+        - name: technitium-dns-web
+          namespace: technitium-dns
+          port: 80
+    - kind: Rule
       middlewares:
         - name: authentik
           namespace: traefik
