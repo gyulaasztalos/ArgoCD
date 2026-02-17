@@ -9,11 +9,11 @@ configMapGenerator:
 
 resources:
   - technitium-dns-secret.yaml
+  - pvc.yaml
   - deployment.yaml
   - service.yaml
   - servicemonitor.yaml
-  - prometheus-alarms.yaml
-  - pvc.yaml
+  - ingressroute.yaml
 
 generatorOptions:
   labels:
