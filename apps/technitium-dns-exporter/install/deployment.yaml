@@ -45,7 +45,7 @@ spec:
               memory: 32Mi
             limits:
               cpu: 100m
-              memory: 256Mi
+              memory: 64Mi
           ports:
             - containerPort: 9105
               name: http
@@ -59,12 +59,9 @@ spec:
             successThreshold: 1
             timeoutSeconds: 10
           livenessProbe:
-            exec:
-              command:
-                - sh
-                - -c
-                - |
-                  wget -q -O - http://localhost:9105/metrics | awk '{if (NR>1) ok=1};END{if (ok==1) exit 0; else exit 1}'
+            httpGet:
+              path: /metrics
+              port: 9105
             initialDelaySeconds: 30
             periodSeconds: 30
             failureThreshold: 6
