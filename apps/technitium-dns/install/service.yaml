@@ -50,7 +50,7 @@ spec:
       port: 853
       targetPort: dns-tls-tcp
   type: LoadBalancer
-  LoadBalancerIP: 10.10.50.33
+  loadBalancerIP: 10.10.50.33
 ---
 apiVersion: v1
 kind: Service
@@ -78,4 +78,4 @@ spec:
       port: 853
       targetPort: dns-tls-udp
   type: LoadBalancer
-  LoadBalancerIP: 10.10.50.33
+  loadBalancerIP: 10.10.50.33
