@@ -96,7 +96,7 @@ spec:
             claimName: technitium-dns-config
         - name: password
           secret:
-            secretName: technitium-dns-password
+            secretName: technitium-dns-secret
       securityContext:
         seccompProfile:
           type: RuntimeDefault
