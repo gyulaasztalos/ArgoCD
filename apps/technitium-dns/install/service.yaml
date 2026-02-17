@@ -1,0 +1,81 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: technitium-dns-web
+  namespace: technitium-dns
+  labels:
+    app: technitium-dns
+    app.kubernetes.io/name: technitium-dns
+    app.kubernetes.io/part-of: technitium-dns
+    app.kubernetes.io/instance: technitium-dns
+    app.kubernetes.io/component: technitium-dns
+spec:
+  selector:
+    app: technitium-dns
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: http
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: https
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: technitium-dns-tcp
+  namespace: technitium-dns
+  labels:
+    app: technitium-dns
+    app.kubernetes.io/name: technitium-dns
+    app.kubernetes.io/part-of: technitium-dns
+    app.kubernetes.io/instance: technitium-dns
+    app.kubernetes.io/component: technitium-dns
+  annotations:
+    metallb.io/allow-shared-ip: "true"
+spec:
+  selector:
+    app: technitium-dns
+  ports:
+    - name: dns-tcp
+      protocol: TCP
+      port: 53
+      targetPort: dns-tcp
+    - name: dns-tls-tcp
+      protocol: TCP
+      port: 853
+      targetPort: dns-tls-tcp
+  type: LoadBalancer
+  LoadBalancerIP: 10.10.50.33
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: technitium-dns-udp
+  namespace: technitium-dns
+  labels:
+    app: technitium-dns
+    app.kubernetes.io/name: technitium-dns
+    app.kubernetes.io/part-of: technitium-dns
+    app.kubernetes.io/instance: technitium-dns
+    app.kubernetes.io/component: technitium-dns
+  annotations:
+    metallb.io/allow-shared-ip: "true"
+spec:
+  selector:
+    app: technitium-dns
+  ports:
+    - name: dns-udp
+      protocol: UDP
+      port: 53
+      targetPort: dns-udp
+    - name: dns-tls-udp
+      protocol: UDP
+      port: 853
+      targetPort: dns-tls-udp
+  type: LoadBalancer
+  LoadBalancerIP: 10.10.50.33

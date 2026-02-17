@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: technitium-dns-exporter
+  namespace: technitium-dns-exporter
+  labels:
+    app: technitium-dns-exporter
+    app.kubernetes.io/name: technitium-dns-exporter
+    app.kubernetes.io/part-of: technitium-dns-exporter
+    app.kubernetes.io/instance: technitium-dns-exporter
+    app.kubernetes.io/component: technitium-dns-exporter
+spec:
+  selector:
+    app: technitium-dns-exporter
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8080
+      targetPort: http
+  type: ClusterIP

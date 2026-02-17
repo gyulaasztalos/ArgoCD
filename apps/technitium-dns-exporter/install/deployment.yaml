@@ -1,0 +1,95 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: technitium-dns-exporter
+  namespace: technitium-dns-exporter
+  labels:
+    app: technitium-dns-exporter
+    app.kubernetes.io/name: technitium-dns-exporter
+    app.kubernetes.io/part-of: technitium-dns-exporter
+    app.kubernetes.io/instance: technitium-dns-exporter
+    app.kubernetes.io/component: technitium-dns-exporter
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: technitium-dns-exporter
+  template:
+    metadata:
+      labels:
+        app: technitium-dns-exporter
+        app.kubernetes.io/name: technitium-dns-exporter
+        app.kubernetes.io/part-of: technitium-dns-exporter
+        app.kubernetes.io/instance: technitium-dns-exporter
+        app.kubernetes.io/component: technitium-dns-exporter
+    spec:
+      containers:
+        - name: technitium-dns-exporter
+          image: ghcr.io/brioche-works/technitium-dns-prometheus-exporter:master
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false # prevent sudo, etc.
+            privileged: false               # prevent acting like host root
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          ports:
+            - containerPort: 8080
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            failureThreshold: 5
+            successThreshold: 1
+            timeoutSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - |
+                  wget -q -O - http://localhost:8080/metrics | awk '{if (NR>1) ok=1};END{if (ok==1) exit 0; else exit 1}'
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 6
+            successThreshold: 1
+            timeoutSeconds: 10
+          envFrom:
+            - configMapRef:
+                name: technitium-dns-exporter-config
+            - secretRef:
+                name: technitium-dns-exporter-secret
+      restartPolicy: Always
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        fsGroup: 1000            # hardcode group to non-root if not set in Dockerfile
+        runAsUser: 1000          # hardcode user to non-root if not set in Dockerfile
+        runAsGroup: 1000         # hardcode group to non-root if not set in Dockerfile
+        runAsNonRoot: true       # hardcode to non-root. Redundant to above if Dockerfile is set USER 1000
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - technitium-dns-exporter
+              topologyKey: kubernetes.io/hostname
