@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: technitium-dns-exporter-alerts
+  namespace: technitium-dns  # Must match your Prometheus Operator's namespace
+spec:
+  groups:
+  - name: technitium-dns-exporter.rules
+    rules:
+    # Critical: technitium-dns-exporter service is down
+    - alert: technitium-dns-exporter-down
+      expr: absent(up{job="technitium-dns-exporter"} == 1)
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "technitium-dns-exporter service is down"
+        description: "The technitium-dns-exporter service has not been up for the last 5 minutes."
+    - alert: technitium-dns-exporter-restart-loop
+      expr: increase(kube_pod_container_status_restarts_total{namespace="technitium-dns-exporter", pod=~"technitium-dns-exporter-.*"}[18m]) > 3
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "technitium-dns-exporter pod is restarting frequently"
+        description: "The technitium-dns-exporter pod has restarted more than 3 times in the last 18 minutes."

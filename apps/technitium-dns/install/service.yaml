@@ -27,6 +27,27 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: technitium-dns-exporter
+  namespace: technitium-dns
+  labels:
+    app: technitium-dns
+    app.kubernetes.io/name: technitium-dns
+    app.kubernetes.io/part-of: technitium-dns
+    app.kubernetes.io/instance: technitium-dns
+    app.kubernetes.io/component: technitium-dns
+spec:
+  selector:
+    app: technitium-dns
+  ports:
+    - name: metrics
+      protocol: TCP
+      port: 8080
+      targetPort: metrics
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: technitium-dns-tcp
   namespace: technitium-dns
   labels:

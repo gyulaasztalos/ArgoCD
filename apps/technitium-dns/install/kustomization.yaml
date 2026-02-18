@@ -6,14 +6,28 @@ configMapGenerator:
   - name: technitium-dns-config
     namespace: technitium-dns
     env: technitium-dns-config.env
+  - name: technitium-dns-exporter-config
+    namespace: technitium-dns
+    env: technitium-dns-exporter-config.env
+  - name: technitium-dns-exporter-grafana-dashboard
+    namespace: technitium-dns
+    files:
+      - technitium-dns-exporter-grafana-dashboard.json=24555_rev1.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+      annotations:
+        grafana_folder: "/tmp/dashboards/Tools"
 
 resources:
   - technitium-dns-secret.yaml
+  - technitium-dns-exporter-secret.yaml
   - pvc.yaml
   - deployment.yaml
   - service.yaml
   - servicemonitor.yaml
   - ingressroute.yaml
+  - prometheus-alarms.yaml
 
 generatorOptions:
   labels:

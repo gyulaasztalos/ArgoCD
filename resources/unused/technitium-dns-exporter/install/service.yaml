@@ -14,8 +14,8 @@ spec:
   selector:
     app: technitium-dns-exporter
   ports:
-    - name: http
+    - name: metrics
       protocol: TCP
       port: 8080
-      targetPort: http
+      targetPort: metrics
   type: ClusterIP

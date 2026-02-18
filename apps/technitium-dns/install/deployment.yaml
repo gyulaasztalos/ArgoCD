@@ -89,6 +89,46 @@ spec:
             - name: password
               mountPath: /run/secrets/password.txt
               subPath: password.txt
+        - name: technitium-dns-exporter
+          image: ghcr.io/guycalledseven/technitium-dns-prometheus-exporter:v1.1.0
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false # prevent sudo, etc.
+            privileged: false               # prevent acting like host root
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          ports:
+            - containerPort: 9105
+              name: metrics
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 9105
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            failureThreshold: 5
+            successThreshold: 1
+            timeoutSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 9105
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 6
+            successThreshold: 1
+            timeoutSeconds: 10
+          envFrom:
+            - configMapRef:
+                name: technitium-dns-exporter-config
+            - secretRef:
+                name: technitium-dns-exporter-secret
       restartPolicy: Always
       volumes:
         - name: config

@@ -37,4 +37,3 @@ resources:
   - solaredge-exporter/application.yaml
   # - unpoller/application.yaml
   - technitium-dns/application.yaml
-  - technitium-dns-exporter/application.yaml
