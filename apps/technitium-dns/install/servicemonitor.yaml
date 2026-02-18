@@ -10,13 +10,9 @@ spec:
     matchLabels:
       app.kubernetes.io/name: technitium-dns  # or the label used by your exporter service
   endpoints:
-    - path: /
-      interval: 30s
-      targetPort: http
-      honorLabels: true
     - path: /metrics
       interval: 30s
-      targetPort: http
+      targetPort: metrics
       honorLabels: true
   namespaceSelector:
     matchNames:
