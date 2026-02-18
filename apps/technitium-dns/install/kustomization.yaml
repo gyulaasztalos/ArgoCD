@@ -6,15 +6,22 @@ configMapGenerator:
   - name: technitium-dns-config
     namespace: technitium-dns
     env: technitium-dns-config.env
+    options:
+      labels:
+        app.kubernetes.io/name: technitium-dns
   - name: technitium-dns-exporter-config
     namespace: technitium-dns
     env: technitium-dns-exporter-config.env
+    options:
+      labels:
+        app.kubernetes.io/name: technitium-dns-exporter
   - name: technitium-dns-exporter-grafana-dashboard
     namespace: technitium-dns
     files:
       - technitium-dns-exporter-grafana-dashboard.json=24555_rev1.json
     options:
       labels:
+        app.kubernetes.io/name: technitium-dns-exporter
         grafana_dashboard: "1"
       annotations:
         grafana_folder: "/tmp/dashboards/Tools"
@@ -31,7 +38,6 @@ resources:
 
 generatorOptions:
   labels:
-    app.kubernetes.io/name: technitium-dns
     app.kubernetes.io/part-of: technitium-dns
     app.kubernetes.io/instance: technitium-dns
     app.kubernetes.io/component: technitium-dns

@@ -31,7 +31,7 @@ metadata:
   namespace: technitium-dns
   labels:
     app: technitium-dns
-    app.kubernetes.io/name: technitium-dns
+    app.kubernetes.io/name: technitium-dns-exporter
     app.kubernetes.io/part-of: technitium-dns
     app.kubernetes.io/instance: technitium-dns
     app.kubernetes.io/component: technitium-dns

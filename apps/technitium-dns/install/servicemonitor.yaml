@@ -8,7 +8,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app.kubernetes.io/name: technitium-dns  # or the label used by your exporter service
+      app.kubernetes.io/name: technitium-dns-exporter  # or the label used by your exporter service
   endpoints:
     - path: /metrics
       interval: 30s
