@@ -10,6 +10,8 @@ metadata:
     app.kubernetes.io/part-of: technitium-dns
     app.kubernetes.io/instance: technitium-dns
     app.kubernetes.io/component: technitium-dns
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "LinuxServer.io images do not require a read-only root filesystem"
 spec:
   replicas: 1
   progressDeadlineSeconds: 600
@@ -36,7 +38,7 @@ spec:
           image: technitium/dns-server:14.3.0
           imagePullPolicy: IfNotPresent
           securityContext:
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: false # Technitium DNS needs to write to the filesystem for caching and other operations
             allowPrivilegeEscalation: false # prevent sudo, etc.
             privileged: false               # prevent acting like host root
           resources:
