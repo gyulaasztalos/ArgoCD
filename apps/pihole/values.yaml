@@ -52,7 +52,7 @@ serviceDns:
 
   # -- A fixed `spec.loadBalancerIP` for the DNS Service
   loadBalancerIP: 10.10.50.31
-  loadBalancerIPv6: "fdbf:c39a:a943:50::c9"
+  loadBalancerIPv6: "fdbf:c39a:a943:50::31"
   # -- `spec.loadBalancerClass` for the DNS Service. Only used if type is LoadBalancer.
   # loadBalancerClass: kube-vip.io/kube-vip-class  # Optional for kube-vip, but recommended for clarity  # -- A fixed `spec.loadBalancerIP` for the IPv6 DNS Service
   # loadBalancerClass: "metallb.universe.tf/metallb"
