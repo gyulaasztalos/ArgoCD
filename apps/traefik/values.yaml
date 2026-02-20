@@ -597,7 +597,7 @@ metrics:
       namespaceSelector: {}
     prometheusRule:
       # -- Enable optional CR for Prometheus Operator. See EXAMPLES.md for more details.
-      enabled: true
+      enabled: false
       rules:
         - alert: TraefikDown
           expr: up{job="traefik"} == 0
