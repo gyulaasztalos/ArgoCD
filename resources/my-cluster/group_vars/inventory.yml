@@ -1,0 +1,28 @@
+---
+k3s_cluster:
+  hosts:
+    Archer:
+      ansible_host: "archer.local.asztalos.net"
+      node_ipv4: 10.10.50.21
+      node_ipv6: fdbf:c39a:a943:50:ee4b:c54d:a81b:621b
+    Lana:
+      ansible_host: "lana.local.asztalos.net"
+      node_ipv4: 10.10.50.22
+      node_ipv6: fdbf:c39a:a943:50:9b4f:5b9:6654:1342
+    Pam:
+      ansible_host: "pam.local.asztalos.net"
+      node_ipv4: 10.10.50.23
+      node_ipv6: fdbf:c39a:a943:50:a27a:1b5a:f4e2:7dc9
+    Cheryl:
+      ansible_host: "cheryl.local.asztalos.net"
+      node_ipv4: 10.10.50.24
+      node_ipv6: fdbf:c39a:a943:50:34be:b1fb:5e4a:45c1
+  children:
+    master:
+      hosts:
+        Lana:
+        Pam:
+        Cheryl:
+    node:
+      hosts:
+        Archer:
