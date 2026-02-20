@@ -37,7 +37,7 @@ connect:
     serviceMonitor:
       # -- Create ServiceMonitor Resource for scraping metrics using PrometheusOperator
       #
-      enabled: true
+      enabled: false
       # -- Specify the interval at which metrics should be scraped
       #
       interval: 30s
