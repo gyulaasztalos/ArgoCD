@@ -530,7 +530,7 @@ prometheus:
 
   servicemonitor:
     # Create a ServiceMonitor to add cert-manager to Prometheus.
-    enabled: true
+    enabled: false
 
     # The namespace that the service monitor should live in, defaults
     # to the cert-manager namespace.
