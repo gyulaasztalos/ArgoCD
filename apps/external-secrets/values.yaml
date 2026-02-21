@@ -198,7 +198,7 @@ resources:
 
 serviceMonitor:
   # -- Specifies whether to create a ServiceMonitor resource for collecting Prometheus metrics
-  enabled: false
+  enabled: true
 
   # -- namespace where you want to install ServiceMonitors
   namespace: "external-secrets"

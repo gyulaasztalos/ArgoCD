@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: databases
+---
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: backblaze-b2
+  namespace: databases
+spec:
+  configuration:
+    destinationPath: s3://homelab-cnpg-backup-production/cnpg-backup/
+    endpointURL: https://s3.eu-central-003.backblazeb2.com
+    data:
+      compression: bzip2
+    wal:
+      compression: bzip2
+      maxParallel: 4
+    s3Credentials:
+      accessKeyId:
+        name: cnpg-backblaze-secret
+        key: application_key_id
+      secretAccessKey:
+        name: cnpg-backblaze-secret
+        key: application_key
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres
+  namespace: databases
+spec:
+  instances: 3
+  imageCatalogRef:
+    apiGroup: postgresql.cnpg.io
+    kind: ClusterImageCatalog
+    name: postgresql
+    major: 17
+  storage:
+    size: 20Gi
+    storageClass: longhorn-1r
+  affinity:
+    podAntiAffinityType: required
+
+  # Bootstrap from backups in the ObjectStore via plugin
+  bootstrap:
+    recovery:
+      source: postgres-origin
+      # Optional PITR:
+      recoveryTarget:
+        backupID: "20260206T200835"
+        targetImmediate: true
+
+  # Where to fetch backups/WAL from
+  externalClusters:
+  - name: postgres-origin
+    plugin:
+      name: barman-cloud.cloudnative-pg.io
+      parameters:
+        barmanObjectName: backblaze-b2
+        serverName: postgres   # matches your original cluster/serverName
+
+  monitoring:
+    enablePodMonitor: true
+
+  managed:
+    roles:
+      - name: authentik
+        connectionLimit: -1
+        ensure: present
+        inherit: true
+        passwordSecret:
+          name: authentik-postgres-password
+        login: true
+      - name: paperless
+        connectionLimit: -1
+        ensure: present
+        inherit: true
+        passwordSecret:
+          name: paperless-postgres-password
+        login: true
+
+  # IMPORTANT: plugins section is intentionally omitted during restore
+  # plugins:
+  #   - name: barman-cloud.cloudnative-pg.io
+  #     enabled: true
+  #     isWALArchiver: true
+  #     parameters:
+  #       barmanObjectName: backblaze-b2
+  #       serverName: postgres
+  #       retentionPolicy: "7d"
