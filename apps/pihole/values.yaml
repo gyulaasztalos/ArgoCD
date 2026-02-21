@@ -24,7 +24,7 @@ image:
 
 dualStack:
   # -- set this to true to enable creation of DualStack services or creation of separate IPv6 services if `serviceDns.type` is set to `"LoadBalancer"`
-  enabled: false
+  enabled: true
 
 dnsHostPort:
   # -- set this to true to enable dnsHostPort
