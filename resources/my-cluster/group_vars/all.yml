@@ -2,7 +2,7 @@
 # renovate: datasource=github-releases depName=k3s-ansible packageName=techno-tim/k3s-ansible
 playbook_version: v1.30.2+k3s2+tt1
 # renovate: datasource=github-releases depName=k3s packageName=k3s-io/k3s
-k3s_version: v1.33.3+k3s1
+k3s_version: v1.34.4+k3s1
 # this is the user that has ssh access to these machines
 ansible_user: red
 systemd_dir: /etc/systemd/system
@@ -53,7 +53,7 @@ kube_vip_bgp_peeraddress: "10.10.50.1"  # Defines the address for the external r
 kube_vip_bgp_peeras: "65000"  # Defines the AS for the external router
 
 # apiserver_endpoint is virtual ip-address which will be configured on each master
-apiserver_endpoint: 10.10.50.20
+apiserver_endpoint: fdbf:c39a:a943:50::20
 
 # k3s_token is required  masters can talk together securely
 # this token should be alpha numeric only
@@ -62,7 +62,7 @@ k3s_token: iRed7SxMUvKDAM745VLkpeWJO4AhIxhkZ1zVlw+1Uk8=
 # The IP on which the node is reachable in the cluster.
 # Here, a sensible default is provided, you can still override
 # it for each of your hosts, though.
-k3s_node_ip: "{{ ansible_facts[(cilium_iface | default(calico_iface | default(flannel_iface)))]['ipv4']['address'] }}"
+k3s_node_ip: "{{ node_ipv4 }},{{ node_ipv6 }}"
 
 # Disable the taint manually by setting: k3s_master_taint = false
 # k3s_master_taint: "{{ true if groups['node'] | default([]) | length >= 1 else false }}"
@@ -75,24 +75,35 @@ extra_args: >-
 
 # change these to your liking, the only required are: --disable servicelb, --tls-san {{ apiserver_endpoint }}
 # the contents of the if block is also required if using calico or cilium
+# extra_server_args: >-
+#   {{ extra_args }}
+#   {{ '--node-taint node-role.kubernetes.io/master=true:NoSchedule' if k3s_master_taint else '' }}
+#   {% if calico_iface is defined or cilium_iface is defined %}
+#   --flannel-backend=none
+#   --disable-network-policy
+#   --cluster-cidr={{ cluster_cidr | default('10.52.0.0/16') }}
+#   {% endif %}
+#   --tls-san {{ apiserver_endpoint }}
+#   --disable servicelb
+#   --disable traefik
+
+# IPv6
 extra_server_args: >-
   {{ extra_args }}
-  {{ '--node-taint node-role.kubernetes.io/master=true:NoSchedule' if k3s_master_taint else '' }}
-  {% if calico_iface is defined or cilium_iface is defined %}
-  --flannel-backend=none
-  --disable-network-policy
-  --cluster-cidr={{ cluster_cidr | default('10.52.0.0/16') }}
-  {% endif %}
   --tls-san {{ apiserver_endpoint }}
+  {{ '--node-taint node-role.kubernetes.io/control-plane=true:NoSchedule' if k3s_master_taint else '' }}
   --disable servicelb
   --disable traefik
+  --cluster-cidr=10.42.0.0/16,fdbf:c39a:a943:4200::/56
+  --service-cidr=10.43.0.0/16,fdbf:c39a:a943:4300::/112
+  --flannel-ipv6-masq
 
 extra_agent_args: >-
   {{ extra_args }}
 
 # image tag for kube-vip
 # renovate: datasource=github-releases depName=kube-vip packageName=kube-vip/kube-vip versioning=semver
-kube_vip_tag_version: v0.9.1
+kube_vip_tag_version: v1.0.4
 # v0.8.2
 
 # tag for kube-vip-cloud-provider manifest
@@ -103,7 +114,7 @@ kube_vip_tag_version: v0.9.1
 # kube_vip_lb_ip_range: "10.10.50.30-10.10.50.39"
 
 # metallb type frr or native
-metal_lb_type: native
+metal_lb_type: frr
 
 # metallb mode layer2 or bgp
 metal_lb_mode: bgp
@@ -112,15 +123,18 @@ metal_lb_mode: bgp
 metal_lb_bgp_my_asn: "65001"
 metal_lb_bgp_peer_asn: "65000"
 metal_lb_bgp_peer_address: "10.10.50.1"
+metal_lb_bgp_peer_address_v6: "fdbf:c39a:a943:50::"
 
 # image tag for metal lb
 # renovate: datasource=github-releases depName=metallb packageName=metallb/metallb versioning=semver
-metal_lb_speaker_tag_version: v0.15.1
+metal_lb_speaker_tag_version: v0.15.3
 # renovate: datasource=github-releases depName=metallb packageName=metallb/metallb versioning=semver
-metal_lb_controller_tag_version: v0.15.1
+metal_lb_controller_tag_version: v0.15.3
 
 # metallb ip range for load balancer
-metal_lb_ip_range: 10.10.50.30-10.10.50.39
+metal_lb_ip_range:
+  - 10.10.50.30-10.10.50.39
+  - fdbf:c39a:a943:50::30-fdbf:c39a:a943:50::39
 
 # Only enable if your nodes are proxmox LXC nodes, make sure to configure your proxmox nodes
 # in your hosts.ini file.
