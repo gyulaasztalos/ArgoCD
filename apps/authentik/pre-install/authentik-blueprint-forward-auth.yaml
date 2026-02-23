@@ -5,7 +5,7 @@ metadata:
   name: authentik-blueprint-forward-auth
   namespace: authentik
 data:
-  forward-auth.yml: |
+  forward-auth.yaml: |
     version: 1
     metadata:
       name: "Forward Auth Provider Blueprint"
