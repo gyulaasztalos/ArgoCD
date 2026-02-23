@@ -1322,7 +1322,7 @@ data:
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "-(time() - max(cnpg_collector_last_available_backup_timestamp{namespace=\"$namespace\",pod=~\"$instances\"}))",
+              "expr": "-(time() - max(barman_cloud_cloudnative_pg_io_last_available_backup_timestamp{namespace=\"$namespace\",pod=~\"$instances\"}))",
               "instant": true,
               "legendFormat": "__auto",
               "range": false,
@@ -1971,7 +1971,7 @@ data:
                 "uid": "Prometheus"
               },
               "editorMode": "code",
-              "expr": "time() - max(cnpg_collector_last_available_backup_timestamp{namespace=\"$namespace\", pod=~\"$instances\"})",
+              "expr": "time() - max(barman_cloud_cloudnative_pg_io_last_available_backup_timestamp{namespace=\"$namespace\", pod=~\"$instances\"})",
               "legendFormat": "Backups",
               "range": true,
               "refId": "BACKUPS"
@@ -2771,7 +2771,7 @@ data:
               },
               "editorMode": "code",
               "exemplar": false,
-              "expr": "max(cnpg_collector_first_recoverability_point{namespace=~\"$namespace\",pod=~\"$instances\"})*1000",
+              "expr": "max(barman_cloud_cloudnative_pg_io_first_recoverability_point{namespace=~\"$namespace\",pod=~\"$instances\"})*1000",
               "format": "time_series",
               "instant": true,
               "interval": "",
@@ -7641,7 +7641,7 @@ data:
                     "uid": "Prometheus"
                   },
                   "exemplar": true,
-                  "expr": "cnpg_collector_first_recoverability_point{namespace=~\"$namespace\",pod=~\"$instances\"}*1000 > 0",
+                  "expr": "barman_cloud_cloudnative_pg_io_first_recoverability_point{namespace=~\"$namespace\",pod=~\"$instances\"}*1000 > 0",
                   "format": "time_series",
                   "interval": "",
                   "legendFormat": "{{pod}}",
