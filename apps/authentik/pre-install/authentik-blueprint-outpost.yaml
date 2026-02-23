@@ -15,7 +15,7 @@ data:
           name: "authentik Embedded Outpost"
         attrs:
           applications:
-            - !Find [authentik_core.application, [name, "Traefik Forward Auth"]]
+            - !Find [authentik_core.application, [slug, traefik-forward-auth]]
           config:
             kubernetes_ingress_annotations:
               cert-manager.io/cluster-issuer: letsencrypt-production
