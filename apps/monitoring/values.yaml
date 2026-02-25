@@ -499,7 +499,7 @@ alertmanager:
   podDisruptionBudget:
     enabled: false
     minAvailable: 1
-    maxUnavailable: ""
+    maxUnavailable:
     unhealthyPodEvictionPolicy: AlwaysAllow
 
   ## Alertmanager configuration directives
@@ -2774,7 +2774,7 @@ prometheusOperator:
       podDisruptionBudget:
         enabled: false
         minAvailable: 1
-        maxUnavailable: ""
+        maxUnavailable:
         unhealthyPodEvictionPolicy: AlwaysAllow
 
       ## Number of old replicasets to retain ##
@@ -3176,7 +3176,7 @@ prometheusOperator:
   podDisruptionBudget:
     enabled: false
     minAvailable: 1
-    maxUnavailable: ""
+    maxUnavailable:
     unhealthyPodEvictionPolicy: AlwaysAllow
 
   ## Assign a PriorityClassName to pods if set
@@ -4961,7 +4961,7 @@ thanosRuler:
   podDisruptionBudget:
     enabled: false
     minAvailable: 1
-    maxUnavailable: ""
+    maxUnavailable:
     unhealthyPodEvictionPolicy: AlwaysAllow
 
   ingress:
