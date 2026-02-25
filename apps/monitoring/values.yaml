@@ -1257,7 +1257,7 @@ grafana:
 
   podDisruptionBudget:
     enabled: true
-    minAvailable: ""
+    minAvailable:
     maxUnavailable: 1
 
   extraSecretMounts:
@@ -3719,7 +3719,7 @@ prometheus:
   ##
   podDisruptionBudget:
     enabled: true
-    minAvailable: ""
+    minAvailable:
     maxUnavailable: 1
     unhealthyPodEvictionPolicy: AlwaysAllow
 
