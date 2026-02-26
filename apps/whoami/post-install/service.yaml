@@ -7,6 +7,10 @@ metadata:
 spec:
   selector:
     app: whoami
+  IPFamilyPolicy: PreferDualStack
+  IPFamilies:
+    - IPv4
+    - IPv6
   ports:
   - name: http
     targetPort: 80
