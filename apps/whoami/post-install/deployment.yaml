@@ -31,6 +31,8 @@ spec:
         app.kubernetes.io/instance: whoami
         app.kubernetes.io/component: whoami
     spec:
+      ipFamilyPolicy: RequireDualStack
+      ipFamilies: ["IPv4","IPv6"]
       containers:
         - name: whoami
           image: traefik/whoami:v1.11.0
