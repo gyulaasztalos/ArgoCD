@@ -13,3 +13,15 @@ spec:
     - temp
   retain: 3
   concurrency: 1
+---
+apiVersion: longhorn.io/v1beta2
+kind: RecurringJob
+metadata:
+  name: weekly-system-backup
+  namespace: longhorn-system
+spec:
+  task: system-backup
+  cron: '0 6 * * 0'  # Weekly Sunday 4 AM
+  retain: 3
+  parameters:
+    volume-backup-policy: disabled
