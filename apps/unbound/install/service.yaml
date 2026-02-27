@@ -13,6 +13,10 @@ metadata:
 spec:
   selector:
     app: unbound
+  IPFamilyPolicy: RequireDualStack
+  IPFamilies:
+    - IPv4
+    - IPv6
   ports:
     - name: dns-udp
       protocol: UDP

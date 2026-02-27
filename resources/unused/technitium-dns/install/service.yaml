@@ -13,6 +13,10 @@ metadata:
 spec:
   selector:
     app: technitium-dns
+  IPFamilyPolicy: RequireDualStack
+  IPFamilies:
+    - IPv4
+    - IPv6
   ports:
     - name: http
       protocol: TCP
@@ -38,6 +42,10 @@ metadata:
 spec:
   selector:
     app: technitium-dns
+  IPFamilyPolicy: RequireDualStack
+  IPFamilies:
+    - IPv4
+    - IPv6
   ports:
     - name: metrics
       protocol: TCP
