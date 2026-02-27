@@ -8,8 +8,8 @@ metadata:
   annotations:
     ignore-check.kube-linter.io/dangling-service: "This service intentionally has no selector; used for external endpoint routing."
 spec:
-  IPFamilyPolicy: RequireDualStack
-  IPFamilies:
+  ipFamilyPolicy: RequireDualStack
+  ipFamilies:
     - IPv4
     - IPv6
   ports:
@@ -36,7 +36,7 @@ ports:
     protocol: TCP
 endpoints:
   - addresses:
-      - "fdbf:c39a:a943:50::"  # Router IP which is accessible from the traefik pod
+      - "10.10.50.1"  # Router IP which is accessible from the traefik pod
     conditions:
       ready: true
 ---
@@ -54,7 +54,7 @@ ports:
     protocol: TCP
 endpoints:
   - addresses:
-      - "10.10.50.1"  # Router IP which is accessible from the traefik pod
+      - "fdbf:c39a:a943:50::"  # Router IP which is accessible from the traefik pod
     conditions:
       ready: true
 

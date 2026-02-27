@@ -13,8 +13,8 @@ metadata:
 spec:
   selector:
     app: technitium-dns
-  IPFamilyPolicy: RequireDualStack
-  IPFamilies:
+  ipFamilyPolicy: RequireDualStack
+  ipFamilies:
     - IPv4
     - IPv6
   ports:
@@ -42,8 +42,8 @@ metadata:
 spec:
   selector:
     app: technitium-dns
-  IPFamilyPolicy: RequireDualStack
-  IPFamilies:
+  ipFamilyPolicy: RequireDualStack
+  ipFamilies:
     - IPv4
     - IPv6
   ports:

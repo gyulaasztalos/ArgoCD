@@ -13,8 +13,8 @@ spec:
   type: ClusterIP
   selector:
     app: paperless-ngx
-  IPFamilyPolicy: RequireDualStack
-  IPFamilies:
+  ipFamilyPolicy: RequireDualStack
+  ipFamilies:
     - IPv4
     - IPv6
   ports:

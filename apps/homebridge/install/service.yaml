@@ -7,8 +7,8 @@ metadata:
 spec:
   selector:
     app: homebridge
-  IPFamilyPolicy: RequireDualStack
-  IPFamilies:
+  ipFamilyPolicy: RequireDualStack
+  ipFamilies:
     - IPv4
     - IPv6
   ports:

@@ -13,8 +13,8 @@ metadata:
 spec:
   selector:
     app: netatmo-exporter
-  IPFamilyPolicy: RequireDualStack
-  IPFamilies:
+  ipFamilyPolicy: RequireDualStack
+  ipFamilies:
     - IPv4
     - IPv6
   ports:
