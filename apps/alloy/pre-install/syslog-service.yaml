@@ -10,6 +10,10 @@ spec:
   selector:
     app.kubernetes.io/instance: alloy
     app.kubernetes.io/name: alloy
+  IPFamilyPolicy: RequireDualStack
+  IPFamilies:
+    - IPv4
+    - IPv6
   ports:
     - name: alloy-syslog
       protocol: UDP

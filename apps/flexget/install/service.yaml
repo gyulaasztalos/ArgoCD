@@ -7,6 +7,10 @@ metadata:
 spec:
   selector:
     app: flexget
+  IPFamilyPolicy: RequireDualStack
+  IPFamilies:
+    - IPv4
+    - IPv6
   ports:
   - name: webui
     targetPort: 5050
