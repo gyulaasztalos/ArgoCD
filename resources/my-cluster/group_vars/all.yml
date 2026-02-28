@@ -97,6 +97,8 @@ extra_server_args: >-
   --cluster-cidr=10.42.0.0/16,fdbf:c39a:a943:4200::/56
   --service-cidr=10.43.0.0/16,fdbf:c39a:a943:4300::/112
   --flannel-ipv6-masq
+  --etcd-s3
+  --etcd-s3-config-secret=etcd-backblaze-secret
 
 extra_agent_args: >-
   {{ extra_args }}
