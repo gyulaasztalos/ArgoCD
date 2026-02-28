@@ -10,9 +10,10 @@ spec:
     matchLabels:
       app.kubernetes.io/name: tado-exporter  # or the label used by your exporter service
   endpoints:
-    - path: /metrics
+    - port: metrics
       interval: 30s
-      targetPort: http
+      path: /metrics
+      scheme: http
       honorLabels: true
   namespaceSelector:
     matchNames:
