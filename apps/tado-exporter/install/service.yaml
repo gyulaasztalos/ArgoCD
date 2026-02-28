@@ -18,7 +18,7 @@ spec:
     - IPv6
     - IPv4
   ports:
-    - name: http
+    - name: metrics
       protocol: TCP
       port: 9898
       targetPort: 9898
