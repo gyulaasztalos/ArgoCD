@@ -752,9 +752,9 @@ alertmanager:
     labels: {}
     clusterIP: ""
     ipDualStack:
-      enabled: false
+      enabled: true
       ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilyPolicy: "RequireDualStack"
 
     ## Port for Alertmanager Service to listen on
     ##
@@ -1922,9 +1922,9 @@ kubeControllerManager:
     port: null
     targetPort: null
     ipDualStack:
-      enabled: false
+      enabled: true
       ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilyPolicy: "RequireDualStack"
     # selector:
     #   component: kube-controller-manager
 
@@ -2017,9 +2017,9 @@ coreDns:
     targetPort: 9153
 
     ipDualStack:
-      enabled: false
+      enabled: true
       ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilyPolicy: "RequireDualStack"
     # selector:
     #   k8s-app: kube-dns
   serviceMonitor:
@@ -2101,9 +2101,9 @@ kubeDns:
       port: 10055
       targetPort: 10055
     ipDualStack:
-      enabled: false
+      enabled: true
       ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilyPolicy: "RequireDualStack"
     # selector:
     #   k8s-app: kube-dns
   serviceMonitor:
@@ -2206,9 +2206,9 @@ kubeEtcd:
     port: 2381
     targetPort: 2381
     ipDualStack:
-      enabled: false
+      enabled: true
       ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilyPolicy: "RequireDualStack"
     # selector:
     #   component: etcd
 
@@ -2318,9 +2318,9 @@ kubeScheduler:
     port: null
     targetPort: null
     ipDualStack:
-      enabled: false
+      enabled: true
       ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilyPolicy: "RequireDualStack"
     # selector:
     #   component: kube-scheduler
 
@@ -2419,9 +2419,9 @@ kubeProxy:
     port: 10249
     targetPort: 10249
     ipDualStack:
-      enabled: false
+      enabled: true
       ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilyPolicy: "RequireDualStack"
     # selector:
     #   k8s-app: kube-proxy
 
@@ -2609,9 +2609,9 @@ prometheus-node-exporter:
   service:
     portName: http-metrics
     ipDualStack:
-      enabled: false
+      enabled: true
       ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilyPolicy: "RequireDualStack"
     labels:
       jobLabel: node-exporter
 
@@ -2806,9 +2806,9 @@ prometheusOperator:
         labels: {}
         clusterIP: ""
         ipDualStack:
-          enabled: false
+          enabled: true
           ipFamilies: ["IPv6", "IPv4"]
-          ipFamilyPolicy: "PreferDualStack"
+          ipFamilyPolicy: "RequireDualStack"
 
         ## Port to expose on each node
         ## Only used if service.type is 'NodePort'
@@ -3119,9 +3119,9 @@ prometheusOperator:
     labels: {}
     clusterIP: ""
     ipDualStack:
-      enabled: false
+      enabled: true
       ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilyPolicy: "RequireDualStack"
 
   ## Port to expose on each node
   ## Only used if service.type is 'NodePort'
@@ -3521,9 +3521,9 @@ prometheus:
     ## Service dual stack
     ##
     ipDualStack:
-      enabled: false
+      enabled: true
       ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilyPolicy: "RequireDualStack"
 
     ## gRPC port config
     portName: grpc
@@ -3612,9 +3612,9 @@ prometheus:
     labels: {}
     clusterIP: ""
     ipDualStack:
-      enabled: false
+      enabled: true
       ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilyPolicy: "RequireDualStack"
 
     ## Port for Prometheus Service to listen on
     ##
@@ -3710,9 +3710,9 @@ prometheus:
     ## Service dual stack
     ##
     ipDualStack:
-      enabled: false
+      enabled: trur
       ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilyPolicy: "RequireDualStack"
 
   ## Configure pod disruption budgets for Prometheus
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
@@ -5046,9 +5046,9 @@ thanosRuler:
     labels: {}
     clusterIP: ""
     ipDualStack:
-      enabled: false
+      enabled: true
       ipFamilies: ["IPv6", "IPv4"]
-      ipFamilyPolicy: "PreferDualStack"
+      ipFamilyPolicy: "RequireDualStack"
 
     ## Port for ThanosRuler Service to listen on
     ##
