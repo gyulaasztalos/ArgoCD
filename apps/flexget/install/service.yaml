@@ -9,8 +9,8 @@ spec:
     app: flexget
   ipFamilyPolicy: RequireDualStack
   ipFamilies:
-    - IPv4
     - IPv6
+    - IPv4
   ports:
   - name: webui
     targetPort: 5050

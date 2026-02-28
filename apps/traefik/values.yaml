@@ -1122,8 +1122,8 @@ service:
   ## List of IP families (e.g. IPv4 and/or IPv6).
   ## ref: https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services
   # ipFamilies:
-  #  - IPv4
   #  - IPv6
+  #  - IPv4
   ##
   additionalServices: {}
   ## -- An additional and optional internal Service.
@@ -1135,7 +1135,7 @@ service:
   #   # spec: {}
   #   # loadBalancerSourceRanges: []
   #   # externalIPs: []
-  #   # ipFamilies: [ "IPv4","IPv6" ]
+  #   # ipFamilies: [ "IPv6","IPv4" ]
 
 autoscaling:  # @schema additionalProperties: false
   # -- Create HorizontalPodAutoscaler object.

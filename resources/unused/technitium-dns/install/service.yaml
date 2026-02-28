@@ -15,8 +15,8 @@ spec:
     app: technitium-dns
   ipFamilyPolicy: RequireDualStack
   ipFamilies:
-    - IPv4
     - IPv6
+    - IPv4
   ports:
     - name: http
       protocol: TCP
@@ -44,8 +44,8 @@ spec:
     app: technitium-dns
   ipFamilyPolicy: RequireDualStack
   ipFamilies:
-    - IPv4
     - IPv6
+    - IPv4
   ports:
     - name: metrics
       protocol: TCP

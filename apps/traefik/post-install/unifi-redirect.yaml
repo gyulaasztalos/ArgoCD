@@ -10,8 +10,8 @@ metadata:
 spec:
   ipFamilyPolicy: RequireDualStack
   ipFamilies:
-    - IPv4
     - IPv6
+    - IPv4
   ports:
   - name: https
     port: 443

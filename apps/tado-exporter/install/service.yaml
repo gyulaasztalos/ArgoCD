@@ -15,8 +15,8 @@ spec:
     app: tado-exporter
   ipFamilyPolicy: RequireDualStack
   ipFamilies:
-    - IPv4
     - IPv6
+    - IPv4
   ports:
     - name: http
       protocol: TCP

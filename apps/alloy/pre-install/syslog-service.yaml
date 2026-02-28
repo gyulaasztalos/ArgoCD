@@ -12,8 +12,8 @@ spec:
     app.kubernetes.io/name: alloy
   ipFamilyPolicy: RequireDualStack
   ipFamilies:
-    - IPv4
     - IPv6
+    - IPv4
   ports:
     - name: alloy-syslog
       protocol: UDP

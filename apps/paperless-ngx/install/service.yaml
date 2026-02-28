@@ -15,8 +15,8 @@ spec:
     app: paperless-ngx
   ipFamilyPolicy: RequireDualStack
   ipFamilies:
-    - IPv4
     - IPv6
+    - IPv4
   ports:
     - name: webui
       port: 8000

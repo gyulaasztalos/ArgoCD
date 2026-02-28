@@ -960,8 +960,8 @@ metadata:
 spec:
   ipFamilyPolicy: RequireDualStack
   ipFamilies:
-    - IPv4
     - IPv6
+    - IPv4
   ports:
   - port: 9090
     protocol: TCP
