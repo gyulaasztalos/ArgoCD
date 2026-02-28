@@ -1,7 +1,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: tado-exporter-exporter
+  name: tado-exporter
   namespace: tado-exporter  # or the namespace where your exporter runs
   labels:
     release: prometheus-operator  # match your Prometheus Operator’s selector if needed
