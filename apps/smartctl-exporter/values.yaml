@@ -164,6 +164,6 @@ service:
   type: ClusterIP
   port: 80
   ipDualStack:
-    enabled: true
+    enabled: false
     ipFamilies: ["IPv6", "IPv4"]
     ipFamilyPolicy: "RequireDualStack"
