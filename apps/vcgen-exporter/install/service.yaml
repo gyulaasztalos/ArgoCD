@@ -14,10 +14,6 @@ spec:
   selector:
     app.kubernetes.io/name: vcgen-exporter
     app.kubernetes.io/instance: vcgen-exporter
-  ipFamilyPolicy: RequireDualStack
-  ipFamilies:
-    - IPv6
-    - IPv4
   ports:
     - name: metrics
       protocol: TCP

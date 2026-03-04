@@ -13,10 +13,6 @@ metadata:
 spec:
   selector:
     app: unpoller
-  ipFamilyPolicy: RequireDualStack
-  ipFamilies:
-    - IPv6
-    - IPv4
   ports:
     - name: http
       protocol: TCP

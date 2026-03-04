@@ -958,10 +958,6 @@ metadata:
   name: barman-cloud
   namespace: cnpg-system
 spec:
-  ipFamilyPolicy: RequireDualStack
-  ipFamilies:
-    - IPv6
-    - IPv4
   ports:
   - port: 9090
     protocol: TCP

@@ -7,10 +7,6 @@ spec:
   type: ClusterIP
   selector:
     app: ddns-updater
-  ipFamilyPolicy: RequireDualStack
-  ipFamilies:
-    - IPv6
-    - IPv4
   ports:
     - name: webui
       protocol: TCP

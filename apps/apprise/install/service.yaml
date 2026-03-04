@@ -7,10 +7,6 @@ spec:
   type: ClusterIP
   selector:
     app: apprise
-  ipFamilyPolicy: RequireDualStack
-  ipFamilies:
-    - IPv6
-    - IPv4
   ports:
     - name: http
       protocol: TCP

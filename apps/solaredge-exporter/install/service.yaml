@@ -13,10 +13,6 @@ metadata:
 spec:
   selector:
     app: solaredge-exporter
-  ipFamilyPolicy: RequireDualStack
-  ipFamilies:
-    - IPv6
-    - IPv4
   ports:
     - name: http
       protocol: TCP

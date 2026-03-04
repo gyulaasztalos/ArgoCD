@@ -7,10 +7,6 @@ metadata:
 spec:
   selector:
     app: nginx
-  ipFamilyPolicy: RequireDualStack
-  ipFamilies:
-    - IPv6
-    - IPv4
   ports:
   - name: http
     targetPort: 80

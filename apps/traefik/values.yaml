@@ -1095,8 +1095,8 @@ service:
   single: true
   type: LoadBalancer
   # -- Additional annotations applied to both TCP and UDP services (e.g. for cloud provider specific config)
-  annotations:
-    metallb.universe.tf/address-pool: ipv4-pool
+  annotations: {}
+  #  metallb.universe.tf/address-pool: ipv4-pool
   # -- Additional annotations for TCP service only
   annotationsTCP: {}
   # -- Additional annotations for UDP service only

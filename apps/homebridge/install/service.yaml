@@ -7,10 +7,6 @@ metadata:
 spec:
   selector:
     app: homebridge
-  ipFamilyPolicy: RequireDualStack
-  ipFamilies:
-    - IPv6
-    - IPv4
   ports:
   - name: webui
     targetPort: 8581

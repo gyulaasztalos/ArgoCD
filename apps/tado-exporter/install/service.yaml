@@ -13,10 +13,6 @@ metadata:
 spec:
   selector:
     app: tado-exporter
-  ipFamilyPolicy: RequireDualStack
-  ipFamilies:
-    - IPv6
-    - IPv4
   ports:
     - name: metrics
       protocol: TCP

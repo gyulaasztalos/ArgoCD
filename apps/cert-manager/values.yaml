@@ -893,9 +893,9 @@ webhook:
   serviceLabels: {}
 
   # Optionally set the IP family policy for the controller Service to configure dual-stack; see [Configure dual-stack](https://kubernetes.io/docs/concepts/services-networking/dual-stack/#services).
-  serviceIPFamilyPolicy: "RequireDualStack"
+  serviceIPFamilyPolicy: ""
   # Optionally set the IP families for the controller Service that should be supported, in the order in which they should be applied to ClusterIP. Can be IPv4 and/or IPv6.
-  serviceIPFamilies: ["IPv6", "IPv4"]
+  serviceIPFamilies: []
 
   image:
     # The container registry to pull the webhook image from.
