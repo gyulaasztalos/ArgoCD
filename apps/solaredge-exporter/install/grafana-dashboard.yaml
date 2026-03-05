@@ -1171,7 +1171,7 @@ data:
               "refId": "A"
             },
             {
-              "expr": "60",
+              "expr": "50",
               "refId": "B"
             }
           ],
