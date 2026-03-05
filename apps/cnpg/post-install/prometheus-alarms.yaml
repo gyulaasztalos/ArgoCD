@@ -10,40 +10,58 @@ spec:
   groups:
   - name: cnpg.rules
     rules:
-    - alert: CNPGClusterNotReady
-      annotations:
-        description: The CNPG cluster {{ $labels.cluster }} is not ready.
-        summary: CNPG cluster is not ready.
-      expr: cnpg_cluster_ready == 0
+    - alert: PostgresClusterDown
+      expr: sum by (namespace) (
+              kube_pod_container_status_ready{
+                namespace="databases",
+                container="postgres",
+                pod=~"postgres-.*"
+              } == 1
+            ) == 0
       for: 5m
       labels:
         severity: critical
-    - alert: CNPGInstanceNotReady
       annotations:
-        description: The CNPG instance {{ $labels.instance }} in cluster {{ $labels.cluster }} is not ready.
-        summary: CNPG instance is not ready.
-      expr: cnpg_instance_ready == 0
+        summary: "PostgreSQL cluster in {{ $labels.namespace }} has no ready instances"
+        description: "No postgres-.* pod is Ready in namespace {{ $labels.namespace }} for over 5 minutes."
+    - alert: PostgresInstanceNotReady
+      expr: kube_pod_container_status_ready{
+              namespace=~"databases",
+              container="postgres",
+              pod=~"postgres-.*"
+            } == 0
       for: 5m
       labels:
         severity: warning
-    - alert: CNPGInstanceDown
-      expr: kube_pod_status_phase{namespace="databases", phase="Running", label_postgresql_cnpg_io_cluster!=""} == 0
-      for: 5m
+      annotations:
+        summary: "PostgreSQL instance not ready"
+        description: "Postgres container in pod {{ $labels.namespace }}/{{ $labels.pod }} is not Ready for over 5 minutes."
+    - alert: PostgresPodStuckNotRunning
+      expr: min_over_time(
+              sum by (namespace, pod) (
+                kube_pod_status_phase{
+                  namespace="databases",
+                  pod=~"postgres-.*",
+                  phase=~"Pending|Unknown|Failed"
+                }
+              )[15m:1m]
+            ) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "PostgreSQL pod {{ $labels.namespace }}/{{ $labels.pod }} stuck in non-Running phase"
+        description: "Postgres pod {{ $labels.namespace }}/{{ $labels.pod }} has been Pending/Unknown/Failed for at least 15 minutes."
+    - alert: PostgresInstanceDown
+      expr: cnpg_collector_up == 0
+      for: 30s
       labels:
         severity: critical
       annotations:
-        summary: "No running CNPG pods in namespace databases"
-        description: "All PostgreSQL pods for a CNPG cluster are down in the 'databases' namespace."
-    - alert: CNPGBackupLastFailed
-      expr: cnpg_backup_last_status{status="Failed"} == 1
-      for: 5m
-      labels:
-        severity: critical
-      annotations:
-        summary: "CloudNativePG backup failed"
-        description: "The last backup for cluster {{ $labels.cluster }} has failed."
+        summary: "PostgreSQL instance {{ $labels.cluster }} is down"
+        description: "Instance has been unresponsive for 30 seconds. Cluster: {{ $labels.cluster }}"
     - alert: CNPGBackupStale
-      expr: time() - cnpg_backup_last_success_timestamp_seconds > 86400
+      expr: time() - barman_cloud_cloudnative_pg_io_last_available_backup_timestamp > 86400
       for: 15m
       labels:
         severity: warning
@@ -51,18 +69,11 @@ spec:
         summary: "No successful CNPG backup in 24h"
         description: "No successful backup for cluster {{ $labels.cluster }} in the last 24 hours."
     - alert: CNPGReplicationLagHigh
-      expr: cnpg_replication_lag_bytes > 104857600  # 100MB
+      # replication lag behind primary in seconds
+      expr: cnpg_pg_replication_lag > 300
       for: 10m
       labels:
         severity: warning
       annotations:
         summary: "CNPG replication lag high"
-        description: "Replication lag for cluster {{ $labels.cluster }} is above 100MB."
-    - alert: CNPGDiskSpaceLow
-      expr: (cnpg_data_directory_bytes_total - cnpg_data_directory_bytes_free) / cnpg_data_directory_bytes_total > 0.85
-      for: 10m
-      labels:
-        severity: warning
-      annotations:
-        summary: "CNPG disk space usage high"
-        description: "Disk usage for cluster {{ $labels.cluster }} exceeds 85%."
+        description: "Replication lag for cluster {{ $labels.cluster }} is above 300 seconds for more than 10 minutes (instance {{ $labels.instance }})."
