@@ -92,7 +92,7 @@ spec:
               mountPath: /run/secrets/password.txt
               subPath: password.txt
         - name: technitium-dns-exporter
-          image: ghcr.io/guycalledseven/technitium-dns-prometheus-exporter:v1.1.0
+          image: ghcr.io/guycalledseven/technitium-dns-prometheus-exporter:v1.2.0
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
