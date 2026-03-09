@@ -602,7 +602,7 @@ podAnnotations:
 # -- any initContainers you might want to run before starting pihole
 extraInitContainers:
   - name: update-adlists
-    image: busybox
+    image: curlimages/curl:8.18.0
     args:
       - sh
       - -c
