@@ -16,7 +16,7 @@ spec:
       targetRevision: main
       ref: config
     - repoURL: https://grafana.github.io/helm-charts
-      targetRevision: 1.6.1
+      targetRevision: 1.6.2
       helm:
         valueFiles:
           - $config/apps/alloy/values.yaml
