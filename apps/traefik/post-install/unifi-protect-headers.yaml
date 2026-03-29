@@ -1,0 +1,31 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: unifi-protect-headers
+  namespace: traefik
+spec:
+  headers:
+    browserXssFilter: true
+    contentTypeNosniff: true
+    forceSTSHeader: true
+    stsIncludeSubdomains: true
+    stsPreload: true
+    stsSeconds: 15552000
+    referrerPolicy: no-referrer
+    # Relaxed, Protect-friendly CSP
+    contentSecurityPolicy: >
+      default-src 'self' https:;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https:;
+      style-src 'self' 'unsafe-inline' https:;
+      img-src 'self' https:  blob:;
+      font-src 'self' https: ;
+      connect-src 'self' https: wss:;
+      frame-src 'self' https:;
+      media-src 'self' https: blob:;
+      object-src 'none';
+      frame-ancestors 'self';
+      base-uri 'self';
+      form-action 'self';
+    customFrameOptionsValue: SAMEORIGIN
+    customRequestHeaders:
+      X-Forwarded-Proto: https

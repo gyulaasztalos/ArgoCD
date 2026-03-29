@@ -62,7 +62,7 @@ spec:
   - match: Host(`unifi.local.asztalos.net`)
     kind: Rule
     middlewares:
-    - name: default-headers  # Your default-headers equivalent
+    - name: unifi-protect-headers
     services:
     - name: unifi-router
       kind: Service
