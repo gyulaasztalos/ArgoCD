@@ -59,10 +59,22 @@ spec:
   entryPoints:
   - websecure
   routes:
-  - match: Host(`unifi.local.asztalos.net`)
+  - match: Host(`unifi.local.asztalos.net`) && PathPrefix(`/protect`)
     kind: Rule
+    priority: 20
     middlewares:
     - name: unifi-protect-headers
+    services:
+    - name: unifi-router
+      kind: Service
+      port: 443
+      scheme: https
+      serversTransport: unifi-servers-transport
+  - match: Host(`unifi.local.asztalos.net`)
+    kind: Rule
+    priority: 10
+    middlewares:
+    - name: unifi-default-headers
     services:
     - name: unifi-router
       kind: Service
