@@ -74,7 +74,7 @@ spec:
     kind: Rule
     priority: 10
     middlewares:
-    - name: unifi-default-headers
+    - name: default-headers
     services:
     - name: unifi-router
       kind: Service
