@@ -35,7 +35,7 @@ spec:
     spec:
       containers:
         - name: technitium-dns
-          image: technitium/dns-server:14.3.0
+          image: technitium/dns-server:15.0.1
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: false # Technitium DNS needs to write to the filesystem for caching and other operations
