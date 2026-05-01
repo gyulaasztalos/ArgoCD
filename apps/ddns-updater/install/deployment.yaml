@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: ddns-updater
-          image: qmcgaw/ddns-updater:2.9.0
+          image: qmcgaw/ddns-updater:v2.10.0
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
