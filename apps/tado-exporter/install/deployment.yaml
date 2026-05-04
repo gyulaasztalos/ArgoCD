@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: tado-exporter
-          image: asztalosgyula/tado-exporter:20250730
+          image: asztalosgyula/tado-exporter:20260504
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
