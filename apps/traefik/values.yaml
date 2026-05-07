@@ -1286,10 +1286,6 @@ rbac:  # @schema additionalProperties: false
   # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles
   aggregateTo: []
 
-# -- Enable to create a PodSecurityPolicy and assign it to the Service Account via RoleBinding or ClusterRoleBinding
-podSecurityPolicy:
-  enabled: false
-
 # -- The service account the pods will use to interact with the Kubernetes API
 serviceAccount:  # @schema additionalProperties: false
   # If set, an existing service account is used
