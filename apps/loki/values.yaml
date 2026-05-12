@@ -529,7 +529,7 @@ loki:
         schema: v13
         index:
           prefix: loki_index_
-          period: 24h
+          period: 72h
   # -- a real Loki install requires a proper schemaConfig defined above this, however for testing or playing around
   # you can enable useTestSchema
   useTestSchema: false
