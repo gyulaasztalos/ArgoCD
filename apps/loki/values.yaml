@@ -1089,12 +1089,7 @@ monitoring:
     scrapeTimeout: null
     # -- ServiceMonitor relabel configs to apply to samples before scraping
     # https://github.com/prometheus-operator/prometheus-operator/blob/master/Documentation/api.md#relabelconfig
-    relabelings:
-      - sourceLabels: [job]
-        targetLabel: job
-        replacement: loki  # was: loki/$1
-      - targetLabel: cluster
-        replacement: loki
+    relabelings: []
     # -- ServiceMonitor metric relabel configs to apply to samples before ingestion
     # https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#endpoint
     metricRelabelings: []
