@@ -410,6 +410,7 @@ loki:
     split_queries_by_interval: 15m
     query_timeout: 300s
     volume_enabled: true
+    retention_period: 168h
   # -- Provides a reloadable runtime configuration file for some specific configuration
   runtimeConfig: {}
   # -- Check https://grafana.com/docs/loki/latest/configuration/#common_config for more info on how to provide a common configuration
@@ -574,7 +575,10 @@ loki:
       max_per_second: 20
       up_to: 3
   # --  Optional compactor configuration
-  compactor: {}
+  compactor:
+    working_directory: /var/loki/compactor
+    delete_request_store: filesystem
+    retention_enabled: true
   # --  Optional compactor grpc client configuration
   compactor_grpc_client: {}
   # --  Optional pattern ingester configuration
