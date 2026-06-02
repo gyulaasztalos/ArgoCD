@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
         - name: technitium-dns-exporter
-          image: ghcr.io/guycalledseven/technitium-dns-prometheus-exporter:v2.0.1
+          image: ghcr.io/guycalledseven/technitium-dns-prometheus-exporter:v2.1.0
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
