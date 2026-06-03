@@ -14,6 +14,7 @@ metadata:
 spec:
   type: LoadBalancer
   loadBalancerIP: 10.10.50.32
+  externalTrafficPolicy: Local
   selector:
     app: transmission
   ports:
@@ -42,6 +43,7 @@ metadata:
 spec:
   type: LoadBalancer
   loadBalancerIP: 10.10.50.32
+  externalTrafficPolicy: Local
   selector:
     app: transmission
   ports:
