@@ -36,7 +36,7 @@ spec:
     spec:
       initContainers:
         - name: get-flood-for-transmission
-          image: alpine:3.23
+          image: alpine:3.24
           imagePullPolicy: IfNotPresent
           resources:
             requests:
