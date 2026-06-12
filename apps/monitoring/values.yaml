@@ -201,7 +201,7 @@ defaultRules:
     nodeExporterRecording: true
     prometheus: true
     prometheusOperator: true
-    windows: true
+    windows: false
 
   ## Reduce app namespace alert scope
   appNamespacesTarget: ".*"
