@@ -180,7 +180,7 @@ defaultRules:
     k8sContainerMemoryWorkingSetBytes: true
     k8sPodOwner: true
     kubeApiserverAvailability: true
-    kubeApiserverBurnrate: true
+    kubeApiserverBurnrate: false
     kubeApiserverHistogram: true
     kubeApiserverSlos: true
     kubeControllerManager: false
