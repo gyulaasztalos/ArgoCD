@@ -34,7 +34,8 @@ crds:
   # -- Keep CRDs on chart uninstall
   keep: true
   # -- Annotations to be added to all CRDs
-  annotations: {}
+  annotations:
+    argocd.argoproj.io/sync-options: ServerSideApply=true
   # -- Additional labels to be added to all CRDs
   additionalLabels: {}
 
@@ -76,6 +77,9 @@ global:
   # -- Annotations for the all deployed Statefulsets
   statefulsetAnnotations: {}
 
+  # -- Labels for the all deployed Statefulsets
+  statefulsetLabels: {}
+
   # -- Annotations for the all deployed Deployments
   deploymentAnnotations: {}
 
@@ -114,7 +118,7 @@ global:
   # Default network policy rules used by all components
   networkPolicy:
     # -- Create NetworkPolicy objects for all components
-    create: false
+    create: true
     # -- Default deny all ingress traffic
     defaultDenyIngress: false
 
@@ -162,6 +166,22 @@ global:
   # -- Environment variables to pass to all deployed Deployments
   env: []
 
+  # -- Extra volumes to add to all deployed Deployments and StatefulSets
+  extraVolumes: []
+  # Example of adding a custom CA bundle from a ConfigMap:
+  # - name: my-root-ca
+  #   configMap:
+  #     name: my-trustbundle
+  #     items:
+  #       - key: bundle.pem
+  #         path: ca-certificates.crt
+
+  # -- Extra volume mounts to add to all deployed Deployments and StatefulSets
+  extraVolumeMounts: []
+  # Example of adding a custom CA bundle mount:
+  # - name: my-root-ca
+  #   mountPath: /etc/ssl/certs
+
   # -- Annotations for the all deployed Certificates
   certificateAnnotations: {}
 
@@ -200,6 +220,9 @@ configs:
 
     # -- Timeout to discover if a new manifests version got published to the repository
     timeout.reconciliation: 180s
+
+    # -- Maximum jitter added to the reconciliation timeout to spread out refreshes and reduce repo-server load
+    timeout.reconciliation.jitter: 60s
 
     # -- Timeout to refresh application data as well as target manifests cache
     timeout.hard.reconciliation: 0s
@@ -242,6 +265,9 @@ configs:
     #   issuer: https://login.microsoftonline.com/TENANT_ID/v2.0
     #   clientID: aaaabbbbccccddddeee
     #   clientSecret: $oidc.azuread.clientSecret
+    #   # Optional: set to true to use Azure Workload Identity instead of clientSecret
+    #   azure:
+    #     useWorkloadIdentity: false
 
     # Some OIDC providers require a separate clientID for different callback URLs.
     # For example, if configuring Argo CD with self-hosted Dex, you will need a separate client ID
@@ -422,7 +448,6 @@ configs:
         - ClusterBackgroundScanReport
         - UpdateRequest
 
-
   # Argo CD configuration parameters
   ## Ref: https://github.com/argoproj/argo-cd/blob/master/docs/operator-manual/argocd-cmd-params-cm.yaml
   params:
@@ -507,7 +532,7 @@ configs:
 
     # -- The name of the default role which Argo CD will falls back to, when authorizing API requests (optional).
     # If omitted or empty, users may be still be able to login, but will see no apps, projects, etc...
-    policy.default: ''
+    policy.default: ""
 
     # -- File containing user-defined policies and role definitions.
     # @default -- `''` (See [values.yaml])
@@ -580,7 +605,7 @@ configs:
       vs-ssh.visualstudio.com ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7Hr1oTWqNqOlzGJOfGJ4NakVyIzf1rXYd4d7wo6jBlkLvCA4odBlL0mDUyZ0/QUfTTqeu+tm22gOsv+VrVTMk6vwRU75gY/y9ut5Mb3bR5BV58dKXyq9A9UeB5Cakehn5Zgm6x1mKoVyf+FFn26iYqXJRgzIZZcZ5V6hrE0Qg39kZm4az48o0AUbf6Sp4SLdvnuMa2sVNwHBboS7EJkm57XQPVU3/QpyNLHbWDdzwtrlS+ez30S3AdYhLKEOxAG8weOnyrtLJAUen9mTkol8oII1edf7mWWbWVf0nBmly21+nZcmCTISQBtdcyPaEno7fFQMDD26/s0lfKob4Kw8H
 
     # -- Additional known hosts for private repositories
-    extraHosts: ''
+    extraHosts: ""
 
   # Repository TLS certificates
   # Ref: https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#repositories-using-self-signed-tls-certificates-or-are-signed-by-custom-ca
@@ -767,8 +792,7 @@ configs:
     ## Custom secrets. Useful for injecting SSO secrets into environment variables.
     ## Ref: https://argo-cd.readthedocs.io/en/stable/operator-manual/user-management/#sensitive-data-and-sso-client-secrets
     ## Note that all values must be non-empty.
-    extra:
-      {}
+    extra: {}
       # LDAP_PASSWORD: "mypassword"
 
     # -- Bcrypt hashed admin password
@@ -888,7 +912,6 @@ controller:
       #   cpu: 1
       #   memory: 1Gi
 
-
   ## Application controller image
   image:
     # -- Repository to use for the application controller
@@ -961,6 +984,9 @@ controller:
   # -- Annotations for the application controller StatefulSet
   statefulsetAnnotations: {}
 
+  # -- Labels for the application controller StatefulSet
+  statefulsetLabels: {}
+
   # -- Annotations for the application controller Deployment
   deploymentAnnotations: {}
 
@@ -1005,13 +1031,33 @@ controller:
       type: RuntimeDefault
     capabilities:
       drop:
-      - ALL
+        - ALL
 
   # Readiness probe for application controller
   ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   readinessProbe:
+    # -- Http path to use for the readiness probe
+    httpPath: /healthz
     # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
     failureThreshold: 5
+    # -- Number of seconds after the container has started before [probe] is initiated
+    initialDelaySeconds: 10
+    # -- How often (in seconds) to perform the [probe]
+    periodSeconds: 20
+    # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
+    successThreshold: 1
+    # -- Number of seconds after which the [probe] times out
+    timeoutSeconds: 10
+
+  ## Startup probe for application controller (optional)
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  startupProbe:
+    # -- Enable Kubernetes startup probe for application controller
+    enabled: false
+    # -- Http path to use for the startup probe
+    httpPath: /healthz
+    # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
+    failureThreshold: 20
     # -- Number of seconds after the container has started before [probe] is initiated
     initialDelaySeconds: 10
     # -- How often (in seconds) to perform the [probe]
@@ -1118,7 +1164,6 @@ controller:
       enabled: true
       # -- PrometheusRule namespace
       namespace: "" # "monitoring"
-
       # -- PrometheusRule selector
       selector: {}
         # prometheus: kube-prometheus
@@ -1248,6 +1293,30 @@ dex:
     ## Has higher precedence over `dex.pdb.minAvailable`
     maxUnavailable: ""
 
+  ## Dex Vertical Pod Autoscaler
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically/
+  vpa:
+    # -- Deploy a [VerticalPodAutoscaler](https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically/) for the Dex server
+    enabled: false
+    # -- Labels to be added to Dex server vpa
+    labels: {}
+    # -- Annotations to be added to Dex server vpa
+    annotations: {}
+    # -- One of the VPA operation modes
+    ## Ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically
+    ## Note: Recreate update mode requires more than one replica unless the min-replicas VPA controller flag is overridden
+    updateMode: Initial
+    # -- Controls how VPA computes the recommended resources for Dex server container
+    ## Ref: https://github.com/kubernetes/autoscaler/blob/master/vertical-pod-autoscaler/examples/hamster.yaml
+    containerPolicy: {}
+      # controlledResources: ["cpu", "memory"]
+      # minAllowed:
+      #   cpu: 250m
+      #   memory: 256Mi
+      # maxAllowed:
+      #   cpu: 1
+      #   memory: 1Gi
+
   ## Dex image
   image:
     # -- Dex image repository
@@ -1326,11 +1395,11 @@ dex:
     # -- Annotations to be added to argocd-dex-server-tls secret
     annotations: {}
     # -- Certificate authority. Required for self-signed certificates.
-    ca: ''
+    ca: ""
     # -- Certificate private key
-    key: ''
+    key: ""
     # -- Certificate data. Must contain SANs of Dex service (ie: argocd-dex-server, argocd-dex-server.argo-cd.svc)
-    crt: ''
+    crt: ""
 
   # -- Annotations to be added to the Dex server Deployment
   deploymentAnnotations: {}
@@ -1378,7 +1447,7 @@ dex:
       type: RuntimeDefault
     capabilities:
       drop:
-      - ALL
+        - ALL
 
   ## Probes for Dex server
   ## Supported from Dex >= 2.28.0
@@ -1413,6 +1482,28 @@ dex:
     httpScheme: HTTP
     # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
     failureThreshold: 5
+    # -- Number of seconds after the container has started before [probe] is initiated
+    initialDelaySeconds: 10
+    # -- How often (in seconds) to perform the [probe]
+    periodSeconds: 20
+    # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
+    successThreshold: 1
+    # -- Number of seconds after which the [probe] times out
+    timeoutSeconds: 10
+
+  ## Startup probe for Dex server (optional)
+  ## Supported from Dex >= 2.28.0
+  startupProbe:
+    # -- Enable Kubernetes startup probe for Dex >= 2.28.0
+    enabled: false
+    # -- Http path to use for the startup probe
+    httpPath: /healthz/ready
+    # -- Http port to use for the startup probe
+    httpPort: metrics
+    # -- Scheme to use for the startup probe (can be HTTP or HTTPS)
+    httpScheme: HTTP
+    # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
+    failureThreshold: 20
     # -- Number of seconds after the container has started before [probe] is initiated
     initialDelaySeconds: 10
     # -- How often (in seconds) to perform the [probe]
@@ -1522,6 +1613,30 @@ redis:
     ## Has higher precedence over `redis.pdb.minAvailable`
     maxUnavailable: ""
 
+  ## Redis Vertical Pod Autoscaler
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically/
+  vpa:
+    # -- Deploy a [VerticalPodAutoscaler](https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically/) for the Redis
+    enabled: false
+    # -- Labels to be added to Redis vpa
+    labels: {}
+    # -- Annotations to be added to Redis vpa
+    annotations: {}
+    # -- One of the VPA operation modes
+    ## Ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically
+    ## Note: Recreate update mode requires more than one replica unless the min-replicas VPA controller flag is overridden
+    updateMode: Initial
+    # -- Controls how VPA computes the recommended resources for Redis container
+    ## Ref: https://github.com/kubernetes/autoscaler/blob/master/vertical-pod-autoscaler/examples/hamster.yaml
+    containerPolicy: {}
+      # controlledResources: ["cpu", "memory"]
+      # minAllowed:
+      #   cpu: 250m
+      #   memory: 256Mi
+      # maxAllowed:
+      #   cpu: 1
+      #   memory: 1Gi
+
   ## Redis image
   image:
     # -- Redis repository
@@ -1558,7 +1673,7 @@ redis:
         type: RuntimeDefault
       capabilities:
         drop:
-        - ALL
+          - ALL
 
     ## Probes for Redis exporter (optional)
     ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
@@ -1709,7 +1824,7 @@ redis:
     allowPrivilegeEscalation: false
     capabilities:
       drop:
-      - ALL
+        - ALL
 
   # -- Redis service port
   servicePort: 6379
@@ -2070,6 +2185,30 @@ server:
     ## Has higher precedence over `server.pdb.minAvailable`
     maxUnavailable: ""
 
+  ## Argo CD server Vertical Pod Autoscaler
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically/
+  vpa:
+    # -- Deploy a [VerticalPodAutoscaler](https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically/) for the Argo CD server
+    enabled: false
+    # -- Labels to be added to Argo CD server vpa
+    labels: {}
+    # -- Annotations to be added to Argo CD server vpa
+    annotations: {}
+    # -- One of the VPA operation modes
+    ## Ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically
+    ## Note: Recreate update mode requires more than one replica unless the min-replicas VPA controller flag is overridden
+    updateMode: Initial
+    # -- Controls how VPA computes the recommended resources for Argo CD server container
+    ## Ref: https://github.com/kubernetes/autoscaler/blob/master/vertical-pod-autoscaler/examples/hamster.yaml
+    containerPolicy: {}
+      # controlledResources: ["cpu", "memory"]
+      # minAllowed:
+      #   cpu: 250m
+      #   memory: 256Mi
+      # maxAllowed:
+      #   cpu: 1
+      #   memory: 1Gi
+
   ## Argo CD server image
   image:
     # -- Repository to use for the Argo CD server
@@ -2144,7 +2283,7 @@ server:
         type: RuntimeDefault
       capabilities:
         drop:
-        - ALL
+          - ALL
 
     # -- Resource limits and requests for the argocd-extensions container
     resources: {}
@@ -2259,11 +2398,15 @@ server:
       type: RuntimeDefault
     capabilities:
       drop:
-      - ALL
+        - ALL
 
   ## Readiness and liveness probes for default backend
   ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   readinessProbe:
+    # -- Enable Kubernetes readiness probe for default backend
+    enabled: true
+    # -- Http path to use for the readiness probe
+    httpPath: /healthz
     # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
     failureThreshold: 5
     # -- Number of seconds after the container has started before [probe] is initiated
@@ -2276,12 +2419,34 @@ server:
     timeoutSeconds: 10
 
   livenessProbe:
+    # -- Enable Kubernetes liveness probe for default backend
+    enabled: true
+    # -- Http path to use for the liveness probe
+    httpPath: /healthz?full=true
     # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
     failureThreshold: 5
     # -- Number of seconds after the container has started before [probe] is initiated
     initialDelaySeconds: 10
     # -- How often (in seconds) to perform the [probe]
     periodSeconds: 20
+    # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
+    successThreshold: 1
+    # -- Number of seconds after which the [probe] times out
+    timeoutSeconds: 10
+
+  ## Startup probe for Argo CD server (optional)
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  startupProbe:
+    # -- Enable Kubernetes startup probe for Argo CD server
+    enabled: false
+    # -- Http path to use for the startup probe
+    httpPath: /healthz
+    # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
+    failureThreshold: 20
+    # -- Number of seconds after the container has started before [probe] is initiated
+    initialDelaySeconds: 10
+    # -- How often (in seconds) to perform the [probe]
+    periodSeconds: 10
     # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
     successThreshold: 1
     # -- Number of seconds after which the [probe] times out
@@ -2377,9 +2542,9 @@ server:
     # -- Labels to be added to argocd-server-tls secret
     labels: {}
     # -- Private Key of the certificate
-    key: ''
+    key: ""
     # -- Certificate data
-    crt: ''
+    crt: ""
 
   ## Server service configuration
   service:
@@ -2460,7 +2625,7 @@ server:
       # -- Prometheus ServiceMonitor tlsConfig
       tlsConfig: {}
       # -- Prometheus ServiceMonitor namespace
-      namespace: "" # "monitoring"
+      namespace: "" # monitoring
       # -- Prometheus ServiceMonitor labels
       additionalLabels: {}
       # -- Prometheus ServiceMonitor annotations
@@ -2566,6 +2731,9 @@ server:
       ## Instance mode needs type NodePort, IP mode needs type ClusterIP
       ## Ref: https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/how-it-works/#ingress-traffic
       serviceType: NodePort
+      # -- Annotations for the AWS ALB gRPC service
+      ## Allows adding custom annotations to the gRPC service for integrations like DataDog, Prometheus, etc.
+      serviceAnnotations: {}
 
     # Google specific options for Google Application Load Balancer
     # Applies only when `server.ingress.controller` is set to `gke`
@@ -2714,6 +2882,9 @@ server:
         #       add:
         #         - name: X-Custom-Header
         #           value: custom-value
+        # timeouts:
+        #   request: 10s
+        #   backendRequest: 2s
 
   # Gateway API GRPCRoute configuration
   # NOTE: Gateway API support is in EXPERIMENTAL status
@@ -2751,7 +2922,7 @@ server:
         #           value: custom-value
 
   # Gateway API BackendTLSPolicy configuration
-  # NOTE: BackendTLSPolicy is in EXPERIMENTAL status (v1alpha3)
+  # NOTE: BackendTLSPolicy support is in EXPERIMENTAL status
   # Required for HTTPS backends when using Gateway API
   # Not all Gateway controllers support this resource (e.g., Cilium does not support it yet)
   backendTLSPolicy:
@@ -2777,6 +2948,43 @@ server:
       #     group: ""
       #     kind: ConfigMap
       # wellKnownCACertificates: System
+
+  # Gateway API ListenerSet configuration
+  # NOTE: Gateway API support is in EXPERIMENTAL status
+  # ListenerSet allows attaching additional listeners to an existing Gateway
+  # Requires Gateway API v1alpha2 and a controller that supports ListenerSet
+  # Refer to https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1alpha2.ListenerSet
+  listenerset:
+    # -- Enable ListenerSet resource for Argo CD server (Gateway API)
+    enabled: false
+    # -- Additional ListenerSet labels
+    labels: {}
+    # -- Additional ListenerSet annotations
+    annotations: {}
+    # -- Gateway API parentRef for the ListenerSet
+    ## Must reference an existing Gateway. Unlike HTTPRoute, ListenerSet accepts exactly one parentRef.
+    # @default -- `{}` (See [values.yaml])
+    parentRef: {}
+      # group: gateway.networking.k8s.io
+      # kind: Gateway
+      # name: example-gateway
+      # namespace: example-gateway-namespace
+    # -- Listeners to attach to the parent Gateway
+    # @default -- `[]` (See [values.yaml])
+    listeners: []
+      # - name: https
+      #   port: 443
+      #   protocol: HTTPS
+      #   hostname: argocd.example.com
+      #   tls:
+      #     mode: Terminate
+      #     certificateRefs:
+      #       - group: ""
+      #         kind: Secret
+      #         name: argocd-server-tls
+      #   allowedRoutes:
+      #     namespaces:
+      #       from: Same
 
   ## Enable this and set the rules: to whatever custom rules you want for the Cluster Role resource.
   ## Defaults to off
@@ -2849,6 +3057,30 @@ repoServer:
     # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%).
     ## Has higher precedence over `repoServer.pdb.minAvailable`
     maxUnavailable: ""
+
+  ## Repo server Vertical Pod Autoscaler
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically/
+  vpa:
+    # -- Deploy a [VerticalPodAutoscaler](https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically/) for the repo server
+    enabled: false
+    # -- Labels to be added to repo server vpa
+    labels: {}
+    # -- Annotations to be added to repo server vpa
+    annotations: {}
+    # -- One of the VPA operation modes
+    ## Ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically
+    ## Note: Recreate update mode requires more than one replica unless the min-replicas VPA controller flag is overridden
+    updateMode: Initial
+    # -- Controls how VPA computes the recommended resources for repo server container
+    ## Ref: https://github.com/kubernetes/autoscaler/blob/master/vertical-pod-autoscaler/examples/hamster.yaml
+    containerPolicy: {}
+      # controlledResources: ["cpu", "memory"]
+      # minAllowed:
+      #   cpu: 250m
+      #   memory: 256Mi
+      # maxAllowed:
+      #   cpu: 1
+      #   memory: 1Gi
 
   ## Repo server image
   image:
@@ -2932,6 +3164,9 @@ repoServer:
   initContainers: []
 
   copyutil:
+    # -- Extra arguments for the cp command in the repo server copyutil initContainer
+    # @default -- `"--update=none"`
+    extraArgs: "--update=none"
     # -- Resource limits and requests for the repo server copyutil initContainer
     resources: {}
     #  limits:
@@ -3029,11 +3264,15 @@ repoServer:
       type: RuntimeDefault
     capabilities:
       drop:
-      - ALL
+        - ALL
 
-  ## Readiness and liveness probes for default backend
+  ## Readiness and liveness probes for Repo Server
   ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   readinessProbe:
+    # -- Enable Kubernetes readiness probe for Repo Server
+    enabled: true
+    # -- Http path to use for the readiness probe
+    httpPath: /healthz
     # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
     failureThreshold: 5
     # -- Number of seconds after the container has started before [probe] is initiated
@@ -3046,12 +3285,34 @@ repoServer:
     timeoutSeconds: 10
 
   livenessProbe:
+    # -- Enable Kubernetes liveness probe for Repo Server
+    enabled: true
+    # -- Http path to use for the liveness probe
+    httpPath: /healthz?full=true
     # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
     failureThreshold: 5
     # -- Number of seconds after the container has started before [probe] is initiated
     initialDelaySeconds: 10
     # -- How often (in seconds) to perform the [probe]
     periodSeconds: 20
+    # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
+    successThreshold: 1
+    # -- Number of seconds after which the [probe] times out
+    timeoutSeconds: 10
+
+  ## Startup probe for Repo Server (optional)
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  startupProbe:
+    # -- Enable Kubernetes startup probe for Repo Server
+    enabled: false
+    # -- Http path to use for the startup probe
+    httpPath: /healthz
+    # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
+    failureThreshold: 20
+    # -- Number of seconds after the container has started before [probe] is initiated
+    initialDelaySeconds: 10
+    # -- How often (in seconds) to perform the [probe]
+    periodSeconds: 10
     # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
     successThreshold: 1
     # -- Number of seconds after which the [probe] times out
@@ -3103,11 +3364,11 @@ repoServer:
     # -- Labels to be added to argocd-repo-server-tls secret
     labels: {}
     # -- Certificate authority. Required for self-signed certificates.
-    ca: ''
+    ca: ""
     # -- Certificate private key
-    key: ''
+    key: ""
     # -- Certificate data. Must contain SANs of Repo service (ie: argocd-repo-server, argocd-repo-server.argo-cd.svc)
-    crt: ''
+    crt: ""
 
   ## Repo server service configuration
   service:
@@ -3162,7 +3423,6 @@ repoServer:
       tlsConfig: {}
       # -- Prometheus ServiceMonitor namespace
       namespace: "" # "monitoring"
-
       # -- Prometheus ServiceMonitor labels
       additionalLabels: {}
       # -- Prometheus ServiceMonitor annotations
@@ -3238,6 +3498,30 @@ applicationSet:
     # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%).
     ## Has higher precedence over `applicationSet.pdb.minAvailable`
     maxUnavailable: ""
+
+  ## ApplicationSet controller Vertical Pod Autoscaler
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically/
+  vpa:
+    # -- Deploy a [VerticalPodAutoscaler](https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically/) for the ApplicationSet controller
+    enabled: false
+    # -- Labels to be added to ApplicationSet controller vpa
+    labels: {}
+    # -- Annotations to be added to ApplicationSet controller vpa
+    annotations: {}
+    # -- One of the VPA operation modes
+    ## Ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically
+    ## Note: Recreate update mode requires more than one replica unless the min-replicas VPA controller flag is overridden
+    updateMode: Initial
+    # -- Controls how VPA computes the recommended resources for ApplicationSet controller container
+    ## Ref: https://github.com/kubernetes/autoscaler/blob/master/vertical-pod-autoscaler/examples/hamster.yaml
+    containerPolicy: {}
+      # controlledResources: ["cpu", "memory"]
+      # minAllowed:
+      #   cpu: 250m
+      #   memory: 256Mi
+      # maxAllowed:
+      #   cpu: 1
+      #   memory: 1Gi
 
   ## ApplicationSet controller image
   image:
@@ -3331,7 +3615,7 @@ applicationSet:
       # -- Prometheus ServiceMonitor tlsConfig
       tlsConfig: {}
       # -- Prometheus ServiceMonitor namespace
-      namespace: ""  # monitoring
+      namespace: "" # monitoring
       # -- Prometheus ServiceMonitor labels
       additionalLabels: {}
       # -- Prometheus ServiceMonitor annotations
@@ -3410,7 +3694,7 @@ applicationSet:
       type: RuntimeDefault
     capabilities:
       drop:
-      - ALL
+        - ALL
 
   ## Probes for ApplicationSet controller (optional)
   ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
@@ -3441,6 +3725,22 @@ applicationSet:
     successThreshold: 1
     # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
     failureThreshold: 5
+
+  ## Startup probe for ApplicationSet controller (optional)
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  startupProbe:
+    # -- Enable Kubernetes startup probe for ApplicationSet controller
+    enabled: false
+    # -- Number of seconds after the container has started before [probe] is initiated
+    initialDelaySeconds: 10
+    # -- How often (in seconds) to perform the [probe]
+    periodSeconds: 10
+    # -- Number of seconds after which the [probe] times out
+    timeoutSeconds: 1
+    # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
+    successThreshold: 1
+    # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
+    failureThreshold: 20
 
   # -- terminationGracePeriodSeconds for container lifecycle hook
   terminationGracePeriodSeconds: 30
@@ -3581,6 +3881,83 @@ applicationSet:
       # - secretName: argocd-applicationset-tls
       #   hosts:
       #     - argocd-applicationset.example.com
+
+  ## Gateway API HTTPRoute for the Git Generator webhook
+  ## Ref: https://argocd-applicationset.readthedocs.io/en/master/Generators-Git/#webhook-configuration)
+  # NOTE: Gateway API support is in EXPERIMENTAL status
+  # Support depends on your Gateway controller implementation
+  # Some controllers may require additional configuration (e.g., BackendTLSPolicy for HTTPS backends)
+  # Refer to https://gateway-api.sigs.k8s.io/implementations/ for controller-specific details
+  httproute:
+    # -- Enable HTTPRoute resource for Argo CD Applicationset Webhook (Gateway API)
+    enabled: false
+    # -- Additional HTTPRoute labels
+    labels: {}
+    # -- Additional HTTPRoute annotations
+    annotations: {}
+    # -- Gateway API parentRefs for the HTTPRoute
+    ## Must reference an existing Gateway
+    # @default -- `[]` (See [values.yaml])
+    parentRefs: []
+      # - name: example-gateway
+      #   namespace: example-gateway-namespace
+      #   sectionName: https
+    # -- List of hostnames for the HTTPRoute
+    # @default -- `[]` (See [values.yaml])
+    hostnames: []
+      # - argocd.example.com
+    # -- HTTPRoute rules configuration
+    # @default -- `[]` (See [values.yaml])
+    rules:
+      - matches:
+          - path:
+              type: PathPrefix
+              value: /api/webhook
+        # filters: []
+        #   - type: RequestHeaderModifier
+        #     requestHeaderModifier:
+        #       add:
+        #         - name: X-Custom-Header
+        #           value: custom-value
+
+  # Gateway API ListenerSet configuration for the Git Generator webhook
+  ## Ref: https://argocd-applicationset.readthedocs.io/en/master/Generators-Git/#webhook-configuration
+  # NOTE: Gateway API support is in EXPERIMENTAL status
+  # ListenerSet allows attaching additional listeners to an existing Gateway
+  # Requires Gateway API v1alpha2 and a controller that supports ListenerSet
+  # Refer to https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1alpha2.ListenerSet
+  listenerset:
+    # -- Enable ListenerSet resource for Argo CD ApplicationSet webhook (Gateway API)
+    enabled: false
+    # -- Additional ListenerSet labels
+    labels: {}
+    # -- Additional ListenerSet annotations
+    annotations: {}
+    # -- Gateway API parentRef for the ListenerSet
+    ## Must reference an existing Gateway. Unlike HTTPRoute, ListenerSet accepts exactly one parentRef.
+    # @default -- `{}` (See [values.yaml])
+    parentRef: {}
+      # group: gateway.networking.k8s.io
+      # kind: Gateway
+      # name: example-gateway
+      # namespace: example-gateway-namespace
+    # -- Listeners to attach to the parent Gateway
+    # @default -- `[]` (See [values.yaml])
+    listeners: []
+      # - name: https
+      #   port: 443
+      #   protocol: HTTPS
+      #   hostname: argocd.example.com
+      #   tls:
+      #     mode: Terminate
+      #     certificateRefs:
+      #       - group: ""
+      #         kind: Secret
+      #         name: argocd-applicationset-controller-tls
+      #   allowedRoutes:
+      #     namespaces:
+      #       from: Same
+
   # -- Enable ApplicationSet in any namespace feature
   allowAnyNamespace: false
 
@@ -3621,6 +3998,30 @@ notifications:
     # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%).
     ## Has higher precedence over `notifications.pdb.minAvailable`
     maxUnavailable: ""
+
+  ## Notifications controller Vertical Pod Autoscaler
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically/
+  vpa:
+    # -- Deploy a [VerticalPodAutoscaler](https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically/) for the notifications controller
+    enabled: false
+    # -- Labels to be added to notifications controller vpa
+    labels: {}
+    # -- Annotations to be added to notifications controller vpa
+    annotations: {}
+    # -- One of the VPA operation modes
+    ## Ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically
+    ## Note: Recreate update mode requires more than one replica unless the min-replicas VPA controller flag is overridden
+    updateMode: Initial
+    # -- Controls how VPA computes the recommended resources for notifications controller container
+    ## Ref: https://github.com/kubernetes/autoscaler/blob/master/vertical-pod-autoscaler/examples/hamster.yaml
+    containerPolicy: {}
+      # controlledResources: ["cpu", "memory"]
+      # minAllowed:
+      #   cpu: 250m
+      #   memory: 256Mi
+      # maxAllowed:
+      #   cpu: 1
+      #   memory: 1Gi
 
   ## Notifications controller image
   image:
@@ -3708,7 +4109,7 @@ notifications:
 
       # email-username:
       # email-password:
-        # For more information: https://argo-cd.readthedocs.io/en/stable/operator-manual/notifications/services/email/
+      # For more information: https://argo-cd.readthedocs.io/en/stable/operator-manual/notifications/services/email/
 
   metrics:
     # -- Enables prometheus metrics server
@@ -3798,7 +4199,7 @@ notifications:
       type: RuntimeDefault
     capabilities:
       drop:
-      - ALL
+        - ALL
 
   ## Probes for notifications controller Pods (optional)
   ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
@@ -3829,6 +4230,22 @@ notifications:
     successThreshold: 1
     # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
     failureThreshold: 5
+
+  ## Startup probe for notifications controller Pods (optional)
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  startupProbe:
+    # -- Enable Kubernetes startup probe for notifications controller Pods
+    enabled: false
+    # -- Number of seconds after the container has started before [probe] is initiated
+    initialDelaySeconds: 10
+    # -- How often (in seconds) to perform the [probe]
+    periodSeconds: 10
+    # -- Number of seconds after which the [probe] times out
+    timeoutSeconds: 1
+    # -- Minimum consecutive successes for the [probe] to be considered successful after having failed
+    successThreshold: 1
+    # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
+    failureThreshold: 20
 
   # -- terminationGracePeriodSeconds for container lifecycle hook
   terminationGracePeriodSeconds: 30
@@ -4287,7 +4704,7 @@ commitServer:
     allowPrivilegeEscalation: false
     capabilities:
       drop:
-      - ALL
+        - ALL
     seccompProfile:
       type: RuntimeDefault
 
@@ -4296,6 +4713,8 @@ commitServer:
   readinessProbe:
     # -- Enable Kubernetes liveness probe for commit server
     enabled: true
+    # -- Http path to use for the readiness probe
+    httpPath: /healthz
     # -- Number of seconds after the container has started before [probe] is initiated
     initialDelaySeconds: 5
     # -- How often (in seconds) to perform the [probe]
@@ -4308,6 +4727,8 @@ commitServer:
   livenessProbe:
     # -- Enable Kubernetes liveness probe for commit server
     enabled: true
+    # -- Http path to use for the liveness probe
+    httpPath: /healthz?full=true
     # -- Number of seconds after the container has started before [probe] is initiated
     initialDelaySeconds: 30
     # -- How often (in seconds) to perform the [probe]
@@ -4316,6 +4737,22 @@ commitServer:
     timeoutSeconds: 10
     # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
     failureThreshold: 5
+
+  ## Startup probe for commit server (optional)
+  ## Ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  startupProbe:
+    # -- Enable Kubernetes startup probe for commit server
+    enabled: false
+    # -- Http path to use for the startup probe
+    httpPath: /healthz
+    # -- Number of seconds after the container has started before [probe] is initiated
+    initialDelaySeconds: 10
+    # -- How often (in seconds) to perform the [probe]
+    periodSeconds: 10
+    # -- Number of seconds after which the [probe] times out
+    timeoutSeconds: 1
+    # -- Minimum consecutive failures for the [probe] to be considered failed after having succeeded
+    failureThreshold: 20
 
   # -- terminationGracePeriodSeconds for container lifecycle hook
   terminationGracePeriodSeconds: 30
@@ -4357,3 +4794,27 @@ commitServer:
     # -- Default network policy rules used by commit server
     # @default -- `false` (defaults to global.networkPolicy.create)
     create: false
+
+  ## Commit server Vertical Pod Autoscaler
+  ## Ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically/
+  vpa:
+    # -- Deploy a [VerticalPodAutoscaler](https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically/) for the commit server
+    enabled: false
+    # -- Labels to be added to commit server vpa
+    labels: {}
+    # -- Annotations to be added to commit server vpa
+    annotations: {}
+    # -- One of the VPA operation modes
+    ## Ref: https://kubernetes.io/docs/concepts/workloads/autoscaling/#scaling-workloads-vertically
+    ## Note: Recreate update mode requires more than one replica unless the min-replicas VPA controller flag is overridden
+    updateMode: Initial
+    # -- Controls how VPA computes the recommended resources for commit server container
+    ## Ref: https://github.com/kubernetes/autoscaler/blob/master/vertical-pod-autoscaler/examples/hamster.yaml
+    containerPolicy: {}
+      # controlledResources: ["cpu", "memory"]
+      # minAllowed:
+      #   cpu: 250m
+      #   memory: 256Mi
+      # maxAllowed:
+      #   cpu: 1
+      #   memory: 1Gi
