@@ -4,9 +4,8 @@ kind: IngressRoute
 metadata:
   name: apprise
   namespace: apprise
-  annotations:
-    kubernetes.io/ingress.class: traefik-external
 spec:
+  ingressClassName: traefik-external
   entryPoints:
     - websecure
   routes:

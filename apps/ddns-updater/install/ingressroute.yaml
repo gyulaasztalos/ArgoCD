@@ -4,9 +4,8 @@ kind: IngressRoute
 metadata:
   name: ddns-updater
   namespace: ddns-updater
-  annotations:
-    kubernetes.io/ingress.class: traefik-external
 spec:
+  ingressClassName: traefik-external
   entryPoints:
     - websecure
   routes:

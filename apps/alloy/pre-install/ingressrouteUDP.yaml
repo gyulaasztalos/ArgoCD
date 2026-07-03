@@ -4,9 +4,8 @@ kind: IngressRouteUDP
 metadata:
   name: alloy-syslog
   namespace: alloy
-  annotations:
-    kubernetes.io/ingress.class: traefik-external
 spec:
+  ingressClassName: traefik-external
   entryPoints:
     - syslog
   routes:

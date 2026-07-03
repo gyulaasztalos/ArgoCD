@@ -4,8 +4,6 @@ kind: IngressRoute
 metadata:
   name: flexget
   namespace: flexget
-  annotations:
-    kubernetes.io/ingress.class: traefik-external
   labels:
     app: flexget
     app.kubernetes.io/name: flexget
@@ -13,6 +11,7 @@ metadata:
     app.kubernetes.io/instance: flexget
     app.kubernetes.io/component: flexget
 spec:
+  ingressClassName: traefik-external
   entryPoints:
     - websecure
   routes:

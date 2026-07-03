@@ -4,8 +4,6 @@ kind: IngressRoute
 metadata:
   name: homebridge
   namespace: homebridge
-  annotations:
-    kubernetes.io/ingress.class: traefik-external
   labels:
     app: homebridge
     app.kubernetes.io/name: homebridge
@@ -13,6 +11,7 @@ metadata:
     app.kubernetes.io/instance: homebridge
     app.kubernetes.io/component: homebridge
 spec:
+  ingressClassName: traefik-external
   entryPoints:
     - websecure
   routes:

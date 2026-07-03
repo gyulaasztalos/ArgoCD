@@ -4,9 +4,8 @@ kind: IngressRoute
 metadata:
   name: prometheus
   namespace: monitoring
-  annotations:
-    kubernetes.io/ingress.class: traefik-external
 spec:
+  ingressClassName: traefik-external
   entryPoints:
     - websecure
   routes:
@@ -37,9 +36,8 @@ kind: IngressRoute
 metadata:
   name: grafana
   namespace: monitoring
-  annotations:
-    kubernetes.io/ingress.class: traefik-external
 spec:
+  ingressClassName: traefik-external
   entryPoints:
     - websecure
   routes:
@@ -57,9 +55,8 @@ kind: IngressRoute
 metadata:
   name: alertmanager
   namespace: monitoring
-  annotations:
-    kubernetes.io/ingress.class: traefik-external
 spec:
+  ingressClassName: traefik-external
   entryPoints:
     - websecure
   routes:
