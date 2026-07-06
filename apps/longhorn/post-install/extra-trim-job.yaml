@@ -5,8 +5,10 @@ metadata:
   namespace: longhorn-system
 spec:
   concurrency: 1
-  cron: '0 5 * * 4'  # Weekly at 5 AM on Thursdays
-  groups: ["temp"]
+  cron: '0 18 * * *'  # Daily at 18:00
+  groups:
+    - temp
+    - temp-1r
   name: extra-filesystem-trim
   retain: 0
   task: filesystem-trim

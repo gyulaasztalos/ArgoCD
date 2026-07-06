@@ -4399,7 +4399,7 @@ prometheus:
     storageSpec:
       volumeClaimTemplate:
         spec:
-          storageClassName: "longhorn-temp"
+          storageClassName: "longhorn-temp-1r"
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:

@@ -1,9 +1,9 @@
 ---
-# This StorageClass is used for frequently changing volumes where the content is not so important (Pihole logs).
+# This StorageClass is used for frequently changing volumes where the content is not so important (Prometheus metrics).
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: longhorn-temp
+  name: longhorn-temp-1r
 provisioner: driver.longhorn.io
 parameters:
   backupTargetName: default
@@ -12,10 +12,10 @@ parameters:
   disableRevisionCounter: 'true'
   fromBackup: ''
   fsType: ext4
-  numberOfReplicas: '3'
+  numberOfReplicas: '1'
   staleReplicaTimeout: '30'
   unmapMarkSnapChainRemoved: ignored
-  recurringJobSelector: '[{"name":"temp", "isGroup":true }]'
+  recurringJobSelector: '[{"name":"temp-1r", "isGroup":true }]'
   snapshotMaxCount: '4'
 allowVolumeExpansion: true
 reclaimPolicy: Delete
