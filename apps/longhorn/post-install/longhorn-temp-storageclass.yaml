@@ -14,7 +14,7 @@ parameters:
   fsType: ext4
   numberOfReplicas: '3'
   staleReplicaTimeout: '30'
-  unmapMarkSnapChainRemoved: ignored
+  unmapMarkSnapChainRemoved: enabled
   recurringJobSelector: '[{"name":"temp", "isGroup":true }]'
 allowVolumeExpansion: true
 reclaimPolicy: Delete

@@ -14,7 +14,7 @@ parameters:
   fsType: ext4
   numberOfReplicas: '1'
   staleReplicaTimeout: '30'
-  unmapMarkSnapChainRemoved: ignored
+  unmapMarkSnapChainRemoved: enabled
   recurringJobSelector: '[{"name":"temp-1r", "isGroup":true }]'
   snapshotMaxCount: '4'
 allowVolumeExpansion: true
