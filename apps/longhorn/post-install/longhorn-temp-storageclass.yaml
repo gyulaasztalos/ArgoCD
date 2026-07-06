@@ -4,6 +4,8 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: longhorn-temp
+  annotations:
+    argocd.argoproj.io/sync-options: Replace=true
 provisioner: driver.longhorn.io
 parameters:
   backupTargetName: default
@@ -16,6 +18,7 @@ parameters:
   staleReplicaTimeout: '30'
   unmapMarkSnapChainRemoved: enabled
   recurringJobSelector: '[{"name":"temp", "isGroup":true }]'
+  snapshotMaxCount: '4'
 allowVolumeExpansion: true
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
