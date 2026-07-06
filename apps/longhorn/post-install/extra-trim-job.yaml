@@ -5,7 +5,7 @@ metadata:
   namespace: longhorn-system
 spec:
   concurrency: 1
-  cron: '0 18 * * *'  # Daily at 18:00
+  cron: '0 1 * * *'  # Daily at 01:00 (before the daily backup job)
   groups:
     - temp
     - temp-1r
