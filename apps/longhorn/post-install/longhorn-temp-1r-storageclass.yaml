@@ -16,7 +16,6 @@ parameters:
   staleReplicaTimeout: '30'
   unmapMarkSnapChainRemoved: ignored
   recurringJobSelector: '[{"name":"temp-1r", "isGroup":true }]'
-  snapshotMaxCount: '4'
 allowVolumeExpansion: true
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
