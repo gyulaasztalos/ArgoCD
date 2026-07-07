@@ -30,7 +30,7 @@ spec:
         - name: influxdb
           # refluxdb = unlocked InfluxDB 3 Core fork. Pin to a released -unlocked tag;
           # do not float on :latest (nightly). Renovate will propose bumps.
-          image: "ghcr.io/refluxdb/refluxdb:v3.3.3-unlocked"
+          image: "ghcr.io/refluxdb/refluxdb:v3.3.3-nightly"
           imagePullPolicy: IfNotPresent
           command: ["influxdb3", "serve"]
           args:
