@@ -5,10 +5,10 @@ metadata:
 spec:
   images:
     - major: 15
-      image: ghcr.io/cloudnative-pg/postgresql:15.18-system-trixie
+      image: ghcr.io/cloudnative-pg/postgresql:18.4-system-trixie
     - major: 16
-      image: ghcr.io/cloudnative-pg/postgresql:16.14-system-trixie
+      image: ghcr.io/cloudnative-pg/postgresql:18.4-system-trixie
     - major: 17
-      image: ghcr.io/cloudnative-pg/postgresql:17.10-system-trixie
+      image: ghcr.io/cloudnative-pg/postgresql:18.4-system-trixie
     - major: 18
       image: ghcr.io/cloudnative-pg/postgresql:18.4-system-trixie
