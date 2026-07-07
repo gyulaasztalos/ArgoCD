@@ -1,0 +1,357 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "liveNow": false,
+  "refresh": "5m",
+  "schemaVersion": 39,
+  "tags": ["homeassistant", "haccp", "influxdb"],
+  "templating": { "list": [] },
+  "time": { "from": "now-30d", "to": "now" },
+  "timepicker": {
+    "refresh_intervals": ["1m", "5m", "15m", "30m", "1h"]
+  },
+  "timezone": "Europe/Budapest",
+  "title": "Refrigeration Temperatures (HACCP)",
+  "uid": "fridge-haccp",
+  "panels": [
+    {
+      "id": 100,
+      "type": "row",
+      "title": "Fridges (limit 5 °C)",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }
+    },
+    {
+      "id": 1,
+      "title": "Fridge — Current",
+      "type": "stat",
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 5, "w": 8, "x": 0, "y": 1 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 5 }
+            ]
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": ".*_temperature_3.*" },
+            "properties": [ { "id": "displayName", "value": "LG Fridge" } ] },
+          { "matcher": { "id": "byRegexp", "options": ".*_temperature_4.*" },
+            "properties": [ { "id": "displayName", "value": "Electrolux Fridge" } ] }
+        ]
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true },
+        "colorMode": "background",
+        "graphMode": "area",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "SELECT last(\"value\") FROM \"°C\" WHERE (\"entity_id\" =~ /0x58e6c5fffe0f58b0_temperature_[34]/) AND $timeFilter GROUP BY \"entity_id\"",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Fridge — Max (window)",
+      "type": "stat",
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 5, "w": 8, "x": 8, "y": 1 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 5 }
+            ]
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": ".*_temperature_3.*" },
+            "properties": [ { "id": "displayName", "value": "LG Fridge" } ] },
+          { "matcher": { "id": "byRegexp", "options": ".*_temperature_4.*" },
+            "properties": [ { "id": "displayName", "value": "Electrolux Fridge" } ] }
+        ]
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true },
+        "colorMode": "value",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "SELECT max(\"value\") FROM \"°C\" WHERE (\"entity_id\" =~ /0x58e6c5fffe0f58b0_temperature_[34]/) AND $timeFilter GROUP BY \"entity_id\"",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Fridge — Min (window)",
+      "type": "stat",
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 5, "w": 8, "x": 16, "y": 1 },
+      "fieldConfig": {
+        "defaults": { "unit": "celsius" },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": ".*_temperature_3.*" },
+            "properties": [ { "id": "displayName", "value": "LG Fridge" } ] },
+          { "matcher": { "id": "byRegexp", "options": ".*_temperature_4.*" },
+            "properties": [ { "id": "displayName", "value": "Electrolux Fridge" } ] }
+        ]
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true },
+        "colorMode": "value",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "SELECT min(\"value\") FROM \"°C\" WHERE (\"entity_id\" =~ /0x58e6c5fffe0f58b0_temperature_[34]/) AND $timeFilter GROUP BY \"entity_id\"",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Fridge — temperature history",
+      "type": "timeseries",
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 11, "w": 24, "x": 0, "y": 6 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "stepAfter",
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": false,
+            "thresholdsStyle": { "mode": "line" }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 5 }
+            ]
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": ".*_temperature_3.*" },
+            "properties": [ { "id": "displayName", "value": "LG Fridge" } ] },
+          { "matcher": { "id": "byRegexp", "options": ".*_temperature_4.*" },
+            "properties": [ { "id": "displayName", "value": "Electrolux Fridge" } ] }
+        ]
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["min", "max", "mean", "lastNotNull"] },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "SELECT mean(\"value\") FROM \"°C\" WHERE (\"entity_id\" =~ /0x58e6c5fffe0f58b0_temperature_[34]/) AND $timeFilter GROUP BY time($__interval), \"entity_id\" fill(none)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 200,
+      "type": "row",
+      "title": "Freezers (limit -18 °C)",
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 17 }
+    },
+    {
+      "id": 5,
+      "title": "Freezer — Current",
+      "type": "stat",
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 5, "w": 8, "x": 0, "y": 18 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": -18 }
+            ]
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": ".*_temperature_5.*" },
+            "properties": [ { "id": "displayName", "value": "LG Freezer" } ] },
+          { "matcher": { "id": "byRegexp", "options": ".*_temperature_6.*" },
+            "properties": [ { "id": "displayName", "value": "Electrolux Freezer" } ] }
+        ]
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true },
+        "colorMode": "background",
+        "graphMode": "area",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "SELECT last(\"value\") FROM \"°C\" WHERE (\"entity_id\" =~ /0x58e6c5fffe0f58b0_temperature_[56]/) AND $timeFilter GROUP BY \"entity_id\"",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Freezer — Max (window)",
+      "type": "stat",
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 5, "w": 8, "x": 8, "y": 18 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": -18 }
+            ]
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": ".*_temperature_5.*" },
+            "properties": [ { "id": "displayName", "value": "LG Freezer" } ] },
+          { "matcher": { "id": "byRegexp", "options": ".*_temperature_6.*" },
+            "properties": [ { "id": "displayName", "value": "Electrolux Freezer" } ] }
+        ]
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true },
+        "colorMode": "value",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "SELECT max(\"value\") FROM \"°C\" WHERE (\"entity_id\" =~ /0x58e6c5fffe0f58b0_temperature_[56]/) AND $timeFilter GROUP BY \"entity_id\"",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Freezer — Min (window)",
+      "type": "stat",
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 5, "w": 8, "x": 16, "y": 18 },
+      "fieldConfig": {
+        "defaults": { "unit": "celsius" },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": ".*_temperature_5.*" },
+            "properties": [ { "id": "displayName", "value": "LG Freezer" } ] },
+          { "matcher": { "id": "byRegexp", "options": ".*_temperature_6.*" },
+            "properties": [ { "id": "displayName", "value": "Electrolux Freezer" } ] }
+        ]
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": true },
+        "colorMode": "value",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "SELECT min(\"value\") FROM \"°C\" WHERE (\"entity_id\" =~ /0x58e6c5fffe0f58b0_temperature_[56]/) AND $timeFilter GROUP BY \"entity_id\"",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Freezer — temperature history",
+      "type": "timeseries",
+      "datasource": { "type": "influxdb", "uid": "influxdb" },
+      "gridPos": { "h": 11, "w": 24, "x": 0, "y": 23 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "stepAfter",
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": false,
+            "thresholdsStyle": { "mode": "line" }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": -18 }
+            ]
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": ".*_temperature_5.*" },
+            "properties": [ { "id": "displayName", "value": "LG Freezer" } ] },
+          { "matcher": { "id": "byRegexp", "options": ".*_temperature_6.*" },
+            "properties": [ { "id": "displayName", "value": "Electrolux Freezer" } ] }
+        ]
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["min", "max", "mean", "lastNotNull"] },
+        "tooltip": { "mode": "multi", "sort": "none" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "influxdb", "uid": "influxdb" },
+          "query": "SELECT mean(\"value\") FROM \"°C\" WHERE (\"entity_id\" =~ /0x58e6c5fffe0f58b0_temperature_[56]/) AND $timeFilter GROUP BY time($__interval), \"entity_id\" fill(none)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "refId": "A"
+        }
+      ]
+    }
+  ]
+}

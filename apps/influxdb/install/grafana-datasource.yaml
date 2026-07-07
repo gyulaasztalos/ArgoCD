@@ -1,0 +1,50 @@
+---
+# Grafana datasource for InfluxDB 3 (InfluxQL mode — plain HTTP/1.1, no gRPC needed).
+# Rendered as a labeled Secret so the Grafana datasources sidecar auto-discovers it
+# (requires sidecar.datasources.searchNamespace: ALL in monitoring/values.yaml).
+#
+# The token is pulled from 1Password (item "influxdb", property "token") — populate it
+# during the one-time bootstrap in README.md BEFORE this will sync cleanly.
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: influxdb-grafana-datasource
+  namespace: influxdb
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: onepassword-connect
+    kind: ClusterSecretStore
+  target:
+    name: influxdb-grafana-datasource
+    creationPolicy: Owner
+    template:
+      engineVersion: v2
+      type: Opaque
+      metadata:
+        labels:
+          # picked up by the Grafana datasources sidecar
+          grafana_datasource: "1"
+      data:
+        influxdb.yaml: |
+          apiVersion: 1
+          datasources:
+            - name: InfluxDB
+              uid: influxdb
+              type: influxdb
+              access: proxy
+              # in-cluster service — no ingress/TLS hop needed
+              url: http://influxdb.influxdb.svc.cluster.local:8181
+              jsonData:
+                version: InfluxQL
+                dbName: homeassistant
+                httpMode: POST
+                httpHeaderName1: Authorization
+              secureJsonData:
+                httpHeaderValue1: "Bearer {{ .token }}"
+              editable: false
+  data:
+    - secretKey: token
+      remoteRef:
+        key: influxdb
+        property: token

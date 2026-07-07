@@ -1,0 +1,95 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: influxdb
+  namespace: influxdb
+  labels:
+    app: influxdb
+    app.kubernetes.io/name: influxdb
+    app.kubernetes.io/part-of: influxdb
+    app.kubernetes.io/instance: influxdb
+    app.kubernetes.io/component: influxdb
+spec:
+  replicas: 1
+  serviceName: influxdb
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: influxdb
+  template:
+    metadata:
+      labels:
+        app: influxdb
+        app.kubernetes.io/name: influxdb
+        app.kubernetes.io/part-of: influxdb
+        app.kubernetes.io/instance: influxdb
+        app.kubernetes.io/component: influxdb
+    spec:
+      containers:
+        - name: influxdb
+          # refluxdb = unlocked InfluxDB 3 Core fork. Pin to a released -unlocked tag;
+          # do not float on :latest (nightly). Renovate will propose bumps.
+          image: "ghcr.io/refluxdb/refluxdb:v3.3.3-unlocked"
+          imagePullPolicy: IfNotPresent
+          command: ["influxdb3", "serve"]
+          args:
+            - "--node-id=influxdb-0"
+            - "--object-store=file"
+            - "--data-dir=/var/lib/influxdb3"
+            - "--http-bind=0.0.0.0:8181"
+            # Auth is ON by default (a token is created via the bootstrap step in README.md).
+            # For a dead-simple, internal-only instance you MAY disable auth instead — see README.
+            # - "--without-auth"
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          ports:
+            - containerPort: 8181
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8181
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            failureThreshold: 5
+            timeoutSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8181
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 6
+            timeoutSeconds: 10
+          volumeMounts:
+            - name: influxdb-data
+              mountPath: /var/lib/influxdb3
+      restartPolicy: Always
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        # fsGroup makes the Longhorn volume group-writable so the container's
+        # non-root user can persist data. Adjust if the image runs as a different uid/gid.
+        fsGroup: 1500
+  volumeClaimTemplates:
+    - metadata:
+        name: influxdb-data
+        labels:
+          app: influxdb
+          app.kubernetes.io/name: influxdb
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: longhorn
+        resources:
+          requests:
+            storage: 10Gi

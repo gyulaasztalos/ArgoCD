@@ -1,0 +1,25 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - statefulset.yaml
+  - service.yaml
+  - ingressroute.yaml
+  - grafana-datasource.yaml
+
+configMapGenerator:
+  - name: influxdb-fridge-haccp-dashboard
+    namespace: influxdb
+    files:
+      - fridge-haccp-dashboard.json=fridge-haccp-dashboard.json
+
+generatorOptions:
+  labels:
+    app.kubernetes.io/name: influxdb
+    app.kubernetes.io/instance: influxdb
+    app.kubernetes.io/part-of: influxdb
+    app.kubernetes.io/component: influxdb
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "/tmp/dashboards/HomeAssistant"

@@ -1,0 +1,25 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: influxdb
+  namespace: influxdb
+  labels:
+    app: influxdb
+    app.kubernetes.io/name: influxdb
+    app.kubernetes.io/part-of: influxdb
+    app.kubernetes.io/instance: influxdb
+    app.kubernetes.io/component: influxdb
+spec:
+  ingressClassName: traefik-external
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`influxdb.local.asztalos.net`)
+      kind: Rule
+      services:
+        - name: influxdb
+          namespace: influxdb
+          port: 8181
+  tls:
+    secretName: local-asztalos-net-tls

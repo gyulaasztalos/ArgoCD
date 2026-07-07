@@ -1454,6 +1454,12 @@ grafana:
       defaultDatasourceEnabled: true
       isDefaultDatasource: true
 
+      # Discover datasource ConfigMaps/Secrets (label grafana_datasource=1) in ALL
+      # namespaces, so apps like influxdb can ship their own datasource object.
+      # Default in the upstream chart is null (= Grafana's own namespace only).
+      # Mirrors sidecar.dashboards.searchNamespace above.
+      searchNamespace: ALL
+
       name: Prometheus
       uid: prometheus
 
