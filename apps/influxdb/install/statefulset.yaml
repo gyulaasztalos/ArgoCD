@@ -100,7 +100,9 @@ spec:
         # Longhorn volumes group-writable so the non-root process can persist data.
         fsGroup: 1000
   volumeClaimTemplates:
-    - metadata:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
         name: influxdb-data
         labels:
           app: influxdb
