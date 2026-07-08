@@ -15,6 +15,13 @@ spec:
   entryPoints:
     - websecure
   routes:
+    - kind: Rule
+      match: Host(`influxdb.local.asztalos.net`) && PathPrefix(`/api`)
+      priority: 20  # Higher than your main route
+      services:
+        - name: influxdb
+          namespace: influxdb
+          port: 8086
     - match: Host(`influxdb.local.asztalos.net`)
       kind: Rule
       middlewares:
