@@ -30,7 +30,7 @@ spec:
         - name: influxdb
           # Official InfluxDB 2.x OSS — multi-arch (linux/arm64 for rPi 5), MIT/Apache.
           # Renovate will propose bumps. Pin the minor; avoid bare ":2" drifting majors.
-          image: "influxdb:2.7"
+          image: "influxdb:2.9"
           imagePullPolicy: IfNotPresent
           # On first boot, DOCKER_INFLUXDB_INIT_MODE=setup auto-creates the org, the bucket
           # (with retention), and the admin user + token. No manual bootstrap needed.
