@@ -1,0 +1,103 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: influxdb-alerts
+  namespace: influxdb
+  labels:
+    app.kubernetes.io/name: influxdb
+    app.kubernetes.io/part-of: influxdb
+spec:
+  groups:
+    - name: influxdb.rules
+      rules:
+        # --- Availability -------------------------------------------------
+        # The ServiceMonitor job is "influxdb". If nothing is up, the scrape
+        # target is gone (pod down, crashloop, or /metrics unreachable).
+        - alert: InfluxDBDown
+          expr: absent(up{job="influxdb"} == 1)
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "InfluxDB is down"
+            description: "No healthy InfluxDB scrape target for 5m. HACCP browse copy + HA export sink are unavailable."
+
+        - alert: InfluxDBRestartLoop
+          expr: increase(kube_pod_container_status_restarts_total{namespace="influxdb", pod=~"influxdb-.*"}[18m]) > 3
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            summary: "InfluxDB pod is restarting frequently"
+            description: "The InfluxDB pod restarted more than 3 times in the last 18 minutes."
+
+        # --- HTTP error rate ---------------------------------------------
+        # http_api_requests_total is labelled with status (2XX/4XX/5XX).
+        # 5XX = server-side failures (writes/queries failing).
+        - alert: InfluxDBHighServerErrorRate
+          expr: |
+            sum(rate(http_api_requests_total{job="influxdb", status="5XX"}[5m]))
+              /
+            clamp_min(sum(rate(http_api_requests_total{job="influxdb"}[5m])), 1)
+              > 0.05
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "InfluxDB 5XX error rate > 5%"
+            description: "More than 5% of InfluxDB HTTP requests returned 5XX over the last 5m — writes or queries are failing server-side."
+
+        # A sustained burst of 4XX often means a bad/expired token from HA or
+        # Grafana (writes silently dropped → data gaps → HACCP risk).
+        - alert: InfluxDBHighClientErrorRate
+          expr: |
+            sum(rate(http_api_requests_total{job="influxdb", status="4XX"}[5m])) > 1
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "InfluxDB sustained 4XX rate"
+            description: "InfluxDB is returning 4XX steadily for 15m — likely an invalid/expired API token (HA or Grafana). Writes may be rejected."
+
+        # --- Write path latency ------------------------------------------
+        - alert: InfluxDBWriteLatencyHigh
+          expr: |
+            histogram_quantile(0.99,
+              sum(rate(http_api_request_duration_seconds_bucket{job="influxdb", path=~"/api/v2/write"}[5m])) by (le)
+            ) > 2
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "InfluxDB write latency p99 > 2s"
+            description: "p99 of the /api/v2/write handler exceeded 2s for 10m — ingestion is struggling (I/O pressure on Longhorn / rPi)."
+
+        # --- Resource health ---------------------------------------------
+        - alert: InfluxDBMemoryHigh
+          expr: |
+            sum(container_memory_working_set_bytes{namespace="influxdb", pod=~"influxdb-.*", container="influxdb"})
+              /
+            sum(kube_pod_container_resource_limits{namespace="influxdb", pod=~"influxdb-.*", resource="memory"})
+              > 0.9
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "InfluxDB near memory limit"
+            description: "InfluxDB working set is >90% of its memory limit for 15m — OOM-kill risk on rPi hardware."
+
+        # --- Data storage growth -----------------------------------------
+        # Longhorn PVC filling up would eventually block writes.
+        - alert: InfluxDBDiskFillingUp
+          expr: |
+            kubelet_volume_stats_available_bytes{namespace="influxdb", persistentvolumeclaim=~"influxdb-data-.*"}
+              /
+            kubelet_volume_stats_capacity_bytes{namespace="influxdb", persistentvolumeclaim=~"influxdb-data-.*"}
+              < 0.15
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "InfluxDB data volume <15% free"
+            description: "The InfluxDB Longhorn data PVC has less than 15% space left. Grow the volume before writes start failing."

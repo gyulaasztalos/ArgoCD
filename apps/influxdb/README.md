@@ -13,8 +13,11 @@ install/
   statefulset.yaml            # single-replica StatefulSet; single Longhorn data volume (/var/lib/influxdb2)
   service.yaml                # ClusterIP :8086
   ingressroute.yaml           # https://influxdb.local.asztalos.net via traefik-external + Authentik SSO
-  grafana-datasource.yaml     # ExternalSecret → Flux datasource (sidecar-discovered)
-  fridge-haccp-dashboard.json # two-section HACCP dashboard (fridges / freezers)
+  grafana-datasource.yaml            # ExternalSecret → Flux datasource (sidecar-discovered)
+  fridge-haccp-dashboard.json        # two-section HACCP dashboard (fridges / freezers)
+  influxdb-oss-metrics-dashboard.json# server-health dashboard (Flux, reads _monitoring bucket)
+  servicemonitor.yaml                # scrapes /metrics into Prometheus (for the alert rules)
+  prometheus-rules.yaml              # PrometheusRule alerts on the scraped /metrics
   kustomization.yaml
 ```
 
@@ -73,6 +76,13 @@ paths at the network layer rather than inside InfluxDB:
 HA is the source of truth (SQLite on the Yellow). This InfluxDB is a **parallel export sink** — a
 disposable browse copy. HA keeps working if the cluster is down.
 
+> **Configure via YAML only — skip the UI integration.** The InfluxDB integration is YAML-only; it
+> has **no config-flow**, which is why the UI setup shows no field for included entities. Do **not**
+> add it from Settings → Devices & Services — that path can't filter entities and would firehose
+> *every* entity into InfluxDB, bloating the 45-day bucket. Put the `influxdb:` block below in
+> `configuration.yaml` and restart HA Core. The `include:` filter is the whole point — it's what
+> keeps the sink scoped to the HACCP probes.
+
 > **The HACCP retention record lives on the HA side too.** Set the recorder to keep full-resolution
 > history longer than your required window (default is only 10 days). In `configuration.yaml`
 > on the Yellow:
@@ -121,6 +131,33 @@ Datasource and dashboard are shipped as code — no manual Grafana clicking:
   sections (Fridges, limit 5 °C / Freezers, limit −18 °C), each with current/min/max/mean tiles +
   step-line history over a 30-day default window and its own threshold line. Discovered via
   `grafana_dashboard: "1"`, lands in the **HomeAssistant** folder.
+- `install/influxdb-oss-metrics-dashboard.json` — **server-health** dashboard (uptime, orgs/users/
+  buckets/tokens/tasks, query load, object-store IO, memory, build info). Based on InfluxData's
+  own preinstalled dashboard (grafana.com **13315**), which queries the **InfluxDB `_monitoring`
+  bucket via Flux** — its `$ds` variable is pinned to the provisioned `influxdb` datasource.
+
+## Server monitoring (Prometheus alerts)
+
+Two separate monitoring paths — this is deliberate:
+
+- **Dashboard health data → Flux/`_monitoring` bucket** (the dashboard above). Rich, InfluxDB-native.
+- **Alerting → Prometheus** via `servicemonitor.yaml`, which scrapes the in-cluster Service
+  `/metrics` (never through Traefik/Authentik, so no auth needed) into kube-prometheus-stack.
+  `serviceMonitorSelectorNilUsesHelmValues: false` in the stack means it's auto-discovered — no
+  special label required.
+
+`prometheus-rules.yaml` alerts on the scraped metrics (verified names from the InfluxDB metrics
+reference):
+
+| alert | condition | why |
+|-------|-----------|-----|
+| `InfluxDBDown` | `up{job="influxdb"}` absent 5m | sink + browse copy unavailable |
+| `InfluxDBRestartLoop` | >3 restarts / 18m | crashloop |
+| `InfluxDBHighServerErrorRate` | 5XX rate >5% of `http_api_requests_total` | writes/queries failing |
+| `InfluxDBHighClientErrorRate` | sustained 4XX 15m | **likely bad/expired HA or Grafana token → dropped writes** |
+| `InfluxDBWriteLatencyHigh` | p99 `/api/v2/write` >2s | ingestion struggling (I/O on rPi) |
+| `InfluxDBMemoryHigh` | working set >90% of limit | OOM risk on rPi |
+| `InfluxDBDiskFillingUp` | data PVC <15% free | writes will eventually fail |
 
 > **Measurement / entity-id caveats:** the HA InfluxDB integration names measurements after
 > the unit of measurement — a °C sensor lands in a measurement literally called `°C`, with field

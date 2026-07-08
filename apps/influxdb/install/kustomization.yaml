@@ -9,12 +9,17 @@ resources:
   - ingressroute.yaml
   - grafana-datasource.yaml
   - servicemonitor.yaml
+  - prometheus-rules.yaml
 
 configMapGenerator:
   - name: influxdb-fridge-haccp-dashboard
     namespace: influxdb
     files:
       - fridge-haccp-dashboard.json=fridge-haccp-dashboard.json
+  - name: influxdb-oss-metrics-dashboard
+    namespace: influxdb
+    files:
+      - influxdb-oss-metrics-dashboard.json=influxdb-oss-metrics-dashboard.json
 
 generatorOptions:
   labels:
