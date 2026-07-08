@@ -23,6 +23,7 @@ spec:
           namespace: influxdb
           port: 8086
     - match: Host(`influxdb.local.asztalos.net`)
+      priority: 10
       kind: Rule
       middlewares:
         - name: authentik
