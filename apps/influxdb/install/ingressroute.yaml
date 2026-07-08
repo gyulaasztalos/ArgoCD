@@ -17,9 +17,14 @@ spec:
   routes:
     - match: Host(`influxdb.local.asztalos.net`)
       kind: Rule
+      middlewares:
+        - name: authentik
+          namespace: traefik
+        - name: default-headers
+          namespace: traefik
       services:
         - name: influxdb
           namespace: influxdb
-          port: 8181
+          port: 8086
   tls:
     secretName: local-asztalos-net-tls

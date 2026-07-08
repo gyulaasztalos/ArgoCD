@@ -1,10 +1,11 @@
 ---
-# Grafana datasource for InfluxDB 3 (InfluxQL mode — plain HTTP/1.1, no gRPC needed).
-# Rendered as a labeled Secret so the Grafana datasources sidecar auto-discovers it
-# (requires sidecar.datasources.searchNamespace: ALL in monitoring/values.yaml).
+# Grafana datasource for InfluxDB 2.x (Flux — the native v2 query language; no DBRP/v1
+# compatibility mapping needed). Rendered as a labeled Secret so the Grafana datasources
+# sidecar auto-discovers it (requires sidecar.datasources.searchNamespace: ALL in
+# monitoring/values.yaml).
 #
-# The token is pulled from 1Password (item "influxdb", property "token") — populate it
-# during the one-time bootstrap in README.md BEFORE this will sync cleanly.
+# Reuses the same admin token created at first-boot setup (1Password item "influxdb",
+# property "admin-token") — one token, one source of truth.
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
@@ -23,7 +24,6 @@ spec:
       type: Opaque
       metadata:
         labels:
-          # picked up by the Grafana datasources sidecar
           grafana_datasource: "1"
       data:
         influxdb.yaml: |
@@ -34,17 +34,16 @@ spec:
               type: influxdb
               access: proxy
               # in-cluster service — no ingress/TLS hop needed
-              url: http://influxdb.influxdb.svc.cluster.local:8181
+              url: http://influxdb.influxdb.svc.cluster.local:8086
               jsonData:
-                version: InfluxQL
-                dbName: homeassistant
-                httpMode: POST
-                httpHeaderName1: Authorization
+                version: Flux
+                organization: homelab
+                defaultBucket: homeassistant
               secureJsonData:
-                httpHeaderValue1: "Bearer {{ .credential }}"
+                token: "{{ .credential }}"
               editable: false
   data:
     - secretKey: credential
       remoteRef:
         key: influxdb
-        property: credential
+        property: admin-token

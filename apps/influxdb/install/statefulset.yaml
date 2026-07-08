@@ -28,19 +28,38 @@ spec:
     spec:
       containers:
         - name: influxdb
-          # refluxdb = unlocked InfluxDB 3 Core fork. Pin to a released -unlocked tag;
-          # do not float on :latest (nightly). Renovate will propose bumps.
-          image: "ghcr.io/refluxdb/influxdb3-unlocked:latest"
-          imagePullPolicy: Always
-          command: ["influxdb3", "serve"]
-          args:
-            - "--node-id=influxdb-0"
-            - "--object-store=file"
-            - "--data-dir=/var/lib/influxdb3"
-            - "--http-bind=0.0.0.0:8181"
-            # Auth is ON by default (a token is created via the bootstrap step in README.md).
-            # For a dead-simple, internal-only instance you MAY disable auth instead — see README.
-            # - "--without-auth"
+          # Official InfluxDB 2.x OSS — multi-arch (linux/arm64 for rPi 5), MIT/Apache.
+          # Renovate will propose bumps. Pin the minor; avoid bare ":2" drifting majors.
+          image: "influxdb:2.7"
+          imagePullPolicy: IfNotPresent
+          # On first boot, DOCKER_INFLUXDB_INIT_MODE=setup auto-creates the org, the bucket
+          # (with retention), and the admin user + token. No manual bootstrap needed.
+          # On subsequent boots the entrypoint detects existing data and skips setup.
+          env:
+            - name: DOCKER_INFLUXDB_INIT_MODE
+              value: "setup"
+            - name: DOCKER_INFLUXDB_INIT_ORG
+              value: "homelab"
+            - name: DOCKER_INFLUXDB_INIT_BUCKET
+              value: "homeassistant"
+            # 45-day retention on THIS bucket only (HACCP window + buffer). Format: <n>d/w/h, 0 = infinite.
+            - name: DOCKER_INFLUXDB_INIT_RETENTION
+              value: "45d"
+            - name: DOCKER_INFLUXDB_INIT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: influxdb-init
+                  key: admin-username
+            - name: DOCKER_INFLUXDB_INIT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: influxdb-init
+                  key: admin-password
+            - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: influxdb-init
+                  key: admin-token
           securityContext:
             allowPrivilegeEscalation: false
             privileged: false
@@ -52,12 +71,12 @@ spec:
               cpu: "1"
               memory: 1Gi
           ports:
-            - containerPort: 8181
+            - containerPort: 8086
               name: http
           readinessProbe:
             httpGet:
               path: /health
-              port: 8181
+              port: 8086
             initialDelaySeconds: 10
             periodSeconds: 20
             failureThreshold: 5
@@ -65,21 +84,21 @@ spec:
           livenessProbe:
             httpGet:
               path: /health
-              port: 8181
+              port: 8086
             initialDelaySeconds: 30
             periodSeconds: 30
             failureThreshold: 6
             timeoutSeconds: 10
           volumeMounts:
             - name: influxdb-data
-              mountPath: /var/lib/influxdb3
+              mountPath: /var/lib/influxdb2
       restartPolicy: Always
       securityContext:
         seccompProfile:
           type: RuntimeDefault
-        # fsGroup makes the Longhorn volume group-writable so the container's
-        # non-root user can persist data. Adjust if the image runs as a different uid/gid.
-        fsGroup: 1500
+        # The influxdb user in the official image is uid/gid 1000. fsGroup makes the
+        # Longhorn volumes group-writable so the non-root process can persist data.
+        fsGroup: 1000
   volumeClaimTemplates:
     - metadata:
         name: influxdb-data

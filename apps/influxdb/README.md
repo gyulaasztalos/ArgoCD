@@ -1,56 +1,80 @@
-# InfluxDB (refluxdb — unlocked InfluxDB 3 Core)
+# InfluxDB 2.x OSS
 
-Long-term storage for Home Assistant sensor data (fridge temperatures / HACCP), browsed in Grafana.
+Long-term storage for Home Assistant sensor data (fridge/freezer temperatures / HACCP), browsed in Grafana.
 
-- **Image:** `ghcr.io/refluxdb/refluxdb` — community fork of InfluxDB 3 Core with the artificial
-  limits removed (query window, cardinality, retention, request size). Apache-2.0 / MIT, no license key.
-- Single-node binary, file object store on a Longhorn volume.
-- **Native HTTP API port:** `8181`.
+- **Image:** `influxdb:2.7` — official InfluxDB 2.x OSS. Multi-arch (**linux/arm64** for the rPi 5
+  cluster)
 
 ## Layout
 
 ```
 install/
-  statefulset.yaml   # single-replica StatefulSet, Longhorn RWO data volume at /var/lib/influxdb3
-  service.yaml       # ClusterIP :8181
-  ingressroute.yaml  # https://influxdb.local.asztalos.net via traefik-external
+  influxdb-secret.yaml        # ExternalSecret → admin username/password/token (1Password)
+  statefulset.yaml            # single-replica StatefulSet; single Longhorn data volume (/var/lib/influxdb2)
+  service.yaml                # ClusterIP :8086
+  ingressroute.yaml           # https://influxdb.local.asztalos.net via traefik-external + Authentik SSO
+  grafana-datasource.yaml     # ExternalSecret → Flux datasource (sidecar-discovered)
+  fridge-haccp-dashboard.json # two-section HACCP dashboard (fridges / freezers)
   kustomization.yaml
 ```
 
-## One-time bootstrap: create an admin token
+## First-boot setup (automatic — no manual bootstrap)
 
-InfluxDB 3 Core (v3.2+) starts with **authentication enabled**. On first start there is no token —
-you must create one imperatively (analogous to the paperless-ngx post-install step). ArgoCD does not
-do this for you.
+Unlike v3, InfluxDB 2.x **self-initializes from env vars** on first start
+(`DOCKER_INFLUXDB_INIT_MODE=setup`). The entrypoint creates:
 
-```bash
-# 1. Exec into the running pod
-kubectl exec -it -n influxdb influxdb-0 -- sh
+- org **`homelab`**
+- bucket **`homeassistant`** with **45-day retention** (`DOCKER_INFLUXDB_INIT_RETENTION=45d`)
+- the admin user + admin token from the `influxdb-init` secret
 
-# 2. Create an admin token (prints the token ONCE — copy it immediately)
-influxdb3 create token --admin
+On later restarts the entrypoint detects existing data and skips setup. **No `kubectl exec`
+bootstrap step.**
 
-# 3. Store it in 1Password. If you want HA/Grafana to use scoped tokens later,
-#    create resource tokens with `influxdb3 create token --help`.
-```
+### Prerequisite: populate 1Password
 
-Then create the database HA will write to:
+Create/confirm a 1Password item named **`influxdb`** with these properties (consumed by
+`influxdb-secret.yaml`):
 
-```bash
-influxdb3 create database homeassistant --token <ADMIN_TOKEN>
-```
+| property | value |
+|----------|-------|
+| `username` | admin login (e.g. `admin`) |
+| `password` | strong admin password (≥ 8 chars) |
+| `admin-token` | a strong random token — generate with `openssl rand -hex 32` |
 
-> **Simpler alternative (internal-only, no auth):** uncomment `--without-auth` in
-> `statefulset.yaml`. Anyone who can reach the service can read/write. Acceptable for a
-> LAN-only browse copy; do **not** expose it publicly in that mode.
+If these are missing the `influxdb-init` ExternalSecret stays `SecretSyncedError` and the pod
+won't complete setup.
+
+> ⚠️ **Retention is applied only at bucket creation (first boot).** Changing
+> `DOCKER_INFLUXDB_INIT_RETENTION` later has no effect on an already-created bucket — update it
+> live instead: `influx bucket update --name homeassistant --retention 45d` (via `kubectl exec`),
+> or from the InfluxDB UI.
+
+## Access & authentication (two distinct paths)
+
+InfluxDB 2.x **OSS has no OIDC/OAuth/SSO** — it only knows local username/password + API tokens
+(SSO is a Cloud/Enterprise feature). We get the behaviour you want by splitting the two access
+paths at the network layer rather than inside InfluxDB:
+
+| Path | Who | Endpoint | Auth |
+|------|-----|----------|------|
+| **Browser** | you | `https://influxdb.local.asztalos.net` (Traefik ingress) | **Authentik SSO** (forward-auth middleware) → then InfluxDB's own local login |
+| **API** | HA, Grafana | `http://influxdb.influxdb.svc:8086` (in-cluster Service) | **API token** only |
+
+- The `authentik` forward-auth Middleware is attached to the IngressRoute, exactly like the other
+  protected apps (e.g. nut-exporter). It guards **only** the ingress/browser path.
+- HA and Grafana talk to the **in-cluster Service**, which never passes through Traefik/Authentik,
+  so their token auth is completely independent of SSO. Nothing to configure for them here.
+- **First browser visit = two gates:** Authentik SSO, then InfluxDB's local login form (OSS can't
+  delegate its own login to Authentik). After that an InfluxDB session cookie keeps you in.
+  This is intentional — Authentik ensures only your SSO identities can even reach the UI.
 
 ## Home Assistant wiring
 
 HA is the source of truth (SQLite on the Yellow). This InfluxDB is a **parallel export sink** — a
 disposable browse copy. HA keeps working if the cluster is down.
 
-> **The HACCP retention lives on the HA side, not here.** Set the recorder to keep full-resolution
-> history for longer than your required window (default is only 10 days). In `configuration.yaml`
+> **The HACCP retention record lives on the HA side too.** Set the recorder to keep full-resolution
+> history longer than your required window (default is only 10 days). In `configuration.yaml`
 > on the Yellow:
 >
 > ```yaml
@@ -58,24 +82,28 @@ disposable browse copy. HA keeps working if the cluster is down.
 >   purge_keep_days: 45   # > 1 month HACCP window + buffer; SQLite stays authoritative, cluster-independent
 > ```
 >
-> This InfluxDB copy is disposable — if it's ever lost, the record of truth is still HA's SQLite
-> (backed up to NAS → Backblaze B2).
+> `recorder:` is **not YAML-reloadable** — restart HA Core (not a host reboot) to apply, and note
+> it only affects data **going forward**. This InfluxDB copy is disposable — if it's ever lost, the
+> record of truth is still HA's SQLite (backed up to NAS → Backblaze B2).
 
 `configuration.yaml` on the Yellow:
 
 ```yaml
 influxdb:
-  api_version: 2                       # InfluxDB 3 speaks the v2 write API
+  api_version: 2
   host: influxdb.local.asztalos.net
   port: 443
   ssl: true
-  token: !secret influxdb_token        # the admin (or a write-scoped) token
-  organization: default                # ignored by v3 but the integration requires a value
-  bucket: homeassistant                # = the database created above
+  token: !secret influxdb_token        # the admin-token from 1Password
+  organization: homelab                # = DOCKER_INFLUXDB_INIT_ORG
+  bucket: homeassistant                # = the auto-created bucket
   max_retries: 10                      # buffer across brief cluster blips
   include:
     entities:
-      - sensor.fridge_temperature       # keep the sink lean — only what you want long-term
+      - sensor.0x58e6c5fffe0f58b0_temperature_3   # LG Fridge
+      - sensor.0x58e6c5fffe0f58b0_temperature_4   # Electrolux Fridge
+      - sensor.0x58e6c5fffe0f58b0_temperature_5   # LG Freezer
+      - sensor.0x58e6c5fffe0f58b0_temperature_6   # Electrolux Freezer
 ```
 
 ## Grafana (auto-provisioned)
@@ -86,23 +114,21 @@ Datasource and dashboard are shipped as code — no manual Grafana clicking:
   (`grafana_datasource: "1"`) Secret. The Grafana **datasources sidecar** discovers it.
   - Requires `sidecar.datasources.searchNamespace: ALL` in `apps/monitoring/values.yaml`
     (added alongside this app) so it's found outside the `monitoring` namespace.
-  - Pulls the token from 1Password item **`influxdb`**, property **`token`**. Store the
-    admin token there during the bootstrap step above, or the ExternalSecret stays `SecretSyncedError`.
-  - Uses **InfluxQL** over the in-cluster service (`http://influxdb.influxdb.svc:8181`) — plain
-    HTTP/1.1. (SQL/FlightSQL mode would need gRPC/HTTP2 and buys nothing for a browse copy.)
+  - Reuses the **admin token** from 1Password item **`influxdb`**, property **`admin-token`**.
+  - Uses **Flux** (the native v2 query language) over the in-cluster service
+    (`http://influxdb.influxdb.svc:8086`) — no DBRP/InfluxQL compatibility mapping needed.
 - `install/fridge-haccp-dashboard.json` — a HACCP temperature dashboard with two separate
   sections (Fridges, limit 5 °C / Freezers, limit −18 °C), each with current/min/max/mean tiles +
   step-line history over a 30-day default window and its own threshold line. Discovered via
   `grafana_dashboard: "1"`, lands in the **HomeAssistant** folder.
 
 > **Measurement / entity-id caveats:** the HA InfluxDB integration names measurements after
-> the unit of measurement — a °C sensor lands in a measurement literally called `°C`, tagged
-> with `entity_id` (stored **without** the `sensor.` domain prefix). The dashboard filters on
-> the four Zigbee probes of device `0x58e6c5fffe0f58b0`
-> (`..._temperature_3` … `_6`) via `entity_id =~ /0x58e6c5fffe0f58b0_temperature_[3-6]/`,
-> and every query is `GROUP BY "entity_id"` so each probe is its own series/tile — no averaging
-> across probes (each is a separate HACCP control point). If you add probes or a different unit
-> (or set `override_measurement`), adjust the `FROM` clause and the regexes in the JSON.
+> the unit of measurement — a °C sensor lands in a measurement literally called `°C`, with field
+> `value` and tag `entity_id` (stored **without** the `sensor.` domain prefix). The Flux queries
+> filter `r._measurement == "°C" and r._field == "value"` then match `entity_id`. In Flux each
+> `entity_id` stays a separate series, so each probe is its own tile/line — no averaging across
+> probes (each is a separate HACCP control point). If you add probes or a different unit (or set
+> `override_measurement`), adjust the measurement name and the regexes in the JSON.
 >
 > **Probe map.** The dashboard has two fully separate sections — fridges and freezers are
 > never mixed (different limits, different control points). Each section's queries hard-filter

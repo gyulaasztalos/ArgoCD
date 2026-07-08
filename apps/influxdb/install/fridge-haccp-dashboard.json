@@ -69,9 +69,7 @@
       "targets": [
         {
           "datasource": { "type": "influxdb", "uid": "influxdb" },
-          "query": "SELECT last(\"value\") FROM \"°C\" WHERE (\"entity_id\" =~ /0x58e6c5fffe0f58b0_temperature_[34]/) AND $timeFilter GROUP BY \"entity_id\"",
-          "rawQuery": true,
-          "resultFormat": "time_series",
+          "query": "from(bucket: \"homeassistant\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°C\" and r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id =~ /0x58e6c5fffe0f58b0_temperature_[34]/)\n  |> last()",
           "refId": "A"
         }
       ]
@@ -108,9 +106,7 @@
       "targets": [
         {
           "datasource": { "type": "influxdb", "uid": "influxdb" },
-          "query": "SELECT max(\"value\") FROM \"°C\" WHERE (\"entity_id\" =~ /0x58e6c5fffe0f58b0_temperature_[34]/) AND $timeFilter GROUP BY \"entity_id\"",
-          "rawQuery": true,
-          "resultFormat": "time_series",
+          "query": "from(bucket: \"homeassistant\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°C\" and r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id =~ /0x58e6c5fffe0f58b0_temperature_[34]/)\n  |> max()",
           "refId": "A"
         }
       ]
@@ -138,9 +134,7 @@
       "targets": [
         {
           "datasource": { "type": "influxdb", "uid": "influxdb" },
-          "query": "SELECT min(\"value\") FROM \"°C\" WHERE (\"entity_id\" =~ /0x58e6c5fffe0f58b0_temperature_[34]/) AND $timeFilter GROUP BY \"entity_id\"",
-          "rawQuery": true,
-          "resultFormat": "time_series",
+          "query": "from(bucket: \"homeassistant\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°C\" and r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id =~ /0x58e6c5fffe0f58b0_temperature_[34]/)\n  |> min()",
           "refId": "A"
         }
       ]
@@ -184,9 +178,7 @@
       "targets": [
         {
           "datasource": { "type": "influxdb", "uid": "influxdb" },
-          "query": "SELECT mean(\"value\") FROM \"°C\" WHERE (\"entity_id\" =~ /0x58e6c5fffe0f58b0_temperature_[34]/) AND $timeFilter GROUP BY time($__interval), \"entity_id\" fill(none)",
-          "rawQuery": true,
-          "resultFormat": "time_series",
+          "query": "from(bucket: \"homeassistant\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°C\" and r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id =~ /0x58e6c5fffe0f58b0_temperature_[34]/)\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
           "refId": "A"
         }
       ]
@@ -231,9 +223,7 @@
       "targets": [
         {
           "datasource": { "type": "influxdb", "uid": "influxdb" },
-          "query": "SELECT last(\"value\") FROM \"°C\" WHERE (\"entity_id\" =~ /0x58e6c5fffe0f58b0_temperature_[56]/) AND $timeFilter GROUP BY \"entity_id\"",
-          "rawQuery": true,
-          "resultFormat": "time_series",
+          "query": "from(bucket: \"homeassistant\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°C\" and r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id =~ /0x58e6c5fffe0f58b0_temperature_[56]/)\n  |> last()",
           "refId": "A"
         }
       ]
@@ -270,9 +260,7 @@
       "targets": [
         {
           "datasource": { "type": "influxdb", "uid": "influxdb" },
-          "query": "SELECT max(\"value\") FROM \"°C\" WHERE (\"entity_id\" =~ /0x58e6c5fffe0f58b0_temperature_[56]/) AND $timeFilter GROUP BY \"entity_id\"",
-          "rawQuery": true,
-          "resultFormat": "time_series",
+          "query": "from(bucket: \"homeassistant\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°C\" and r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id =~ /0x58e6c5fffe0f58b0_temperature_[56]/)\n  |> max()",
           "refId": "A"
         }
       ]
@@ -300,9 +288,7 @@
       "targets": [
         {
           "datasource": { "type": "influxdb", "uid": "influxdb" },
-          "query": "SELECT min(\"value\") FROM \"°C\" WHERE (\"entity_id\" =~ /0x58e6c5fffe0f58b0_temperature_[56]/) AND $timeFilter GROUP BY \"entity_id\"",
-          "rawQuery": true,
-          "resultFormat": "time_series",
+          "query": "from(bucket: \"homeassistant\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°C\" and r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id =~ /0x58e6c5fffe0f58b0_temperature_[56]/)\n  |> min()",
           "refId": "A"
         }
       ]
@@ -346,9 +332,7 @@
       "targets": [
         {
           "datasource": { "type": "influxdb", "uid": "influxdb" },
-          "query": "SELECT mean(\"value\") FROM \"°C\" WHERE (\"entity_id\" =~ /0x58e6c5fffe0f58b0_temperature_[56]/) AND $timeFilter GROUP BY time($__interval), \"entity_id\" fill(none)",
-          "rawQuery": true,
-          "resultFormat": "time_series",
+          "query": "from(bucket: \"homeassistant\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°C\" and r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id =~ /0x58e6c5fffe0f58b0_temperature_[56]/)\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
           "refId": "A"
         }
       ]
