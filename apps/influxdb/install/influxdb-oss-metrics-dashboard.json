@@ -21,7 +21,7 @@
   "links": [],
   "panels": [
     {
-      "datasource": "$ds",
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -106,7 +106,7 @@
       "type": "stat"
     },
     {
-      "datasource": "$ds",
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -182,7 +182,7 @@
       "type": "table"
     },
     {
-      "datasource": "$ds",
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -266,7 +266,7 @@
       "type": "stat"
     },
     {
-      "datasource": "$ds",
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -350,7 +350,7 @@
       "type": "stat"
     },
     {
-      "datasource": "$ds",
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -434,7 +434,7 @@
       "type": "stat"
     },
     {
-      "datasource": "$ds",
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -518,7 +518,7 @@
       "type": "stat"
     },
     {
-      "datasource": "$ds",
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -602,7 +602,7 @@
       "type": "stat"
     },
     {
-      "datasource": "$ds",
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -686,7 +686,7 @@
       "type": "stat"
     },
     {
-      "datasource": "$ds",
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -770,7 +770,7 @@
       "type": "stat"
     },
     {
-      "datasource": "$ds",
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -858,7 +858,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$ds",
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -993,7 +993,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$ds",
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -1121,7 +1121,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$ds",
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -1249,7 +1249,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$ds",
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "custom": {},
@@ -1377,7 +1377,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "$ds",
+      "datasource": "InfluxDB",
       "fieldConfig": {
         "defaults": {
           "custom": {},
