@@ -8,6 +8,7 @@ resources:
   - service.yaml
   - ingressroute.yaml
   - grafana-datasource.yaml
+  - servicemonitor.yaml
 
 configMapGenerator:
   - name: influxdb-fridge-haccp-dashboard
