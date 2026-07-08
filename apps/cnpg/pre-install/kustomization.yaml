@@ -8,3 +8,4 @@ resources:
   - authentik-postgres-password.yaml
   - paperless-postgres-password.yaml
   - cnpg-backblaze-secret.yaml
+  - clusterimagecatalog.yaml
