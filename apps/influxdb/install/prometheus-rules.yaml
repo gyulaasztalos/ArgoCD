@@ -63,6 +63,25 @@ spec:
             summary: "InfluxDB rejecting writes with 4XX"
             description: "InfluxDB has returned 4XX on the write path for 15m — likely an invalid/expired API token (HA or Grafana). Writes are being rejected → data gap risk."
 
+        # --- Write heartbeat (HACCP backstop) ----------------------------
+        # Complements the HA-side gap automation (see README). If HA stops writing
+        # entirely — HA down, network partition, expired token — the write request
+        # count flatlines. This catches the whole-fleet gap that HA itself can't
+        # report (a down HA can't send its own alert). NOTE the metric only appears
+        # once at least one write has happened; `absent()` also fires before the
+        # first-ever write, so only enable this AFTER HA has begun writing.
+        - alert: InfluxDBNoWritesReceived
+          expr: |
+            absent(http_api_request_duration_seconds_count{job="influxdb", path=~"/api/v2/write.*"})
+              or
+            sum(increase(http_api_request_duration_seconds_count{job="influxdb", path=~"/api/v2/write.*"}[20m])) == 0
+          for: 20m
+          labels:
+            severity: critical
+          annotations:
+            summary: "InfluxDB has received no writes for 20m"
+            description: "No successful writes to InfluxDB for 20m — Home Assistant is likely down, partitioned, or its token expired. The HACCP browse copy is going stale (source of truth is still HA's SQLite)."
+
         # --- Write path latency ------------------------------------------
         # Note: the `path` label templates write requests as "/api/v2/write" — matched with =~ to be safe.
         - alert: InfluxDBWriteLatencyHigh

@@ -116,6 +116,49 @@ influxdb:
       - sensor.0x58e6c5fffe0f58b0_temperature_6   # Electrolux Freezer
 ```
 
+## HACCP gap detection (missing readings)
+
+Retention answers "how long is data kept"; it says nothing about **holes**. A month of data with a
+silent 2-day gap fails an audit as surely as an over-temperature reading. Because all four probes
+ride one Zigbee device (`0x58e6c5fffe0f58b0`), a single device dropout loses **all** control points
+at once — so gap detection matters more here than the threshold alert.
+
+Gap detection must live on the **HA side**: the temperature data goes to InfluxDB, not Prometheus,
+so a cluster-side Prometheus rule can't see per-probe readings. HA also keeps working if the cluster
+is down. Add to `configuration.yaml` (or an `automations.yaml`) on the Yellow:
+
+```yaml
+# Fires when ANY of the four probes stops updating for 15 min (Zigbee drop, sensor dead, HA issue).
+automation:
+  - alias: "HACCP - fridge/freezer probe stopped reporting"
+    trigger:
+      - platform: state
+        entity_id:
+          - sensor.0x58e6c5fffe0f58b0_temperature_3
+          - sensor.0x58e6c5fffe0f58b0_temperature_4
+          - sensor.0x58e6c5fffe0f58b0_temperature_5
+          - sensor.0x58e6c5fffe0f58b0_temperature_6
+        to: "unavailable"
+        for: { minutes: 15 }
+      # also catch a probe that goes stale without flipping to 'unavailable'
+      - platform: template
+        value_template: >
+          {{ now() - states.sensor.0x58e6c5fffe0f58b0_temperature_3.last_updated > timedelta(minutes=15)
+          or now() - states.sensor.0x58e6c5fffe0f58b0_temperature_4.last_updated > timedelta(minutes=15)
+          or now() - states.sensor.0x58e6c5fffe0f58b0_temperature_5.last_updated > timedelta(minutes=15)
+          or now() - states.sensor.0x58e6c5fffe0f58b0_temperature_6.last_updated > timedelta(minutes=15) }}
+    action:
+      - service: notify.notify   # replace with your notifier
+        data:
+          title: "HACCP ALERT: refrigeration probe not reporting"
+          message: >
+            A fridge/freezer probe has not reported for 15+ minutes — temperature logging has a gap.
+```
+
+> Tune `for:` to your HACCP plan's tolerance. Shorter = noisier, longer = bigger allowable gap.
+> This is separate from the temperature-threshold alerts (also best done as HA automations, since
+> HA holds the live values). The Prometheus rule below is a **complementary** backstop only.
+
 ## Grafana (auto-provisioned)
 
 Datasource and dashboard are shipped as code — no manual Grafana clicking:
@@ -163,6 +206,7 @@ reference):
 | `InfluxDBRestartLoop` | >3 restarts / 18m | crashloop |
 | `InfluxDBHighServerErrorRate` | 5XX rate >5% (via `http_api_request_duration_seconds_count`) | writes/queries failing |
 | `InfluxDBWriteAuthErrors` | any 4XX on `/api/v2/write` 15m | **likely bad/expired HA or Grafana token → dropped writes** |
+| `InfluxDBNoWritesReceived` | no writes for 20m | **HACCP backstop: HA down / partitioned / token expired → whole-fleet gap** (enable after first write) |
 | `InfluxDBWriteLatencyHigh` | p99 `/api/v2/write` >2s | ingestion struggling (I/O on rPi) |
 | `InfluxDBMemoryHigh` | working set >90% of limit | OOM risk on rPi |
 | `InfluxDBDiskFillingUp` | data PVC <15% free | writes will eventually fail |
