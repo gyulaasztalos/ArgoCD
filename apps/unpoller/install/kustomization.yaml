@@ -11,6 +11,10 @@ configMapGenerator:
     namespace: unpoller
     files:
       - unpoller-client-insights.json=unpoller-client-insights.json
+  - name: unpoller-client-dpi-dashboard
+    namespace: unpoller
+    files:
+      - unpoller-client-dpi.json=unpoller-client-dpi.json
   - name: unpoller-usw-insights-dashboard
     namespace: unpoller
     files:
