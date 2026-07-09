@@ -14,6 +14,8 @@ spec:
       labels:
         severity: critical
         team: networking
+        namespace: pihole
+        app: pihole
       annotations:
         description: Pi-hole has been down for 5 minutes. DNS resolution and ad-blocking are unavailable.
         summary: Pi-hole service is down
@@ -26,6 +28,8 @@ spec:
       labels:
         severity: warning
         team: networking
+        namespace: pihole
+        app: pihole
       annotations:
         description: DNS query rate has dropped by more than 50% compared to historical averages.
         summary: Significant drop in DNS query volume
@@ -37,6 +41,8 @@ spec:
       labels:
         severity: critical
         team: networking
+        namespace: pihole
+        app: pihole
       annotations:
         description: Ads blocking rate has fallen below 10%. Check filter lists and gravity updates.
         summary: Low ads blocking rate
@@ -48,6 +54,8 @@ spec:
       labels:
         severity: critical
         team: networking
+        namespace: pihole
+        app: pihole
       annotations:
         description: All configured upstream DNS servers are unreachable.
         summary: Upstream DNS resolution failure
@@ -59,6 +67,8 @@ spec:
       labels:
         severity: critical
         team: storage
+        namespace: pihole
+        app: pihole
       annotations:
         description: Pi-hole storage volume has less than 10% free space.
         summary: Low storage capacity for Pi-hole

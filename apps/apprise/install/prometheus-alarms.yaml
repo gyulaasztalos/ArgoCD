@@ -18,6 +18,8 @@ spec:
           for: 2m
           labels:
             severity: critical
+            namespace: apprise
+            app: apprise
           annotations:
             summary: "Apprise API is down"
             description: "No Apprise API targets are available for scraping."
@@ -27,6 +29,8 @@ spec:
           for: 5m
           labels:
             severity: warning
+            namespace: apprise
+            app: apprise
           annotations:
             summary: "High 5xx error rate on Apprise API"
             description: "More than 5 5xx errors in the last 5 minutes."
@@ -36,6 +40,8 @@ spec:
           for: 10m
           labels:
             severity: warning
+            namespace: apprise
+            app: apprise
           annotations:
             summary: "High latency on Apprise API"
             description: "95th percentile latency is above 1 second."

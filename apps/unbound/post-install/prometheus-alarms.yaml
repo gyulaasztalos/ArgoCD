@@ -15,6 +15,8 @@ spec:
       labels:
         severity: critical
         team: networking
+        namespace: unbound
+        app: unbound
       annotations:
         description: Unbound DNS resolver is down. DNS resolution is unavailable.
         summary: Unbound service is down
@@ -27,6 +29,8 @@ spec:
       labels:
         severity: warning
         team: networking
+        namespace: unbound
+        app: unbound
       annotations:
         description: Unbound has recorded a high number of failed DNS queries in the last 5 minutes.
         summary: High number of failed DNS queries
@@ -38,6 +42,8 @@ spec:
       labels:
         severity: warning
         team: networking
+        namespace: unbound
+        app: unbound
       annotations:
         description: Unbound has recorded a high number of recursion failures in the last 5 minutes.
         summary: High number of recursion failures
@@ -49,6 +55,8 @@ spec:
       labels:
         severity: warning
         team: networking
+        namespace: unbound
+        app: unbound
       annotations:
         description: Unbound is experiencing slow DNS query responses (average > 0.5s per query).
         summary: Slow DNS query responses
@@ -60,6 +68,8 @@ spec:
       labels:
         severity: critical
         team: security
+        namespace: unbound
+        app: unbound
       annotations:
         description: Unbound has detected DNSSEC validation failures.
         summary: DNSSEC validation failures detected
@@ -71,6 +81,8 @@ spec:
       labels:
         severity: warning
         team: networking
+        namespace: unbound
+        app: unbound
       annotations:
         description: Unbound memory usage is high (over 512MB).
         summary: High memory usage
@@ -82,6 +94,8 @@ spec:
       labels:
         severity: critical
         team: storage
+        namespace: unbound
+        app: unbound
       annotations:
         description: Unbound storage volume has less than 10% free space.
         summary: Low storage capacity for Unbound

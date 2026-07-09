@@ -17,6 +17,9 @@ spec:
       for: 10m
       labels:
         severity: critical
+        app: external-secrets
+        # NOTE: no static `namespace` label — annotations use $labels.namespace,
+        # which is the (varying) namespace of the failing ExternalSecret.
 
     - alert: ExternalSecretProviderAPIErrors
       annotations:
@@ -27,6 +30,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        app: external-secrets
 
     - alert: ExternalSecretUnhealthy
       annotations:
@@ -37,6 +41,7 @@ spec:
       for: 15m
       labels:
         severity: warning
+        app: external-secrets
 
     - alert: ExternalSecretSlowReconciliation
       annotations:
@@ -47,6 +52,7 @@ spec:
       for: 5m
       labels:
         severity: warning
+        app: external-secrets
 
     - alert: ClusterSecretStoreUnhealthy
       annotations:
@@ -58,3 +64,4 @@ spec:
       for: 10m
       labels:
         severity: critical
+        app: external-secrets

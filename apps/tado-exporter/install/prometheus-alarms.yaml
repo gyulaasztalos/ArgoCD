@@ -13,6 +13,8 @@ spec:
       for: 5m
       labels:
         severity: critical
+        namespace: tado-exporter
+        app: tado-exporter
       annotations:
         summary: "tado-exporter service is down"
         description: "The tado-exporter service has not been up for the last 5 minutes."
@@ -21,6 +23,8 @@ spec:
       for: 1m
       labels:
         severity: warning
+        namespace: tado-exporter
+        app: tado-exporter
       annotations:
         summary: "tado-exporter pod is restarting frequently"
         description: "The tado-exporter pod has restarted more than 3 times in the last 18 minutes."

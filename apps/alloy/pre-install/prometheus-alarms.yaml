@@ -19,6 +19,8 @@ spec:
           for: 5m
           labels:
             severity: critical
+            namespace: alloy
+            app: alloy
           annotations:
             summary: "Alloy metrics endpoint unreachable"
             description: "Prometheus cannot reach Alloy's /metrics exporter. Alloy may not be running or scraping logs."
@@ -29,6 +31,8 @@ spec:
           for: 2m
           labels:
             severity: critical
+            namespace: alloy
+            app: alloy
           annotations:
             summary: "Alloy log collection encountered errors"
             description: "Alloy self-exported error metrics are nonzero. Check Alloy subsystem logs."

@@ -21,6 +21,8 @@ spec:
       for: 5m
       labels:
         severity: critical
+        namespace: databases
+        app: cnpg
       annotations:
         summary: "PostgreSQL cluster in {{ $labels.namespace }} has no ready instances"
         description: "No postgres-.* pod is Ready in namespace {{ $labels.namespace }} for over 5 minutes."
@@ -33,6 +35,8 @@ spec:
       for: 5m
       labels:
         severity: warning
+        namespace: databases
+        app: cnpg
       annotations:
         summary: "PostgreSQL instance not ready"
         description: "Postgres container in pod {{ $labels.namespace }}/{{ $labels.pod }} is not Ready for over 5 minutes."
@@ -49,6 +53,8 @@ spec:
       for: 0m
       labels:
         severity: warning
+        namespace: databases
+        app: cnpg
       annotations:
         summary: "PostgreSQL pod {{ $labels.namespace }}/{{ $labels.pod }} stuck in non-Running phase"
         description: "Postgres pod {{ $labels.namespace }}/{{ $labels.pod }} has been Pending/Unknown/Failed for at least 15 minutes."
@@ -57,6 +63,8 @@ spec:
       for: 30s
       labels:
         severity: critical
+        namespace: databases
+        app: cnpg
       annotations:
         summary: "PostgreSQL instance {{ $labels.cluster }} is down"
         description: "Instance has been unresponsive for 30 seconds. Cluster: {{ $labels.cluster }}"
@@ -65,6 +73,8 @@ spec:
       for: 15m
       labels:
         severity: warning
+        namespace: databases
+        app: cnpg
       annotations:
         summary: "No successful CNPG backup in 24h"
         description: "No successful backup for cluster {{ $labels.cluster }} in the last 24 hours."
@@ -74,6 +84,8 @@ spec:
       for: 10m
       labels:
         severity: warning
+        namespace: databases
+        app: cnpg
       annotations:
         summary: "CNPG replication lag high"
         description: "Replication lag for cluster {{ $labels.cluster }} is above 300 seconds for more than 10 minutes (instance {{ $labels.instance }})."

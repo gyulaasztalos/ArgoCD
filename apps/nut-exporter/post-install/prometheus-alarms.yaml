@@ -17,6 +17,8 @@ spec:
         for: 60s
         labels:
           severity: high
+          namespace: nut-exporter
+          app: nut-exporter
       - alert: UPSLowBattery
         annotations:
           message: '{{ $labels.ups }} has low battery and is running on backup. Expect shutdown soon'
@@ -24,6 +26,8 @@ spec:
         for: 60s
         labels:
           severity: critical
+          namespace: nut-exporter
+          app: nut-exporter
       - alert: UPSRuntimeShort
         annotations:
           message: '{{ $labels.ups }} has only {{ $value | humanizeDuration}} of battery autonomy'
@@ -31,6 +35,8 @@ spec:
         for: 30s
         labels:
           severity: high
+          namespace: nut-exporter
+          app: nut-exporter
       - alert: UPSMainPowerOutage
         annotations:
           message: '{{ $labels.ups }} has no main power and is running on backup.'
@@ -38,6 +44,8 @@ spec:
         for: 60s
         labels:
           severity: critical
+          namespace: nut-exporter
+          app: nut-exporter
       - alert: UPSIndicatesWarningStatus
         annotations:
           message: '{{ $labels.ups }} is indicating a need for a battery replacement.'
@@ -45,3 +53,5 @@ spec:
         for: 60s
         labels:
           severity: warning
+          namespace: nut-exporter
+          app: nut-exporter

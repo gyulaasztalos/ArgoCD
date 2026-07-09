@@ -13,6 +13,8 @@ spec:
         for: 10m
         labels:
           severity: warning
+          namespace: vcgen-exporter
+          app: vcgen-exporter
         annotations:
           summary: "High temperature on Raspberry Pi {{ $labels.host }}"
           description: "Temperature has exceeded 70°C for more than 10 minutes."
@@ -21,6 +23,8 @@ spec:
         for: 5m
         labels:
           severity: critical
+          namespace: vcgen-exporter
+          app: vcgen-exporter
         annotations:
           summary: "Critical temperature on Raspberry Pi {{ $labels.host }}"
           description: "Temperature has exceeded 80°C for more than 5 minutes, immediate action recommended."

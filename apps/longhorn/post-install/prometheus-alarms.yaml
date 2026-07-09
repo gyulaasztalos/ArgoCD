@@ -20,6 +20,8 @@ spec:
       labels:
         issue: The actual used space of Longhorn volume {{$labels.volume}} on {{$labels.node}} is high.
         severity: warning
+        namespace: longhorn-system
+        app: longhorn
     - alert: LonghornVolumeStatusCritical
       annotations:
         description: Longhorn volume {{$labels.volume}} on {{$labels.node}} is Fault for
@@ -30,6 +32,8 @@ spec:
       labels:
         issue: Longhorn volume {{$labels.volume}} is Fault.
         severity: critical
+        namespace: longhorn-system
+        app: longhorn
     - alert: LonghornVolumeStatusWarning
       annotations:
         description: Longhorn volume {{$labels.volume}} on {{$labels.node}} is Degraded for
@@ -40,6 +44,8 @@ spec:
       labels:
         issue: Longhorn volume {{$labels.volume}} is Degraded.
         severity: warning
+        namespace: longhorn-system
+        app: longhorn
     - alert: LonghornNodeStorageWarning
       annotations:
         description: The used storage of node {{$labels.node}} is at {{$value}}% capacity for
@@ -50,6 +56,8 @@ spec:
       labels:
         issue: The used storage of node {{$labels.node}} is high.
         severity: warning
+        namespace: longhorn-system
+        app: longhorn
     - alert: LonghornDiskStorageWarning
       annotations:
         description: The used storage of disk {{$labels.disk}} on node {{$labels.node}} is at {{$value}}% capacity for
@@ -60,6 +68,8 @@ spec:
       labels:
         issue: The used storage of disk {{$labels.disk}} on node {{$labels.node}} is high.
         severity: warning
+        namespace: longhorn-system
+        app: longhorn
     - alert: LonghornNodeDown
       annotations:
         description: There are {{$value}} Longhorn nodes which have been offline for more than 5 minutes.
@@ -69,6 +79,8 @@ spec:
       labels:
         issue: There are {{$value}} Longhorn nodes are offline
         severity: critical
+        namespace: longhorn-system
+        app: longhorn
     - alert: LonghornInstanceManagerCPUUsageWarning
       annotations:
         description: Longhorn instance manager {{$labels.instance_manager}} on {{$labels.node}} has CPU Usage / CPU request is {{$value}}% for
@@ -79,6 +91,8 @@ spec:
       labels:
         issue: Longhorn instance manager {{$labels.instance_manager}} on {{$labels.node}} consumes 3 times the CPU request.
         severity: warning
+        namespace: longhorn-system
+        app: longhorn
     - alert: LonghornNodeCPUUsageWarning
       annotations:
         description: Longhorn node {{$labels.node}} has CPU Usage / CPU capacity is {{$value}}% for
@@ -89,3 +103,5 @@ spec:
       labels:
         issue: Longhorn node {{$labels.node}} experiences high CPU pressure.
         severity: warning
+        namespace: longhorn-system
+        app: longhorn

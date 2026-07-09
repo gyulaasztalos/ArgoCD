@@ -19,6 +19,8 @@ spec:
           for: 5m
           labels:
             severity: critical
+            namespace: influxdb
+            app: influxdb
           annotations:
             summary: "InfluxDB is down"
             description: "No healthy InfluxDB scrape target for 5m. HACCP browse copy + HA export sink are unavailable."
@@ -28,6 +30,8 @@ spec:
           for: 1m
           labels:
             severity: warning
+            namespace: influxdb
+            app: influxdb
           annotations:
             summary: "InfluxDB pod is restarting frequently"
             description: "The InfluxDB pod restarted more than 3 times in the last 18 minutes."
@@ -46,6 +50,8 @@ spec:
           for: 10m
           labels:
             severity: warning
+            namespace: influxdb
+            app: influxdb
           annotations:
             summary: "InfluxDB 5XX error rate > 5%"
             description: "More than 5% of InfluxDB HTTP requests returned 5XX over the last 5m — writes or queries are failing server-side."
@@ -59,6 +65,8 @@ spec:
           for: 15m
           labels:
             severity: warning
+            namespace: influxdb
+            app: influxdb
           annotations:
             summary: "InfluxDB rejecting writes with 4XX"
             description: "InfluxDB has returned 4XX on the write path for 15m — likely an invalid/expired API token (HA or Grafana). Writes are being rejected → data gap risk."
@@ -78,6 +86,8 @@ spec:
           for: 20m
           labels:
             severity: critical
+            namespace: influxdb
+            app: influxdb
           annotations:
             summary: "InfluxDB has received no writes for 20m"
             description: "No successful writes to InfluxDB for 20m — Home Assistant is likely down, partitioned, or its token expired. The HACCP browse copy is going stale (source of truth is still HA's SQLite)."
@@ -92,6 +102,8 @@ spec:
           for: 10m
           labels:
             severity: warning
+            namespace: influxdb
+            app: influxdb
           annotations:
             summary: "InfluxDB write latency p99 > 2s"
             description: "p99 of the /api/v2/write handler exceeded 2s for 10m — ingestion is struggling (I/O pressure on Longhorn / rPi)."
@@ -106,6 +118,8 @@ spec:
           for: 15m
           labels:
             severity: warning
+            namespace: influxdb
+            app: influxdb
           annotations:
             summary: "InfluxDB near memory limit"
             description: "InfluxDB working set is >90% of its memory limit for 15m — OOM-kill risk on rPi hardware."
@@ -121,6 +135,8 @@ spec:
           for: 10m
           labels:
             severity: warning
+            namespace: influxdb
+            app: influxdb
           annotations:
             summary: "InfluxDB data volume <15% free"
             description: "The InfluxDB Longhorn data PVC has less than 15% space left. Grow the volume before writes start failing."
