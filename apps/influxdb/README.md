@@ -131,10 +131,13 @@ Datasource and dashboard are shipped as code — no manual Grafana clicking:
   sections (Fridges, limit 5 °C / Freezers, limit −18 °C), each with current/min/max/mean tiles +
   step-line history over a 30-day default window and its own threshold line. Discovered via
   `grafana_dashboard: "1"`, lands in the **HomeAssistant** folder.
-- `install/influxdb-oss-metrics-dashboard.json` — **server-health** dashboard (uptime, orgs/users/
-  buckets/tokens/tasks, query load, object-store IO, memory, build info). Based on InfluxData's
-  own preinstalled dashboard (grafana.com **13315**), which queries the **InfluxDB `_monitoring`
-  bucket via Flux** — its `$ds` variable is pinned to the provisioned `influxdb` datasource.
+- `install/influxdb-oss-metrics-dashboard.json` — **server-health** dashboard built **only on the
+  metrics actually present at `/metrics`**, using the **Prometheus** datasource (uid `prometheus`).
+  No `_monitoring` bucket, no Flux. Panels: up / go version / goroutines / heap / threads; HTTP
+  request rate by status & by path, latency p50/p90/p99, 4XX-5XX error ratio (from the
+  `http_api_request_duration_seconds` histogram); Go memory, GC pause & rate, allocation rate; and
+  BoltDB read/write ops. (The popular grafana.com InfluxDB dashboards were discarded — they assume
+  the Flux `_monitoring` path, which this deployment intentionally does not use.)
 
 ## Server monitoring (Prometheus alerts)
 
@@ -145,6 +148,11 @@ Two separate monitoring paths — this is deliberate:
   `/metrics` (never through Traefik/Authentik, so no auth needed) into kube-prometheus-stack.
   `serviceMonitorSelectorNilUsesHelmValues: false` in the stack means it's auto-discovered — no
   special label required.
+  - **Cardinality guard:** InfluxDB templates the `path` label of the request-duration histogram
+    across every UI static asset (× `user_agent`). The ServiceMonitor `metricRelabelings` drop
+    those series at scrape time, keeping only the bounded `/api/v2/*` paths the rules need —
+    important on rPi. There is **no** `http_api_requests_total` counter; the request-duration
+    histogram's `_count` is the source of truth for request rates.
 
 `prometheus-rules.yaml` alerts on the scraped metrics (verified names from the InfluxDB metrics
 reference):
@@ -153,8 +161,8 @@ reference):
 |-------|-----------|-----|
 | `InfluxDBDown` | `up{job="influxdb"}` absent 5m | sink + browse copy unavailable |
 | `InfluxDBRestartLoop` | >3 restarts / 18m | crashloop |
-| `InfluxDBHighServerErrorRate` | 5XX rate >5% of `http_api_requests_total` | writes/queries failing |
-| `InfluxDBHighClientErrorRate` | sustained 4XX 15m | **likely bad/expired HA or Grafana token → dropped writes** |
+| `InfluxDBHighServerErrorRate` | 5XX rate >5% (via `http_api_request_duration_seconds_count`) | writes/queries failing |
+| `InfluxDBWriteAuthErrors` | any 4XX on `/api/v2/write` 15m | **likely bad/expired HA or Grafana token → dropped writes** |
 | `InfluxDBWriteLatencyHigh` | p99 `/api/v2/write` >2s | ingestion struggling (I/O on rPi) |
 | `InfluxDBMemoryHigh` | working set >90% of limit | OOM risk on rPi |
 | `InfluxDBDiskFillingUp` | data PVC <15% free | writes will eventually fail |

@@ -34,12 +34,14 @@ spec:
 
         # --- HTTP error rate ---------------------------------------------
         # http_api_requests_total is labelled with status (2XX/4XX/5XX).
-        # 5XX = server-side failures (writes/queries failing).
+        # 5XX = server-side failures (writes/queries failing). InfluxDB exposes no
+        # separate request counter — we use the _count of the request-duration
+        # histogram, which carries the same status label (2XX/4XX/5XX).
         - alert: InfluxDBHighServerErrorRate
           expr: |
-            sum(rate(http_api_requests_total{job="influxdb", status="5XX"}[5m]))
+            sum(rate(http_api_request_duration_seconds_count{job="influxdb", status="5XX"}[5m]))
               /
-            clamp_min(sum(rate(http_api_requests_total{job="influxdb"}[5m])), 1)
+            clamp_min(sum(rate(http_api_request_duration_seconds_count{job="influxdb"}[5m])), 1)
               > 0.05
           for: 10m
           labels:
@@ -48,23 +50,25 @@ spec:
             summary: "InfluxDB 5XX error rate > 5%"
             description: "More than 5% of InfluxDB HTTP requests returned 5XX over the last 5m — writes or queries are failing server-side."
 
-        # A sustained burst of 4XX often means a bad/expired token from HA or
-        # Grafana (writes silently dropped → data gaps → HACCP risk).
-        - alert: InfluxDBHighClientErrorRate
+        # A sustained burst of 4XX on the write path means a bad/expired token from
+        # HA or Grafana (writes silently dropped → data gaps → HACCP risk). Scoped to
+        # write paths so UI 4XXs (favicon probes etc.) don't trip it.
+        - alert: InfluxDBWriteAuthErrors
           expr: |
-            sum(rate(http_api_requests_total{job="influxdb", status="4XX"}[5m])) > 1
+            sum(rate(http_api_request_duration_seconds_count{job="influxdb", status="4XX", path=~"/api/v2/write.*"}[5m])) > 0
           for: 15m
           labels:
             severity: warning
           annotations:
-            summary: "InfluxDB sustained 4XX rate"
-            description: "InfluxDB is returning 4XX steadily for 15m — likely an invalid/expired API token (HA or Grafana). Writes may be rejected."
+            summary: "InfluxDB rejecting writes with 4XX"
+            description: "InfluxDB has returned 4XX on the write path for 15m — likely an invalid/expired API token (HA or Grafana). Writes are being rejected → data gap risk."
 
         # --- Write path latency ------------------------------------------
+        # Note: the `path` label templates write requests as "/api/v2/write" — matched with =~ to be safe.
         - alert: InfluxDBWriteLatencyHigh
           expr: |
             histogram_quantile(0.99,
-              sum(rate(http_api_request_duration_seconds_bucket{job="influxdb", path=~"/api/v2/write"}[5m])) by (le)
+              sum(rate(http_api_request_duration_seconds_bucket{job="influxdb", path=~"/api/v2/write.*"}[5m])) by (le)
             ) > 2
           for: 10m
           labels:
