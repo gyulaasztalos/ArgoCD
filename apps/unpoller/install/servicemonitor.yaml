@@ -11,7 +11,7 @@ spec:
       app.kubernetes.io/name: unpoller  # or the label used by your exporter service
   endpoints:
     - path: /metrics
-      interval: 30s
+      interval: 60s      # unpoller background-refreshes controller data every 60s (v3.2+); faster scrapes only re-read cached values
       targetPort: http
       honorLabels: true
   namespaceSelector:

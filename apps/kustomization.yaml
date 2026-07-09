@@ -36,4 +36,4 @@ resources:
   - vcgen-exporter/application.yaml
   - solaredge-exporter/application.yaml
   - influxdb/application.yaml
-  # - unpoller/application.yaml
+  - unpoller/application.yaml

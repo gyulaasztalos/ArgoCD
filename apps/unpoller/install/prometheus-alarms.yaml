@@ -7,20 +7,60 @@ spec:
   groups:
   - name: unpoller.rules
     rules:
-    # Critical: unpoller service is down
-    - alert: unpoller-down
-      expr: absent(up{job="unpoller"} == 1)
+    # --- Exporter process health ---------------------------------------
+    # Target has disappeared entirely (ServiceMonitor selected nothing / pod gone)
+    - alert: unpoller-target-missing
+      expr: absent(up{job="unpoller"})
       for: 5m
       labels:
         severity: critical
+        namespace: unpoller
+        app: unpoller
       annotations:
-        summary: "unpoller service is down"
-        description: "The unpoller service has not been up for the last 5 minutes."
+        summary: "unpoller scrape target is missing"
+        description: "Prometheus has no unpoller target (up{job=\"unpoller\"} absent) for 5 minutes — ServiceMonitor or pod issue."
+    # Target exists but /metrics scrape is failing
+    - alert: unpoller-down
+      expr: up{job="unpoller"} == 0
+      for: 5m
+      labels:
+        severity: critical
+        namespace: unpoller
+        app: unpoller
+      annotations:
+        summary: "unpoller exporter is down"
+        description: "The unpoller /metrics endpoint has been unreachable for the last 5 minutes."
     - alert: unpoller-restart-loop
       expr: increase(kube_pod_container_status_restarts_total{namespace="unpoller", pod=~"unpoller-.*"}[18m]) > 3
       for: 1m
       labels:
         severity: warning
+        namespace: unpoller
+        app: unpoller
       annotations:
         summary: "unpoller pod is restarting frequently"
         description: "The unpoller pod has restarted more than 3 times in the last 18 minutes."
+    # --- Controller reachability (data freshness) ----------------------
+    # The exporter can be up while the UniFi controller poll silently fails
+    # (bad creds, expired cert, controller reboot, API 429). These catch that.
+    # NOTE: verify exact metric names against /metrics once running.
+    - alert: unpoller-controller-unreachable
+      expr: unpoller_controller_up == 0
+      for: 10m
+      labels:
+        severity: warning
+        namespace: unpoller
+        app: unpoller
+      annotations:
+        summary: "unpoller cannot poll the UniFi controller"
+        description: "unpoller_controller_up has been 0 for 10 minutes — exporter is running but the last controller poll failed (check creds/cert/controller)."
+    - alert: unpoller-data-stale
+      expr: unpoller_prometheus_cache_age_seconds > 300
+      for: 10m
+      labels:
+        severity: warning
+        namespace: unpoller
+        app: unpoller
+      annotations:
+        summary: "unpoller is serving stale data"
+        description: "Last successful controller refresh was over 5 minutes ago (cache_age > 300s) for 10 minutes — metrics are stale."
