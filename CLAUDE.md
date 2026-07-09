@@ -13,7 +13,10 @@ k3s HA cluster on 4× Raspberry Pi 5, managed entirely via GitOps. Entry point: 
 
 ## Application Manifest Pattern
 
-Each `apps/<name>/application.yaml` is an ArgoCD `Application`. Most use the **multi-source pattern**: one source refs this repo (`ref: config`) for `values.yaml`, another pulls the Helm chart from upstream. Chart version pinned in `targetRevision`, updated by Renovate.
+Each `apps/<name>/application.yaml` is an ArgoCD `Application`. Two patterns:
+
+- **Multi-source (Helm)** — most apps: one source refs this repo (`ref: config`) for `values.yaml`, another pulls the Helm chart from upstream. Chart version pinned in `targetRevision`, updated by Renovate.
+- **Single-source (plain manifests)** — apps *without* an upstream chart: one source, `path: apps/<name>/install` pointing at a kustomize dir of hand-written manifests. Use this instead of forcing a chart. (e.g. `apps/influxdb`.)
 
 ## Adding or Modifying an App
 
@@ -49,6 +52,21 @@ kubectl get secret -n kube-system -l sealedsecrets.bitnami.com/sealed-secrets-ke
 ## Renovate
 
 Auto-updates `targetRevision` and image tags. Minor/patch: auto-merged weekdays 05:00–16:00 + weekends (Europe/Budapest). Major: PR only.
+
+## Conventions
+
+### Grafana provisioning (kube-prometheus-stack sidecars)
+- **Dashboards:** ship a ConfigMap labeled `grafana_dashboard: "1"` with a `grafana_folder` annotation, generated via kustomize `configMapGenerator`. The dashboards sidecar has `searchNamespace: ALL` — discovered in any namespace.
+- **Datasources:** ship a Secret labeled `grafana_datasource: "1"` (an ExternalSecret rendering the datasource YAML works well for token-bearing sources). The **datasource** sidecar's `searchNamespace` is set to `ALL` in `apps/monitoring/values.yaml` so app-owned datasources are found outside the `monitoring` namespace — it is NOT `ALL` by default in the chart.
+
+### Prometheus auto-discovery
+`serviceMonitorSelectorNilUsesHelmValues: false` (+ empty selectors) means **all** `ServiceMonitor` and `PrometheusRule` objects are auto-discovered regardless of labels/namespace — no `release:` label needed. Control metric cardinality with ServiceMonitor `metricRelabelings` (drop noisy high-cardinality label values at scrape time) — rPi is memory-constrained.
+
+### Authentik: SSO for humans, tokens for machines
+Guard the **browser** path by attaching the `traefik/authentik` forward-auth + `traefik/default-headers` middlewares to the IngressRoute. **API** clients (HA, Grafana, exporters) should hit the in-cluster `Service` directly — that bypasses Traefik/Authentik entirely, so authenticate them with API tokens. Apps whose own login can't delegate to OIDC still work: Authentik just gates who reaches the UI.
+
+### Stateful workloads on rPi
+Single-writer databases use a **StatefulSet** (not Deployment) with a Longhorn RWO `volumeClaimTemplate`; set pod `securityContext.fsGroup` to the image's uid/gid so the non-root process can write. Persist only real state dirs — don't PVC a config dir that holds no state (GitOps drift). Auto-setup via env vars (e.g. `DOCKER_INFLUXDB_INIT_*`) beats manual post-install exec steps where the image supports it.
 
 ## Known Constraints
 
