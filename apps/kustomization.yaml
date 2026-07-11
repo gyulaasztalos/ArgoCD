@@ -37,3 +37,4 @@ resources:
   - solaredge-exporter/application.yaml
   - influxdb/application.yaml
   - unpoller/application.yaml
+  - cake-pricing/application.yaml

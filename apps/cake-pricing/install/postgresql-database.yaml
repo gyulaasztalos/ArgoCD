@@ -1,0 +1,19 @@
+---
+# Dedicated database on the shared CNPG cluster. UTF-8 is mandatory for the
+# Hungarian data (PLANNING.md). The `cake-pricing` role is provisioned as a
+# managed role on the cluster (see apps/cnpg/post-install/postgresql-cluster.yaml)
+# using the cake-pricing-postgres-password secret.
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: cake-pricing-db
+  namespace: databases
+spec:
+  name: cake-pricing
+  owner: cake-pricing
+  encoding: UTF8
+  localeCType: C
+  localeCollate: C
+  template: template0
+  cluster:
+    name: postgres

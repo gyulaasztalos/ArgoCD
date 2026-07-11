@@ -64,6 +64,13 @@ spec:
         passwordSecret:
           name: paperless-postgres-password
         login: true
+      - name: cake-pricing
+        connectionLimit: -1
+        ensure: present
+        inherit: true
+        passwordSecret:
+          name: cake-pricing-postgres-password
+        login: true
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       enabled: true

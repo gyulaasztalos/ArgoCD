@@ -1,0 +1,20 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - postgresql-database.yaml
+  - cake-pricing-postgres-secret.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingressroute.yaml
+  - servicemonitor.yaml
+  - prometheus-alarms.yaml
+
+labels:
+  - pairs:
+      app.kubernetes.io/name: cake-pricing
+      app.kubernetes.io/part-of: cake-pricing
+      app.kubernetes.io/instance: cake-pricing
+      app.kubernetes.io/component: cake-pricing
+    includeSelectors: false

@@ -1,0 +1,29 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cake-pricing-alerts
+  namespace: cake-pricing
+spec:
+  groups:
+    - name: cake-pricing.rules
+      rules:
+        - alert: cake-pricing-down
+          expr: absent(up{job="cake-pricing"} == 1)
+          for: 5m
+          labels:
+            severity: critical
+            namespace: cake-pricing
+            app: cake-pricing
+          annotations:
+            summary: "cake-pricing service is down"
+            description: "The cake-pricing service has not been up for the last 5 minutes."
+        - alert: cake-pricing-restart-loop
+          expr: increase(kube_pod_container_status_restarts_total{namespace="cake-pricing", pod=~"cake-pricing-.*"}[18m]) > 3
+          for: 1m
+          labels:
+            severity: warning
+            namespace: cake-pricing
+            app: cake-pricing
+          annotations:
+            summary: "cake-pricing pod is restarting frequently"
+            description: "The cake-pricing pod has restarted more than 3 times in the last 18 minutes."
