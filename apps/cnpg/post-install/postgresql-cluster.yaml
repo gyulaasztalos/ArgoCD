@@ -77,7 +77,6 @@ spec:
           serviceTemplate:
             metadata:
               name: postgres-rw-lb
-              namespace: databases
             spec:
               type: LoadBalancer
               loadBalancerIP: 10.10.50.33
