@@ -71,6 +71,22 @@ spec:
         passwordSecret:
           name: cake-pricing-postgres-password
         login: true
+    services:
+      additional:
+        - selectorType: rw
+          serviceTemplate:
+            metadata:
+              name: postgres-rw-lb
+              namespace: databases
+            spec:
+              type: LoadBalancer
+              loadBalancerIP: 10.10.50.33
+              externalTrafficPolicy: Local
+              ports:
+                - name: postgres
+                  port: 5432
+                  targetPort: 5432
+                  protocol: TCP
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       enabled: true
