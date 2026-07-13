@@ -86,6 +86,7 @@ spec:
                   port: 5432
                   targetPort: 5432
                   protocol: TCP
+          updateStrategy: patch
   plugins:
     - name: barman-cloud.cloudnative-pg.io
       enabled: true
