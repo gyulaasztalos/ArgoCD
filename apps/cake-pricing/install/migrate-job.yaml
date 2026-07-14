@@ -1,0 +1,56 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cake-pricing-migrate
+  namespace: cake-pricing
+  labels:
+    app: cake-pricing
+    app.kubernetes.io/name: cake-pricing
+    app.kubernetes.io/part-of: cake-pricing
+    app.kubernetes.io/instance: cake-pricing
+    app.kubernetes.io/component: cake-pricing-migrate
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app: cake-pricing
+        app.kubernetes.io/name: cake-pricing
+    spec:
+      restartPolicy: Never
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+      containers:
+        - name: migrate
+          # renovate: managed image tag — kept in lockstep with deployment.yaml
+          image: asztalosgyula/cake-pricing:1.0.1
+          command: ["alembic", "upgrade", "head"]
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            privileged: false
+          env:
+            - name: DB_HOST
+              value: postgres-rw.databases.svc.cluster.local
+            - name: DB_NAME
+              value: cake-pricing
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cake-pricing-postgres-secret
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cake-pricing-postgres-secret
+                  key: password
