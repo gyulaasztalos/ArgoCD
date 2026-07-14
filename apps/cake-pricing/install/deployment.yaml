@@ -34,7 +34,7 @@ spec:
       containers:
         - name: cake-pricing
           # renovate: managed image tag — Renovate bumps this on new semver releases
-          image: asztalosgyula/cake-pricing:0.1.1
+          image: asztalosgyula/cake-pricing:1.0.0
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
