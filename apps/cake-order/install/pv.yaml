@@ -1,0 +1,18 @@
+---
+# Gallery photos live on the NAS, not in the (public) repo or the image.
+# The chef manages them by dropping JPGs into the share; the app lists the
+# mounted directories at request time (no redeploy needed).
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cake-order-gallery-pv
+spec:
+  capacity:
+    storage: 1Gi # arbitrary for NFS
+  accessModes:
+    - ReadOnlyMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: cake-order-gallery
+  nfs:
+    server: unvr-pro.local.asztalos.net
+    path: /private/anitatortai

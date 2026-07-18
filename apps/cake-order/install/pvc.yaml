@@ -1,0 +1,19 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cake-order-gallery
+  namespace: cake-order
+  labels:
+    app: cake-order
+    app.kubernetes.io/name: cake-order
+    app.kubernetes.io/part-of: cake-order
+    app.kubernetes.io/instance: cake-order
+    app.kubernetes.io/component: cake-order
+spec:
+  accessModes:
+    - ReadOnlyMany
+  storageClassName: cake-order-gallery
+  resources:
+    requests:
+      storage: 1Gi

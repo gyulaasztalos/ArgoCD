@@ -34,7 +34,7 @@ spec:
       containers:
         - name: cake-pricing
           # renovate: managed image tag — Renovate bumps this on new semver releases
-          image: asztalosgyula/cake-pricing:1.2.2
+          image: asztalosgyula/cake-pricing:1.3.0
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
@@ -68,6 +68,12 @@ spec:
                 secretKeyRef:
                   name: cake-pricing-postgres-secret
                   key: password
+            # Customer-intake API token (§8a) — shared with cake-order.
+            - name: INTAKE_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cake-pricing-intake-secret
+                  key: intake_token
           readinessProbe:
             httpGet:
               path: /readyz

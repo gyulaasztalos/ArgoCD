@@ -39,7 +39,7 @@ spec:
           containers:
             - name: purge
               # renovate: managed image tag — kept in lockstep with deployment.yaml
-              image: asztalosgyula/cake-order:0.2.0
+              image: asztalosgyula/cake-order:0.3.0
               command: ["python", "-m", "app.jobs.purge"]
               securityContext:
                 readOnlyRootFilesystem: true

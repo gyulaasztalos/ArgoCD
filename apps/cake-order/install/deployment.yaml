@@ -34,7 +34,7 @@ spec:
       containers:
         - name: cake-order
           # renovate: managed image tag — Renovate bumps this on new semver releases
-          image: asztalosgyula/cake-order:0.2.0
+          image: asztalosgyula/cake-order:0.3.0
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
@@ -103,6 +103,29 @@ spec:
                 secretKeyRef:
                   name: cake-order-app-secret
                   key: rate_hash_salt
+            # Phase 2: forward confirmed offer requests to cake-pricing as
+            # external draft offers. In-cluster ClusterIP call — no ingress,
+            # no Authentik; the bearer token is still required (§8a).
+            - name: BACKEND_ENABLED
+              value: "true"
+            - name: BACKEND_URL
+              value: http://cake-pricing.cake-pricing.svc.cluster.local
+            - name: BACKEND_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cake-order-app-secret
+                  key: intake_token
+          volumeMounts:
+            # NAS photos overlay the two gallery dirs; the baked-in placeholder
+            # SVGs in gallery/ itself stay visible for empty galleries.
+            - name: gallery
+              mountPath: /app/app/static/img/gallery/cakes
+              subPath: cakes
+              readOnly: true
+            - name: gallery
+              mountPath: /app/app/static/img/gallery/desserts
+              subPath: desserts # create this dir next to cakes/ on the NAS
+              readOnly: true
           readinessProbe:
             httpGet:
               path: /readyz
@@ -121,6 +144,10 @@ spec:
             failureThreshold: 6
             successThreshold: 1
             timeoutSeconds: 5
+      volumes:
+        - name: gallery
+          persistentVolumeClaim:
+            claimName: cake-order-gallery
       restartPolicy: Always
       securityContext:
         seccompProfile:
