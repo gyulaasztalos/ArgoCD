@@ -1,0 +1,131 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cake-order
+  namespace: cake-order
+  labels:
+    app: cake-order
+    app.kubernetes.io/name: cake-order
+    app.kubernetes.io/part-of: cake-order
+    app.kubernetes.io/instance: cake-order
+    app.kubernetes.io/component: cake-order
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cake-order
+  template:
+    metadata:
+      labels:
+        app: cake-order
+        app.kubernetes.io/name: cake-order
+        app.kubernetes.io/part-of: cake-order
+        app.kubernetes.io/instance: cake-order
+        app.kubernetes.io/component: cake-order
+    spec:
+      containers:
+        - name: cake-order
+          # renovate: managed image tag — Renovate bumps this on new semver releases
+          image: asztalosgyula/cake-order:0.2.0
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            privileged: false
+          resources:
+            requests:
+              cpu: 25m
+              memory: 96Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          ports:
+            - containerPort: 8000
+              name: http
+          env:
+            - name: APP_ENV
+              value: prod
+            # Public base URL — verification links are built from this.
+            # Dev phase: order.local.asztalos.net; flips to order.anitatortai.hu at go-live.
+            - name: BASE_URL
+              value: https://order.local.asztalos.net
+            - name: ENABLED_LOCALES
+              value: hu,en
+            # DB connection: assembled from the CNPG-managed role secret.
+            - name: DB_HOST
+              value: postgres-rw.databases.svc.cluster.local
+            - name: DB_NAME
+              value: cake-order
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cake-order-postgres-secret
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cake-order-postgres-secret
+                  key: password
+            # E-mail via iCloud Mail (custom domain anitatortai.hu behind it).
+            # iCloud requires STARTTLS on 587 and an app-specific password.
+            - name: SMTP_HOST
+              value: smtp.mail.me.com
+            - name: SMTP_PORT
+              value: "587"
+            - name: SMTP_SECURITY
+              value: starttls
+            - name: SMTP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cake-order-app-secret
+                  key: smtp_user
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cake-order-app-secret
+                  key: smtp_password
+            # iCloud only lets you send as the account address or a configured
+            # alias of the custom domain — info@ is the safe choice.
+            - name: MAIL_FROM
+              value: info@anitatortai.hu
+            - name: ORDER_INBOX
+              value: info@anitatortai.hu
+            - name: RATE_HASH_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: cake-order-app-secret
+                  key: rate_hash_salt
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            failureThreshold: 5
+            successThreshold: 1
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            failureThreshold: 6
+            successThreshold: 1
+            timeoutSeconds: 5
+      restartPolicy: Always
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true

@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cake-order
+  namespace: cake-order
+  labels:
+    app: cake-order
+    app.kubernetes.io/name: cake-order
+    app.kubernetes.io/part-of: cake-order
+    app.kubernetes.io/instance: cake-order
+    app.kubernetes.io/component: cake-order
+spec:
+  selector:
+    app: cake-order
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: ClusterIP

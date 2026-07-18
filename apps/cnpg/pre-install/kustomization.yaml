@@ -9,4 +9,5 @@ resources:
   - authentik-postgres-password.yaml
   - paperless-postgres-password.yaml
   - cake-pricing-postgres-password.yaml
+  - cake-order-postgres-password.yaml
   - cnpg-backblaze-secret.yaml

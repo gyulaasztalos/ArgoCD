@@ -1,0 +1,56 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: cake-order-migrate
+  namespace: cake-order
+  labels:
+    app: cake-order
+    app.kubernetes.io/name: cake-order
+    app.kubernetes.io/part-of: cake-order
+    app.kubernetes.io/instance: cake-order
+    app.kubernetes.io/component: cake-order-migrate
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app: cake-order
+        app.kubernetes.io/name: cake-order
+    spec:
+      restartPolicy: Never
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+      containers:
+        - name: migrate
+          # renovate: managed image tag — kept in lockstep with deployment.yaml
+          image: asztalosgyula/cake-order:0.2.0
+          command: ["alembic", "upgrade", "head"]
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            privileged: false
+          env:
+            - name: DB_HOST
+              value: postgres-rw.databases.svc.cluster.local
+            - name: DB_NAME
+              value: cake-order
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: cake-order-postgres-secret
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cake-order-postgres-secret
+                  key: password

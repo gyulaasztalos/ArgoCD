@@ -1,0 +1,39 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cake-order-alerts
+  namespace: cake-order
+spec:
+  groups:
+    - name: cake-order.rules
+      rules:
+        - alert: cake-order-down
+          expr: absent(up{job="cake-order"} == 1)
+          for: 5m
+          labels:
+            severity: critical
+            namespace: cake-order
+            app: cake-order
+          annotations:
+            summary: "cake-order service is down"
+            description: "The cake-order service has not been up for the last 5 minutes."
+        - alert: cake-order-restart-loop
+          expr: increase(kube_pod_container_status_restarts_total{namespace="cake-order", pod=~"cake-order-.*"}[18m]) > 3
+          for: 1m
+          labels:
+            severity: warning
+            namespace: cake-order
+            app: cake-order
+          annotations:
+            summary: "cake-order pod is restarting frequently"
+            description: "The cake-order pod has restarted more than 3 times in the last 18 minutes."
+        - alert: cake-order-5xx-burst
+          expr: sum(rate(http_requests_total{namespace="cake-order", status=~"5.."}[5m])) > 0.2
+          for: 5m
+          labels:
+            severity: warning
+            namespace: cake-order
+            app: cake-order
+          annotations:
+            summary: "cake-order is returning 5xx responses"
+            description: "Sustained 5xx rate on the public order app (SMTP or DB trouble?)."

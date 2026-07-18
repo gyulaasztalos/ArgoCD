@@ -1,0 +1,62 @@
+---
+# GDPR retention job (cake-order PLANNING §3.5): purges unverified orders
+# after 48h, completed orders after 30 days, and stale rate-limit events.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cake-order-purge
+  namespace: cake-order
+  labels:
+    app: cake-order
+    app.kubernetes.io/name: cake-order
+    app.kubernetes.io/part-of: cake-order
+    app.kubernetes.io/instance: cake-order
+    app.kubernetes.io/component: cake-order-purge
+spec:
+  schedule: "20 3 * * *"
+  timeZone: Europe/Budapest
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      ttlSecondsAfterFinished: 3600
+      template:
+        metadata:
+          labels:
+            app: cake-order
+            app.kubernetes.io/name: cake-order
+        spec:
+          restartPolicy: Never
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+            fsGroup: 1000
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+          containers:
+            - name: purge
+              # renovate: managed image tag — kept in lockstep with deployment.yaml
+              image: asztalosgyula/cake-order:0.1.0
+              command: ["python", "-m", "app.jobs.purge"]
+              securityContext:
+                readOnlyRootFilesystem: true
+                allowPrivilegeEscalation: false
+                privileged: false
+              env:
+                - name: DB_HOST
+                  value: postgres-rw.databases.svc.cluster.local
+                - name: DB_NAME
+                  value: cake-order
+                - name: DB_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: cake-order-postgres-secret
+                      key: username
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: cake-order-postgres-secret
+                      key: password

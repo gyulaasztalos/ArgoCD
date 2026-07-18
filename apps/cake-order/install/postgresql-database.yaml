@@ -1,0 +1,19 @@
+---
+# Dedicated database on the shared CNPG cluster. UTF-8 is mandatory for the
+# Hungarian data. The `cake-order` role is provisioned as a managed role on the
+# cluster (see apps/cnpg/post-install/postgresql-cluster.yaml) using the
+# cake-order-postgres-password secret.
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: cake-order-db
+  namespace: databases
+spec:
+  name: cake-order
+  owner: cake-order
+  encoding: UTF8
+  localeCType: C
+  localeCollate: C
+  template: template0
+  cluster:
+    name: postgres

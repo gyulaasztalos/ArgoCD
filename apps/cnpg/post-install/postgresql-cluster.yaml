@@ -71,6 +71,13 @@ spec:
         passwordSecret:
           name: cake-pricing-postgres-password
         login: true
+      - name: cake-order
+        connectionLimit: -1
+        ensure: present
+        inherit: true
+        passwordSecret:
+          name: cake-order-postgres-password
+        login: true
     services:
       additional:
         - selectorType: rw
