@@ -80,7 +80,7 @@ spec:
             # Public base URL — verification links are built from this.
             # Dev phase: order.local.asztalos.net; flips to https://anitatortai.hu at go-live.
             - name: BASE_URL
-              value: https://order.local.asztalos.net
+              value: https://anitatortai.hu
             # Public hostnames (apex + www) — /metrics is 404'd for these so the
             # tunnel can't expose Prometheus data. Add the dev host too so the
             # gate behaves the same behind the internal Traefik route.
