@@ -41,7 +41,7 @@ metadata:
     app.kubernetes.io/instance: cake-order
     app.kubernetes.io/component: tunnel
 spec:
-  replicas: 1
+  replicas: 0
   revisionHistoryLimit: 2
   selector:
     matchLabels:
