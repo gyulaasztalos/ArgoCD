@@ -31,10 +31,34 @@ spec:
         app.kubernetes.io/instance: cake-order
         app.kubernetes.io/component: cake-order
     spec:
+      initContainers:
+        # Copy the gallery photos off the NFS mount into a pod-local emptyDir
+        # ONCE at startup, so the app serves them from local SSD and never
+        # touches NFS at request time (a hung NAS can't affect the running app).
+        # New photos on the NAS appear after a pod restart/rollout.
+        - name: copy-gallery
+          # renovate: managed image tag
+          image: busybox:1.37
+          command:
+            - sh
+            - -c
+            - >
+              mkdir -p /local/cakes /local/desserts &&
+              cp -a /nfs/cakes/. /local/cakes/ 2>/dev/null || true;
+              cp -a /nfs/desserts/. /local/desserts/ 2>/dev/null || true
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - name: gallery-nfs
+              mountPath: /nfs
+              readOnly: true
+            - name: gallery-local
+              mountPath: /local
       containers:
         - name: cake-order
           # renovate: managed image tag — Renovate bumps this on new semver releases
-          image: asztalosgyula/cake-order:0.3.0
+          image: asztalosgyula/cake-order:1.0.0
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
@@ -54,9 +78,14 @@ spec:
             - name: APP_ENV
               value: prod
             # Public base URL — verification links are built from this.
-            # Dev phase: order.local.asztalos.net; flips to order.anitatortai.hu at go-live.
+            # Dev phase: order.local.asztalos.net; flips to https://anitatortai.hu at go-live.
             - name: BASE_URL
               value: https://order.local.asztalos.net
+            # Public hostnames (apex + www) — /metrics is 404'd for these so the
+            # tunnel can't expose Prometheus data. Add the dev host too so the
+            # gate behaves the same behind the internal Traefik route.
+            - name: PUBLIC_HOSTS
+              value: anitatortai.hu,www.anitatortai.hu,order.local.asztalos.net
             - name: ENABLED_LOCALES
               value: hu,en
             # DB connection: assembled from the CNPG-managed role secret.
@@ -116,15 +145,16 @@ spec:
                   name: cake-order-app-secret
                   key: intake_token
           volumeMounts:
-            # NAS photos overlay the two gallery dirs; the baked-in placeholder
-            # SVGs in gallery/ itself stay visible for empty galleries.
-            - name: gallery
+            # Local copy of the NAS photos (populated by the initContainer)
+            # overlays the two gallery dirs; the baked-in placeholder SVGs in
+            # gallery/ itself stay visible for empty galleries.
+            - name: gallery-local
               mountPath: /app/app/static/img/gallery/cakes
               subPath: cakes
               readOnly: true
-            - name: gallery
+            - name: gallery-local
               mountPath: /app/app/static/img/gallery/desserts
-              subPath: desserts # create this dir next to cakes/ on the NAS
+              subPath: desserts
               readOnly: true
           readinessProbe:
             httpGet:
@@ -145,9 +175,13 @@ spec:
             successThreshold: 1
             timeoutSeconds: 5
       volumes:
-        - name: gallery
+        # NFS source (read-only) — mounted ONLY in the copy-gallery initContainer.
+        - name: gallery-nfs
           persistentVolumeClaim:
             claimName: cake-order-gallery
+        # Pod-local copy the app actually serves from (node SSD, not memory).
+        - name: gallery-local
+          emptyDir: {}
       restartPolicy: Always
       securityContext:
         seccompProfile:

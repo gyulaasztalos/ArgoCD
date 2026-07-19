@@ -1,0 +1,98 @@
+---
+# Cloudflare Tunnel connector — the ONLY public entry to cake-order.
+# Outbound-only: no inbound ports, no exposed home IP. The tunnel's ingress
+# rule (Cloudflare dashboard, Zero Trust → Networks → Tunnels) maps
+#   order.anitatortai.hu → http://cake-order.cake-order.svc.cluster.local:80
+# Token: 1Password vault `kubernetes`, item `cake-order-app`,
+# field `cloudflare_tunnel_token` (from `cloudflared tunnel create` / dashboard).
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: cake-order-tunnel-secret
+  namespace: cake-order
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: onepassword-connect
+    kind: ClusterSecretStore
+  target:
+    name: cake-order-tunnel-secret
+    creationPolicy: Owner
+    template:
+      engineVersion: v2
+      type: Opaque
+      data:
+        token: "{{ .cloudflare_tunnel_token }}"
+  data:
+    - secretKey: cloudflare_tunnel_token
+      remoteRef:
+        key: cake-order-app
+        property: cloudflare_tunnel_token
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cake-order-cloudflared
+  namespace: cake-order
+  labels:
+    app: cake-order-cloudflared
+    app.kubernetes.io/name: cake-order-cloudflared
+    app.kubernetes.io/part-of: cake-order
+    app.kubernetes.io/instance: cake-order
+    app.kubernetes.io/component: tunnel
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cake-order-cloudflared
+  template:
+    metadata:
+      labels:
+        app: cake-order-cloudflared
+        app.kubernetes.io/name: cake-order-cloudflared
+        app.kubernetes.io/part-of: cake-order
+        app.kubernetes.io/instance: cake-order
+        app.kubernetes.io/component: tunnel
+    spec:
+      containers:
+        - name: cloudflared
+          # renovate: managed image tag
+          image: cloudflare/cloudflared:2026.7.2
+          args:
+            - tunnel
+            - --no-autoupdate
+            - --metrics
+            - 0.0.0.0:2000
+            - run
+          env:
+            - name: TUNNEL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cake-order-tunnel-secret
+                  key: token
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            privileged: false
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: 2000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            failureThreshold: 5
+      restartPolicy: Always
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsUser: 65532
+        runAsGroup: 65532
+        runAsNonRoot: true

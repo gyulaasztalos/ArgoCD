@@ -1,0 +1,117 @@
+---
+# In-cluster "DMZ" for the public app (security review go/no-go condition):
+# every pod in this namespace is default-denied and only the listed flows are
+# open. A compromised cake-order pod cannot reach anything but its own DB,
+# the cake-pricing intake port, DNS, and SMTP.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cake-order-app
+  namespace: cake-order
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: cake-order
+  policyTypes: [Ingress, Egress]
+  ingress:
+    # Public traffic arrives ONLY via the in-namespace cloudflared connector...
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: cake-order-cloudflared
+      ports:
+        - port: 8000
+    # ...plus the internal Traefik route (order.local.asztalos.net, dev/LAN)
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: traefik
+      ports:
+        - port: 8000
+    # Prometheus scrapes /metrics
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 8000
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # own database on the shared CNPG cluster
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: databases
+      ports:
+        - port: 5432
+    # cake-pricing intake API (§8a) — pod port behind the :80 service
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: cake-pricing
+      ports:
+        - port: 8000
+    # iCloud SMTP (STARTTLS)
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 587
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cake-order-cloudflared
+  namespace: cake-order
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: cake-order-cloudflared
+  policyTypes: [Ingress, Egress]
+  ingress:
+    # metrics/readiness probes from Prometheus (kubelet probes are not
+    # subject to NetworkPolicy)
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 2000
+  egress:
+    # DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # Cloudflare edge: QUIC 7844 (primary) with 443 fallback
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 7844
+          protocol: UDP
+        - port: 7844
+          protocol: TCP
+        - port: 443
+          protocol: TCP
+    # the app itself
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: cake-order
+      ports:
+        - port: 8000
