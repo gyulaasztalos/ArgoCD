@@ -1,0 +1,19 @@
+---
+# Dedicated database on the shared CNPG cluster for Umami analytics.
+# The `umami` role is a managed role on the cluster (see
+# apps/cnpg/post-install/postgresql-cluster.yaml) using the
+# umami-postgres-password secret.
+apiVersion: postgresql.cnpg.io/v1
+kind: Database
+metadata:
+  name: umami-db
+  namespace: databases
+spec:
+  name: umami
+  owner: umami
+  encoding: UTF8
+  localeCType: C
+  localeCollate: C
+  template: template0
+  cluster:
+    name: postgres

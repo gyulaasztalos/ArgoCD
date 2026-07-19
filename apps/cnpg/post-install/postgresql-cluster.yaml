@@ -78,6 +78,13 @@ spec:
         passwordSecret:
           name: cake-order-postgres-password
         login: true
+      - name: umami
+        connectionLimit: -1
+        ensure: present
+        inherit: true
+        passwordSecret:
+          name: umami-postgres-password
+        login: true
     services:
       additional:
         - selectorType: rw

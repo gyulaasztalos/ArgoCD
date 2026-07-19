@@ -38,4 +38,5 @@ resources:
   - influxdb/application.yaml
   - unpoller/application.yaml
   - cake-order/application.yaml
+  - umami/application.yaml
   - cake-pricing/application.yaml

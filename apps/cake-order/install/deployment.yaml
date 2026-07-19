@@ -144,6 +144,18 @@ spec:
                 secretKeyRef:
                   name: cake-order-app-secret
                   key: intake_token
+            # Internal cake-pricing UI URL — used only to build the chef's
+            # "open the draft" link in the order e-mail.
+            - name: PRICING_BASE_URL
+              value: https://torta.local.asztalos.net
+            # Cookieless self-hosted analytics (Umami). Tracking activates ONLY
+            # when both are non-empty; ANALYTICS_WEBSITE_ID is generated in the
+            # Umami dashboard after first login, so it starts empty (analytics
+            # off) until the site is created there and this is filled in.
+            - name: ANALYTICS_SRC
+              value: https://stats.anitatortai.hu/script.js
+            - name: ANALYTICS_WEBSITE_ID
+              value: ""
           volumeMounts:
             # Local copy of the NAS photos (populated by the initContainer)
             # overlays the two gallery dirs; the baked-in placeholder SVGs in

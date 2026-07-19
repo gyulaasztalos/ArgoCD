@@ -10,4 +10,5 @@ resources:
   - paperless-postgres-password.yaml
   - cake-pricing-postgres-password.yaml
   - cake-order-postgres-password.yaml
+  - umami-postgres-password.yaml
   - cnpg-backblaze-secret.yaml

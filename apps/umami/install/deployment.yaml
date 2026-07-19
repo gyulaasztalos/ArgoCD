@@ -1,0 +1,92 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: umami
+  namespace: umami
+  labels:
+    app: umami
+    app.kubernetes.io/name: umami
+    app.kubernetes.io/part-of: umami
+    app.kubernetes.io/instance: umami
+    app.kubernetes.io/component: umami
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: umami
+  template:
+    metadata:
+      labels:
+        app: umami
+        app.kubernetes.io/name: umami
+        app.kubernetes.io/part-of: umami
+        app.kubernetes.io/instance: umami
+        app.kubernetes.io/component: umami
+    spec:
+      containers:
+        - name: umami
+          # renovate: managed image tag — Umami v3 unified image (auto-detects
+          # DB from DATABASE_URL). Multi-arch (amd64 + arm64 for rPi5).
+          image: umamisoftware/umami:3.2.0
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            readOnlyRootFilesystem: false # Next.js writes a cache under /app/.next
+            allowPrivilegeEscalation: false
+            privileged: false
+          resources:
+            requests:
+              cpu: 50m
+              memory: 192Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: DATABASE_TYPE
+              value: postgresql
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: umami-postgres-secret
+                  key: database_url
+            - name: APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: umami-app-secret
+                  key: app_secret
+            - name: DISABLE_TELEMETRY
+              value: "1"
+          readinessProbe:
+            httpGet:
+              path: /api/heartbeat
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            failureThreshold: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/heartbeat
+              port: 3000
+            initialDelaySeconds: 40
+            periodSeconds: 30
+            failureThreshold: 6
+            timeoutSeconds: 5
+      restartPolicy: Always
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
