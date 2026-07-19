@@ -66,15 +66,12 @@ spec:
                   key: app_secret
             - name: DISABLE_TELEMETRY
               value: "1"
-            # Authentication is delegated to Authentik on the internal ingress —
-            # DISABLE_LOGIN makes Umami treat every request as the admin (no login
-            # page). SECURITY: because this bypasses Umami's own auth entirely, the
-            # dashboard MUST stay behind Authentik. The public tracking route
-            # (stats.anitatortai.hu, needed so anonymous visitors can load the
-            # tracker) MUST therefore be path-restricted to /script.js + /api/send
-            # only — it must NEVER expose the dashboard or the management API.
-            - name: DISABLE_LOGIN
-              value: "1"
+            # NOTE: we do NOT set DISABLE_LOGIN — in Umami v3 it does not cleanly
+            # auto-authenticate and leaves the dashboard returning "access denied".
+            # Umami keeps its own login (default admin/umami — change it on first
+            # login); Authentik on the internal ingress is an additional outer
+            # gate. Keeping Umami's login also means the public tracking route can
+            # never expose an unauthenticated dashboard.
           readinessProbe:
             httpGet:
               path: /api/heartbeat

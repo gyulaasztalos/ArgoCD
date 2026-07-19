@@ -1,12 +1,12 @@
 ---
 # Internal dashboard access, behind Authentik forward-auth (cluster standard for
-# admin UIs). Umami's own login is disabled (DISABLE_LOGIN, see deployment) so
-# Authentik is the ONLY thing guarding the dashboard on this route — keep it.
+# admin UIs). Umami also keeps its own login (see deployment note), so the
+# dashboard is double-gated here.
 #
 # Public visitor tracking (script.js + /api/send) is exposed separately via the
 # Cloudflare tunnel at stats.anitatortai.hu so anonymous visitors' browsers can
-# reach it. Because login is disabled, that public route MUST be path-restricted
-# to the tracking endpoints only and MUST NOT reach the dashboard/management API.
+# reach it. Restrict that public route to the tracking endpoints as
+# defence-in-depth; Umami's own login still guards the dashboard there.
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
