@@ -38,7 +38,7 @@ spec:
         # New photos on the NAS appear after a pod restart/rollout.
         - name: copy-gallery
           # renovate: managed image tag
-          image: busybox:1.37
+          image: busybox:1.38
           command:
             - sh
             - -c
