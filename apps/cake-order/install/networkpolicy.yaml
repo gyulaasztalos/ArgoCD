@@ -115,3 +115,10 @@ spec:
               app.kubernetes.io/name: cake-order
       ports:
         - port: 8000
+    # Umami analytics (optional, but the app works without it)
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: umami
+      ports:
+        - port: 80

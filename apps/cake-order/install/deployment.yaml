@@ -35,20 +35,45 @@ spec:
         # Copy the gallery photos off the NFS mount into a pod-local emptyDir
         # ONCE at startup, so the app serves them from local SSD and never
         # touches NFS at request time (a hung NAS can't affect the running app).
+        # The SAME step downscales each cakes/desserts photo into a thumbs/
+        # subdir — the grid loads the small thumbnail, the lightbox the full
+        # image. `hero/` (homepage backdrop) is copied as-is, no thumbnail.
         # New photos on the NAS appear after a pod restart/rollout.
-        - name: copy-gallery
-          # renovate: managed image tag
-          image: busybox:1.38
+        - name: prepare-gallery
+          # ImageMagick (multi-arch: amd64 + arm64 for rPi5) — busybox-based, so
+          # it still has sh/cp/find. renovate: managed image tag.
+          image: minidocks/imagemagick:7
           command:
             - sh
             - -c
-            - >
-              mkdir -p /local/cakes /local/desserts &&
-              cp -a /nfs/cakes/. /local/cakes/ 2>/dev/null || true;
-              cp -a /nfs/desserts/. /local/desserts/ 2>/dev/null || true
+            - |
+              set -u
+              for kind in cakes desserts hero; do
+                mkdir -p "/local/$kind"
+                cp -a "/nfs/$kind/." "/local/$kind/" 2>/dev/null || true
+              done
+              for kind in cakes desserts; do
+                mkdir -p "/local/$kind/thumbs"
+                find "/local/$kind" -maxdepth 1 -type f \
+                  \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) \
+                  | while IFS= read -r f; do
+                      convert "$f" -auto-orient -thumbnail '600x600^' -gravity center \
+                        -extent 600x600 -quality 82 "/local/$kind/thumbs/$(basename "$f")" \
+                        2>/dev/null || true
+                    done
+              done
+              true
           securityContext:
-            readOnlyRootFilesystem: true
+            # ImageMagick needs a writable /tmp for its temp files.
+            readOnlyRootFilesystem: false
             allowPrivilegeEscalation: false
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
           volumeMounts:
             - name: gallery-nfs
               mountPath: /nfs
@@ -155,7 +180,7 @@ spec:
             - name: ANALYTICS_SRC
               value: https://stats.anitatortai.hu/script.js
             - name: ANALYTICS_WEBSITE_ID
-              value: ""
+              value: "eee307fe-35fe-481a-be39-a443c416ea6d"
           volumeMounts:
             # Local copy of the NAS photos (populated by the initContainer)
             # overlays the two gallery dirs; the baked-in placeholder SVGs in
@@ -167,6 +192,10 @@ spec:
             - name: gallery-local
               mountPath: /app/app/static/img/gallery/desserts
               subPath: desserts
+              readOnly: true
+            - name: gallery-local
+              mountPath: /app/app/static/img/gallery/hero
+              subPath: hero
               readOnly: true
           readinessProbe:
             httpGet:
