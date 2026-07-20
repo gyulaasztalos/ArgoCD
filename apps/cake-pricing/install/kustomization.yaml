@@ -6,6 +6,7 @@ resources:
   - postgresql-database.yaml
   - cake-pricing-postgres-secret.yaml
   - cake-pricing-intake-secret.yaml
+  - cake-pricing-calendar-secret.yaml
   - migrate-job.yaml
   - deployment.yaml
   - service.yaml

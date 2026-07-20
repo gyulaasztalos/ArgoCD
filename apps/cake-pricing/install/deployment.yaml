@@ -74,6 +74,13 @@ spec:
                 secretKeyRef:
                   name: cake-pricing-intake-secret
                   key: intake_token
+            # Secret path segment for the published .ics calendar feed.
+            # Empty/absent disables the feed (the endpoint 404s).
+            - name: CALENDAR_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cake-pricing-calendar-secret
+                  key: calendar_token
           readinessProbe:
             httpGet:
               path: /readyz
