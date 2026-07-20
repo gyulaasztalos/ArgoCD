@@ -1,0 +1,472 @@
+# SPDX-License-Identifier: Apache-2.0
+# =============================================================================
+# Umami Helm Chart - Default Values
+# =============================================================================
+# Focus: privacy-first web analytics with PostgreSQL backend
+#
+# Full upstream values.yaml of helmforge/umami (chart 2.2.2, Umami 3.2.0) kept
+# as a complete reference. Deviations from upstream defaults for this cluster:
+#
+#   fullnameOverride              -> "umami"  (clean names; the Traefik
+#                                    IngressRoute targets Service "umami":80)
+#   image.repository              -> Docker Hub (3.2.0 is published there;
+#                                    the chart's GHCR default was not usable)
+#   postgresql.enabled            -> false    (we use the shared CNPG cluster)
+#   database.external.*           -> CNPG postgres-rw
+#   externalSecrets.*             -> ESO + 1Password (onepassword-connect)
+#   resources / securityContext   -> rPi-sized, non-root
+#
+# Left at upstream defaults on purpose:
+#   ingress.enabled=false   -> we attach our own Traefik IngressRoute
+#                              (Authentik forward-auth) from pre-install/
+#   pdb.enabled=false       -> replicaCount is 1; a PDB with minAvailable=1
+#                              would block node drains. Matches the other apps.
+#   service.ipFamily*       -> cluster default (dual-stack is not opted into
+#                              anywhere else in this repo either)
+#   backup.enabled=false    -> this is a pg_dump of the Umami DB to S3; the
+#                              CNPG cluster is already backed up by Barman to
+#                              Backblaze B2, so it would be redundant.
+#   networkPolicy.enabled=false -> not used for this app today.
+
+nameOverride: ""
+fullnameOverride: "umami"
+commonLabels: {}
+
+# -- Number of Umami application replicas. Use external PostgreSQL before scaling above one.
+replicaCount: 1
+
+# =============================================================================
+# Image
+# =============================================================================
+
+image:
+  # -- Umami container image
+  repository: docker.io/umamisoftware/umami
+  # -- Image tag
+  tag: "3.2.0"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+# =============================================================================
+# Umami Configuration
+# =============================================================================
+
+umami:
+  # -- Application port
+  port: 3000
+  # -- Secret used for hashing (auto-generated if empty)
+  appSecret: ""
+  # -- Existing secret containing the APP_SECRET key
+  existingSecret: ""
+  # -- Key in the existing secret
+  existingSecretKey: app-secret
+  # -- Disable telemetry
+  disableTelemetry: true
+  # -- Disable upstream update checks
+  disableUpdates: true
+  # -- Disable bot detection. Leave false for normal analytics accuracy.
+  disableBotCheck: false
+  # -- Disable users, teams, and websites settings pages for managed/cloud-style deployments
+  cloudMode: false
+  # -- Force Strict-Transport-Security responses from Umami. Enable only when public access is HTTPS.
+  # Left false: HSTS is owned by the Cloudflare edge, not the origin.
+  forceSSL: false
+  # -- HTTP header used to determine client IP behind reverse proxies
+  clientIpHeader: ""
+  # -- Custom collection endpoint to avoid ad blockers. Defaults to Umami upstream behavior when empty.
+  collectApiEndpoint: ""
+  # -- CORS preflight max age in seconds. Empty uses upstream default.
+  corsMaxAge: ""
+  # -- Space-delimited URLs allowed to frame Umami. Prefer explicit origins.
+  allowedFrameUrls: ""
+  # -- Debug namespaces, for example umami:prisma or umami:middleware
+  debug: ""
+  # -- Custom tracker script name (for ad-blocker bypass)
+  trackerScriptName: ""
+  # -- Extra environment variables for the container
+  # -- @default -- `[]`
+  extraEnv: []
+    # - name: ALLOWED_FRAME_URLS
+    #   value: "https://example.com"
+
+# =============================================================================
+# Database
+# =============================================================================
+
+database:
+  # -- External PostgreSQL configuration (used when postgresql subchart is disabled)
+  external:
+    host: postgres-rw.databases.svc.cluster.local
+    port: "5432"
+    name: umami
+    username: umami
+    password: ""
+    # -- Existing secret containing the database password
+    # Left empty: externalSecrets.database renders the Secret and the chart
+    # wires DATABASE_PASSWORD from it automatically.
+    existingSecret: ""
+    # -- Key in the existing secret containing the password
+    existingSecretPasswordKey: password
+    init:
+      # -- Prepare an external PostgreSQL database before Umami starts. Useful when the app user cannot create extensions.
+      # Not needed: the CNPG Database CRD in pre-install/ creates the database,
+      # and Umami's own migrations handle the schema.
+      enabled: false
+      # -- PostgreSQL client image used by the init container.
+      image: docker.io/library/postgres:18-alpine
+      # -- Administrative database user used only by the init container.
+      adminUsername: postgres
+      # -- Existing secret containing the administrative database password.
+      adminExistingSecret: ""
+      # -- Key in adminExistingSecret containing the administrative database password.
+      adminExistingSecretPasswordKey: postgres-password
+      # -- SQL executed against database.external.name before Umami starts.
+      sql: |
+        CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+# =============================================================================
+# Service Account
+# =============================================================================
+
+serviceAccount:
+  # -- Create a ServiceAccount
+  create: false
+  # -- ServiceAccount name
+  name: ""
+  # -- Annotations for the ServiceAccount
+  annotations: {}
+  # -- Mount Kubernetes API credentials into Umami and backup pods
+  automountServiceAccountToken: false
+
+# =============================================================================
+# Service
+# =============================================================================
+
+service:
+  # -- Service type
+  type: ClusterIP
+  # -- HTTP service port
+  port: 80
+  # -- Annotations for the Service
+  annotations: {}
+  # -- Service IP family policy: SingleStack | PreferDualStack | RequireDualStack. Empty uses cluster default.
+  ipFamilyPolicy: ""
+  # -- Ordered Service IP families: IPv4 | IPv6. Empty uses cluster default.
+  ipFamilies: []
+
+# =============================================================================
+# Ingress
+# =============================================================================
+
+ingress:
+  # -- Enable ingress for Umami
+  # Disabled: we use our own Traefik IngressRoute (Authentik forward-auth),
+  # see pre-install/ingressroute.yaml.
+  enabled: false
+  # -- Ingress class name (for example: traefik, nginx)
+  ingressClassName: traefik
+  annotations: {}
+    # cert-manager.io/cluster-issuer: letsencrypt
+  # -- Ingress hosts
+  hosts: []
+    # - host: analytics.example.com
+    #   paths:
+    #     - path: /
+    #       pathType: Prefix
+  # -- Ingress TLS configuration
+  tls: []
+    # - hosts:
+    #     - analytics.example.com
+    #   secretName: umami-tls
+
+# =============================================================================
+# Gateway API
+# =============================================================================
+
+gatewayAPI:
+  # -- Render Gateway API HTTPRoute resources
+  enabled: false
+  # -- HTTPRoute parentRefs
+  parentRefs: []
+    # - name: public-gateway
+    #   namespace: gateway-system
+  # -- Hostnames routed to Umami
+  hostnames: []
+    # - analytics.example.com
+  # -- Additional HTTPRoute annotations
+  annotations: {}
+  # -- Path matches for the HTTPRoute
+  matches:
+    - path:
+        type: PathPrefix
+        value: /
+  # -- Optional HTTPRoute filters
+  filters: []
+
+# =============================================================================
+# External Secrets
+# =============================================================================
+
+externalSecrets:
+  # -- Enable External Secrets Operator resources (external-secrets.io/v1)
+  enabled: true
+  # -- ExternalSecret API version. Must remain external-secrets.io/v1.
+  apiVersion: external-secrets.io/v1
+  # -- Refresh interval used by rendered ExternalSecrets
+  refreshInterval: 1h
+  secretStoreRef:
+    # -- SecretStore or ClusterSecretStore name
+    name: onepassword-connect
+    # -- SecretStore kind: SecretStore | ClusterSecretStore
+    kind: ClusterSecretStore
+  target:
+    # -- ExternalSecret target creation policy
+    creationPolicy: Owner
+  app:
+    # -- Manage APP_SECRET through External Secrets
+    enabled: true
+    # -- Optional target Secret name. Defaults to the application Secret name.
+    targetName: ""
+    appSecretRemoteRef:
+      key: umami-app
+      property: credential
+  database:
+    # -- Manage external database password through External Secrets. Requires postgresql.enabled=false.
+    enabled: true
+    # -- Optional target Secret name. Defaults to the database Secret name.
+    targetName: ""
+    passwordRemoteRef:
+      key: umami-postgres-password
+      property: password
+  backup:
+    # -- Manage S3 backup credentials through External Secrets
+    enabled: false
+    # -- Optional target Secret name. Defaults to the backup Secret name.
+    targetName: ""
+    accessKeyRemoteRef:
+      key: ""
+      property: ""
+    secretKeyRemoteRef:
+      key: ""
+      property: ""
+
+# =============================================================================
+# Probes
+# =============================================================================
+
+probes:
+  startup:
+    enabled: true
+    path: /api/heartbeat
+    initialDelaySeconds: 30
+    periodSeconds: 5
+    timeoutSeconds: 3
+    failureThreshold: 30
+  liveness:
+    enabled: true
+    path: /api/heartbeat
+    initialDelaySeconds: 0
+    periodSeconds: 15
+    timeoutSeconds: 5
+    failureThreshold: 3
+  readiness:
+    enabled: true
+    path: /api/heartbeat
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+# =============================================================================
+# Resources and Security
+# =============================================================================
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 192Mi
+  limits:
+    cpu: "1"
+    memory: 512Mi
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  privileged: false
+  # Note: readOnlyRootFilesystem is NOT set — Next.js writes a cache under
+  # /app/.next at runtime.
+
+# =============================================================================
+# NetworkPolicy
+# =============================================================================
+
+networkPolicy:
+  # -- Enable NetworkPolicy resources
+  enabled: false
+  ingress:
+    # -- Allow HTTP ingress from pods in the same namespace
+    allowSameNamespace: true
+    # -- Additional NetworkPolicy ingress peers for HTTP traffic, for example Gateway controller namespaces
+    extraFrom: []
+  egress:
+    # -- Enable egress policy rules. Disabled by default to avoid blocking unknown database, OIDC, or backup endpoints.
+    enabled: false
+    # -- Allow DNS egress to kube-system
+    allowDNS: true
+    # -- Allow egress to same-namespace PostgreSQL pods
+    allowSameNamespaceDatabase: true
+    # -- Database port allowed when allowSameNamespaceDatabase=true
+    databasePort: 5432
+    # -- Allow HTTPS egress to public internet for integrations, update checks when enabled, and S3 HTTPS endpoints
+    allowHTTPS: true
+    # -- Allow HTTP egress to public internet for non-TLS S3 endpoints or internal integrations
+    allowHTTP: false
+    # -- Additional NetworkPolicy egress peers
+    extraTo: []
+
+# =============================================================================
+# Disruption Budget
+# =============================================================================
+
+pdb:
+  # -- Create a PodDisruptionBudget. Useful when replicaCount is increased with an external PostgreSQL backend.
+  # Left disabled: replicaCount is 1, so minAvailable=1 would block node drains.
+  enabled: false
+  minAvailable: 1
+  maxUnavailable: ""
+
+# =============================================================================
+# S3 Backup
+# =============================================================================
+# This is a pg_dump of the Umami DATABASE uploaded to S3 (it works against the
+# external CNPG database too, not just the bundled subchart). Disabled here
+# because the CNPG cluster is already backed up by Barman to Backblaze B2.
+
+backup:
+  # -- Enable scheduled PostgreSQL backups to S3-compatible storage
+  enabled: false
+
+  # -- Cron schedule for backups (default: daily at 03:00 UTC)
+  schedule: "0 3 * * *"
+
+  # -- Suspend the CronJob without deleting it
+  suspend: false
+
+  # -- Concurrency policy: Forbid, Replace, Allow
+  concurrencyPolicy: Forbid
+
+  # -- Number of successful job records to keep
+  successfulJobsHistoryLimit: 3
+
+  # -- Number of failed job records to keep
+  failedJobsHistoryLimit: 3
+
+  # -- Maximum retries per backup job
+  backoffLimit: 1
+
+  # -- Prefix for backup archive filenames
+  archivePrefix: umami
+
+  images:
+    # -- Image used for PostgreSQL backup (must have pg_dump)
+    postgresql: docker.io/library/postgres:18-alpine
+    # -- Image used for S3 upload (MinIO client)
+    uploader: docker.io/helmforge/mc:1.0.0
+
+  # -- Resources for backup containers
+  resources: {}
+
+  s3:
+    # -- S3-compatible endpoint URL
+    endpoint: ""
+
+    # -- Target bucket name
+    bucket: ""
+
+    # -- Key prefix within the bucket
+    prefix: umami
+
+    # -- Auto-create the bucket if it does not exist
+    createBucketIfNotExists: true
+
+    # -- Use an existing secret for S3 credentials
+    existingSecret: ""
+
+    # -- Key in the existing secret for the access key
+    existingSecretAccessKeyKey: access-key
+
+    # -- Key in the existing secret for the secret key
+    existingSecretSecretKeyKey: secret-key
+
+    # -- Inline S3 access key (ignored when existingSecret is set)
+    accessKey: ""
+
+    # -- Inline S3 secret key (ignored when existingSecret is set)
+    secretKey: ""
+
+  # -- Override database credentials for backup (uses app credentials if empty)
+  database:
+    host: ""
+    port: ""
+    name: ""
+    username: ""
+    password: ""
+    existingSecret: ""
+    existingSecretPasswordKey: password
+    postgresDumpArgs: ""
+
+# =============================================================================
+# Scheduling
+# =============================================================================
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+topologySpreadConstraints: []
+priorityClassName: ""
+terminationGracePeriodSeconds: 30
+
+podLabels: {}
+podAnnotations: {}
+
+# =============================================================================
+# Extra
+# =============================================================================
+
+extraVolumes: []
+extraVolumeMounts: []
+extraInitContainers: []
+
+# -- Extra manifests to deploy alongside the chart
+extraManifests: []
+
+# =============================================================================
+# Subcharts
+# =============================================================================
+
+postgresql:
+  # -- Deploy PostgreSQL as a subchart
+  # Disabled: we use the shared CloudNativePG cluster (postgres-rw in the
+  # databases namespace). The umami database itself is created by the CNPG
+  # Database CRD in pre-install/.
+  enabled: false
+  architecture: standalone
+  auth:
+    database: umami
+    username: umami
+    # -- PostgreSQL password (auto-generated if empty)
+    password: ""
+  serviceAccount:
+    automountServiceAccountToken: false
+  initdb:
+    scripts:
+      02-extensions.sql: |
+        CREATE EXTENSION IF NOT EXISTS pgcrypto;

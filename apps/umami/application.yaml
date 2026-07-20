@@ -9,9 +9,22 @@ metadata:
 spec:
   project: default
   sources:
+    # Resources the chart does not render: the CNPG Database CRD that creates
+    # the `umami` database, and our Traefik IngressRoute (Authentik forward-auth).
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/umami/install
+      path: apps/umami/pre-install
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      ref: config
+    # Upstream chart (HelmForge). Umami app version comes from the chart's
+    # appVersion; the image is pinned in values.yaml.
+    - repoURL: https://repo.helmforge.dev
+      targetRevision: 2.2.2
+      helm:
+        valueFiles:
+          - $config/apps/umami/values.yaml
+      chart: umami
   destination:
     server: https://kubernetes.default.svc
     namespace: umami

@@ -6,8 +6,12 @@ aggregate counts, stored entirely in our own PostgreSQL. Runs internally behind
 Authentik; the tracking script is exposed publicly through the cake-order
 Cloudflare tunnel.
 
-- **Image**: `umamisoftware/umami:3.2.0` (Docker Hub, multi-arch — amd64 + arm64
-  for the rPi5). The v3 "unified" image auto-detects the DB from `DATABASE_URL`.
+- **Chart**: [HelmForge `umami`](https://helmforge.dev/docs/charts/umami/) `2.2.2`
+  from `https://repo.helmforge.dev` — the third-party chart documented by
+  [upstream Umami](https://docs.umami.is/docs/guides/running-on-helmforge).
+- **Image**: `docker.io/umamisoftware/umami:3.2.0` (multi-arch — amd64 + arm64
+  for the rPi5). Pinned in `values.yaml`; the chart defaults to GHCR, which did
+  not serve this tag.
 - **Namespace**: `umami`
 - **Dashboard**: `https://umami.local.asztalos.net` (internal, Authentik-gated)
 - **Public tracker**: `https://stats.anitatortai.hu` (path-restricted — see §4)
@@ -16,21 +20,36 @@ Cloudflare tunnel.
 
 ## 1. What's in this app
 
+Deployed from the **upstream Helm chart** — we only supply values plus the two
+resources the chart cannot render.
+
 | File | Purpose |
 |------|---------|
-| `application.yaml` | Argo CD `Application` (registered in `apps/kustomization.yaml`) |
-| `install/postgresql-database.yaml` | CNPG `Database` CRD — creates the `umami` DB (UTF-8) |
-| `install/umami-postgres-secret.yaml` | ESO → `DATABASE_URL` composed from the CNPG role creds |
-| `install/umami-app-secret.yaml` | ESO → `APP_SECRET` (signs Umami auth tokens) |
-| `install/deployment.yaml` | The Umami Deployment (non-root, rPi-sized) |
-| `install/service.yaml` | ClusterIP `:80 → :3000` |
-| `install/ingressroute.yaml` | Internal Traefik IngressRoute behind Authentik |
+| `application.yaml` | Argo CD `Application`: multi-source (pre-install path + `ref: config` + chart) |
+| `values.yaml` | **Full upstream values reference** with our overrides marked in the header |
+| `pre-install/postgresql-database.yaml` | CNPG `Database` CRD — creates the `umami` DB (the chart only *consumes* an external DB) |
+| `pre-install/ingressroute.yaml` | Traefik IngressRoute + Authentik forward-auth (chart Ingress is disabled) |
+
+The chart itself renders the **Deployment**, **Service**, and — via its
+`externalSecrets` section — both **ExternalSecrets** (`umami-app`, `umami-db`),
+so we no longer hand-write any of those.
 
 Plus wiring outside this folder:
 
 - `apps/cnpg/post-install/postgresql-cluster.yaml` — a **managed role** `umami`.
 - `apps/cnpg/pre-install/umami-postgres-password.yaml` — ESO that materializes the
   role's `username`/`password` secret in the `databases` namespace.
+
+### Notable values decisions
+
+| Value | Setting | Why |
+|-------|---------|-----|
+| `postgresql.enabled` | `false` | We use the shared CNPG cluster |
+| `ingress.enabled` | `false` | We attach our own IngressRoute (Authentik) |
+| `pdb.enabled` | `false` | `replicaCount: 1` — a PDB with `minAvailable: 1` would block node drains. Matches the other apps in this repo |
+| `service.ipFamily*` | cluster default | Dual-stack isn't opted into anywhere in this repo |
+| `backup.enabled` | `false` | It's a `pg_dump` of the Umami DB to S3; CNPG is already backed up by Barman to Backblaze B2, so it'd be redundant |
+| `database.external.init.enabled` | `false` | Runs as an **initContainer before** Umami's migrations, so it can only do pre-schema work (e.g. `CREATE EXTENSION pgcrypto`) — it cannot seed users/websites. Needs a CNPG superuser secret if ever enabled |
 
 ## 2. Prerequisites — 1Password items
 
