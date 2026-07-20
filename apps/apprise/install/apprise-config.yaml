@@ -22,7 +22,7 @@ spec:
 
           urls:
             - tgram://{{ .telegram_token }}/{{ .telegram_chat_id }}/?overflow=split:
-                - tag: argocd,telegram,kuma,restic_succ,transmission,ddns,unattended-upgrades,nut,keepalived,watchtower,flexget,grafana,babybuddy,paperless,nebula,alertmanager
+                - tag: argocd,telegram,kuma,restic_succ,transmission,ddns,unattended-upgrades,nut,keepalived,watchtower,flexget,grafana,babybuddy,paperless,nebula,alertmanager,influxdb
             - mailtos://{{ .email_user_id }}:{{ .email_password }}@icloud.com?smtp=smtp.mail.me.com&to={{ .email_address }}&from={{ .email_address }}:
                 - tag: email
             - discord://{{ .discord_id }}/{{ .discord_token }}/?overflow=split:

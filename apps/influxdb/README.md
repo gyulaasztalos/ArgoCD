@@ -18,6 +18,8 @@ install/
   influxdb-oss-metrics-dashboard.json# server-health dashboard (Flux, reads _monitoring bucket)
   servicemonitor.yaml                # scrapes /metrics into Prometheus (for the alert rules)
   prometheus-rules.yaml              # PrometheusRule alerts on the scraped /metrics
+  haccp-backup-alert-template.yml    # InfluxDB Task (Flux) — backup HACCP temp/gap alarm
+  haccp-backup-alert-job.yaml        # PostSync hook: `influx apply`s the Task above
   kustomization.yaml
 ```
 
@@ -231,3 +233,39 @@ reference):
 > **This mapping is current-setup-specific and will change** (per your note). When appliances
 > change, update the `entity_id` regexes in each section's queries and the `displayName`
 > field overrides.
+
+## HACCP backup alarm (InfluxDB-native)
+
+The **primary** HACCP alarm is the Home Assistant automation described above ("HACCP gap
+detection") — it's already live and notifies directly. `haccp-backup-alert-template.yml` adds a
+**secondary, independently-implemented** alarm that runs entirely inside InfluxDB itself, so a
+failure on the HA side (automation misfire, HA down, a YAML typo) doesn't leave HACCP silently
+unmonitored by a single point of failure.
+
+It's a native InfluxDB **Task** (Flux, scheduled every 15m) — not the UI Checks/Notification-Rules
+objects, because their built-in HTTP notification endpoint sends a fixed, undocumented JSON
+payload that isn't guaranteed to match what `apprise-api` expects. The Task uses `http.post()`
+directly instead, giving full control over the request body, and POSTs straight to Apprise's REST
+API (`http://apprise.apprise.svc.cluster.local:8000/notify/apprise`, no mailrise hop) with the
+existing `influxdb` tag — routes to Telegram, see `apps/apprise/install/apprise-config.yaml`. No
+new pod, no new image: it reuses the bucket, the running InfluxDB instance, and the already-running
+apprise service.
+
+It re-implements the same two checks as the HA automation:
+
+- **Threshold** — mean temperature over the last 15m per probe, fridges > 5 °C / freezers > −18 °C
+  (same limits as the dashboard — see the probe map above).
+- **Deadman** — via Flux's `monitor.deadman()`, any of the four probes silent for 30m+ (a longer
+  window than HA's 15m, intentionally: this is a backstop, not the fast path).
+
+### Idempotent apply — no manual bootstrap
+
+`influx apply` is normally one-shot (every run **adds** resources — reapplying without tracking
+would create a duplicate Task on every ArgoCD sync). Idempotent reapply requires an InfluxDB
+**stack**, so `haccp-backup-alert-job.yaml`'s entrypoint finds-or-creates one itself on every run:
+it looks up a stack named `haccp-backup-alert` via `influx stacks --stack-name ...` (a server-side
+exact-name filter), creates it with `influx stacks init` if missing, then applies the template
+against that stack ID. No manual step, no ID to copy into git — the stack's existence inside
+InfluxDB itself *is* the durable "already applied" marker, the same way ArgoCD tracks every other
+resource in this repo. From then on, each sync updates the Task in place instead of duplicating
+it.

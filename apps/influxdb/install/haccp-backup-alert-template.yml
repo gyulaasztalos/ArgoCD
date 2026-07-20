@@ -1,0 +1,84 @@
+# InfluxDB template (`influx apply` — see haccp-backup-alert-job.yaml) defining a native
+# InfluxDB Task. This is a SECONDARY/backup HACCP alarm: the primary alarm is the Home
+# Assistant automation (see README.md, "HACCP gap detection"), which already notifies on
+# both over-temperature and probe-silence. This Task re-implements the same two checks
+# independently, inside InfluxDB itself, so a HA-side failure (automation misfire, HA
+# down, YAML typo) doesn't leave HACCP silently unmonitored. It posts straight to Apprise's
+# HTTP API (no mailrise hop) with the existing "influxdb" tag — routes to Telegram, see
+# apps/apprise/install/apprise-config.yaml.
+#
+# Uses a plain Flux Task (not the Checks/Notification-Rules UI objects) because the
+# built-in HTTP Notification Endpoint sends a fixed, undocumented JSON payload that isn't
+# guaranteed to match what apprise-api expects. http.post() gives full control over the
+# request body instead.
+apiVersion: influxdata.com/v2alpha1
+kind: Task
+metadata:
+    name: haccp-backup-alert
+spec:
+    name: HACCP backup alert (fridge/freezer)
+    every: 15m0s
+    status: active
+    query: |-
+        import "http"
+        import "json"
+        import "experimental"
+        import "influxdata/influxdb/monitor"
+
+        apprise = (title, body) =>
+            http.post(
+                url: "http://apprise.apprise.svc.cluster.local:8000/notify/apprise",
+                headers: {"Content-Type": "application/json"},
+                data: json.encode(v: {title: title, body: body, tag: "influxdb", type: "failure"}),
+            )
+
+        fridgeLimitC = 5.0
+        freezerLimitC = -18.0
+        fridgeProbes = ["0x58e6c5fffe0f58b0_temperature_3", "0x58e6c5fffe0f58b0_temperature_4"]
+        freezerProbes = ["0x58e6c5fffe0f58b0_temperature_5", "0x58e6c5fffe0f58b0_temperature_6"]
+        allProbes = fridgeProbes + freezerProbes
+
+        readings =
+            from(bucket: "homeassistant")
+                |> range(start: -15m)
+                |> filter(fn: (r) => r._measurement == "°C" and r._field == "value")
+                |> filter(fn: (r) => contains(value: r.entity_id, set: allProbes))
+                |> group(columns: ["entity_id"])
+
+        // --- Threshold: fridges averaging above limit over the last 15m ---
+        readings
+            |> filter(fn: (r) => contains(value: r.entity_id, set: fridgeProbes))
+            |> mean()
+            |> filter(fn: (r) => r._value > fridgeLimitC)
+            |> map(fn: (r) => ({r with _sent: apprise(
+                title: "HACCP backup: fridge over temperature",
+                body: "Probe " + r.entity_id + " averaged " + string(v: r._value) +
+                    " C over the last 15m (limit " + string(v: fridgeLimitC) +
+                    " C). [InfluxDB-native backup check]",
+            )}))
+
+        // --- Threshold: freezers averaging above limit over the last 15m ---
+        readings
+            |> filter(fn: (r) => contains(value: r.entity_id, set: freezerProbes))
+            |> mean()
+            |> filter(fn: (r) => r._value > freezerLimitC)
+            |> map(fn: (r) => ({r with _sent: apprise(
+                title: "HACCP backup: freezer over temperature",
+                body: "Probe " + r.entity_id + " averaged " + string(v: r._value) +
+                    " C over the last 15m (limit " + string(v: freezerLimitC) +
+                    " C). [InfluxDB-native backup check]",
+            )}))
+
+        // --- Deadman: any probe silent for 30m+ (independent of the HA-side 15m check) ---
+        from(bucket: "homeassistant")
+            |> range(start: -6h)
+            |> filter(fn: (r) => r._measurement == "°C" and r._field == "value")
+            |> filter(fn: (r) => contains(value: r.entity_id, set: allProbes))
+            |> group(columns: ["entity_id"])
+            |> monitor.deadman(t: experimental.subDuration(d: 30m, from: now()))
+            |> filter(fn: (r) => r.dead)
+            |> map(fn: (r) => ({r with _sent: apprise(
+                title: "HACCP backup: probe not reporting",
+                body: "Probe " + r.entity_id + " has not reported for 30+ minutes (last point " +
+                    string(v: r._time) + "). [InfluxDB-native backup check]",
+            )}))

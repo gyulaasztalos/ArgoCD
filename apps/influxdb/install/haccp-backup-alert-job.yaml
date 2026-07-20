@@ -1,0 +1,100 @@
+---
+# Applies haccp-backup-alert-template.yml (an InfluxDB Task) idempotently on every ArgoCD
+# sync, using the influxdb:2.9 image already used by the StatefulSet (no new image, no
+# permanent pod — this Job runs for a few seconds and self-deletes).
+#
+# PostSync (not PreSync): `influx apply` needs the InfluxDB API to already be reachable.
+#
+# Idempotency requires a stable InfluxDB "stack" — without one, `influx apply` has no way
+# to recognize a previously-applied Task and would create a duplicate on every sync. The
+# entrypoint script below finds-or-creates the stack by name itself (`influx stacks
+# --stack-name ... ` is a server-side exact-name filter), so no manual bootstrap step is
+# needed — the stack lives inside InfluxDB, which is exactly the durable state a "did this
+# already run" check needs.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: influxdb-haccp-alert-apply
+  namespace: influxdb
+  labels:
+    app: influxdb
+    app.kubernetes.io/name: influxdb
+    app.kubernetes.io/part-of: influxdb
+    app.kubernetes.io/instance: influxdb
+    app.kubernetes.io/component: haccp-alert-apply
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app: influxdb
+        app.kubernetes.io/name: influxdb
+    spec:
+      restartPolicy: Never
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+      containers:
+        - name: apply-haccp-backup-alert
+          image: "influxdb:2.9"
+          command:
+            - sh
+            - -c
+            - |
+              set -eu
+
+              # Name used to look up (or create) the InfluxDB stack that tracks this
+              # Task, so re-applying on every ArgoCD sync updates it in place instead
+              # of creating a duplicate each time.
+              STACK_NAME="haccp-backup-alert"
+
+              # Look up an existing stack with this exact name (server-side filter).
+              LIST_OUTPUT=$(influx stacks --org "${INFLUX_ORG}" --stack-name "${STACK_NAME}" --hide-headers)
+              STACK_ID=$(printf '%s\n' "${LIST_OUTPUT}" | awk 'NR==1{print $1}')
+
+              # No existing stack found — create one now, first run only.
+              if [ -z "${STACK_ID}" ]
+              then
+                INIT_OUTPUT=$(influx stacks init --org "${INFLUX_ORG}" --stack-name "${STACK_NAME}" --hide-headers)
+                STACK_ID=$(printf '%s\n' "${INIT_OUTPUT}" | awk 'NR==1{print $1}')
+              fi
+
+              # Apply the Task template against the (now guaranteed-to-exist) stack.
+              influx apply --file /templates/haccp-backup-alert-template.yml \
+                --org "${INFLUX_ORG}" --stack-id "${STACK_ID}" --force
+          env:
+            - name: HOME
+              value: /tmp/influx-home
+            - name: INFLUX_HOST
+              value: "http://influxdb.influxdb.svc.cluster.local:8086"
+            - name: INFLUX_ORG
+              value: "homelab"
+            - name: INFLUX_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: influxdb-init
+                  key: admin-token
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            privileged: false
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: haccp-template
+              mountPath: /templates
+            - name: influx-home
+              mountPath: /tmp/influx-home
+      volumes:
+        - name: haccp-template
+          configMap:
+            name: influxdb-haccp-alert-template
+        - name: influx-home
+          emptyDir: {}
