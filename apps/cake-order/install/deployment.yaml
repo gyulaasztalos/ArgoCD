@@ -35,30 +35,76 @@ spec:
         # Copy the gallery photos off the NFS mount into a pod-local emptyDir
         # ONCE at startup, so the app serves them from local SSD and never
         # touches NFS at request time (a hung NAS can't affect the running app).
-        # The SAME step downscales each cakes/desserts photo into a thumbs/
-        # subdir — the grid loads the small thumbnail, the lightbox the full
-        # image. `hero/` (homepage backdrop) is copied as-is, no thumbnail.
+        # It then renames each photo to its CAPTURE DATE (EXIF DateTimeOriginal)
+        # as YYYYMMDDHHMM.<ext>, so a plain filename sort is truly chronological
+        # — the app's "newest first" ordering (and the hero pick) no longer rely
+        # on the camera's IMG_#### counter.
+        # Finally it downscales each cakes/desserts photo into a thumbs/ subdir
+        # — the grid loads the small thumbnail, the lightbox the full image.
+        # `hero/` (homepage backdrop) is renamed too but needs no thumbnail.
+        # Renaming happens BEFORE thumbnailing so thumbs/<name> matches its full
+        # image. Only the pod-local copy is renamed; NAS originals are untouched.
         # New photos on the NAS appear after a pod restart/rollout.
         - name: prepare-gallery
           # ImageMagick (multi-arch: amd64 + arm64 for rPi5) — busybox-based, so
-          # it still has sh/cp/find. renovate: managed image tag.
+          # it still has sh/cp/find, and `identify` reads the EXIF date.
+          # renovate: managed image tag.
           image: minidocks/imagemagick:7
           command:
             - sh
             - -c
             - |
               set -u
-              for kind in cakes desserts hero; do
-                mkdir -p "/local/$kind"
-                cp -a "/nfs/$kind/." "/local/$kind/" 2>/dev/null || true
+              for KIND in cakes desserts hero
+              do
+                mkdir -p "/local/${KIND}"
+                cp -a "/nfs/${KIND}/." "/local/${KIND}/" 2>/dev/null || true
               done
-              for kind in cakes desserts; do
-                mkdir -p "/local/$kind/thumbs"
-                find "/local/$kind" -maxdepth 1 -type f \
+              # Rename to the capture date. Fallback chain: EXIF DateTimeOriginal
+              # -> EXIF DateTime -> file mtime -> keep the original name (never
+              # drop a photo). Same-minute shots get a -2/-3 suffix so a
+              # collision can never silently overwrite another photo.
+              for KIND in cakes desserts hero
+              do
+                find "/local/${KIND}" -maxdepth 1 -type f \
                   \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) \
-                  | while IFS= read -r f; do
-                      convert "$f" -auto-orient -thumbnail '600x600^' -gravity center \
-                        -extent 600x600 -quality 82 "/local/$kind/thumbs/$(basename "$f")" \
+                  | while IFS= read -r FILE
+                    do
+                      # get the extension in lowercase, so .JPG and .jpg are treated the same
+                      EXT=$(printf '%s' "${FILE##*.}" | tr 'A-Z' 'a-z')
+                      # get the capture date from EXIF
+                      CAPTURE_DATE=$(identify -format '%[EXIF:DateTimeOriginal]' "${FILE}" 2>/dev/null)
+                      [ -n "$CAPTURE_DATE" ] || CAPTURE_DATE=$(identify -format '%[EXIF:DateTime]' "${FILE}" 2>/dev/null)
+                      # create a 12-digit timestamp from the capture date
+                      STAMP=$(printf '%s' "$CAPTURE_DATE" | tr -cd '0-9' | cut -c1-12)
+                      # If timestamp is not 12 digits, fallback to file mtime.
+                      [ ${#STAMP} -eq 12 ] || STAMP=$(date -r "${FILE}" +%Y%m%d%H%M 2>/dev/null)
+                      # If timestamp is still not 12 digits, skip renaming this file.
+                      [ ${#STAMP} -eq 12 ] || continue
+                      TARGET="/local/${KIND}/${STAMP}.${EXT}"
+                      # If a file with the same timestamp already exists, append a suffix to avoid overwriting.
+                      n=2
+                      while [ -e "${TARGET}" ] && [ "${TARGET}" != "${FILE}" ]
+                      do
+                        TARGET="/local/${KIND}/${STAMP}-$n.${EXT}"
+                        n=$((n + 1))
+                      done
+                      # when the first available suffix is found, rename the file to the target name (if it's not already the same)
+                      if [ "${TARGET}" != "${FILE}" ]
+                      then
+                        mv "${FILE}" "${TARGET}"
+                      fi
+                    done
+              done
+              for KIND in cakes desserts
+              do
+                mkdir -p "/local/${KIND}/thumbs"
+                find "/local/${KIND}" -maxdepth 1 -type f \
+                  \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \) \
+                  | while IFS= read -r FILE
+                    do
+                      convert "${FILE}" -auto-orient -thumbnail '600x600^' -gravity center \
+                        -extent 600x600 -quality 82 "/local/${KIND}/thumbs/$(basename "${FILE}")" \
                         2>/dev/null || true
                     done
               done
