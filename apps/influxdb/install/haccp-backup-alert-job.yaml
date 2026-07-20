@@ -67,8 +67,10 @@ spec:
               fi
 
               # Apply the Task template against the (now guaranteed-to-exist) stack.
+              # NOTE: this CLI build takes --force as a valued flag ("yes"), not a bare
+              # boolean switch like newer influx-cli docs describe.
               influx apply --file /templates/haccp-backup-alert-template.yml \
-                --org "${INFLUX_ORG}" --stack-id "${STACK_ID}" --force
+                --org "${INFLUX_ORG}" --stack-id "${STACK_ID}" --force yes
           env:
             - name: HOME
               value: /tmp/influx-home
