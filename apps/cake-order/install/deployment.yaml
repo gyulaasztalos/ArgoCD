@@ -226,7 +226,7 @@ spec:
             # off) until the site is created there and this is filled in.
             - name: ANALYTICS_SRC
             #  value: https://stats.anitatortai.hu/script.js
-              value: http://umami.umami.svc.cluster.local/script.js
+              value: https://umami.local.asztalos.net/script.js
             - name: ANALYTICS_WEBSITE_ID
               value: "eee307fe-35fe-481a-be39-a443c416ea6d"
           volumeMounts:

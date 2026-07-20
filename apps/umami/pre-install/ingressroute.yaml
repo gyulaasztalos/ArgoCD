@@ -24,6 +24,16 @@ spec:
     - websecure
   routes:
     - kind: Rule
+      match: Host(`umami.local.asztalos.net`) && (PathPrefix(`/script.js`) || PathPrefix(`/api/send`))
+      priority: 20
+      middlewares:
+        - name: default-headers
+          namespace: traefik
+      services:
+        - name: umami
+          namespace: umami
+          port: 80
+    - kind: Rule
       match: Host(`umami.local.asztalos.net`)
       priority: 10
       middlewares:
