@@ -129,7 +129,7 @@ spec:
       containers:
         - name: cake-order
           # renovate: managed image tag — Renovate bumps this on new semver releases
-          image: asztalosgyula/cake-order:1.1.2
+          image: asztalosgyula/cake-order:1.3.1
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
