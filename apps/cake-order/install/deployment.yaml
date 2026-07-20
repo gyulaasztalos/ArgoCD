@@ -83,7 +83,7 @@ spec:
       containers:
         - name: cake-order
           # renovate: managed image tag — Renovate bumps this on new semver releases
-          image: asztalosgyula/cake-order:1.1.0
+          image: asztalosgyula/cake-order:1.1.1
           imagePullPolicy: IfNotPresent
           securityContext:
             readOnlyRootFilesystem: true
@@ -105,7 +105,8 @@ spec:
             # Public base URL — verification links are built from this.
             # Dev phase: order.local.asztalos.net; flips to https://anitatortai.hu at go-live.
             - name: BASE_URL
-              value: https://anitatortai.hu
+            #  value: https://anitatortai.hu
+              value: https://order.local.asztalos.net
             # Public hostnames (apex + www) — /metrics is 404'd for these so the
             # tunnel can't expose Prometheus data. Add the dev host too so the
             # gate behaves the same behind the internal Traefik route.
@@ -178,7 +179,8 @@ spec:
             # Umami dashboard after first login, so it starts empty (analytics
             # off) until the site is created there and this is filled in.
             - name: ANALYTICS_SRC
-              value: https://stats.anitatortai.hu/script.js
+            #  value: https://stats.anitatortai.hu/script.js
+              value: http://umami.umami.svc.cluster.local/script.js
             - name: ANALYTICS_WEBSITE_ID
               value: "eee307fe-35fe-481a-be39-a443c416ea6d"
           volumeMounts:

@@ -33,7 +33,7 @@ spec:
       containers:
         - name: migrate
           # renovate: managed image tag — kept in lockstep with deployment.yaml
-          image: asztalosgyula/cake-order:1.1.0
+          image: asztalosgyula/cake-order:1.1.1
           command: ["alembic", "upgrade", "head"]
           securityContext:
             readOnlyRootFilesystem: true
