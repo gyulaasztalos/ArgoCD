@@ -62,6 +62,7 @@ spec:
                     " C over the last 15m (limit " + string(v: fridgeLimitC) +
                     " C). [InfluxDB-native backup check]",
             )}))
+            |> yield(name: "fridgeThresholdCheck")
 
         // --- Threshold: freezers averaging above limit over the last 15m ---
         readings
@@ -74,6 +75,7 @@ spec:
                     " C over the last 15m (limit " + string(v: freezerLimitC) +
                     " C). [InfluxDB-native backup check]",
             )}))
+            |> yield(name: "freezerThresholdCheck")
 
         // --- Deadman: any probe silent for 30m+ (independent of the HA-side 15m check) ---
         from(bucket: "homeassistant")
@@ -88,3 +90,4 @@ spec:
                 body: "Probe " + r.entity_id + " has not reported for 30+ minutes (last point " +
                     string(v: r._time) + "). [InfluxDB-native backup check]",
             )}))
+            |> yield(name: "deadmanCheck")
