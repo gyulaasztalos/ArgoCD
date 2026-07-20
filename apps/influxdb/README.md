@@ -243,13 +243,22 @@ failure on the HA side (automation misfire, HA down, a YAML typo) doesn't leave 
 unmonitored by a single point of failure.
 
 It's a native InfluxDB **Task** (Flux, scheduled every 15m) — not the UI Checks/Notification-Rules
-objects, because their built-in HTTP notification endpoint sends a fixed, undocumented JSON
-payload that isn't guaranteed to match what `apprise-api` expects. The Task uses `http.post()`
-directly instead, giving full control over the request body, and POSTs straight to Apprise's REST
-API (`http://apprise.apprise.svc.cluster.local:8000/notify/apprise`, no mailrise hop) with the
-existing `influxdb` tag — routes to Telegram, see `apps/apprise/install/apprise-config.yaml`. No
-new pod, no new image: it reuses the bucket, the running InfluxDB instance, and the already-running
-apprise service.
+objects. The Task uses `http.post()` directly, giving full control over the request body, and
+POSTs straight to Apprise's REST API (`http://apprise.apprise.svc.cluster.local:8000/notify/apprise`,
+no mailrise hop) with the existing `influxdb` tag — routes to Telegram, see
+`apps/apprise/install/apprise-config.yaml`. No new pod, no new image: it reuses the bucket, the
+running InfluxDB instance, and the already-running apprise service.
+
+> **Why not the Checks/Notification-Rules/Notification-Endpoints UI feature?** That's the
+> InfluxDB-intended mechanism for exactly this kind of alarm, and it was tried first. Its HTTP
+> Notification Endpoint only lets you configure a URL and an auth method — the outbound JSON body
+> is generated internally and isn't documented or customizable. Tested directly against Apprise
+> (2026-07-20): `apprise-api` rejected every notification with `Payload lacks minimum requirements
+> using KEY: apprise` (HTTP 400) — its `/notify/<key>` endpoint requires a `body` field, and
+> whatever InfluxDB sends doesn't include one. A raw Flux Task sidesteps this entirely by
+> constructing the exact JSON `apprise-api` expects. **Worth revisiting** if a future InfluxDB 2.x
+> release adds a customizable/templatable body for the HTTP notification endpoint — at that point
+> the native Checks/Notification-Rules feature would be the simpler choice over hand-written Flux.
 
 It re-implements the same two checks as the HA automation:
 
