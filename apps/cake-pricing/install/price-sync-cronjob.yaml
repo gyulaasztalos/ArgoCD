@@ -1,0 +1,95 @@
+---
+# Daily automatic price update (§ automatic price update). Downloads the
+# árfigyelő XLSX, updates component base prices that changed, e-mails a report,
+# and records last-success for the /metrics staleness gauge. Any failure fails
+# the Job → AlertManager (see the PriceSyncJobFailed rule in prometheus-alarms).
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cake-pricing-price-sync
+  namespace: cake-pricing
+  labels:
+    app: cake-pricing
+    app.kubernetes.io/name: cake-pricing
+    app.kubernetes.io/part-of: cake-pricing
+    app.kubernetes.io/instance: cake-pricing
+    app.kubernetes.io/component: cake-pricing-price-sync
+spec:
+  # 08:00 Europe/Budapest year-round (k8s applies the tz; no UTC/DST maths).
+  schedule: "0 8 * * *"
+  timeZone: "Europe/Budapest"
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1  # one retry for a transient blip, then fail (→ alert)
+      ttlSecondsAfterFinished: 86400
+      template:
+        metadata:
+          labels:
+            app: cake-pricing
+            app.kubernetes.io/name: cake-pricing
+        spec:
+          restartPolicy: Never
+          securityContext:
+            seccompProfile:
+              type: RuntimeDefault
+            fsGroup: 1000
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+          containers:
+            - name: price-sync
+              # renovate: managed image tag — kept in lockstep with deployment.yaml
+              image: asztalosgyula/cake-pricing:1.7.0
+              command: ["python", "-m", "app.jobs.price_sync"]
+              securityContext:
+                readOnlyRootFilesystem: true  # reads to memory; no temp files
+                allowPrivilegeEscalation: false
+                privileged: false
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 192Mi
+                limits:
+                  cpu: "1"
+                  memory: 512Mi
+              env:
+                - name: DB_HOST
+                  value: postgres-rw.databases.svc.cluster.local
+                - name: DB_NAME
+                  value: cake-pricing
+                - name: DB_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: cake-pricing-postgres-secret
+                      key: username
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: cake-pricing-postgres-secret
+                      key: password
+                # E-mail (iCloud, same account as cake-order).
+                - name: SMTP_HOST
+                  value: smtp.mail.me.com
+                - name: SMTP_PORT
+                  value: "587"
+                - name: SMTP_SECURITY
+                  value: starttls
+                - name: SMTP_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: cake-pricing-smtp-secret
+                      key: smtp_user
+                - name: SMTP_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: cake-pricing-smtp-secret
+                      key: smtp_password
+                - name: MAIL_FROM
+                  value: info@anitatortai.hu
+                - name: ORDER_INBOX
+                  value: info@anitatortai.hu
+                # PRICE_SYNC_URL defaults to the árfigyelő file in app config.

@@ -7,7 +7,9 @@ resources:
   - cake-pricing-postgres-secret.yaml
   - cake-pricing-intake-secret.yaml
   - cake-pricing-calendar-secret.yaml
+  - cake-pricing-smtp-secret.yaml
   - migrate-job.yaml
+  - price-sync-cronjob.yaml
   - deployment.yaml
   - service.yaml
   - ingressroute.yaml

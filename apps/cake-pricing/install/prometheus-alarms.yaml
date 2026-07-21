@@ -27,3 +27,26 @@ spec:
           annotations:
             summary: "cake-pricing pod is restarting frequently"
             description: "The cake-pricing pod has restarted more than 3 times in the last 18 minutes."
+        # Daily price-sync CronJob failed (download / parse / DB / e-mail).
+        - alert: cake-pricing-price-sync-failed
+          expr: kube_job_status_failed{namespace="cake-pricing", job_name=~"cake-pricing-price-sync-.*"} > 0
+          for: 1m
+          labels:
+            severity: warning
+            namespace: cake-pricing
+            app: cake-pricing
+          annotations:
+            summary: "cake-pricing price-sync job failed"
+            description: "The daily price-sync CronJob failed. Check its pod logs; component prices were not updated."
+        # No successful price-sync run in over 25 hours (the daily job at 08:00
+        # should refresh this well within a day). Catches a job that never runs.
+        - alert: cake-pricing-price-sync-stale
+          expr: time() - cake_pricing_price_sync_last_success_timestamp_seconds > 90000
+          for: 30m
+          labels:
+            severity: warning
+            namespace: cake-pricing
+            app: cake-pricing
+          annotations:
+            summary: "cake-pricing price-sync is stale"
+            description: "No successful price-sync run in over 25 hours (last success > 25h ago)."
