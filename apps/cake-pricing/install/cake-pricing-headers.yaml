@@ -1,0 +1,25 @@
+---
+# Per-app security headers — a copy of the shared `default-headers` middleware
+# with ONE change: referrerPolicy `no-referrer` → `same-origin`. The forms'
+# "return to the previous page" (return_to) reads the Referer, which the shared
+# default-headers strips. `same-origin` sends the full path on SAME-ORIGIN
+# navigations (so return_to works) but nothing cross-origin — so no path leaks
+# off this internal, customer-data host. Precedent: apps/argocd/argocd-headers.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: cake-pricing-headers
+  namespace: traefik
+spec:
+  headers:
+    browserXssFilter: true
+    contentTypeNosniff: true
+    forceSTSHeader: true
+    stsIncludeSubdomains: true
+    stsPreload: true
+    stsSeconds: 15552000
+    referrerPolicy: same-origin
+    contentSecurityPolicy: "default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' https: data:; connect-src 'self' https:; frame-src 'self' https:; media-src 'self' https:; object-src 'none'; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"
+    customFrameOptionsValue: SAMEORIGIN
+    customRequestHeaders:
+      X-Forwarded-Proto: https

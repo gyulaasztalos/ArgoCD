@@ -26,7 +26,7 @@ spec:
       match: Host(`torta.local.asztalos.net`) && PathPrefix(`/calendar/`)
       priority: 20
       middlewares:
-        - name: default-headers
+        - name: cake-pricing-headers
           namespace: traefik
       services:
         - name: cake-pricing
@@ -39,7 +39,7 @@ spec:
         # Authentication is handled entirely at the ingress (no in-app auth).
         - name: authentik
           namespace: traefik
-        - name: default-headers
+        - name: cake-pricing-headers
           namespace: traefik
       services:
         - name: cake-pricing

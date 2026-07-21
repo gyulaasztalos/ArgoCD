@@ -12,6 +12,7 @@ resources:
   - price-sync-cronjob.yaml
   - deployment.yaml
   - service.yaml
+  - cake-pricing-headers.yaml
   - ingressroute.yaml
   - servicemonitor.yaml
   - prometheus-alarms.yaml
