@@ -50,3 +50,18 @@ spec:
           annotations:
             summary: "cake-pricing price-sync is stale"
             description: "No successful price-sync run in over 25 hours (last success > 25h ago)."
+        # Safety net for the staleness gauge itself. The app emits NO sample when
+        # it can't read the DB (a 0 would false-page the stale rule above), so a
+        # long absence must be caught separately — otherwise "app up but DB
+        # unreadable" (or a deleted state row) would silently disable staleness
+        # detection. absent_over_time(1h) + for:30m ignores a brief scrape blip.
+        - alert: cake-pricing-price-sync-metric-missing
+          expr: absent_over_time(cake_pricing_price_sync_last_success_timestamp_seconds[1h])
+          for: 30m
+          labels:
+            severity: warning
+            namespace: cake-pricing
+            app: cake-pricing
+          annotations:
+            summary: "cake-pricing price-sync freshness metric is missing"
+            description: "The price-sync last-success metric has been absent for over an hour — the app can't read the DB at scrape time, or the price_sync_state row is gone. Staleness can't be evaluated until it returns."

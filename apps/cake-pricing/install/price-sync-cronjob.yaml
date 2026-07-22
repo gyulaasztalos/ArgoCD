@@ -43,7 +43,7 @@ spec:
           containers:
             - name: price-sync
               # renovate: managed image tag — kept in lockstep with deployment.yaml
-              image: asztalosgyula/cake-pricing:1.8.0
+              image: asztalosgyula/cake-pricing:1.8.1
               command: ["python", "-m", "app.jobs.price_sync"]
               securityContext:
                 readOnlyRootFilesystem: true  # reads to memory; no temp files
