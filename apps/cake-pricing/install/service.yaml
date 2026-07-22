@@ -11,8 +11,14 @@ metadata:
     app.kubernetes.io/instance: cake-pricing
     app.kubernetes.io/component: cake-pricing
 spec:
+  # Select ONLY the web Deployment pods, not the batch pods (migrate / price-sync
+  # Jobs also carry app=cake-pricing + app.kubernetes.io/name=cake-pricing). Those
+  # pods have NO `component` label, so keying on the web component keeps them out
+  # of this Service's endpoints — otherwise the ServiceMonitor scrapes a running
+  # Job pod's :8000/metrics (nothing listens there → target "down", 50% of two).
   selector:
-    app: cake-pricing
+    app.kubernetes.io/name: cake-pricing
+    app.kubernetes.io/component: cake-pricing
   ports:
     - name: http
       protocol: TCP
