@@ -9,9 +9,18 @@ metadata:
 spec:
   project: default
   sources:
+    # 1) this repo — provides the tailored valueFile (referenced as $config below)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/ddns-updater/install
+      ref: config
+    # 2) the homelab-charts monorepo — the ddns-updater wrapper chart + `common`
+    #    library dependency (resolved from the same checkout via file://../common)
+    - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
+      targetRevision: main
+      path: charts/ddns-updater
+      helm:
+        valueFiles:
+          - $config/apps/ddns-updater/values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: ddns-updater

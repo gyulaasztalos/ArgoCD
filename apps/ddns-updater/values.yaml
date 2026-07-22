@@ -1,0 +1,247 @@
+# =============================================================================
+# ddns-updater — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/ddns-updater chart.
+#
+# This file is the COMPLETE, reviewable contract for the live deployment: it
+# carries the domain-specific values (real hostnames, notification target,
+# secret refs) AND all the unchanged defaults, so the whole configuration is
+# visible in one place in the GitOps repo. The chart's own values.yaml holds
+# only generic example.com placeholders.
+# =============================================================================
+
+# App identity. `name` drives all resource names, labels and the namespace.
+name: ddns-updater
+namespace: ddns-updater
+
+# -----------------------------------------------------------------------------
+# Container image. `image.tag` is the SINGLE source of truth for the app version.
+# Renovate bumps the tag below.
+# -----------------------------------------------------------------------------
+image:
+  repository: qmcgaw/ddns-updater
+  # renovate: datasource=docker depName=qmcgaw/ddns-updater
+  tag: v2.10.0
+  pullPolicy: IfNotPresent
+
+# -----------------------------------------------------------------------------
+# Controller. StatefulSet — owns a writable RWO PVC and runs a single replica.
+# -----------------------------------------------------------------------------
+controller:
+  type: statefulset
+  replicas: 1
+  revisionHistoryLimit: 2
+  updateStrategy:
+    type: RollingUpdate
+
+# Per-replica RWO volume → data-ddns-updater-0. Regenerable state.
+volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: longhorn
+      resources:
+        requests:
+          storage: 1Mi
+
+# -----------------------------------------------------------------------------
+# Pod / container security — homelab standard, fully non-root.
+# -----------------------------------------------------------------------------
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  privileged: false
+
+podAntiAffinity: true
+
+# -----------------------------------------------------------------------------
+# Ports.
+# -----------------------------------------------------------------------------
+ports:
+  - name: webui
+    containerPort: 8000
+    protocol: TCP
+  - name: health
+    containerPort: 9999
+    protocol: TCP
+
+# -----------------------------------------------------------------------------
+# Configuration — non-secret env via generated ConfigMap.
+# -----------------------------------------------------------------------------
+envFromConfigMap: ddns-updater-env
+envFromSecrets: []
+env: []
+
+configMaps:
+  - name: ddns-updater-env
+    data:
+      TZ: "Europe/Budapest"
+      PERIOD: "5m"
+      UPDATE_COOLDOWN_PERIOD: "5m"
+      PUBLICIP_FETCHERS: "all"
+      PUBLICIP_HTTP_PROVIDERS: "all"
+      PUBLICIPV4_HTTP_PROVIDERS: "all"
+      PUBLICIPV6_HTTP_PROVIDERS: "all"
+      PUBLICIP_DNS_PROVIDERS: "all"
+      PUBLICIP_DNS_TIMEOUT: "3s"
+      HTTP_TIMEOUT: "10s"
+      LISTENING_PORT: "8000"
+      ROOT_URL: "/"
+      BACKUP_PERIOD: "0" # 0 to disable
+      BACKUP_DIRECTORY: "/updater/data"
+      CONFIG_FILEPATH: "/updater/config/config.json"
+      LOG_LEVEL: "info"
+      LOG_CALLER: "hidden"
+      HEALTH_SERVER_ADDRESS: "0.0.0.0:9999"
+      SHOUTRRR_ADDRESSES: "generic://apprise.apprise.svc.cluster.local:8000/notify/apprise?template=json&messagekey=body&disabletls=yes&tag=ddns&type=info&title=DDNS"
+
+# -----------------------------------------------------------------------------
+# Secrets — ExternalSecret (onepassword-connect ClusterSecretStore). Renders the
+# real config.json for the asztalos.net zone. NO secret material stored here.
+# The {{ .cloudflare_* }} braces are the ExternalSecret's OWN (ESO) templating,
+# resolved at runtime; written raw because valueFiles are not Helm-processed.
+# -----------------------------------------------------------------------------
+externalSecrets:
+  - name: ddns-updater-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          config.json: |
+            {
+              "settings": [
+                {
+                  "provider": "cloudflare",
+                  "zone_identifier": "{{ .cloudflare_zone_id }}",
+                  "domain": "@.asztalos.net",
+                  "ttl": 600,
+                  "token": "{{ .cloudflare_token }}",
+                  "ip_version": "ipv4"
+                },
+                {
+                  "provider": "cloudflare",
+                  "zone_identifier": "{{ .cloudflare_zone_id }}",
+                  "domain": "@.asztalos.net",
+                  "ttl": 600,
+                  "token": "{{ .cloudflare_token }}",
+                  "ip_version": "ipv6",
+                  "ipv6_suffix": ""
+                }
+              ]
+            }
+    data:
+      - secretKey: cloudflare_zone_id
+        remoteRef:
+          key: cloudflare-token-secret
+          property: cloudflare-zone-id
+      - secretKey: cloudflare_token
+        remoteRef:
+          key: cloudflare-token-secret
+          property: cloudflare-token
+
+# -----------------------------------------------------------------------------
+# Resources.
+# -----------------------------------------------------------------------------
+resources:
+  requests:
+    memory: "32Mi"
+    cpu: "50m"
+  limits:
+    memory: "64Mi"
+    cpu: "100m"
+
+# -----------------------------------------------------------------------------
+# Probes — health server on :9999.
+# -----------------------------------------------------------------------------
+readinessProbe:
+  httpGet:
+    path: /
+    port: 9999
+    scheme: HTTP
+  initialDelaySeconds: 60
+  periodSeconds: 60
+  timeoutSeconds: 10
+  successThreshold: 1
+  failureThreshold: 5
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: 9999
+    scheme: HTTP
+  initialDelaySeconds: 60
+  periodSeconds: 60
+  timeoutSeconds: 10
+  successThreshold: 1
+  failureThreshold: 5
+
+# -----------------------------------------------------------------------------
+# Volumes / mounts.
+# -----------------------------------------------------------------------------
+volumeMounts:
+  - name: ddns-updater-secret
+    mountPath: /updater/config/config.json
+    subPath: config.json
+  - name: data
+    mountPath: /updater/data
+
+volumes:
+  - name: ddns-updater-secret
+    secret:
+      secretName: ddns-updater-secret
+
+initContainers: []
+
+# -----------------------------------------------------------------------------
+# Service (ClusterIP).
+# -----------------------------------------------------------------------------
+service:
+  enabled: true
+  type: ClusterIP
+  ports:
+    - name: webui
+      protocol: TCP
+      port: 8000
+      targetPort: 8000
+
+# -----------------------------------------------------------------------------
+# Traefik IngressRoute — real homelab hostname + TLS secret.
+# -----------------------------------------------------------------------------
+ingress:
+  enabled: true
+  ingressClassName: traefik-external
+  entryPoint: websecure
+  host: ddns-updater.local.asztalos.net
+  port: 8000
+  priority: 10
+  middlewares:
+    - name: authentik
+      namespace: traefik
+    - name: default-headers
+      namespace: traefik
+  tlsSecretName: local-asztalos-net-tls
+
+# -----------------------------------------------------------------------------
+# ServiceMonitor — disabled to match current state (see homelab-charts backlog:
+# believed to be a bug; revisit and enable once the metrics endpoint is confirmed).
+# -----------------------------------------------------------------------------
+serviceMonitor:
+  enabled: false
+  labels: {}
+  endpoints: []
+
+persistentVolumeClaims: []
+persistentVolumes: []
+
+extraLabels: {}
