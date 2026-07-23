@@ -291,9 +291,13 @@ initContainers: []
 # It is reached from outside the cluster through an IngressRouteTCP that lives in
 # apps/apprise/post-install/ — NOT in this chart (edge case; see README).
 #
-# The image is pinned to :latest upstream, which is why the Deployment carries a
-# latest-tag kube-linter waiver. Renovate cannot track a floating tag, so this
-# one image is deliberately NOT under Renovate control.
+# mailrise has no pinned release tag on Docker Hub, so it MUST use :latest. Two
+# consequences follow from that floating tag:
+#   - the Deployment carries a latest-tag kube-linter waiver, and Renovate cannot
+#     track it, so this one image is deliberately NOT under Renovate control;
+#   - imagePullPolicy MUST be `Always`. With `IfNotPresent` the node keeps serving
+#     whatever `:latest` it first cached and never picks up a new release — the
+#     pull policy is the ONLY thing that makes a floating tag actually float.
 # -----------------------------------------------------------------------------
 extraContainers:
   - name: mailrise
