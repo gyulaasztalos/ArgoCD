@@ -55,6 +55,13 @@ Auto-updates `targetRevision` and image tags. Minor/patch: auto-merged weekdays 
 
 ## Conventions
 
+### ExternalSecret `secretKey` names use underscores
+`spec.data[].secretKey` is referenced from `spec.target.template` as a **Go template field** (`{{ .my_token }}`), so it may only contain letters, digits, and underscores — `my-token` fails to render with `bad character U+002D '-'`. The manifest is valid YAML and ArgoCD syncs it happily; the Secret just never populates, and the resource status shows only `could not update secret` / `SecretSyncedError`. Get the real error from events:
+```bash
+kubectl get events -n <ns> --field-selector involvedObject.name=<externalsecret-name>
+```
+(`{{ index . "my-token" }}` works around a hyphen, but keep to underscores for consistency.)
+
 ### Grafana provisioning (kube-prometheus-stack sidecars)
 - **Dashboards:** ship a ConfigMap labeled `grafana_dashboard: "1"` with a `grafana_folder` annotation, generated via kustomize `configMapGenerator`. The dashboards sidecar has `searchNamespace: ALL` — discovered in any namespace.
 - **Datasources:** ship a Secret labeled `grafana_datasource: "1"` (an ExternalSecret rendering the datasource YAML works well for token-bearing sources). The **datasource** sidecar's `searchNamespace` is set to `ALL` in `apps/monitoring/values.yaml` so app-owned datasources are found outside the `monitoring` namespace — it is NOT `ALL` by default in the chart.
