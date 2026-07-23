@@ -1,0 +1,266 @@
+# =============================================================================
+# netatmo-exporter — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/netatmo-exporter chart.
+#
+# This file is the COMPLETE, reviewable contract for the live deployment: real
+# hostnames + secret refs AND all unchanged defaults, so the whole configuration
+# is visible in one place. The chart's own values.yaml holds only generic
+# example.com placeholders.
+#
+# NOTE: the Grafana dashboard that used to live in install/ has been relocated
+# to apps/netatmo-exporter/post-install/ (synced as a separate ArgoCD source);
+# it is NOT part of this chart. See homelab-charts/PLAN.md "Scope boundary".
+# =============================================================================
+
+name: netatmo-exporter
+namespace: netatmo-exporter
+
+# -----------------------------------------------------------------------------
+# Container image. image.tag is the single source of truth for the app version.
+# -----------------------------------------------------------------------------
+image:
+  repository: ghcr.io/xperimental/netatmo-exporter
+  # renovate: datasource=docker depName=ghcr.io/xperimental/netatmo-exporter
+  tag: "2.1.2"
+  pullPolicy: IfNotPresent
+
+# -----------------------------------------------------------------------------
+# Controller. StatefulSet — owns a writable RWO config volume (token cache).
+# The cached token is regenerable (init container re-seeds it), so migration is
+# delete-and-recreate.
+# -----------------------------------------------------------------------------
+controller:
+  type: statefulset
+  replicas: 1
+  revisionHistoryLimit: 2
+  updateStrategy:
+    type: RollingUpdate
+
+# Per-replica RWO volume (→ config-netatmo-exporter-0), mounted at /config.
+volumeClaimTemplates:
+  - metadata:
+      name: config
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: longhorn
+      resources:
+        requests:
+          storage: 10Mi
+
+# -----------------------------------------------------------------------------
+# Security — homelab standard, fully non-root.
+# -----------------------------------------------------------------------------
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  privileged: false
+
+podAntiAffinity: true
+
+# -----------------------------------------------------------------------------
+# Ports.
+# -----------------------------------------------------------------------------
+ports:
+  - name: http
+    containerPort: 9210
+
+# -----------------------------------------------------------------------------
+# Configuration — non-secret env via generated ConfigMap; OAuth client id/secret
+# injected as individual env from the ExternalSecret-created Secret.
+# -----------------------------------------------------------------------------
+envFromConfigMap: netatmo-exporter-config
+envFromSecrets: []
+env:
+  - name: NETATMO_CLIENT_ID
+    valueFrom:
+      secretKeyRef:
+        name: netatmo-exporter-secret
+        key: NETATMO_CLIENT_ID
+  - name: NETATMO_CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: netatmo-exporter-secret
+        key: NETATMO_CLIENT_SECRET
+
+configMaps:
+  - name: netatmo-exporter-config
+    data:
+      NETATMO_EXPORTER_TOKEN_FILE: /config/netatmo-token.json
+      NETATMO_EXPORTER_EXTERNAL_URL: https://netatmo-exporter.local.asztalos.net
+
+# -----------------------------------------------------------------------------
+# Secrets — ExternalSecret (onepassword-connect). OAuth client credentials as env
+# keys + the seed token file (netatmo-token.json). NO secret material stored here.
+# The {{ .* }} braces are the ExternalSecret's OWN (ESO) runtime templating,
+# written raw because valueFiles are not Helm-processed.
+# -----------------------------------------------------------------------------
+externalSecrets:
+  - name: netatmo-exporter-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          NETATMO_CLIENT_ID: "{{ .client_id }}"
+          NETATMO_CLIENT_SECRET: "{{ .client_secret }}"
+          netatmo-token.json: |
+            {
+              "access_token":"{{ .access_token }}",
+              "refresh_token":"{{ .refresh_token }}",
+              "expiry":"2025-07-30T10:50:59.589899665Z"}
+            }
+    data:
+      - secretKey: client_id
+        remoteRef:
+          key: netatmo-exporter
+          property: client_id
+      - secretKey: client_secret
+        remoteRef:
+          key: netatmo-exporter
+          property: client_secret
+      - secretKey: access_token
+        remoteRef:
+          key: netatmo-exporter
+          property: access_token
+      - secretKey: refresh_token
+        remoteRef:
+          key: netatmo-exporter
+          property: refresh_token
+
+# -----------------------------------------------------------------------------
+# Init container — seeds the token file from the secret into the config volume on
+# first start (idempotent; skips if already present).
+# -----------------------------------------------------------------------------
+initContainers:
+  - name: add-netatmo-token
+    image: alpine:3.24
+    imagePullPolicy: IfNotPresent
+    securityContext:
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      privileged: false
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 64Mi
+    command:
+      - sh
+      - -c
+      - |
+        [ ! -s /config/netatmo-token.json ] && cp /secrets/netatmo-token.json /config/netatmo-token.json
+        chmod 600 /config/netatmo-token.json
+    volumeMounts:
+      - name: netatmo-exporter-secret
+        mountPath: /secrets/netatmo-token.json
+        subPath: netatmo-token.json
+      - name: config
+        mountPath: /config
+
+# -----------------------------------------------------------------------------
+# Resources.
+# -----------------------------------------------------------------------------
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+
+# -----------------------------------------------------------------------------
+# Probes — httpGet /metrics on :9210.
+# -----------------------------------------------------------------------------
+readinessProbe:
+  httpGet:
+    path: /metrics
+    port: 9210
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+livenessProbe:
+  httpGet:
+    path: /metrics
+    port: 9210
+  initialDelaySeconds: 30
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+# -----------------------------------------------------------------------------
+# Volumes / mounts. `config` comes from the volumeClaimTemplate; the secret is
+# mounted for the init container to read.
+# -----------------------------------------------------------------------------
+volumeMounts:
+  - name: config
+    mountPath: /config
+
+volumes:
+  - name: netatmo-exporter-secret
+    secret:
+      secretName: netatmo-exporter-secret
+
+# -----------------------------------------------------------------------------
+# Service (ClusterIP), targetPort by name.
+# -----------------------------------------------------------------------------
+service:
+  enabled: true
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 9210
+      targetPort: http
+
+# -----------------------------------------------------------------------------
+# Traefik IngressRoute — real homelab hostname + TLS secret.
+# -----------------------------------------------------------------------------
+ingress:
+  enabled: true
+  ingressClassName: traefik-external
+  entryPoint: websecure
+  host: netatmo-exporter.local.asztalos.net
+  port: 9210
+  priority: 10
+  middlewares:
+    - name: authentik
+      namespace: traefik
+    - name: default-headers
+      namespace: traefik
+  tlsSecretName: local-asztalos-net-tls
+
+# -----------------------------------------------------------------------------
+# ServiceMonitor — this exporter IS scraped. `release: prometheus-operator` label
+# preserved from the original (harmless; Prometheus discovers all ServiceMonitors
+# regardless of label per the cluster config).
+# -----------------------------------------------------------------------------
+serviceMonitor:
+  enabled: true
+  labels:
+    release: prometheus-operator
+  endpoints:
+    - path: /metrics
+      interval: 30s
+      targetPort: http
+      honorLabels: true
+
+persistentVolumeClaims: []
+persistentVolumes: []
+
+extraLabels: {}
