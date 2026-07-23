@@ -1,0 +1,22 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Edge-case manifests kept OUT of the Helm chart, synced as a separate ArgoCD
+# Application source alongside it:
+#
+#   - ingressrouteTCP.yaml  the `mailrise` IngressRouteTCP. Traefik's TCP router
+#                           on the `mailsecure` entryPoint, so appliances can
+#                           speak SMTP to the mailrise sidecar from outside the
+#                           cluster. IngressRouteTCP is deliberately NOT modelled
+#                           in charts/common: mailrise is the only consumer in
+#                           the homelab, apprise functions without it, and adding
+#                           a template for one caller would be dead weight in
+#                           every other chart.
+#
+#   - prometheus-alarms.yaml  the apprise PrometheusRule. Auxiliary observability
+#                             assets live in post-install by the standing scope
+#                             boundary (see homelab-charts/PLAN.md).
+resources:
+  - ingressrouteTCP.yaml
+  - prometheus-alarms.yaml

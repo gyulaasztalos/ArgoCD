@@ -706,6 +706,15 @@ services:
 # -----------------------------------------------------------------------------
 # Traefik IngressRoute — one object with a `routes` list; real homelab hostname
 # + TLS secret. Keep HOMEPAGE_ALLOWED_HOSTS above in sync with this host.
+#
+# Per-route options beyond host/port (common >= 0.4.0):
+#   pathPrefix: /api   match becomes Host(`…`) && PathPrefix(`/api`); use
+#                      `priority` to rank it above the catch-all host route.
+#   middlewares: []    renders NO middlewares. OMIT the key to get the default
+#                      authentik + default-headers pair. These are different:
+#                      an empty list used to be indistinguishable from an absent
+#                      key and silently got the defaults — see charts/apprise,
+#                      whose machine-facing API routes must stay unauthenticated.
 # -----------------------------------------------------------------------------
 ingressRoute:
   enabled: true

@@ -1,0 +1,401 @@
+# =============================================================================
+# apprise — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/apprise chart.
+#
+# This file is the COMPLETE, reviewable contract for the live deployment: real
+# hostnames + secret refs AND all unchanged defaults, so the whole configuration
+# is visible in one place. The chart's own values.yaml holds only generic
+# example.com placeholders.
+#
+# Apprise API is the homelab's notification fan-out hub: services POST to it and
+# it dispatches to Telegram/email/Discord/Pushover by tag.
+#
+# TWO CONTAINERS: apprise-api itself, plus a `mailrise` sidecar accepting SMTP on
+# :8025 and re-posting each mail into apprise — that is how appliances which can
+# only send email reach the same fan-out.
+#
+# NOT in this chart (see apps/apprise/post-install/, synced as a separate ArgoCD
+# source): the `mailrise` IngressRouteTCP and the PrometheusRule alarms.
+# See homelab-charts/PLAN.md "Scope boundary".
+# =============================================================================
+
+name: apprise
+namespace: apprise
+
+# -----------------------------------------------------------------------------
+# Container image (the MAIN container). The mailrise sidecar carries its own
+# image string further down under `extraContainers`.
+# -----------------------------------------------------------------------------
+image:
+  repository: lscr.io/linuxserver/apprise-api
+  # renovate: datasource=docker depName=lscr.io/linuxserver/apprise-api
+  tag: v1.2.0-ls193
+  pullPolicy: IfNotPresent
+
+# -----------------------------------------------------------------------------
+# Controller. Stateless — everything it holds is in emptyDirs, config comes from
+# a Secret and a ConfigMap — so a plain Deployment.
+#
+# The three kube-linter waivers are preserved verbatim from the original
+# manifest. `latest-tag` is needed because the mailrise sidecar is pinned to
+# :latest upstream (see extraContainers below).
+# -----------------------------------------------------------------------------
+controller:
+  type: deployment
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "LinuxServer.io images do not require a read-only root filesystem"
+    ignore-check.kube-linter.io/run-as-non-root: "LinuxServer.io images do not require a non-root user"
+    ignore-check.kube-linter.io/latest-tag: "This deployment intentionally uses the latest tag"
+
+# -----------------------------------------------------------------------------
+# ServiceAccount. Apprise never calls the Kubernetes API, so it runs under the
+# namespace's `default` ServiceAccount and the chart creates nothing.
+# See charts/homepage for the full knob set (create/name/secrets/tokenSecret).
+# -----------------------------------------------------------------------------
+serviceAccount:
+  create: false
+  secrets: []
+  tokenSecret:
+    create: false
+
+# -----------------------------------------------------------------------------
+# Pod security. NOTE: deliberately minimal — LinuxServer.io images drop
+# privileges themselves via PUID/PGID (set in env below), so only fsGroup is
+# pinned here and the main container is NOT forced non-root. This is why the
+# run-as-non-root kube-linter waiver exists. The mailrise sidecar, which is a
+# normal image, DOES get the full non-root treatment (see extraContainers).
+# -----------------------------------------------------------------------------
+podSecurityContext:
+  fsGroup: 1000
+
+# Container-level security context for the MAIN container.
+securityContext:
+  allowPrivilegeEscalation: false
+
+# Schedule at most one replica per node (default true in the library chart).
+podAntiAffinity: true
+
+# -----------------------------------------------------------------------------
+# Ports on the MAIN container. The sidecar's :8025 is declared on the sidecar.
+# -----------------------------------------------------------------------------
+ports:
+  - containerPort: 8000
+    name: http
+    protocol: TCP
+
+# -----------------------------------------------------------------------------
+# Configuration. Apprise takes plain env vars (no envFrom ConfigMap here) — PUID
+# and PGID are how the LinuxServer.io entrypoint drops privileges.
+# -----------------------------------------------------------------------------
+envFromConfigMap: ""
+envFromSecrets: []
+env:
+  - name: PUID
+    value: "1000"
+  - name: PGID
+    value: "1000"
+  - name: TZ
+    value: Europe/Budapest
+  - name: APPRISE_STATEFUL_MODE
+    value: simple
+  - name: APPRISE_ATTACH_SIZE
+    value: "5"
+
+# The mailrise routing table: which SMTP sender maps to which apprise tag.
+# Chart-owned, so `checksum/config` covers it and editing it rolls the pod —
+# note the ORIGINAL manifest was a plain ConfigMap with no generator hash, so it
+# did NOT roll the pod on change. This is a deliberate improvement.
+configMaps:
+  - name: mailrise-config
+    files:
+      mailrise.conf: |
+        configs:
+          unattended:
+            mailrise:
+              title_template: "[ $from ] $subject ($config)"
+            urls:
+              - apprise://apprise:8000/apprise/?overflow=split&tags=unattended-upgrades
+
+          flexget:
+            mailrise:
+              title_template: "$subject"
+            urls:
+              - apprise://apprise:8000/apprise/?overflow=split&tags=flexget
+
+          grafana:
+            mailrise:
+              title_template: "$subject"
+            urls:
+              - apprise://apprise:8000/apprise/?overflow=split&tags=grafana
+
+          alertmanager:
+            mailrise:
+              title_template: "$subject"
+            urls:
+              - apprise://apprise:8000/apprise/?overflow=split&tags=alertmanager
+
+          "babybuddy":
+            mailrise:
+              title_template: "$subject"
+            urls:
+              - apprise://apprise:8000/apprise/?overflow=split&tags=babybuddy
+
+          "*@*":
+            mailrise:
+              title_template: "[ $from ] $subject ($config)"
+            urls:
+              - apprise://apprise:8000/apprise/?overflow=split&tags=admin
+
+# -----------------------------------------------------------------------------
+# Secrets — ExternalSecret (onepassword-connect) rendering apprise.yml, which
+# holds the notification service URLs (Telegram/email/Discord/Pushover) and their
+# tokens. Mounted over /config/apprise.yml by subPath. NO secret material here.
+# The {{ .* }} braces are ESO's OWN runtime templating, written raw because
+# values.yaml is not Helm-processed.
+# -----------------------------------------------------------------------------
+externalSecrets:
+  - name: apprise-config
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          apprise.yml: |
+            version: 1
+            tag: admin, devops, restic_fail, restic_warn
+
+            urls:
+              - tgram://{{ .telegram_token }}/{{ .telegram_chat_id }}/?overflow=split:
+                  - tag: argocd,telegram,kuma,restic_succ,transmission,ddns,unattended-upgrades,nut,keepalived,watchtower,flexget,grafana,babybuddy,paperless,nebula,alertmanager,influxdb
+              - mailtos://{{ .email_user_id }}:{{ .email_password }}@icloud.com?smtp=smtp.mail.me.com&to={{ .email_address }}&from={{ .email_address }}:
+                  - tag: email
+              - discord://{{ .discord_id }}/{{ .discord_token }}/?overflow=split:
+                  - tag: discord
+              - pover://{{ .pover_token }}@{{ .pover_host }}/?overflow=split:
+                  - tag:
+    data:
+      - secretKey: telegram_token           # key in the Kubernetes Secret
+        remoteRef:
+          key: apprise-config
+          property: apprise-telegram-token  # 1Password item name
+      - secretKey: telegram_chat_id           # key in the Kubernetes Secret
+        remoteRef:
+          key: apprise-config
+          property: apprise-telegram-chat-id # 1Password item name
+      - secretKey: email_user_id          # key in the Kubernetes Secret
+        remoteRef:
+          key: apprise-config
+          property: apprise-email-user-id # 1Password item name
+      - secretKey: email_password           # key in the Kubernetes Secret
+        remoteRef:
+          key: apprise-config
+          property: apprise-email-password  # 1Password item name
+      - secretKey: email_address           # key in the Kubernetes Secret
+        remoteRef:
+          key: apprise-config
+          property: apprise-email-address  # 1Password item name
+      - secretKey: discord_id           # key in the Kubernetes Secret
+        remoteRef:
+          key: apprise-config
+          property: apprise-discord-id  # 1Password item name
+      - secretKey: discord_token           # key in the Kubernetes Secret
+        remoteRef:
+          key: apprise-config
+          property: apprise-discord-token  # 1Password item name
+      - secretKey: pover_token            # key in the Kubernetes Secret
+        remoteRef:
+          key: apprise-config
+          property: apprise-pover-token  # 1Password item name
+      - secretKey: pover_host            # key in the Kubernetes Secret
+        remoteRef:
+          key: apprise-config
+          property: apprise-pover-host  # 1Password item name
+
+# -----------------------------------------------------------------------------
+# Resources for the MAIN container (the sidecar has its own, below).
+# -----------------------------------------------------------------------------
+resources:
+  requests:
+    cpu: 100m
+    memory: 96Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+# -----------------------------------------------------------------------------
+# Probes — apprise-api exposes /status.
+# -----------------------------------------------------------------------------
+readinessProbe:
+  httpGet:
+    path: /status
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+livenessProbe:
+  httpGet:
+    path: /status
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+# -----------------------------------------------------------------------------
+# Volumes / mounts for the MAIN container.
+# -----------------------------------------------------------------------------
+volumeMounts:
+  - name: attachments
+    mountPath: /attachments
+  - name: config
+    mountPath: /config
+  - name: apprise-config
+    mountPath: /config/apprise.yml
+    subPath: apprise.yml
+
+volumes:
+  - name: attachments
+    emptyDir: {}
+  - name: config
+    emptyDir: {}
+  - name: apprise-config
+    secret:
+      secretName: apprise-config
+  - name: mailrise-config
+    configMap:
+      name: mailrise-config
+
+# Init containers (none for this app).
+initContainers: []
+
+# -----------------------------------------------------------------------------
+# Sidecar containers (common >= 0.4.0), appended after the main container and
+# passed through VERBATIM.
+#
+# mailrise runs an SMTP server on :8025 and forwards each received mail into
+# apprise as a notification, using the routing table in mailrise.conf above.
+# It is reached from outside the cluster through an IngressRouteTCP that lives in
+# apps/apprise/post-install/ — NOT in this chart (edge case; see README).
+#
+# The image is pinned to :latest upstream, which is why the Deployment carries a
+# latest-tag kube-linter waiver. Renovate cannot track a floating tag, so this
+# one image is deliberately NOT under Renovate control.
+# -----------------------------------------------------------------------------
+extraContainers:
+  - name: mailrise
+    image: yoryan/mailrise:latest
+    imagePullPolicy: Always
+    securityContext:
+      runAsUser: 999          # hardcode user to non-root if not set in Dockerfile
+      runAsGroup: 999         # hardcode group to non-root if not set in Dockerfile
+      runAsNonRoot: true       # hardcode to non-root. Redundant to above if Dockerfile is set USER 1000
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false # prevent sudo, etc.
+      privileged: false               # prevent acting like host root
+      capabilities:
+        drop: [ALL]
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    ports:
+      - containerPort: 8025
+        name: mailsecure
+        protocol: TCP
+    volumeMounts:
+      - name: mailrise-config
+        mountPath: /etc/mailrise.conf
+        subPath: mailrise.conf
+
+# -----------------------------------------------------------------------------
+# Service — one ClusterIP carrying both the HTTP API and the sidecar's SMTP port.
+# -----------------------------------------------------------------------------
+services:
+  - name: apprise
+    enabled: true
+    type: ClusterIP
+    ports:
+      - name: http
+        protocol: TCP
+        port: 8000
+        targetPort: 8000
+      - name: mailsecure
+        protocol: TCP
+        port: 8025
+        targetPort: 8025
+
+# -----------------------------------------------------------------------------
+# Traefik IngressRoute — THREE routes on one host, ranked by priority.
+#
+# The first two are the MACHINE-FACING API and carry `middlewares: []`, i.e. NO
+# authentik forward-auth: services across the cluster POST notifications to
+# /notify and /apprise with no browser session. Wrapping them in forward-auth
+# would 302 every producer to a login page and silently break notifications.
+# Requires common >= 0.4.0 — before that, `[]` was indistinguishable from an
+# absent key and silently got the default authentik pair.
+#
+# The third is the human-facing UI catch-all and DOES get the default
+# middlewares (the key is omitted, which is what selects the default).
+# Higher priority wins in Traefik, so the two API prefixes must outrank it.
+# -----------------------------------------------------------------------------
+ingressRoute:
+  enabled: true
+  ingressClassName: traefik-external
+  entryPoint: websecure
+  tlsSecretName: local-asztalos-net-tls
+  routes:
+    - host: apprise.local.asztalos.net
+      pathPrefix: /notify
+      port: 8000
+      priority: 25
+      middlewares: []
+    - host: apprise.local.asztalos.net
+      pathPrefix: /apprise
+      port: 8000
+      priority: 20
+      middlewares: []
+    - host: apprise.local.asztalos.net
+      port: 8000
+      priority: 10
+
+# -----------------------------------------------------------------------------
+# ServiceMonitor — scrapes apprise-api's /metrics on the http port.
+#
+# MIGRATION NOTE: the object was previously named `apprise-exporter`; it is
+# normalized to `apprise` (the chart names it after the app), matching the same
+# change made for nut-exporter and unbound. The `release: prometheus-operator`
+# label is preserved but vestigial.
+# -----------------------------------------------------------------------------
+serviceMonitor:
+  enabled: true
+  labels:
+    release: prometheus-operator
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      honorLabels: true
+
+# Static PVCs / PVs — none (emptyDirs only).
+persistentVolumeClaims: []
+persistentVolumes: []
+
+# Extra labels merged into the standard label block.
+extraLabels: {}

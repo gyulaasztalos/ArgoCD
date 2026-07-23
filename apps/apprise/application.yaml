@@ -9,9 +9,25 @@ metadata:
 spec:
   project: default
   sources:
+    # 1) this repo — provides the tailored valueFile (referenced as $config below)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/apprise/install
+      ref: config
+    # 2) the homelab-charts monorepo — the apprise wrapper chart + the `common`
+    #    library dependency (resolved from the same checkout). Renders the API,
+    #    its mailrise sidecar, the mailrise ConfigMap, the ExternalSecret, the
+    #    Service, the IngressRoute and the ServiceMonitor.
+    - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
+      targetRevision: main
+      path: charts/apprise
+      helm:
+        valueFiles:
+          - $config/apps/apprise/values.yaml
+    # 3) edge cases kept out of the chart: the mailrise IngressRouteTCP (Traefik
+    #    TCP router for SMTP) and the PrometheusRule alarms
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/apprise/post-install
   destination:
     server: https://kubernetes.default.svc
     namespace: apprise
