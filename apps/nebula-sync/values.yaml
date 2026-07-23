@@ -1,0 +1,232 @@
+# =============================================================================
+# nebula-sync — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/nebula-sync chart.
+#
+# This file is the COMPLETE, reviewable contract for the live deployment: real
+# Pi-hole endpoints + secret refs AND all unchanged defaults, so the whole
+# configuration is visible in one place.
+#
+# nebula-sync is a headless cron worker — NO Service, NO IngressRoute, NO
+# ServiceMonitor. There are no auxiliary post-install assets either.
+# =============================================================================
+name: nebula-sync
+namespace: nebula-sync
+
+# -----------------------------------------------------------------------------
+# Container image. `image.tag` is the SINGLE source of truth for the app version
+# (there is deliberately no Chart.yaml appVersion). Renovate bumps the tag below.
+# -----------------------------------------------------------------------------
+image:
+  repository: ghcr.io/lovelaze/nebula-sync
+  # renovate: datasource=docker depName=ghcr.io/lovelaze/nebula-sync
+  tag: v0.11.2
+  pullPolicy: IfNotPresent
+
+# -----------------------------------------------------------------------------
+# Controller. type = deployment | statefulset | daemonset.
+# Stateless — it wakes on a cron, syncs Pi-hole over HTTP, and sleeps; the only
+# writable path is an emptyDir at /config — so a plain Deployment.
+# -----------------------------------------------------------------------------
+controller:
+  type: deployment
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+# -----------------------------------------------------------------------------
+# ServiceAccount. nebula-sync never calls the Kubernetes API, so it runs under
+# the namespace's `default` ServiceAccount and the chart creates nothing.
+# See charts/homepage for the full knob set (create/name/secrets/tokenSecret).
+# -----------------------------------------------------------------------------
+serviceAccount:
+  create: false
+  secrets: []
+  tokenSecret:
+    create: false
+
+# -----------------------------------------------------------------------------
+# Pod security. Homelab standard: fully non-root, RuntimeDefault seccomp.
+# NOTE: no fsGroup (the original manifest sets none — the emptyDir needs none).
+# -----------------------------------------------------------------------------
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+
+# Container-level security context.
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  privileged: false
+
+# Schedule at most one replica per node (default true in the library chart).
+podAntiAffinity: true
+
+# -----------------------------------------------------------------------------
+# Ports. nebula-sync serves a /health endpoint on 8080 for the probes. It is NOT
+# exposed by a Service — see the note where `services` would be.
+# -----------------------------------------------------------------------------
+ports:
+  - containerPort: 8080
+
+# -----------------------------------------------------------------------------
+# Configuration. All non-secret behaviour is env, from a generated ConfigMap; the
+# Pi-hole endpoints + app-password tokens come from the ExternalSecret-created
+# Secret. Both via envFrom.
+#
+# ENV PRECEDENCE NOTE: `common` renders envFrom as configMapRef THEN secretRef;
+# the original manifest had secretRef first. The two sets share no keys
+# (ConfigMap is all SYNC_*/CRON/webhooks, Secret is PRIMARY/REPLICAS), so the
+# order is irrelevant — a later duplicate would win, but there are no duplicates.
+# -----------------------------------------------------------------------------
+envFromConfigMap: nebula-sync-env
+envFromSecrets:
+  - nebula-sync-secret
+env: []
+
+configMaps:
+  - name: nebula-sync-env
+    data:
+      FULL_SYNC: "false"
+      RUN_GRAVITY: "false"
+      CRON: "55 2 * * *"
+      CLIENT_SKIP_TLS_VERIFICATION: "true"
+      TZ: "Europe/Budapest"
+      SYNC_CONFIG_DNS: "true"
+      SYNC_CONFIG_DNS_EXCLUDE: "interface,upstreams"
+      WEBHOOK_SYNC_SUCCESS_URL: 'http://apprise.apprise.svc.cluster.local:8000/notify/apprise'
+      WEBHOOK_SYNC_SUCCESS_BODY: '{"tag":"nebula","type":"success","body":"[nebula-sync] [✅] Pi-Hole synced successfully","title":"[k3s] Successful sync"}'
+      WEBHOOK_SYNC_SUCCESS_HEADERS: 'Content-Type:application/json'
+      WEBHOOK_SYNC_FAILURE_URL: 'http://apprise.apprise.svc.cluster.local:8000/notify/apprise'
+      WEBHOOK_SYNC_FAILURE_BODY: '{"tag":"nebula","type":"failure","body":"[nebula-sync] [🔴] Pi-Hole failed to sync","title":"[k3s] Failed sync"}'
+      WEBHOOK_SYNC_FAILURE_HEADERS: 'Content-Type:application/json'
+      SYNC_CONFIG_DHCP: "false"
+      SYNC_CONFIG_NTP: "true"
+      SYNC_CONFIG_RESOLVER: "true"
+      SYNC_CONFIG_DATABASE: "true"
+      SYNC_CONFIG_MISC: "true"
+      SYNC_CONFIG_DEBUG: "false"
+      SYNC_GRAVITY_DHCP_LEASES: "false"
+      SYNC_GRAVITY_GROUP: "true"
+      SYNC_GRAVITY_AD_LIST: "true"
+      SYNC_GRAVITY_AD_LIST_BY_GROUP: "true"
+      SYNC_GRAVITY_DOMAIN_LIST: "true"
+      SYNC_GRAVITY_DOMAIN_LIST_BY_GROUP: "true"
+      SYNC_GRAVITY_CLIENT: "true"
+      SYNC_GRAVITY_CLIENT_BY_GROUP: "true"
+      CLIENT_TIMEOUT_SECONDS: "300"
+      CLIENT_RETRY_DELAY_SECONDS: "30"
+
+# -----------------------------------------------------------------------------
+# Secrets — ExternalSecret referencing the onepassword-connect ClusterSecretStore.
+# nebula-sync's PRIMARY / REPLICAS env vars each combine a Pi-hole URL with its
+# app-password token, so the whole value is assembled by ESO templating. NO
+# secret material is stored here — only references. The {{ .* }} braces are
+# ESO's OWN runtime templating, written raw because valueFiles are not
+# Helm-processed.
+# -----------------------------------------------------------------------------
+externalSecrets:
+  - name: nebula-sync-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          PRIMARY: http://pihole-web.pihole.svc.cluster.local|{{ .primary_token }}
+          REPLICAS: https://10.10.50.5|{{ .replica1_token }}
+    data:
+      - secretKey: primary_token            # key in the Kubernetes Secret
+        remoteRef:
+          key: nebula-sync-secret
+          property: nebula-primary-token  # 1Password item name
+      - secretKey: replica1_token            # key in the Kubernetes Secret
+        remoteRef:
+          key: nebula-sync-secret
+          property: nebula-replica1-token  # 1Password item name
+
+# -----------------------------------------------------------------------------
+# Resources.
+# -----------------------------------------------------------------------------
+resources:
+  requests:
+    memory: "32Mi"
+    cpu: "100m"
+  limits:
+    memory: "64Mi"
+    cpu: "200m"
+
+# -----------------------------------------------------------------------------
+# Probes — nebula-sync exposes /health on :8080.
+# -----------------------------------------------------------------------------
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8080
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  failureThreshold: 30
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8080
+  initialDelaySeconds: 5
+  periodSeconds: 20
+  failureThreshold: 5
+
+# -----------------------------------------------------------------------------
+# Volumes / mounts. The only writable path under the read-only rootfs.
+# -----------------------------------------------------------------------------
+volumeMounts:
+  - name: config
+    mountPath: /config
+
+volumes:
+  - name: config
+    emptyDir: {}
+
+# Init containers (none for this app).
+initContainers: []
+
+# -----------------------------------------------------------------------------
+# Sidecar containers (common >= 0.4.0) — none; this app is a single process.
+# See charts/unbound for a worked example.
+# -----------------------------------------------------------------------------
+extraContainers: []
+
+# -----------------------------------------------------------------------------
+# Service(s) — NONE. nebula-sync is a headless cron worker: it dials OUT to the
+# Pi-hole instances and posts a webhook to apprise; nothing ever connects to it
+# (the :8080 /health endpoint is only used by the in-pod probes). So this list is
+# empty and no Service object is rendered. This is the first migrated app with no
+# Service at all.
+# -----------------------------------------------------------------------------
+services: []
+
+# -----------------------------------------------------------------------------
+# No IngressRoute and no ServiceMonitor — nothing to route to, nothing to scrape.
+# Omitting `routes` skips the IngressRoute; serviceMonitor.enabled false skips the
+# monitor.
+# -----------------------------------------------------------------------------
+ingressRoute: {}
+
+serviceMonitor:
+  enabled: false
+  labels: {}
+  endpoints: []
+
+# Static PVCs / PVs — none (emptyDir only).
+persistentVolumeClaims: []
+persistentVolumes: []
+
+# Extra labels merged into the standard label block.
+extraLabels: {}

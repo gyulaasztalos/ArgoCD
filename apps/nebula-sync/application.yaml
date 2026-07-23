@@ -9,9 +9,20 @@ metadata:
 spec:
   project: default
   sources:
+    # 1) this repo — provides the tailored valueFile (referenced as $config below)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/nebula-sync/install
+      ref: config
+    # 2) the homelab-charts monorepo — the nebula-sync wrapper chart + the
+    #    `common` library dependency (resolved from the same checkout). Renders
+    #    the Deployment, its env ConfigMap and the ExternalSecret. No Service,
+    #    IngressRoute or ServiceMonitor — it is a headless cron worker.
+    - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
+      targetRevision: main
+      path: charts/nebula-sync
+      helm:
+        valueFiles:
+          - $config/apps/nebula-sync/values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: nebula-sync
