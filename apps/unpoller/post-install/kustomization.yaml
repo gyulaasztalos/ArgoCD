@@ -2,6 +2,19 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+# Auxiliary observability assets kept OUT of the Helm chart, synced as a separate
+# ArgoCD Application source alongside it (see homelab-charts/PLAN.md "Scope
+# boundary"):
+#
+#   - six Grafana dashboards (labelled grafana_dashboard: "1", discovered by the
+#     kube-prometheus-stack sidecar in any namespace). These are large JSON blobs
+#     — ~1.2 MB total — which is exactly why they do not belong in values.yaml.
+#   - prometheus-alarms.yaml, the unpoller PrometheusRule.
+#
+# The configMapGenerator hashes each dashboard's name. That is fine here: nothing
+# in the Helm chart references these ConfigMaps by name (the Grafana sidecar finds
+# them by label), so — unlike homepage's images — no disableNameSuffixHash is
+# needed.
 configMapGenerator:
   - name: unpoller-uap-insights-dashboard
     namespace: unpoller
@@ -29,10 +42,6 @@ configMapGenerator:
       - unpoller-usg-insights.json=unpoller-usg-insights.json
 
 resources:
-  - unpoller-secret.yaml
-  - deployment.yaml
-  - service.yaml
-  - servicemonitor.yaml
   - prometheus-alarms.yaml
 
 generatorOptions:

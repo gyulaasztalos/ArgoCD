@@ -1,5 +1,4 @@
 ---
-# apps/unpoller/unpoller-app.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -8,9 +7,24 @@ metadata:
 spec:
   project: default
   sources:
+    # 1) this repo — provides the tailored valueFile (referenced as $config below)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/unpoller/install
+      ref: config
+    # 2) the homelab-charts monorepo — the unpoller wrapper chart + the `common`
+    #    library dependency (resolved from the same checkout). Renders the
+    #    Deployment, the up.conf ExternalSecret, the Service and the ServiceMonitor.
+    - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
+      targetRevision: main
+      path: charts/unpoller
+      helm:
+        valueFiles:
+          - $config/apps/unpoller/values.yaml
+    # 3) auxiliary observability assets kept out of the chart: six Grafana
+    #    dashboards + the PrometheusRule alarms
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/unpoller/post-install
   destination:
     server: https://kubernetes.default.svc
     namespace: unpoller
@@ -20,4 +34,8 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
+      # ServerSideApply is REQUIRED: the six Grafana dashboard ConfigMaps in
+      # post-install/ are large (client-dpi alone is ~834 KB), and client-side
+      # apply would try to stash last-applied-configuration in an annotation,
+      # blowing past the 256 KB metadata limit.
       - ServerSideApply=true

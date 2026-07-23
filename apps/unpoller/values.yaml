@@ -1,0 +1,247 @@
+# =============================================================================
+# unpoller — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/unpoller chart.
+#
+# This file is the COMPLETE, reviewable contract for the live deployment: the real
+# UniFi controller URL + secret refs AND all unchanged defaults, so the whole
+# configuration is visible in one place.
+#
+# NOT in this chart (see apps/unpoller/post-install/, synced as a separate ArgoCD
+# source): six Grafana dashboards + the PrometheusRule alarms.
+# See homelab-charts/PLAN.md "Scope boundary".
+# =============================================================================
+name: unpoller
+namespace: unpoller
+
+# -----------------------------------------------------------------------------
+# Container image. `image.tag` is the SINGLE source of truth for the app version
+# (there is deliberately no Chart.yaml appVersion). Renovate bumps the tag below.
+# -----------------------------------------------------------------------------
+image:
+  repository: ghcr.io/unpoller/unpoller
+  # renovate: datasource=docker depName=ghcr.io/unpoller/unpoller
+  tag: v3.3.3
+  pullPolicy: IfNotPresent
+
+# -----------------------------------------------------------------------------
+# Controller. type = deployment | statefulset | daemonset.
+# unpoller polls the UniFi controller over HTTP and serves the result on
+# /metrics; it owns no PVC and no host hardware, so a plain Deployment.
+# -----------------------------------------------------------------------------
+controller:
+  type: deployment
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+# -----------------------------------------------------------------------------
+# ServiceAccount. unpoller never calls the Kubernetes API, so it runs under the
+# namespace's `default` ServiceAccount and the chart creates nothing.
+# See charts/homepage for the full knob set (create/name/secrets/tokenSecret).
+# -----------------------------------------------------------------------------
+serviceAccount:
+  create: false
+  secrets: []
+  tokenSecret:
+    create: false
+
+# -----------------------------------------------------------------------------
+# Pod security. Homelab standard: fully non-root, RuntimeDefault seccomp.
+# -----------------------------------------------------------------------------
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+
+# Container-level security context.
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  privileged: false
+
+# Schedule at most one replica per node (default true in the library chart).
+podAntiAffinity: true
+
+# -----------------------------------------------------------------------------
+# Ports. unpoller's Prometheus endpoint (matches http_listen in up.conf below).
+# -----------------------------------------------------------------------------
+ports:
+  - containerPort: 9130
+    name: http
+
+# -----------------------------------------------------------------------------
+# Configuration. unpoller is configured ENTIRELY by /etc/unpoller/up.conf, which
+# embeds the UniFi controller credentials — so the whole file is rendered by the
+# ExternalSecret below and mounted by subPath. There is no non-secret ConfigMap.
+# -----------------------------------------------------------------------------
+envFromConfigMap: ""
+envFromSecrets: []
+env: []
+configMaps: []
+
+# -----------------------------------------------------------------------------
+# Secrets — ExternalSecret referencing the onepassword-connect ClusterSecretStore.
+# Renders up.conf (TOML) with the UniFi controller user/pass injected by ESO
+# templating. NO secret material is stored here — only references. The {{ .* }}
+# braces are ESO's OWN runtime templating, written raw because valueFiles are not
+# Helm-processed.
+# -----------------------------------------------------------------------------
+externalSecrets:
+  - name: unpoller-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          up.conf: |
+            [poller]
+                debug = false
+                quiet = false
+                plugins = []
+            [prometheus]
+              disable = false
+              http_listen = "0.0.0.0:9130"
+              report_errors = false
+            [influxdb]
+              disable = true
+            [unifi]
+                dynamic = false
+            [loki]
+                disable = true
+            [[unifi.controller]]
+                url         = "https://unifi.local.asztalos.net"
+                user        = "{{ .username }}"
+                pass        = "{{ .password }}"
+                sites       = ["all"]
+                save_ids    = true
+                save_dpi    = true
+                save_sites  = true
+                hash_pii    = false
+                verify_ssl  = false
+    data:
+      - secretKey: username
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          key: unpoller
+          metadataPolicy: None
+          property: username
+      - secretKey: password
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          key: unpoller
+          metadataPolicy: None
+          property: password
+
+# -----------------------------------------------------------------------------
+# Resources.
+# -----------------------------------------------------------------------------
+resources:
+  requests:
+    cpu: 50m
+    memory: 32Mi
+  limits:
+    cpu: 150m
+    memory: 128Mi
+
+# -----------------------------------------------------------------------------
+# Probes — httpGet /metrics on :9130.
+# -----------------------------------------------------------------------------
+readinessProbe:
+  httpGet:
+    path: /metrics
+    port: 9130
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+livenessProbe:
+  httpGet:
+    path: /metrics
+    port: 9130
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  failureThreshold: 6
+  successThreshold: 1
+  timeoutSeconds: 10
+
+# -----------------------------------------------------------------------------
+# Volumes / mounts. up.conf comes from the ExternalSecret-created Secret, mounted
+# by subPath at the path unpoller reads.
+# -----------------------------------------------------------------------------
+volumeMounts:
+  - name: config-volume
+    mountPath: /etc/unpoller/up.conf
+    subPath: up.conf
+
+volumes:
+  - name: config-volume
+    secret:
+      secretName: unpoller-secret
+
+# Init containers (none for this app).
+initContainers: []
+
+# -----------------------------------------------------------------------------
+# Sidecar containers (common >= 0.4.0) — none; single process. See charts/unbound.
+# -----------------------------------------------------------------------------
+extraContainers: []
+
+# -----------------------------------------------------------------------------
+# Service — ClusterIP exposing /metrics for the ServiceMonitor to scrape.
+# -----------------------------------------------------------------------------
+services:
+  - name: unpoller
+    enabled: true
+    type: ClusterIP
+    ports:
+      - name: http
+        protocol: TCP
+        port: 9130
+        targetPort: http
+
+# -----------------------------------------------------------------------------
+# No IngressRoute — metrics-only, scraped in-cluster by Prometheus. Omitting
+# `routes` skips the object entirely.
+# -----------------------------------------------------------------------------
+ingressRoute: {}
+
+# -----------------------------------------------------------------------------
+# ServiceMonitor — scrapes /metrics. The 60s interval is deliberate: unpoller
+# background-refreshes controller data every 60s (v3.2+), so faster scrapes only
+# re-read cached values.
+#
+# MIGRATION NOTE: the object was previously named `unpoller-exporter`; it is
+# normalized to `unpoller` (the chart names it after the app), matching the same
+# change made for nut-exporter, unbound and apprise. The `release:
+# prometheus-operator` label is preserved but vestigial.
+# -----------------------------------------------------------------------------
+serviceMonitor:
+  enabled: true
+  labels:
+    release: prometheus-operator
+  endpoints:
+    - path: /metrics
+      interval: 60s
+      targetPort: http
+      honorLabels: true
+
+# Static PVCs / PVs — none.
+persistentVolumeClaims: []
+persistentVolumes: []
+
+# Extra labels merged into the standard label block.
+extraLabels: {}
