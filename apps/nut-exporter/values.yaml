@@ -1,0 +1,229 @@
+# =============================================================================
+# nut-exporter — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/nut-exporter chart.
+#
+# This file is the COMPLETE, reviewable contract for the live deployment: real
+# hostnames + secret refs AND all unchanged defaults, so the whole configuration
+# is visible in one place. The chart's own values.yaml holds only generic
+# example.com placeholders.
+#
+# The Grafana dashboards and the UPS PrometheusRule already live in
+# apps/nut-exporter/post-install/ and are synced as a separate ArgoCD source —
+# they are NOT part of this chart. See homelab-charts/PLAN.md "Scope boundary".
+# =============================================================================
+
+name: nut-exporter
+namespace: nut-exporter
+
+# -----------------------------------------------------------------------------
+# Container image. image.tag is the single source of truth for the app version.
+# -----------------------------------------------------------------------------
+image:
+  repository: druggeri/nut_exporter
+  # renovate: datasource=docker depName=druggeri/nut_exporter
+  tag: 3.3.0
+  pullPolicy: IfNotPresent
+
+# -----------------------------------------------------------------------------
+# Controller. Deployment — the exporter is a stateless network poller (no owned
+# PVC, no node-local hardware).
+# -----------------------------------------------------------------------------
+controller:
+  type: deployment
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+# -----------------------------------------------------------------------------
+# Security — homelab standard, fully non-root.
+# -----------------------------------------------------------------------------
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  privileged: false
+
+podAntiAffinity: true
+
+# -----------------------------------------------------------------------------
+# Ports.
+# -----------------------------------------------------------------------------
+ports:
+  - name: http
+    containerPort: 9199
+    protocol: TCP
+
+# -----------------------------------------------------------------------------
+# Configuration — non-secret env via generated ConfigMap; the NUT server login
+# comes from the ExternalSecret-created Secret, both via envFrom.
+# -----------------------------------------------------------------------------
+envFromConfigMap: nut-exporter-config
+envFromSecrets:
+  - nut-exporter-secret
+env: []
+
+configMaps:
+  - name: nut-exporter-config
+    data:
+      NUT_EXPORTER_SERVER: "homeassistant.local.asztalos.net"
+      NUT_EXPORTER_SERVERPORT: "3493"
+      NUT_EXPORTER_VARIABLES: "ups.status,input.voltage,ups.load,battery.runtime,ups.beeper.status,battery.charge,ups.load,battery.voltage,device.model,output.voltage"
+
+# -----------------------------------------------------------------------------
+# Secrets — ExternalSecret (onepassword-connect). NUT server credentials exposed
+# as env keys. NO secret material stored here. The {{ .* }} braces are the
+# ExternalSecret's OWN (ESO) runtime templating, written raw because valueFiles
+# are not Helm-processed.
+# -----------------------------------------------------------------------------
+externalSecrets:
+  - name: nut-exporter-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          NUT_EXPORTER_USERNAME: "{{ .username }}"
+          NUT_EXPORTER_PASSWORD: "{{ .password }}"
+    data:
+      - secretKey: username
+        remoteRef:
+          key: nut-exporter
+          property: username
+      - secretKey: password
+        remoteRef:
+          key: nut-exporter
+          property: password
+
+# -----------------------------------------------------------------------------
+# Resources.
+# -----------------------------------------------------------------------------
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+
+# -----------------------------------------------------------------------------
+# Probes — httpGet /metrics on :9199.
+# -----------------------------------------------------------------------------
+readinessProbe:
+  httpGet:
+    path: /metrics
+    port: 9199
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+livenessProbe:
+  httpGet:
+    path: /metrics
+    port: 9199
+  initialDelaySeconds: 30
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+# -----------------------------------------------------------------------------
+# Volumes / mounts — none (stateless, read-only root filesystem).
+# -----------------------------------------------------------------------------
+volumeMounts: []
+volumes: []
+
+initContainers: []
+
+# -----------------------------------------------------------------------------
+# Service(s) — list form (ClusterIP), targetPort by name.
+# -----------------------------------------------------------------------------
+services:
+  - name: nut-exporter
+    enabled: true
+    type: ClusterIP
+    ports:
+      - name: http
+        protocol: TCP
+        port: 9199
+        targetPort: http
+
+# -----------------------------------------------------------------------------
+# Traefik IngressRoute — one object with a `routes` list; real homelab hostname
+# + TLS secret.
+# -----------------------------------------------------------------------------
+ingressRoute:
+  enabled: true
+  ingressClassName: traefik-external
+  entryPoint: websecure
+  tlsSecretName: local-asztalos-net-tls
+  routes:
+    - host: nut-exporter.local.asztalos.net
+      serviceName: nut-exporter
+      port: 9199
+      priority: 10
+      middlewares:
+        - name: authentik
+          namespace: traefik
+        - name: default-headers
+          namespace: traefik
+
+# -----------------------------------------------------------------------------
+# ServiceMonitor — one endpoint per UPS attached to the NUT server (nut_exporter
+# selects the UPS via the `ups` query parameter on /ups_metrics), each relabeled
+# with a `ups` label so the two units are distinguishable in Prometheus.
+#
+# MIGRATION NOTE: the object was previously named `nut-exporter-exporter`. It is
+# normalized to `nut-exporter` here (the chart names it after the app). ArgoCD
+# prunes the old object and creates the new one; Prometheus re-discovers it
+# within a scrape interval, so expect a brief gap in UPS metrics at cutover.
+#
+# The `release: prometheus-operator` label is preserved from the original. It is
+# harmless but vestigial — serviceMonitorSelectorNilUsesHelmValues: false means
+# Prometheus discovers all ServiceMonitors regardless of labels.
+# -----------------------------------------------------------------------------
+serviceMonitor:
+  enabled: true
+  labels:
+    release: prometheus-operator
+  endpoints:
+    - path: /ups_metrics
+      interval: 30s
+      targetPort: http
+      honorLabels: true
+      params:
+        ups: ["keor"]
+      relabelings:
+        - action: replace
+          targetLabel: ups
+          replacement: keor
+    - path: /ups_metrics
+      interval: 30s
+      targetPort: http
+      honorLabels: true
+      params:
+        ups: ["apc"]
+      relabelings:
+        - action: replace
+          targetLabel: ups
+          replacement: apc
+
+persistentVolumeClaims: []
+persistentVolumes: []
+
+extraLabels: {}

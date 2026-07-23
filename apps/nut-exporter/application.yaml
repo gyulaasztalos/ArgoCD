@@ -9,9 +9,20 @@ metadata:
 spec:
   project: default
   sources:
+    # 1) this repo — provides the tailored valueFile (referenced as $config below)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/nut-exporter/install
+      ref: config
+    # 2) the homelab-charts monorepo — the nut-exporter wrapper chart + the
+    #    `common` library dependency (resolved from the same checkout)
+    - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
+      targetRevision: main
+      path: charts/nut-exporter
+      helm:
+        valueFiles:
+          - $config/apps/nut-exporter/values.yaml
+    # 3) auxiliary observability assets kept out of the chart (two Grafana
+    #    dashboards + the UPS PrometheusRule alarms)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       path: apps/nut-exporter/post-install
