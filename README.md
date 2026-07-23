@@ -212,3 +212,7 @@ On the UDM-PRO:
 37. generate new api key for the read-only account in ArgoCD and update the token in 1password
 
 > **Note:** This setup evolves regularly. Check GitHub commits for latest updates.
+
+## License
+
+© 2026 Gyula Asztalos. Licensed under the **MIT License** — see [`LICENSE`](LICENSE).
