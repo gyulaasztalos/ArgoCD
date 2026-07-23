@@ -204,33 +204,37 @@ volumes:
 initContainers: []
 
 # -----------------------------------------------------------------------------
-# Service (ClusterIP).
+# Service(s) — list form (ClusterIP).
 # -----------------------------------------------------------------------------
-service:
-  enabled: true
-  type: ClusterIP
-  ports:
-    - name: webui
-      protocol: TCP
-      port: 8000
-      targetPort: 8000
+services:
+  - name: ddns-updater
+    enabled: true
+    type: ClusterIP
+    ports:
+      - name: webui
+        protocol: TCP
+        port: 8000
+        targetPort: 8000
 
 # -----------------------------------------------------------------------------
-# Traefik IngressRoute — real homelab hostname + TLS secret.
+# Traefik IngressRoute — one object with a `routes` list; real homelab hostname
+# + TLS secret.
 # -----------------------------------------------------------------------------
-ingress:
+ingressRoute:
   enabled: true
   ingressClassName: traefik-external
   entryPoint: websecure
-  host: ddns-updater.local.asztalos.net
-  port: 8000
-  priority: 10
-  middlewares:
-    - name: authentik
-      namespace: traefik
-    - name: default-headers
-      namespace: traefik
   tlsSecretName: local-asztalos-net-tls
+  routes:
+    - host: ddns-updater.local.asztalos.net
+      serviceName: ddns-updater
+      port: 8000
+      priority: 10
+      middlewares:
+        - name: authentik
+          namespace: traefik
+        - name: default-headers
+          namespace: traefik
 
 # -----------------------------------------------------------------------------
 # ServiceMonitor — disabled to match current state (see homelab-charts backlog:

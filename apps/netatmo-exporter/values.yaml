@@ -217,33 +217,37 @@ volumes:
       secretName: netatmo-exporter-secret
 
 # -----------------------------------------------------------------------------
-# Service (ClusterIP), targetPort by name.
+# Service(s) — list form (ClusterIP), targetPort by name.
 # -----------------------------------------------------------------------------
-service:
-  enabled: true
-  type: ClusterIP
-  ports:
-    - name: http
-      protocol: TCP
-      port: 9210
-      targetPort: http
+services:
+  - name: netatmo-exporter
+    enabled: true
+    type: ClusterIP
+    ports:
+      - name: http
+        protocol: TCP
+        port: 9210
+        targetPort: http
 
 # -----------------------------------------------------------------------------
-# Traefik IngressRoute — real homelab hostname + TLS secret.
+# Traefik IngressRoute — one object with a `routes` list; real homelab hostname
+# + TLS secret.
 # -----------------------------------------------------------------------------
-ingress:
+ingressRoute:
   enabled: true
   ingressClassName: traefik-external
   entryPoint: websecure
-  host: netatmo-exporter.local.asztalos.net
-  port: 9210
-  priority: 10
-  middlewares:
-    - name: authentik
-      namespace: traefik
-    - name: default-headers
-      namespace: traefik
   tlsSecretName: local-asztalos-net-tls
+  routes:
+    - host: netatmo-exporter.local.asztalos.net
+      serviceName: netatmo-exporter
+      port: 9210
+      priority: 10
+      middlewares:
+        - name: authentik
+          namespace: traefik
+        - name: default-headers
+          namespace: traefik
 
 # -----------------------------------------------------------------------------
 # ServiceMonitor — this exporter IS scraped. `release: prometheus-operator` label

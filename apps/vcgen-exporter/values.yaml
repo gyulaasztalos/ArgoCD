@@ -1,0 +1,184 @@
+# =============================================================================
+# vcgen-exporter — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/vcgen-exporter chart.
+#
+# Raspberry Pi vcgencmd exporter: reads on-die temperature/clock/voltage via the
+# privileged `vcgencmd` interface and exposes them as Prometheus metrics. It is a
+# node-local hardware exporter, so per the homelab rule it runs as a DaemonSet
+# (one pod per node). Metrics-only — no IngressRoute (Prometheus scrapes the
+# Service in-cluster). This app has NO domain-specific config, so this file is
+# identical to the chart's own example values.yaml.
+#
+# NOTE: the Grafana dashboard + rpi-alerts PrometheusRule that used to live in
+# install/ have been relocated to apps/vcgen-exporter/post-install/ (synced as a
+# separate ArgoCD source); they are NOT part of this chart.
+# =============================================================================
+
+name: vcgen-exporter
+namespace: vcgen-exporter
+
+# -----------------------------------------------------------------------------
+# Container image. image.tag is the single source of truth for the app version.
+# -----------------------------------------------------------------------------
+image:
+  repository: 2281995/vcgen-exporter
+  # renovate: datasource=docker depName=2281995/vcgen-exporter
+  tag: v1.0.1
+  pullPolicy: IfNotPresent
+
+# -----------------------------------------------------------------------------
+# Controller. DaemonSet — node-local hardware exporter, one pod per node.
+# selectorLabels reproduces the ORIGINAL manifest's selector exactly (name +
+# instance). A DaemonSet's spec.selector is immutable, so on migration the
+# in-place apply must not change it; the pod template still carries the full
+# label set, so this subset selector stays satisfied.
+# -----------------------------------------------------------------------------
+controller:
+  type: daemonset
+  revisionHistoryLimit: 2
+  selectorLabels:
+    app.kubernetes.io/name: vcgen-exporter
+    app.kubernetes.io/instance: vcgen-exporter
+  # Kube-linter waivers on the DaemonSet object (preserved from the original):
+  # this exporter genuinely needs privileged/root to call vcgencmd against the
+  # host hardware.
+  annotations:
+    ignore-check.kube-linter.io/run-as-non-root: "Required for vcgen-exporter to run properly"
+    ignore-check.kube-linter.io/privileged-container: "Required for vcgen-exporter to run properly"
+    ignore-check.kube-linter.io/privilege-escalation-container: "This container requires privileged mode for vcgencmd functionality"
+
+# -----------------------------------------------------------------------------
+# ServiceAccount — the DaemonSet runs under its own SA.
+# -----------------------------------------------------------------------------
+serviceAccount:
+  create: true
+  name: vcgen-exporter
+serviceAccountName: vcgen-exporter
+
+# -----------------------------------------------------------------------------
+# Security. vcgencmd needs privileged + root; RO rootfs is still kept.
+# No podSecurityContext (must run as root, uid 0) — set at container level.
+# -----------------------------------------------------------------------------
+securityContext:
+  privileged: true
+  allowPrivilegeEscalation: true
+  runAsUser: 0
+  readOnlyRootFilesystem: true
+
+# No pod-level security context (runs as root by design).
+podSecurityContext: {}
+
+# Pod anti-affinity is meaningless for a DaemonSet (already one-per-node).
+podAntiAffinity: false
+
+# hostNetwork stays false (matches original); metrics served on the pod IP.
+hostNetwork: false
+
+# -----------------------------------------------------------------------------
+# Ports.
+# -----------------------------------------------------------------------------
+ports:
+  - name: metrics
+    containerPort: 8080
+    protocol: TCP
+
+# -----------------------------------------------------------------------------
+# Configuration — none (no env, no ConfigMap, no secrets).
+# -----------------------------------------------------------------------------
+envFromConfigMap: ""
+envFromSecrets: []
+env: []
+configMaps: []
+externalSecrets: []
+initContainers: []
+
+# -----------------------------------------------------------------------------
+# Resources.
+# -----------------------------------------------------------------------------
+resources:
+  requests:
+    cpu: 50m
+    memory: 50Mi
+  limits:
+    cpu: 200m
+    memory: 100Mi
+
+# -----------------------------------------------------------------------------
+# Probes — httpGet /metrics on :8080.
+# -----------------------------------------------------------------------------
+readinessProbe:
+  httpGet:
+    path: /metrics
+    port: 8080
+  initialDelaySeconds: 5
+  timeoutSeconds: 10
+  periodSeconds: 20
+  failureThreshold: 5
+
+livenessProbe:
+  httpGet:
+    path: /metrics
+    port: 8080
+  initialDelaySeconds: 10
+  timeoutSeconds: 10
+  periodSeconds: 20
+  failureThreshold: 5
+
+# No extra volumes/mounts.
+volumeMounts: []
+volumes: []
+
+# -----------------------------------------------------------------------------
+# Service(s) — list form. The metrics service name carries a `-metrics` suffix
+# (preserved from the original). Selects on the name+instance labels the
+# DaemonSet pods carry (override of the default `app` selector).
+# -----------------------------------------------------------------------------
+services:
+  - name: vcgen-exporter-metrics
+    enabled: true
+    type: ClusterIP
+    selector:
+      app.kubernetes.io/name: vcgen-exporter
+      app.kubernetes.io/instance: vcgen-exporter
+    ports:
+      - name: metrics
+        protocol: TCP
+        port: 8080
+        targetPort: 8080
+
+# -----------------------------------------------------------------------------
+# No IngressRoute — metrics are scraped in-cluster by Prometheus.
+# (omit the ingressRoute object entirely; nothing renders without routes)
+# -----------------------------------------------------------------------------
+ingressRoute: {}
+
+# -----------------------------------------------------------------------------
+# ServiceMonitor — scraped; adds a `nodename` label from the pod's node name so
+# per-node temperatures are distinguishable.
+# -----------------------------------------------------------------------------
+serviceMonitor:
+  enabled: true
+  labels:
+    release: prometheus-operator
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
+      scheme: http
+      honorLabels: true
+      relabelings:
+        - action: replace
+          regex: ^(.*)$
+          replacement: $1
+          separator: ;
+          sourceLabels:
+            - __meta_kubernetes_pod_node_name
+          targetLabel: nodename
+
+# Static PVCs / PVs — none.
+persistentVolumeClaims: []
+persistentVolumes: []
+
+# Extra labels merged into the standard label block.
+extraLabels: {}

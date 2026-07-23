@@ -4,15 +4,31 @@ kind: Application
 metadata:
   name: vcgen-exporter
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
 spec:
-  destination:
-    namespace: vcgen-exporter
-    server: https://kubernetes.default.svc
+  project: default
   sources:
+    # 1) this repo — provides the tailored valueFile (referenced as $config below)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/vcgen-exporter/install
-  project: default
+      ref: config
+    # 2) the homelab-charts monorepo — the vcgen-exporter wrapper chart + the
+    #    `common` library dependency (resolved from the same checkout)
+    - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
+      targetRevision: main
+      path: charts/vcgen-exporter
+      helm:
+        valueFiles:
+          - $config/apps/vcgen-exporter/values.yaml
+    # 3) auxiliary observability assets kept out of the chart (Grafana dashboard
+    #    + rpi temperature PrometheusRule)
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/vcgen-exporter/post-install
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: vcgen-exporter
   syncPolicy:
     automated:
       selfHeal: true
