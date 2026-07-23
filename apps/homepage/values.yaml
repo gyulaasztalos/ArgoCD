@@ -491,14 +491,6 @@ externalSecrets:
           nullBytePolicy: Ignore
           key: traefik-dashboard-auth
           property: users  # 1Password item name
-      - secretKey: homebridge_homepage_password            # key in the Kubernetes Secret
-        remoteRef:
-          conversionStrategy: Default
-          decodingStrategy: None
-          metadataPolicy: None
-          nullBytePolicy: Ignore
-          key: homepage
-          property: homebridge  # 1Password item name
       - secretKey: pihole_rpi_password            # key in the Kubernetes Secret
         remoteRef:
           conversionStrategy: Default
