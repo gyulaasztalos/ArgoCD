@@ -72,6 +72,8 @@ spec:
             - configMapRef:
                 name: paperless-ngx-config
             - secretRef:
+                name: paperless-ngx-app-secret
+            - secretRef:
                 name: paperless-ngx-oauth-secret
             - secretRef:
                 name: paperless-ngx-redis-secret
