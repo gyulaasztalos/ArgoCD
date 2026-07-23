@@ -58,7 +58,7 @@ spec:
       containers:
         - name: cloudflared
           # renovate: managed image tag
-          image: cloudflare/cloudflared:2026.7.2
+          image: cloudflare/cloudflared:2026.7.3
           args:
             - tunnel
             - --no-autoupdate
