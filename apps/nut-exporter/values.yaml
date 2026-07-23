@@ -41,6 +41,32 @@ controller:
       maxUnavailable: 1
 
 # -----------------------------------------------------------------------------
+# ServiceAccount. This app never calls the Kubernetes API, so it runs under the
+# namespace's `default` ServiceAccount and the chart creates nothing.
+#
+# Full knob set (common >= 0.2.0), for when an app DOES need its own identity:
+#   create: true         render a ServiceAccount, named after the app
+#   name: <app>          override that name
+#   annotations: {}      e.g. cloud IAM role bindings
+#   secrets: []          the SA's own `secrets:` back-reference
+#   tokenSecret:
+#     create: true       emit a LONG-LIVED kubernetes.io/service-account-token
+#                        Secret — Kubernetes >= 1.24 no longer auto-creates one,
+#                        so an app needing a durable API token must ask for it.
+#                        Rendered EMPTY: the template has no data/stringData
+#                        field at all, and kube-controller-manager populates the
+#                        token in-cluster, so no secret material enters the repo.
+#     name: <app>        defaults to the ServiceAccount name
+# Also set the top-level `serviceAccountName` so the pod actually uses it.
+# See charts/homepage for a worked example (its `kubernetes` widget needs one).
+# -----------------------------------------------------------------------------
+serviceAccount:
+  create: false
+  secrets: []
+  tokenSecret:
+    create: false
+
+# -----------------------------------------------------------------------------
 # Security — homelab standard, fully non-root.
 # -----------------------------------------------------------------------------
 podSecurityContext:

@@ -9,9 +9,26 @@ metadata:
 spec:
   project: default
   sources:
+    # 1) this repo — provides the tailored valueFile (referenced as $config below)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/homepage/install
+      ref: config
+    # 2) the homelab-charts monorepo — the homepage wrapper chart + the `common`
+    #    library dependency (resolved from the same checkout). Renders the
+    #    workload, the ServiceAccount + its long-lived token Secret, the env and
+    #    dashboard-config ConfigMaps, the ExternalSecret, Service and IngressRoute.
+    - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
+      targetRevision: main
+      path: charts/homepage
+      helm:
+        valueFiles:
+          - $config/apps/homepage/values.yaml
+    # 3) assets homepage needs in place to start: the ClusterRole/ClusterRoleBinding
+    #    for its ServiceAccount, and the binary `homepage-images` ConfigMap
+    #    (artwork cannot live in a Helm values file)
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/homepage/pre-install
   destination:
     server: https://kubernetes.default.svc
     namespace: homepage

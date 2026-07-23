@@ -1,0 +1,723 @@
+# =============================================================================
+# homepage — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/homepage chart.
+#
+# This file is the COMPLETE, reviewable contract for the live deployment: real
+# hostnames + secret refs AND all unchanged defaults, so the whole configuration
+# is visible in one place. The chart's own values.yaml holds only generic
+# example.com placeholders.
+#
+# SPLIT ACROSS SOURCES — see homelab-charts/PLAN.md "Scope boundary":
+#   - the chart owns: workload, ServiceAccount + its token Secret, the env and
+#     dashboard-config ConfigMaps, the ExternalSecret, Service, IngressRoute
+#   - apps/homepage/pre-install/ owns: ClusterRole + ClusterRoleBinding, and the
+#     `homepage-images` ConfigMap (binary artwork, not carryable in values.yaml)
+# =============================================================================
+
+name: homepage
+namespace: homepage
+
+# -----------------------------------------------------------------------------
+# Container image. image.tag is the single source of truth for the app version.
+# -----------------------------------------------------------------------------
+image:
+  repository: ghcr.io/gethomepage/homepage
+  # renovate: datasource=docker depName=ghcr.io/gethomepage/homepage
+  tag: v1.13.2
+  pullPolicy: IfNotPresent
+
+# -----------------------------------------------------------------------------
+# Controller. Deployment — all state lives in ConfigMaps/Secrets and emptyDirs.
+# -----------------------------------------------------------------------------
+controller:
+  type: deployment
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+# -----------------------------------------------------------------------------
+# ServiceAccount + long-lived token. The `kubernetes` widget runs in
+# mode: cluster and calls the API server. Kubernetes >= 1.24 no longer
+# auto-creates a SA token Secret, so the chart emits an EMPTY
+# kubernetes.io/service-account-token Secret that kube-controller-manager fills
+# in-cluster — no secret material is stored in git.
+# The matching ClusterRole/ClusterRoleBinding live in pre-install/rbac.yaml.
+# -----------------------------------------------------------------------------
+serviceAccount:
+  create: true
+  name: homepage
+  secrets:
+    - name: homepage
+  tokenSecret:
+    create: true
+    name: homepage
+serviceAccountName: homepage
+
+# -----------------------------------------------------------------------------
+# Security — homelab standard, fully non-root.
+# -----------------------------------------------------------------------------
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  privileged: false
+
+podAntiAffinity: true
+
+# -----------------------------------------------------------------------------
+# Ports.
+# -----------------------------------------------------------------------------
+ports:
+  - name: http
+    containerPort: 3000
+    protocol: TCP
+
+# -----------------------------------------------------------------------------
+# Configuration. Both ConfigMaps are chart-owned, so the chart's checksum/config
+# annotation covers them: editing anything below rolls the pod automatically.
+# (The binary homepage-images ConfigMap in pre-install/ does NOT — changing
+# artwork needs `kubectl rollout restart deploy/homepage -n homepage`.)
+# -----------------------------------------------------------------------------
+envFromConfigMap: homepage-env
+envFromSecrets: []
+env: []
+
+configMaps:
+  - name: homepage-env
+    data:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: "Europe/Budapest"
+      # Keep in sync with ingressRoute.routes[].host below, or homepage rejects
+      # the request with a bad-host error.
+      HOMEPAGE_ALLOWED_HOSTS: "homepage.local.asztalos.net,localhost:3000"
+      HOMEPAGE_PROXY_DISABLE_IPV6: "true"
+
+  - name: homepage-config
+    files:
+      bookmarks.yaml: |
+        ---
+
+        - Misc 1:
+          - Printer:
+            - icon: printer
+              href: http://printer.local.asztalos.net
+              description: ""
+          - NUT:
+            - icon: nut
+              href: http://raspberrypi.local.asztalos.net:8085/cgi-bin/nut/upsstats.cgi
+              description: ""
+          - rclone:
+            - icon: rclone
+              href: http://unvr-pro.local.asztalos.net:5572
+              description: ""
+
+      kubernetes.yaml: |
+        ---
+        mode: cluster
+        # disable service discovery
+        ingress: false # default, enable ingress
+        traefik: false # enable traefik ingressRoute
+        gateway: false # enable gateway-api
+
+      settings.yaml: |
+        ---
+        # For configuration options and examples, please see:
+        # https://gethomepage.dev/latest/configs/settings
+
+        providers:
+          openweathermap: openweathermapapikey
+          weatherapi: weatherapiapikey
+          longhorn:
+            url: http://longhorn-frontend.longhorn-system.svc.cluster.local
+
+        title: Homelab Homepage
+        startUrl: https://homepage.local.asztalos.net
+        favicon: favicon-32x32.png
+        color: slate
+        background: /images/custom_background.jpg
+        theme: dark # or light
+
+        headerStyle: clean
+
+        target: _blank
+        cardBlur: xl # sm, "", md, etc... see https://tailwindcss.com/docs/backdrop-blur
+
+        layout:
+          Misc 1:
+            style: row
+            columns: 3
+            header: false
+          Line 0A:
+            header: false
+          Line 0B:
+            header: false
+          Line 0C:
+            header: false
+          Line 0D:
+            header: false
+          Line 1A:
+            header: false
+          Line 1B:
+            header: false
+          Line 1C:
+            header: false
+          Line 1D:
+            header: false
+          Line 2:
+            style: row
+            columns: 4
+            header: false
+          Line 3:
+            style: row
+            columns: 4
+            header: false
+          Line 4:
+            style: row
+            columns: 4
+            header: false
+          Line 5:
+            style: row
+            columns: 4
+            header: false
+
+
+        quicklaunch:
+          searchDescriptions: true
+          hideInternetSearch: true
+          hideVisitURL: true
+
+        # showStats: true
+        # statusStyle: "dot"
+
+      widgets.yaml: |
+        ---
+        - logo:
+            icon: homepage
+
+        - kubernetes:
+            nodes:
+              # Shows node-specific statistics
+              show: true
+              # Shows the CPU for each node
+              cpu: true
+              # Shows the memory for each node
+              memory: true
+              # Shows the label, which is always the node name
+              showLabel: true
+            cluster:
+              # Shows cluster-wide statistics
+              show: false
+              # Shows the aggregate CPU stats
+              cpu: true
+              # Shows the aggregate memory stats
+              memory: true
+              # Shows a custom label
+              showLabel: true
+              label: "cluster"
+
+        - longhorn:
+            # Show the expanded view
+            expanded: true
+            # Shows a node representing the aggregate values
+            total: false
+            # Shows the node names as labels
+            labels: true
+            # Show the nodes
+            nodes: true
+
+        - search:
+            provider: duckduckgo # google, duckduckgo, bing, baidu, brave or custom
+            focus: true # Optional, will set focus to the search bar on page load
+            target: _blank # One of _self, _blank, _parent or _top
+
+        - openmeteo:
+            label: Szentendre #optional
+            latitude: 47.69
+            longitude: 19.08
+            timezone: Europe/Budapest # optional
+            units: metric # or imperial
+            cache: 5 # Time in minutes to cache API responses, to stay within limits
+
+        - datetime:
+            locale: hu
+            text_size: md
+            format:
+                dateStyle: short
+                timeStyle: short
+                hourCycle: h23
+
+            # - resources:
+            #    label: System
+            #    cpu: true
+            #    memory: true
+
+            #- resources:
+            #    label: Storage
+            #    disk: /mnt/storage
+
+# -----------------------------------------------------------------------------
+# Secrets — ExternalSecret (onepassword-connect). homepage's services.yaml embeds
+# widget API tokens and passwords, so the WHOLE file is rendered by External
+# Secrets Operator and mounted via subPath. NO secret material is stored here.
+# The {{ .* }} braces are ESO's OWN runtime templating, written raw because
+# valueFiles are not Helm-processed.
+# -----------------------------------------------------------------------------
+externalSecrets:
+  - name: homepage-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          services.yaml: |
+            ---
+            # For configuration options and examples, please see:
+            # https://gethomepage.dev/en/configs/services
+
+            - Line 0A:
+                - Unifi:
+                    icon: unifi
+                    href: https://unifi.local.asztalos.net
+                    widget:
+                        type: unifi
+                        url: https://unifi.local.asztalos.net
+                        username: homepage
+                        password: {{ .unifi_homepage_password }}
+
+            - Line 0B:
+                - UNVR-PRO:
+                    icon: unifi
+                    href: https://unvr-pro.local.asztalos.net
+                    ping: https://unvr-pro.local.asztalos.net
+                - Apprise:
+                    icon: apprise
+                    href: https://apprise.local.asztalos.net/cfg/apprise
+                    siteMonitor: http://apprise.apprise.svc.cluster.local:8000
+                    app: apprise
+                    namespace: apprise
+
+            - Line 0C:
+                - FlexGet:
+                    icon: flexget
+                    href: https://flexget.local.asztalos.net
+                    siteMonitor: http://flexget.flexget.svc.cluster.local:5050
+                    app: flexget
+                    namespace: flexget
+                - ddns-updater:
+                    icon: ddns-updater
+                    href: https://ddns-updater.local.asztalos.net
+                    siteMonitor: http://ddns-updater.ddns-updater.svc.cluster.local:8000
+                    app: ddns-updater
+                    namespace: ddns-updater
+
+            - Line 1A:
+                - ArgoCD:
+                    icon: argo-cd
+                    href: https://argocd.local.asztalos.net
+                    siteMonitor: http://argocd-server.argocd.svc.cluster.local
+                    app: argocd-server
+                    namespace: argocd
+                    widget:
+                        type: argocd
+                        url: http://argocd-server.argocd.svc.cluster.local
+                        key: {{ .argocd_token }}
+
+            - Line 1B:
+                - Authentik:
+                    icon: authentik
+                    href: https://auth.local.asztalos.net
+                    siteMonitor: http://authentik-server.authentik.svc.cluster.local
+                    app: authentik
+                    namespace: authentik
+                    widget:
+                      type: authentik
+                      version: 2
+                      url: http://authentik-server.authentik.svc.cluster.local
+                      key: {{ .authentik_token }}
+
+            - Line 1C:
+                - Traefik:
+                    icon: traefik
+                    href: https://traefik.local.asztalos.net
+                    siteMonitor: https://traefik.local.asztalos.net/api/overview
+                    app: traefik
+                    namespace: traefik
+                    widget:
+                        type: traefik
+                        url: https://traefik.local.asztalos.net
+                        username: red # optional
+                        password: {{ .traefik_dashboard_auth }}
+
+            - Line 1D:
+                - Rancher:
+                    icon: rancher
+                    href: https://rancher.local.asztalos.net
+                    siteMonitor: https://rancher.cattle-system.svc.cluster.local
+                    podSelector:
+                      app: rancher
+                    namespace: cattle-system
+                - Longhorn:
+                    icon: longhorn
+                    href: https://longhorn.local.asztalos.net
+                    siteMonitor: http://longhorn-frontend.longhorn-system.svc.cluster.local
+                    app: longhorn
+                    namespace: longhorn-system
+
+            - Line 2:
+                - Uptime Kuma:
+                    icon: uptime-kuma
+                    href: https://uptime-kuma.local.asztalos.net/status/info
+                    widget:
+                        type: uptimekuma
+                        url: https://uptime-kuma.local.asztalos.net
+                        slug: info
+
+                - Pi-Hole Raspberry Pi:
+                    icon: pi-hole
+                    href: https://pihole-rpi.local.asztalos.net/admin/
+                    ping: https://pihole-rpi.local.asztalos.net/admin/
+                    widget:
+                        type: pihole
+                        version: 6
+                        url: https://pihole-rpi.local.asztalos.net
+                        key: {{ .pihole_rpi_password }}
+
+                - Pi-Hole Cluster:
+                    icon: pi-hole
+                    href: https://pihole.local.asztalos.net/admin/
+                    siteMonitor: http://pihole-web.pihole.svc.cluster.local
+                    app: pihole
+                    namespace: pihole
+                    widget:
+                        type: pihole
+                        version: 6
+                        url: http://pihole-web.pihole.svc.cluster.local
+                        key: {{ .pihole_cluster_password }}
+
+                - Transmission:
+            #        description: Torrent client
+                    icon: transmission
+                    href: http://transmission.local.asztalos.net:9091/transmission/web/
+                    siteMonitor: http://transmission.local.asztalos.net:9091/transmission/web/
+                    app: transmission
+                    namespace: transmission
+                    widget:
+                        type: transmission
+                        url: http://transmission-peer-tcp.transmission.svc.cluster.local:9091
+                        username: {{ .transmission_username}}
+                        password: {{ .transmission_password}}
+                        rpcUrl: /transmission/ # Optional. Matches the value of "rpc-url" in your Transmission's settings.json file
+
+                - Home Assistant:
+                    icon: home-assistant
+                    href: https://homeassistant.local.asztalos.net
+                    widget:
+                      type: homeassistant
+                      url: https://homeassistant.local.asztalos.net
+                      key: {{ .homeassistant_token }}
+                      custom:
+                        - state: sensor.outdoor_module_temperature
+                          label: Temp
+                        - state: alarm_control_panel.home
+                        - state: binary_sensor.0x00158d000359f895_water_leak
+                          label: Water leak
+                        - state: sensor.solaredge_i1_ac_power
+                          label: Solar power
+
+            - Line 4:
+                - Alloy:
+                    icon: alloy
+                    href: https://alloy.local.asztalos.net
+                    siteMonitor: http://alloy.alloy.svc.cluster.local:12345
+                    app: alloy
+                    namespace: alloy
+
+                - Prometheus:
+            #        description: Metrics scraper
+                    icon: prometheus
+                    href: https://prometheus.local.asztalos.net
+                    siteMonitor: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+                    app: prometheus
+                    namespace: monitoring
+                    widget:
+                        type: prometheus
+                        url: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+
+                - Grafana:
+                    icon: grafana
+                    href: https://grafana.local.asztalos.net
+                    siteMonitor: http://monitoring-grafana.monitoring.svc.cluster.local/api/health
+                    app: grafana
+                    namespace: monitoring
+                    widget:
+                      type: grafana
+                      url: http://monitoring-grafana.monitoring.svc.cluster.local
+                      username: {{ .grafana_username }}
+                      password: {{ .grafana_password }}
+
+                - Paperless-ngx:
+                    icon: paperless-ngx
+                    href: https://paperless.local.asztalos.net
+                    siteMonitor: http://paperless-ngx.paperless-ngx.svc.cluster.local:8000
+                    app: paperless-ngx
+                    namespace: paperless-ngx
+                    widget:
+                        type: paperlessngx
+                        url: http://paperless-ngx.paperless-ngx.svc.cluster.local:8000
+                        username: homepage
+                        password: {{ .paperless_ngx_homepage_password }}
+
+    data:
+      - secretKey: traefik_dashboard_auth            # key in the Kubernetes Secret
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          metadataPolicy: None
+          nullBytePolicy: Ignore
+          key: traefik-dashboard-auth
+          property: users  # 1Password item name
+      - secretKey: homebridge_homepage_password            # key in the Kubernetes Secret
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          metadataPolicy: None
+          nullBytePolicy: Ignore
+          key: homepage
+          property: homebridge  # 1Password item name
+      - secretKey: pihole_rpi_password            # key in the Kubernetes Secret
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          metadataPolicy: None
+          nullBytePolicy: Ignore
+          key: homepage
+          property: pihole-rpi  # 1Password item name
+      - secretKey: pihole_cluster_password            # key in the Kubernetes Secret
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          metadataPolicy: None
+          nullBytePolicy: Ignore
+          key: pihole-secret
+          property: webpassword
+      - secretKey: transmission_username            # key in the Kubernetes Secret
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          metadataPolicy: None
+          nullBytePolicy: Ignore
+          key: transmission
+          property: username
+      - secretKey: transmission_password            # key in the Kubernetes Secret
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          metadataPolicy: None
+          nullBytePolicy: Ignore
+          key: transmission
+          property: password
+      - secretKey: grafana_username           # key in the Kubernetes Secret
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          metadataPolicy: None
+          nullBytePolicy: Ignore
+          key: grafana-secrets
+          property: admin-user
+      - secretKey: grafana_password           # key in the Kubernetes Secret
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          metadataPolicy: None
+          nullBytePolicy: Ignore
+          key: grafana-secrets
+          property: admin-password
+      - secretKey: paperless_ngx_homepage_password            # key in the Kubernetes Secret
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          metadataPolicy: None
+          nullBytePolicy: Ignore
+          key: homepage
+          property: paperless-ngx  # 1Password item name
+      - secretKey: unifi_homepage_password            # key in the Kubernetes Secret
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          metadataPolicy: None
+          nullBytePolicy: Ignore
+          key: homepage
+          property: unifi  # 1Password item name
+      - secretKey: argocd_token            # key in the Kubernetes Secret
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          metadataPolicy: None
+          nullBytePolicy: Ignore
+          key: homepage
+          property: argocd  # 1Password item name
+      - secretKey: authentik_token            # key in the Kubernetes Secret
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          metadataPolicy: None
+          nullBytePolicy: Ignore
+          key: authentik-blueprint-secrets
+          property: authentik-homepage-token
+      - secretKey: homeassistant_token
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          metadataPolicy: None
+          nullBytePolicy: Ignore
+          key: homeassistant
+          property: credential  # 1Password item name
+
+# -----------------------------------------------------------------------------
+# Resources.
+# -----------------------------------------------------------------------------
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 1000m
+    memory: 256Mi
+
+# -----------------------------------------------------------------------------
+# Probes — httpGet / on :3000.
+# -----------------------------------------------------------------------------
+readinessProbe:
+  httpGet:
+    path: /
+    port: 3000
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: 3000
+  initialDelaySeconds: 30
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+# -----------------------------------------------------------------------------
+# Volumes / mounts. These are LISTS, so this file replaces the chart's versions
+# wholesale — every entry the deployment needs must be repeated here.
+#   config / logs   — emptyDirs; the rootfs is read-only but homepage writes into
+#                     /app/config at startup.
+#   homepage-config — chart-owned ConfigMap, layered file-by-file via subPath.
+#   homepage-secret — ESO-rendered services.yaml.
+#   homepage-images — ConfigMap generated by pre-install/ (binary artwork). This
+#                     is the one mount the generic chart deliberately omits.
+# -----------------------------------------------------------------------------
+volumeMounts:
+  - mountPath: /app/config
+    name: config
+  - mountPath: /app/config/bookmarks.yaml
+    name: homepage-config
+    subPath: bookmarks.yaml
+  - mountPath: /app/config/kubernetes.yaml
+    name: homepage-config
+    subPath: kubernetes.yaml
+  - mountPath: /app/config/settings.yaml
+    name: homepage-config
+    subPath: settings.yaml
+  - mountPath: /app/config/widgets.yaml
+    name: homepage-config
+    subPath: widgets.yaml
+  - mountPath: /app/public/images/custom_background.jpg
+    name: homepage-images
+    subPath: custom_background.jpg
+  - mountPath: /app/public/images/telekom.png
+    name: homepage-images
+    subPath: telekom.png
+  - mountPath: /app/config/services.yaml
+    name: homepage-secret
+    subPath: services.yaml
+  - mountPath: /app/config/logs
+    name: logs
+
+volumes:
+  - name: config
+    emptyDir: {}
+  - name: homepage-config
+    configMap:
+      name: homepage-config
+  - name: homepage-images
+    configMap:
+      name: homepage-images
+  - name: homepage-secret
+    secret:
+      secretName: homepage-secret
+  - name: logs
+    emptyDir: {}
+
+initContainers: []
+
+# -----------------------------------------------------------------------------
+# Service(s) — list form (ClusterIP), targetPort by name.
+# -----------------------------------------------------------------------------
+services:
+  - name: homepage
+    enabled: true
+    type: ClusterIP
+    ports:
+      - name: http
+        protocol: TCP
+        port: 3000
+        targetPort: http
+
+# -----------------------------------------------------------------------------
+# Traefik IngressRoute — one object with a `routes` list; real homelab hostname
+# + TLS secret. Keep HOMEPAGE_ALLOWED_HOSTS above in sync with this host.
+# -----------------------------------------------------------------------------
+ingressRoute:
+  enabled: true
+  ingressClassName: traefik-external
+  entryPoint: websecure
+  tlsSecretName: local-asztalos-net-tls
+  routes:
+    - host: homepage.local.asztalos.net
+      serviceName: homepage
+      port: 3000
+      priority: 10
+      middlewares:
+        - name: authentik
+          namespace: traefik
+        - name: default-headers
+          namespace: traefik
+
+# -----------------------------------------------------------------------------
+# ServiceMonitor — homepage exposes no Prometheus metrics endpoint.
+# -----------------------------------------------------------------------------
+serviceMonitor:
+  enabled: false
+  labels: {}
+  endpoints: []
+
+persistentVolumeClaims: []
+persistentVolumes: []
+
+extraLabels: {}

@@ -50,10 +50,26 @@ controller:
 
 # -----------------------------------------------------------------------------
 # ServiceAccount — the DaemonSet runs under its own SA.
+#
+# `secrets` and `tokenSecret` (common >= 0.2.0) are both off here: the exporter
+# reads host hardware via vcgencmd and never calls the Kubernetes API, so it
+# needs no API token. They are listed explicitly so this file stays a complete
+# statement of the SA configuration:
+#   secrets: []               the SA's own `secrets:` back-reference
+#   tokenSecret.create: false emit a LONG-LIVED
+#                             kubernetes.io/service-account-token Secret;
+#                             Kubernetes >= 1.24 no longer auto-creates one, so
+#                             only an app needing a durable API token asks for
+#                             it. Rendered EMPTY (the template has no
+#                             data/stringData field) and populated in-cluster by
+#                             kube-controller-manager — see charts/homepage.
 # -----------------------------------------------------------------------------
 serviceAccount:
   create: true
   name: vcgen-exporter
+  secrets: []
+  tokenSecret:
+    create: false
 serviceAccountName: vcgen-exporter
 
 # -----------------------------------------------------------------------------

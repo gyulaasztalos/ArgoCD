@@ -1,0 +1,44 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Assets homepage needs in place to deploy and start correctly, synced as a
+# separate ArgoCD Application source alongside the Helm chart:
+#
+#   - rbac.yaml            the ClusterRole + ClusterRoleBinding granting the
+#                          `homepage` ServiceAccount its read access to
+#                          namespaces/pods/nodes/ingresses/ingressroutes/metrics.
+#                          The ServiceAccount and its long-lived token Secret are
+#                          rendered by the CHART (common >= 0.2.0), not here.
+#
+#   - homepage-images      custom dashboard artwork. These are BINARY files, so
+#                          they cannot live in the chart's values.yaml — that is
+#                          the whole reason this generator stays in kustomize.
+#
+# disableNameSuffixHash is REQUIRED, not cosmetic: the Deployment that mounts
+# this ConfigMap is rendered by Helm in a DIFFERENT ArgoCD source, so kustomize
+# cannot rewrite the volume reference to a hashed name the way it did when the
+# whole app was one kustomize dir. The name must stay literally `homepage-images`.
+#
+# Consequence: replacing an image updates this ConfigMap in place and does NOT
+# roll the pod (the hash churn used to do that). Restart homepage by hand after
+# changing artwork:  kubectl rollout restart deploy/homepage -n homepage
+# The chart-owned config ConfigMaps are unaffected — they still roll the pod via
+# the chart's checksum/config annotation.
+configMapGenerator:
+  - name: homepage-images
+    namespace: homepage
+    files:
+      - custom_background.jpg=./images/custom_background.jpg
+      - telekom.png=./images/telekom.png
+
+resources:
+  - rbac.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+  labels:
+    app.kubernetes.io/name: homepage
+    app.kubernetes.io/part-of: homepage
+    app.kubernetes.io/instance: homepage
+    app.kubernetes.io/component: homepage
