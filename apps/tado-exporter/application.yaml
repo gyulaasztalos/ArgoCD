@@ -9,9 +9,25 @@ metadata:
 spec:
   project: default
   sources:
+    # 1) this repo — provides the tailored valueFile (referenced as $config below)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/tado-exporter/install
+      ref: config
+    # 2) the homelab-charts monorepo — the tado-exporter wrapper chart + the
+    #    `common` library dependency (resolved from the same checkout). Renders
+    #    the Deployment, its config ConfigMap, the ExternalSecret, the Service
+    #    and the ServiceMonitor.
+    - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
+      targetRevision: main
+      path: charts/tado-exporter
+      helm:
+        valueFiles:
+          - $config/apps/tado-exporter/values.yaml
+    # 3) auxiliary observability assets kept out of the chart: the Grafana
+    #    dashboard (generated from JSON) + the PrometheusRule alarms
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/tado-exporter/post-install
   destination:
     server: https://kubernetes.default.svc
     namespace: tado-exporter

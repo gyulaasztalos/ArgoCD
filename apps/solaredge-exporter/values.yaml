@@ -1,0 +1,201 @@
+# =============================================================================
+# solaredge-exporter — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/solaredge-exporter chart.
+#
+# This file is the COMPLETE, reviewable contract for the live deployment: the
+# real inverter LAN address AND all unchanged defaults.
+#
+# NOT in this chart (see apps/solaredge-exporter/post-install/, synced as a
+# separate ArgoCD source): the Grafana dashboard (generated from JSON) +
+# PrometheusRule. See homelab-charts/PLAN.md "Scope boundary".
+# =============================================================================
+name: solaredge-exporter
+namespace: solaredge-exporter
+
+# -----------------------------------------------------------------------------
+# Container image. `image.tag` is the SINGLE source of truth for the app version
+# (there is deliberately no Chart.yaml appVersion). The tag is a build date
+# (YYYYMMDD); Renovate's docker versioning tracks it as an increasing number.
+# -----------------------------------------------------------------------------
+image:
+  repository: asztalosgyula/solaredge-exporter
+  # renovate: datasource=docker depName=asztalosgyula/solaredge-exporter
+  tag: "20250905"
+  pullPolicy: IfNotPresent
+
+# -----------------------------------------------------------------------------
+# Controller. type = deployment | statefulset | daemonset.
+# Reads a LOCAL SolarEdge inverter over Modbus TCP and serves /metrics; owns no
+# PVC and no host hardware, so a plain Deployment.
+# -----------------------------------------------------------------------------
+controller:
+  type: deployment
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+# -----------------------------------------------------------------------------
+# ServiceAccount. Never calls the Kubernetes API, so it runs under the
+# namespace's `default` ServiceAccount and the chart creates nothing.
+# See charts/homepage for the full knob set (create/name/secrets/tokenSecret).
+# -----------------------------------------------------------------------------
+serviceAccount:
+  create: false
+  secrets: []
+  tokenSecret:
+    create: false
+
+# -----------------------------------------------------------------------------
+# Pod security. Homelab standard: fully non-root, RuntimeDefault seccomp.
+# -----------------------------------------------------------------------------
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+
+# Container-level security context.
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  privileged: false
+
+# Schedule at most one replica per node (default true in the library chart).
+podAntiAffinity: true
+
+# -----------------------------------------------------------------------------
+# Ports.
+# -----------------------------------------------------------------------------
+ports:
+  - containerPort: 2112
+    name: http
+
+# -----------------------------------------------------------------------------
+# Configuration. All non-secret — the inverter address/port/interval, from a
+# generated ConfigMap via envFrom. There is NO ExternalSecret: the exporter talks
+# to a LAN inverter over Modbus, which is unauthenticated, so there is no API key.
+# -----------------------------------------------------------------------------
+envFromConfigMap: solaredge-exporter-config
+envFromSecrets: []
+env: []
+
+configMaps:
+  - name: solaredge-exporter-config
+    data:
+      INVERTER_ADDRESS: "10.10.20.14"
+      INVERTER_PORT: "1502"
+      EXPORTER_INTERVAL: "30"
+      INVERTER_CLIENT_ID: "0x01"
+
+# No ExternalSecret — Modbus is unauthenticated (see above).
+externalSecrets: []
+
+# -----------------------------------------------------------------------------
+# Resources.
+# -----------------------------------------------------------------------------
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+
+# -----------------------------------------------------------------------------
+# Probes. Readiness is a plain httpGet on /metrics. Liveness is an EXEC probe:
+# the exporter only updates /metrics after a successful inverter poll, so this
+# asserts the endpoint returns more than the header line (real data), which an
+# httpGet 200 alone would not catch. Preserved verbatim from the original.
+# -----------------------------------------------------------------------------
+readinessProbe:
+  httpGet:
+    path: /metrics
+    port: 2112
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+livenessProbe:
+  exec:
+    command:
+      - sh
+      - -c
+      - |
+        wget -q -O - http://localhost:2112/metrics | awk '{if (NR>1) ok=1};END{if (ok==1) exit 0; else exit 1}'
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  failureThreshold: 6
+  successThreshold: 1
+  timeoutSeconds: 10
+
+# -----------------------------------------------------------------------------
+# Volumes / mounts. The exporter writes to /app under its read-only rootfs, so it
+# needs a writable emptyDir there. Preserved from the original manifest.
+# -----------------------------------------------------------------------------
+volumeMounts:
+  - name: app
+    mountPath: /app
+
+volumes:
+  - name: app
+    emptyDir: {}
+
+# Init containers (none for this app).
+initContainers: []
+
+# -----------------------------------------------------------------------------
+# Sidecar containers (common >= 0.4.0) — none. See charts/unbound.
+# -----------------------------------------------------------------------------
+extraContainers: []
+
+# -----------------------------------------------------------------------------
+# Service — ClusterIP exposing /metrics for the ServiceMonitor.
+# -----------------------------------------------------------------------------
+services:
+  - name: solaredge-exporter
+    enabled: true
+    type: ClusterIP
+    ports:
+      - name: http
+        protocol: TCP
+        port: 2112
+        targetPort: http
+
+# -----------------------------------------------------------------------------
+# No IngressRoute — metrics-only, scraped in-cluster. Omitting `routes` skips it.
+# -----------------------------------------------------------------------------
+ingressRoute: {}
+
+# -----------------------------------------------------------------------------
+# ServiceMonitor.
+# MIGRATION NOTE: the object was previously named `solaredge-exporter-exporter`;
+# it is normalized to `solaredge-exporter` (the chart names it after the app),
+# matching the change made for nut-exporter, unbound, apprise and unpoller. The
+# `release: prometheus-operator` label is preserved but vestigial.
+# -----------------------------------------------------------------------------
+serviceMonitor:
+  enabled: true
+  labels:
+    release: prometheus-operator
+  endpoints:
+    - path: /metrics
+      interval: 30s
+      targetPort: http
+      honorLabels: true
+
+# Static PVCs / PVs — none.
+persistentVolumeClaims: []
+persistentVolumes: []
+
+# Extra labels merged into the standard label block.
+extraLabels: {}

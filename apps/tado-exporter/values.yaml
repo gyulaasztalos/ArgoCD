@@ -1,0 +1,215 @@
+# =============================================================================
+# tado-exporter — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/tado-exporter chart.
+#
+# This file is the COMPLETE, reviewable contract for the live deployment. This
+# app has no domain-specific config — the tado° credentials come from the
+# ExternalSecret — so it is identical to the chart's own values.yaml.
+#
+# NOT in this chart (see apps/tado-exporter/post-install/, synced as a separate
+# ArgoCD source): the Grafana dashboard (generated from JSON) + PrometheusRule.
+# See homelab-charts/PLAN.md "Scope boundary".
+# =============================================================================
+
+name: tado-exporter
+namespace: tado-exporter
+
+# -----------------------------------------------------------------------------
+# Container image. `image.tag` is the SINGLE source of truth for the app version
+# (there is deliberately no Chart.yaml appVersion). The tag is a build date
+# (YYYYMMDD); Renovate's docker versioning tracks it as an increasing number.
+# -----------------------------------------------------------------------------
+image:
+  repository: asztalosgyula/tado-exporter
+  # renovate: datasource=docker depName=asztalosgyula/tado-exporter
+  tag: "20260504"
+  pullPolicy: IfNotPresent
+
+# -----------------------------------------------------------------------------
+# Controller. type = deployment | statefulset | daemonset.
+# Stateless cloud poller — no owned PVC, no host hardware — so a Deployment.
+# -----------------------------------------------------------------------------
+controller:
+  type: deployment
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+# -----------------------------------------------------------------------------
+# ServiceAccount. tado-exporter never calls the Kubernetes API, so it runs under
+# the namespace's `default` ServiceAccount and the chart creates nothing.
+# See charts/homepage for the full knob set (create/name/secrets/tokenSecret).
+# -----------------------------------------------------------------------------
+serviceAccount:
+  create: false
+  secrets: []
+  tokenSecret:
+    create: false
+
+# -----------------------------------------------------------------------------
+# Pod security. Homelab standard: fully non-root, RuntimeDefault seccomp.
+# -----------------------------------------------------------------------------
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+
+# Container-level security context.
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  privileged: false
+
+# Schedule at most one replica per node (default true in the library chart).
+podAntiAffinity: true
+
+# -----------------------------------------------------------------------------
+# Ports.
+# -----------------------------------------------------------------------------
+ports:
+  - containerPort: 9898
+    name: metrics
+
+# -----------------------------------------------------------------------------
+# Configuration. Non-secret tuning via a generated ConfigMap; the tado° cloud
+# credentials come from the ExternalSecret-created Secret. Both via envFrom.
+# -----------------------------------------------------------------------------
+envFromConfigMap: tado-exporter-config
+envFromSecrets:
+  - tado-exporter-secret
+env: []
+
+configMaps:
+  - name: tado-exporter-config
+    data:
+      EXPORTER_TICKER: "60"
+      RUST_LOG: "info"
+
+# -----------------------------------------------------------------------------
+# Secrets — ExternalSecret referencing the onepassword-connect ClusterSecretStore.
+# The tado° account username/password, exposed as env vars. NO secret material is
+# stored here — only references. The {{ .* }} braces are ESO's OWN runtime
+# templating, written raw because valueFiles are not Helm-processed.
+# -----------------------------------------------------------------------------
+externalSecrets:
+  - name: tado-exporter-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          EXPORTER_USERNAME: "{{ .username }}"
+          EXPORTER_PASSWORD: "{{ .password }}"
+    data:
+      - secretKey: username
+        remoteRef:
+          key: tado-exporter
+          property: username
+      - secretKey: password
+        remoteRef:
+          key: tado-exporter
+          property: password
+
+# -----------------------------------------------------------------------------
+# Resources.
+# -----------------------------------------------------------------------------
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+
+# -----------------------------------------------------------------------------
+# Probes. Readiness is a plain httpGet on /metrics. Liveness is an EXEC probe:
+# the exporter only updates /metrics after a successful poll, so this asserts the
+# endpoint returns more than the header line (i.e. real data), which an httpGet
+# 200 alone would not catch. Preserved verbatim from the original manifest.
+# -----------------------------------------------------------------------------
+readinessProbe:
+  httpGet:
+    path: /metrics
+    port: 9898
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+livenessProbe:
+  exec:
+    command:
+      - sh
+      - -c
+      - |
+        wget -q -O - http://localhost:9898/metrics | awk '{if (NR>1) ok=1};END{if (ok==1) exit 0; else exit 1}'
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  failureThreshold: 6
+  successThreshold: 1
+  timeoutSeconds: 10
+
+# -----------------------------------------------------------------------------
+# Volumes / mounts — none (stateless, read-only root filesystem).
+# -----------------------------------------------------------------------------
+volumeMounts: []
+volumes: []
+
+# Init containers (none for this app).
+initContainers: []
+
+# -----------------------------------------------------------------------------
+# Sidecar containers (common >= 0.4.0) — none. See charts/unbound.
+# -----------------------------------------------------------------------------
+extraContainers: []
+
+# -----------------------------------------------------------------------------
+# Service — ClusterIP exposing /metrics for the ServiceMonitor.
+# -----------------------------------------------------------------------------
+services:
+  - name: tado-exporter
+    enabled: true
+    type: ClusterIP
+    ports:
+      - name: metrics
+        protocol: TCP
+        port: 9898
+        targetPort: 9898
+
+# -----------------------------------------------------------------------------
+# No IngressRoute — metrics-only, scraped in-cluster. Omitting `routes` skips it.
+# -----------------------------------------------------------------------------
+ingressRoute: {}
+
+# -----------------------------------------------------------------------------
+# ServiceMonitor. Already named `tado-exporter` in the original (no rename).
+# The `release: prometheus-operator` label is preserved but vestigial.
+# -----------------------------------------------------------------------------
+serviceMonitor:
+  enabled: true
+  labels:
+    release: prometheus-operator
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
+      scheme: http
+      honorLabels: true
+
+# Static PVCs / PVs — none.
+persistentVolumeClaims: []
+persistentVolumes: []
+
+# Extra labels merged into the standard label block.
+extraLabels: {}

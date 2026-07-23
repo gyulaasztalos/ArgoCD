@@ -1,0 +1,32 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Auxiliary observability assets kept OUT of the Helm chart, synced as a separate
+# ArgoCD Application source (see homelab-charts/PLAN.md "Scope boundary"):
+#
+#   - the Grafana dashboard, GENERATED from tado-grafana-dashboard.json via
+#     configMapGenerator. This replaces the old hand-written literal ConfigMap:
+#     the JSON now lives as a plain .json file (diffable, editable) and kustomize
+#     wraps it. Nothing references the ConfigMap by name — the kube-prometheus
+#     Grafana sidecar discovers it by the grafana_dashboard label — so the hash
+#     suffix the generator adds is harmless.
+#   - prometheus-alarms.yaml, the tado-exporter PrometheusRule.
+configMapGenerator:
+  - name: tado-exporter-grafana-dashboard
+    namespace: tado-exporter
+    files:
+      - tado-grafana-dashboard.json=tado-grafana-dashboard.json
+
+resources:
+  - prometheus-alarms.yaml
+
+generatorOptions:
+  labels:
+    app.kubernetes.io/name: tado-exporter
+    app.kubernetes.io/instance: tado-exporter
+    app.kubernetes.io/part-of: tado-exporter
+    app.kubernetes.io/component: tado-exporter
+    grafana_dashboard: "1"
+  annotations:
+    grafana_folder: "/tmp/dashboards/Applications"
