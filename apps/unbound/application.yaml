@@ -9,9 +9,22 @@ metadata:
 spec:
   project: default
   sources:
+    # 1) this repo — provides the tailored valueFile (referenced as $config below)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/unbound/install
+      ref: config
+    # 2) the homelab-charts monorepo — the unbound wrapper chart + the `common`
+    #    library dependency (resolved from the same checkout). Renders the
+    #    resolver, its exporter sidecar, both config ConfigMaps, the Service and
+    #    the ServiceMonitor.
+    - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
+      targetRevision: main
+      path: charts/unbound
+      helm:
+        valueFiles:
+          - $config/apps/unbound/values.yaml
+    # 3) auxiliary observability assets kept out of the chart (Grafana dashboard
+    #    + PrometheusRule alarms)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       path: apps/unbound/post-install

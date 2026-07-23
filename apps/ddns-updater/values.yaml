@@ -230,6 +230,20 @@ volumes:
 initContainers: []
 
 # -----------------------------------------------------------------------------
+# Sidecar containers (common >= 0.3.0) — a list appended AFTER the main container
+# and passed through verbatim, the same contract as initContainers above.
+# None here: this app is a single process.
+#
+# Used when a workload genuinely needs a co-process in the same pod — see
+# charts/unbound, whose exporter reads the resolver's control socket over a
+# shared emptyDir. Because the list is verbatim, a sidecar's image is a combined
+# "repo:tag" string rather than the structured image.repository/image.tag; put a
+# `# renovate:` comment on the line DIRECTLY above `image:` so the second
+# customManager in renovate.json keeps it updated.
+# -----------------------------------------------------------------------------
+extraContainers: []
+
+# -----------------------------------------------------------------------------
 # Service(s) — list form (ClusterIP).
 # -----------------------------------------------------------------------------
 services:
