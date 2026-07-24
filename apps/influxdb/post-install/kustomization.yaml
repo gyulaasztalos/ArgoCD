@@ -1,0 +1,58 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Everything that is NOT the influxdb core workload, synced as a separate ArgoCD
+# Application source alongside the Helm chart (see homelab-charts/PLAN.md "Scope
+# boundary"):
+#
+#   - two Grafana dashboards, GENERATED from JSON (fridge-HACCP + OSS metrics),
+#     labelled grafana_dashboard: "1" and discovered by the kube-prometheus
+#     Grafana sidecar in any namespace.
+#   - grafana-datasource.yaml — an ExternalSecret rendering a grafana_datasource
+#     Secret so the sidecar wires Grafana to influxdb (reuses the admin token).
+#     This is observability glue, not influxdb's own workload, so it lives here.
+#   - prometheus-rules.yaml — the influxdb PrometheusRule alarms.
+#   - haccp-backup-alert-job.yaml + haccp-backup-alert-template.yml — a PostSync
+#     Job that applies an InfluxDB-native Task (the HACCP backup alarm). The Job
+#     and the template ConfigMap are in the SAME kustomization, so kustomize
+#     rewrites the Job's volume reference to the hashed ConfigMap name — no
+#     disableNameSuffixHash needed.
+configMapGenerator:
+  - name: influxdb-fridge-haccp-dashboard
+    namespace: influxdb
+    files:
+      - fridge-haccp-dashboard.json=fridge-haccp-dashboard.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+      annotations:
+        grafana_folder: "/tmp/dashboards/HomeAssistant"
+  - name: influxdb-oss-metrics-dashboard
+    namespace: influxdb
+    files:
+      - influxdb-oss-metrics-dashboard.json=influxdb-oss-metrics-dashboard.json
+    options:
+      labels:
+        grafana_dashboard: "1"
+      annotations:
+        grafana_folder: "/tmp/dashboards/HomeAssistant"
+  - name: influxdb-haccp-alert-template
+    namespace: influxdb
+    files:
+      - haccp-backup-alert-template.yml=haccp-backup-alert-template.yml
+    options:
+      labels:
+        app.kubernetes.io/component: haccp-alert-apply
+
+resources:
+  - grafana-datasource.yaml
+  - prometheus-rules.yaml
+  - haccp-backup-alert-job.yaml
+
+generatorOptions:
+  labels:
+    app.kubernetes.io/name: influxdb
+    app.kubernetes.io/instance: influxdb
+    app.kubernetes.io/part-of: influxdb
+    app.kubernetes.io/component: influxdb

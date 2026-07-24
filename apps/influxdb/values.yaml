@@ -1,0 +1,279 @@
+# =============================================================================
+# influxdb — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/influxdb chart.
+#
+# This file is the COMPLETE, reviewable contract for the live deployment: the real
+# hostname AND all unchanged defaults, so the whole configuration is visible in
+# one place.
+#
+# NOT in this chart (see apps/influxdb/post-install/, synced as a separate ArgoCD
+# source): two Grafana dashboards, the Grafana datasource ExternalSecret, the
+# PrometheusRule alarms, and the InfluxDB-native HACCP backup-alert Task (applied
+# by a PostSync Job). See homelab-charts/PLAN.md "Scope boundary".
+# =============================================================================
+name: influxdb
+namespace: influxdb
+
+# -----------------------------------------------------------------------------
+# Container image. `image.tag` is the SINGLE source of truth for the app version.
+# Pin the MINOR (e.g. "2.9"); a bare ":2" would drift majors. Renovate proposes
+# minor/patch bumps; a major (3.x) opens a PR only (never auto-merged).
+# -----------------------------------------------------------------------------
+image:
+  repository: influxdb
+  # renovate: datasource=docker depName=influxdb
+  tag: "2.9"
+  pullPolicy: IfNotPresent
+
+# -----------------------------------------------------------------------------
+# Controller. type = deployment | statefulset | daemonset.
+# influxdb owns a writable RWO Longhorn volume (its TSM data), so per the homelab
+# bright-line rule it is a StatefulSet with a volumeClaimTemplate.
+# -----------------------------------------------------------------------------
+controller:
+  type: statefulset
+  replicas: 1
+  revisionHistoryLimit: 2
+  # kube-linter waivers. These fix a PRE-EXISTING lint failure: the original
+  # hand-written manifest had neither of these and was non-compliant. InfluxDB
+  # genuinely cannot satisfy them — the official image writes its config to
+  # /etc/influxdb2 (so the rootfs must be writable) and runs as its own non-root
+  # uid 1000 without the pod re-declaring runAsNonRoot. Same pattern as the other
+  # writable-rootfs apps (apprise/flexget/unbound).
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "InfluxDB writes config to /etc/influxdb2 and data to its mounted volume; the root filesystem must be writable."
+    ignore-check.kube-linter.io/run-as-non-root: "The official influxdb image runs as its own non-root uid 1000; the pod does not re-declare runAsNonRoot."
+
+# Per-replica RWO data volume (-> influxdb-data-influxdb-0), mounted at
+# /var/lib/influxdb2. Labels preserved from the original manifest.
+volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: influxdb-data
+      labels:
+        app: influxdb
+        app.kubernetes.io/name: influxdb
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: longhorn
+      resources:
+        requests:
+          storage: 10Gi
+
+# -----------------------------------------------------------------------------
+# ServiceAccount. influxdb never calls the Kubernetes API, so it runs under the
+# namespace's `default` ServiceAccount and the chart creates nothing.
+# See charts/homepage for the full knob set (create/name/secrets/tokenSecret).
+# -----------------------------------------------------------------------------
+serviceAccount:
+  create: false
+  secrets: []
+  tokenSecret:
+    create: false
+
+# -----------------------------------------------------------------------------
+# Pod security. Deliberately minimal, matching the original: the official
+# influxdb image runs as its own uid/gid 1000, so only the seccomp profile and
+# fsGroup (to make the Longhorn volume group-writable) are pinned. The container
+# is NOT forced non-root here and the rootfs is NOT read-only (influxdb writes).
+# -----------------------------------------------------------------------------
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  fsGroup: 1000
+
+# Container-level security context.
+securityContext:
+  allowPrivilegeEscalation: false
+  privileged: false
+
+# Schedule at most one replica per node (default true in the library chart).
+podAntiAffinity: true
+
+# -----------------------------------------------------------------------------
+# Ports.
+# -----------------------------------------------------------------------------
+ports:
+  - containerPort: 8086
+    name: http
+
+# -----------------------------------------------------------------------------
+# Configuration. InfluxDB 2.x auto-setup on first boot: DOCKER_INFLUXDB_INIT_MODE
+# =setup creates the org, bucket (with retention), admin user + token. On later
+# boots the entrypoint detects existing data and skips setup. The admin
+# credentials come from the influxdb-init ExternalSecret; the rest are literal.
+# -----------------------------------------------------------------------------
+envFromConfigMap: ""
+envFromSecrets: []
+env:
+  - name: DOCKER_INFLUXDB_INIT_MODE
+    value: "setup"
+  - name: DOCKER_INFLUXDB_INIT_ORG
+    value: "homelab"
+  - name: DOCKER_INFLUXDB_INIT_BUCKET
+    value: "homeassistant"
+  # 45-day retention on THIS bucket only (HACCP window + buffer). 0 = infinite.
+  - name: DOCKER_INFLUXDB_INIT_RETENTION
+    value: "45d"
+  - name: DOCKER_INFLUXDB_INIT_USERNAME
+    valueFrom:
+      secretKeyRef:
+        name: influxdb-init
+        key: admin-username
+  - name: DOCKER_INFLUXDB_INIT_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: influxdb-init
+        key: admin-password
+  - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: influxdb-init
+        key: admin-token
+
+# No chart-owned ConfigMaps.
+configMaps: []
+
+# -----------------------------------------------------------------------------
+# Secrets — the app's OWN admin credentials + setup token (1Password item
+# "influxdb"). The Grafana datasource ExternalSecret is NOT here: it is
+# observability glue and lives in apps/influxdb/post-install/ with the dashboards.
+# NO secret material is stored here — only references.
+# -----------------------------------------------------------------------------
+externalSecrets:
+  - name: influxdb-init
+    refreshInterval: 1h
+    data:
+      - secretKey: admin-username
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          key: influxdb
+          metadataPolicy: None
+          property: username
+      - secretKey: admin-password
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          key: influxdb
+          metadataPolicy: None
+          property: password
+      - secretKey: admin-token
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          key: influxdb
+          metadataPolicy: None
+          property: admin-token
+
+# -----------------------------------------------------------------------------
+# Resources.
+# -----------------------------------------------------------------------------
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: "1"
+    memory: 1Gi
+
+# -----------------------------------------------------------------------------
+# Probes — httpGet /health on :8086 (no successThreshold, matching the original).
+# -----------------------------------------------------------------------------
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8086
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  failureThreshold: 5
+  timeoutSeconds: 10
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8086
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  failureThreshold: 6
+  timeoutSeconds: 10
+
+# -----------------------------------------------------------------------------
+# Volumes / mounts. `influxdb-data` comes from the volumeClaimTemplate (so it is
+# NOT repeated in `volumes`), mounted at influxdb's data dir.
+# -----------------------------------------------------------------------------
+volumeMounts:
+  - name: influxdb-data
+    mountPath: /var/lib/influxdb2
+
+volumes: []
+
+# Init containers (none for this app).
+initContainers: []
+
+# -----------------------------------------------------------------------------
+# Sidecar containers (common >= 0.4.0) — none. See charts/unbound.
+# -----------------------------------------------------------------------------
+extraContainers: []
+
+# -----------------------------------------------------------------------------
+# Service — ClusterIP for the HTTP API (and the ServiceMonitor scrape).
+# -----------------------------------------------------------------------------
+services:
+  - name: influxdb
+    enabled: true
+    type: ClusterIP
+    ports:
+      - name: http
+        protocol: TCP
+        port: 8086
+        targetPort: http
+
+# -----------------------------------------------------------------------------
+# Traefik IngressRoute — TWO routes on one host:
+#   - /api PathPrefix, NO middlewares (machine-facing: HA + Grafana write/query
+#     with tokens, no browser session) — priority 20 so it outranks the catch-all;
+#   - the catch-all UI route with the default authentik + default-headers pair.
+# Uses common >= 0.4.0 (pathPrefix + the corrected `middlewares: []` semantics).
+# -----------------------------------------------------------------------------
+ingressRoute:
+  enabled: true
+  ingressClassName: traefik-external
+  entryPoint: websecure
+  tlsSecretName: local-asztalos-net-tls
+  routes:
+    - host: influxdb.local.asztalos.net
+      pathPrefix: /api
+      port: 8086
+      priority: 20
+      middlewares: []
+    - host: influxdb.local.asztalos.net
+      port: 8086
+      priority: 10
+
+# -----------------------------------------------------------------------------
+# ServiceMonitor — scrapes /metrics, with metricRelabelings that DROP the
+# high-cardinality UI-asset `path` series (InfluxDB templates a full histogram per
+# static file). The kept /api/v2/* paths are exactly what the alert rules query.
+# -----------------------------------------------------------------------------
+serviceMonitor:
+  enabled: true
+  labels: {}
+  endpoints:
+    - port: http
+      interval: 30s
+      path: /metrics
+      metricRelabelings:
+        - sourceLabels: [path]
+          regex: '/(:.*|[0-9a-f]+\.\..*|.*\.(js|css|svg|png|wasm|woff2|ico|map|html|txt))'
+          action: drop
+
+# Static PVCs / PVs — none (RWO data via volumeClaimTemplate above).
+persistentVolumeClaims: []
+persistentVolumes: []
+
+# Extra labels merged into the standard label block.
+extraLabels: {}

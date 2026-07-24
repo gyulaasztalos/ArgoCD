@@ -22,6 +22,8 @@ spec:
     query: |-
         import "http"
         import "json"
+        import "math"
+        import "dict"
         import "experimental"
         import "influxdata/influxdb/monitor"
 
@@ -44,6 +46,23 @@ spec:
             "0x58e6c5fffe0f58b0_temperature_6",
         ]
 
+        // Map the raw Zigbee entity_id to the human-readable appliance name for the
+        // alert body (the hex id means nothing to whoever reads the Telegram push).
+        // `friendly` falls back to the raw id if an unmapped probe ever appears.
+        probeNames =
+            dict.fromList(
+                pairs: [
+                    {key: "0x58e6c5fffe0f58b0_temperature_3", value: "LG Fridge"},
+                    {key: "0x58e6c5fffe0f58b0_temperature_4", value: "Electrolux Fridge"},
+                    {key: "0x58e6c5fffe0f58b0_temperature_5", value: "LG Freezer"},
+                    {key: "0x58e6c5fffe0f58b0_temperature_6", value: "Electrolux Freezer"},
+                ],
+            )
+        friendly = (id) => dict.get(dict: probeNames, key: id, default: id)
+        // Round a temperature to 2 decimal places for the alert body (the raw mean
+        // is a long float). math.round handles negatives (freezers) correctly.
+        round2 = (x) => math.round(x: x * 100.0) / 100.0
+
         readings =
             from(bucket: "homeassistant")
                 |> range(start: -15m)
@@ -58,7 +77,7 @@ spec:
             |> filter(fn: (r) => r._value > fridgeLimitC)
             |> map(fn: (r) => ({r with _sent: apprise(
                 title: "HACCP backup: fridge over temperature",
-                body: "Probe " + r.entity_id + " averaged " + string(v: r._value) +
+                body: friendly(id: r.entity_id) + " averaged " + string(v: round2(x: r._value)) +
                     " C over the last 15m (limit " + string(v: fridgeLimitC) +
                     " C). [InfluxDB-native backup check]",
             )}))
@@ -71,7 +90,7 @@ spec:
             |> filter(fn: (r) => r._value > freezerLimitC)
             |> map(fn: (r) => ({r with _sent: apprise(
                 title: "HACCP backup: freezer over temperature",
-                body: "Probe " + r.entity_id + " averaged " + string(v: r._value) +
+                body: friendly(id: r.entity_id) + " averaged " + string(v: round2(x: r._value)) +
                     " C over the last 15m (limit " + string(v: freezerLimitC) +
                     " C). [InfluxDB-native backup check]",
             )}))
@@ -87,7 +106,7 @@ spec:
             |> filter(fn: (r) => r.dead)
             |> map(fn: (r) => ({r with _sent: apprise(
                 title: "HACCP backup: probe not reporting",
-                body: "Probe " + r.entity_id + " has not reported for 30+ minutes (last point " +
+                body: friendly(id: r.entity_id) + " has not reported for 30+ minutes (last point " +
                     string(v: r._time) + "). [InfluxDB-native backup check]",
             )}))
             |> yield(name: "deadmanCheck")

@@ -1414,7 +1414,7 @@ grafana:
   # #
   persistence:
     enabled: true
-  #  type: sts
+    type: sts
     storageClassName: longhorn
     accessModes:
       - ReadWriteOnce

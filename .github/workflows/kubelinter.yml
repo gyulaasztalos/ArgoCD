@@ -11,7 +11,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - name: Run KubeLinter
-        uses: stackrox/kube-linter-action@v1
-        with:
-          directory: ./
+
+      # kube-linter is installed and run DIRECTLY rather than via
+      # stackrox/kube-linter-action for TWO reasons:
+      #   1. The action pipes `kube-linter lint … | tee` without pipefail, so the
+      #      pipeline exit code is tee's (always 0) — findings never fail the job.
+      #   2. More importantly, `kube-linter lint ./` (and even `lint apps/`)
+      #      silently reports ZERO findings on this large mixed tree — a
+      #      directory-scan quirk — while each `apps/<app>/` reports correctly.
+      # So we install the binary (exit code propagates) and lint each app + the
+      # other manifest dirs ONE AT A TIME, aggregating the result.
+      - name: Install kube-linter
+        run: |
+          set -euo pipefail
+          KL_VERSION="$(curl -fsSL https://api.github.com/repos/stackrox/kube-linter/releases/latest | grep -oP '"tag_name":\s*"\K[^"]+')"
+          curl -fsSL "https://github.com/stackrox/kube-linter/releases/download/${KL_VERSION}/kube-linter-linux.tar.gz" \
+            | tar xz kube-linter
+          sudo install -m 0755 kube-linter /usr/local/bin/kube-linter
+          kube-linter version
+
+      - name: Run kube-linter (per directory)
+        run: |
+          set -uo pipefail
+          fail=0
+          for d in apps/*/ bootstrap projects resources; do
+            [ -e "$d" ] || continue
+            echo "::group::kube-linter $d"
+            kube-linter lint "$d" || fail=1
+            echo "::endgroup::"
+          done
+          exit "$fail"

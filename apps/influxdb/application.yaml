@@ -10,9 +10,26 @@ metadata:
 spec:
   project: default
   sources:
+    # 1) this repo — provides the tailored valueFile (referenced as $config below)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/influxdb/install
+      ref: config
+    # 2) the homelab-charts monorepo — the influxdb wrapper chart + the `common`
+    #    library dependency (resolved from the same checkout). Renders the
+    #    StatefulSet (RWO data via volumeClaimTemplate), its init ExternalSecret,
+    #    the Service, the IngressRoute and the ServiceMonitor.
+    - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
+      targetRevision: main
+      path: charts/influxdb
+      helm:
+        valueFiles:
+          - $config/apps/influxdb/values.yaml
+    # 3) everything else: two Grafana dashboards, the Grafana datasource
+    #    ExternalSecret, the PrometheusRule alarms, and the PostSync Job that
+    #    applies the InfluxDB-native HACCP backup-alert Task
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/influxdb/post-install
   destination:
     server: https://kubernetes.default.svc
     namespace: influxdb
