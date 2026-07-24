@@ -89,6 +89,15 @@ spec:
             privileged: false
             capabilities:
               drop: [ALL]
+          # Resource requests/limits (kube-linter unset-cpu/memory). A short
+          # `influx apply` on every sync — modest, with a generous ceiling.
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
           volumeMounts:
             - name: haccp-template
               mountPath: /templates
