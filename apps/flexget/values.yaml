@@ -1,0 +1,238 @@
+# =============================================================================
+# flexget — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/flexget chart.
+#
+# This file is the COMPLETE, reviewable contract for the live deployment: the real
+# hostname + secret refs AND all unchanged defaults, so the whole configuration is
+# visible in one place.
+#
+# MIGRATION: flexget moves Deployment -> StatefulSet (RWO volume). The one-time,
+# data-preserving cutover is documented in apps/flexget/MIGRATION-statefulset.md.
+# There are no auxiliary post-install assets.
+# =============================================================================
+name: flexget
+namespace: flexget
+
+# -----------------------------------------------------------------------------
+# Container image. `image.tag` is the SINGLE source of truth for the app version
+# (there is deliberately no Chart.yaml appVersion). Renovate bumps the tag below.
+# -----------------------------------------------------------------------------
+image:
+  repository: lscr.io/linuxserver/flexget
+  # renovate: datasource=docker depName=lscr.io/linuxserver/flexget
+  tag: v3.16.14-ls239
+  pullPolicy: IfNotPresent
+
+# -----------------------------------------------------------------------------
+# Controller. type = deployment | statefulset | daemonset.
+# flexget owns a WRITABLE RWO volume (its /config dir: the task DB, logs), so per
+# the homelab bright-line rule it is a StatefulSet with a volumeClaimTemplate —
+# NOT a Deployment. A Deployment + RollingUpdate on an RWO Longhorn volume causes
+# multi-attach flaps (the new pod attaches before the old releases). The original
+# manifest was a Deployment with a static PVC; see apps/flexget/MIGRATION-statefulset.md
+# for the one-time, data-preserving cutover.
+#
+# The two kube-linter waivers are preserved from the original: LinuxServer.io
+# images run as root-then-drop via PUID/PGID and need a writable rootfs.
+# -----------------------------------------------------------------------------
+controller:
+  type: statefulset
+  replicas: 1
+  revisionHistoryLimit: 2
+  updateStrategy:
+    type: RollingUpdate
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "LinuxServer.io images do not require a read-only root filesystem"
+    ignore-check.kube-linter.io/run-as-non-root: "LinuxServer.io images do not require a non-root user"
+
+# Per-replica RWO volume (-> config-flexget-0), mounted at /config. Holds flexget's
+# task database, logs and working files. 350Mi to match the original static PVC.
+volumeClaimTemplates:
+  - metadata:
+      name: config
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: longhorn
+      resources:
+        requests:
+          storage: 350Mi
+
+# -----------------------------------------------------------------------------
+# ServiceAccount. flexget never calls the Kubernetes API, so it runs under the
+# namespace's `default` ServiceAccount and the chart creates nothing.
+# See charts/homepage for the full knob set (create/name/secrets/tokenSecret).
+# -----------------------------------------------------------------------------
+serviceAccount:
+  create: false
+  secrets: []
+  tokenSecret:
+    create: false
+
+# -----------------------------------------------------------------------------
+# Pod security. Deliberately minimal, matching the original: LinuxServer.io images
+# drop privileges themselves via PUID/PGID (set in the ConfigMap below), so only
+# fsGroup is pinned and the container is NOT forced non-root. This is why the
+# run-as-non-root kube-linter waiver above exists.
+# -----------------------------------------------------------------------------
+podSecurityContext:
+  fsGroup: 1000
+
+# Container-level security context.
+securityContext:
+  allowPrivilegeEscalation: false
+
+# Schedule at most one replica per node (default true in the library chart).
+podAntiAffinity: true
+
+# -----------------------------------------------------------------------------
+# Ports.
+# -----------------------------------------------------------------------------
+ports:
+  - containerPort: 5050
+    name: webui
+
+# -----------------------------------------------------------------------------
+# Configuration. Non-secret env (PUID/PGID/TZ, log + config file paths) from a
+# generated ConfigMap; the web-UI password comes from the ExternalSecret-created
+# Secret as an individual env var.
+# -----------------------------------------------------------------------------
+envFromConfigMap: flexget-config
+envFromSecrets: []
+env:
+  - name: FG_WEBUI_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: flexget-secret
+        key: FG_WEBUI_PASSWORD
+
+configMaps:
+  - name: flexget-config
+    data:
+      PUID: "1000"
+      PGID: "1000"
+      TZ: "Europe/Budapest"
+      FG_LOG_LEVEL: "info"
+      FG_LOG_FILE: "/config/flexget.log"
+      FG_CONFIG_FILE: "/config/config.yml"
+
+# -----------------------------------------------------------------------------
+# Secrets — ExternalSecret referencing the onepassword-connect ClusterSecretStore.
+# flexget's ENTIRE config.yml (feeds, trackers, download rules) is stored in
+# 1Password and pulled verbatim, plus the web-UI password. NO secret material is
+# stored here — only references. There is no ESO template block: both values are
+# copied straight from 1Password properties.
+# -----------------------------------------------------------------------------
+externalSecrets:
+  - name: flexget-secret
+    refreshInterval: 1h
+    data:
+      - secretKey: config.yml
+        remoteRef:
+          key: flexget
+          property: config.yml
+      - secretKey: FG_WEBUI_PASSWORD
+        remoteRef:
+          key: flexget
+          property: FG_WEBUI_PASSWORD
+
+# -----------------------------------------------------------------------------
+# Resources.
+# -----------------------------------------------------------------------------
+resources:
+  requests:
+    cpu: 100m
+    memory: 192Mi
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+
+# -----------------------------------------------------------------------------
+# Probes — the web UI answers on :5050.
+# -----------------------------------------------------------------------------
+readinessProbe:
+  httpGet:
+    path: /
+    port: 5050
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: 5050
+  initialDelaySeconds: 30
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+# -----------------------------------------------------------------------------
+# Volumes / mounts. `config` comes from the volumeClaimTemplate above (so it is
+# NOT repeated in `volumes`). The secret's config.yml is overlaid on top of it at
+# /config/config.yml via subPath, so flexget reads its config from 1Password while
+# everything else in /config lives on the persistent volume.
+# -----------------------------------------------------------------------------
+volumeMounts:
+  - name: flexget-secret
+    mountPath: /config/config.yml
+    subPath: config.yml
+  - name: config
+    mountPath: /config
+
+volumes:
+  - name: flexget-secret
+    secret:
+      secretName: flexget-secret
+
+# Init containers (none for this app).
+initContainers: []
+
+# -----------------------------------------------------------------------------
+# Sidecar containers (common >= 0.4.0) — none. See charts/unbound.
+# -----------------------------------------------------------------------------
+extraContainers: []
+
+# -----------------------------------------------------------------------------
+# Service — ClusterIP for the web UI.
+# -----------------------------------------------------------------------------
+services:
+  - name: flexget
+    enabled: true
+    type: ClusterIP
+    ports:
+      - name: webui
+        port: 5050
+        targetPort: 5050
+
+# -----------------------------------------------------------------------------
+# Traefik IngressRoute — the web UI, guarded by authentik + default-headers
+# (the chart default middlewares; the key is omitted to get them).
+# -----------------------------------------------------------------------------
+ingressRoute:
+  enabled: true
+  ingressClassName: traefik-external
+  entryPoint: websecure
+  tlsSecretName: local-asztalos-net-tls
+  routes:
+    - host: flexget.local.asztalos.net
+      port: 5050
+      priority: 10
+
+# -----------------------------------------------------------------------------
+# ServiceMonitor — flexget exposes no Prometheus metrics endpoint.
+# -----------------------------------------------------------------------------
+serviceMonitor:
+  enabled: false
+  labels: {}
+  endpoints: []
+
+# Static PVCs / PVs — none (the RWO config volume is a volumeClaimTemplate above).
+persistentVolumeClaims: []
+persistentVolumes: []
+
+# Extra labels merged into the standard label block.
+extraLabels: {}

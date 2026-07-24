@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: config-flexget-0
+  namespace: flexget
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 350Mi            # == current size
+  dataSource:
+    kind: PersistentVolumeClaim
+    name: flexget-config-pvc     # the existing, populated PVC
+    apiGroup: ""

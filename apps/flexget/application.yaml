@@ -9,9 +9,21 @@ metadata:
 spec:
   project: default
   sources:
+    # 1) this repo — provides the tailored valueFile (referenced as $config below)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/flexget/install
+      ref: config
+    # 2) the homelab-charts monorepo — the flexget wrapper chart + the `common`
+    #    library dependency (resolved from the same checkout). Renders the
+    #    StatefulSet (RWO config volume via volumeClaimTemplate), its config
+    #    ConfigMap, the ExternalSecret, the Service and the IngressRoute.
+    #    Deployment -> StatefulSet cutover: see MIGRATION-statefulset.md.
+    - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
+      targetRevision: main
+      path: charts/flexget
+      helm:
+        valueFiles:
+          - $config/apps/flexget/values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: flexget
