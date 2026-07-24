@@ -9,9 +9,23 @@ metadata:
 spec:
   project: default
   sources:
+    # 1) this repo — provides the tailored valueFile (referenced as $config below)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/transmission/install
+      ref: config
+    # 2) the homelab-charts monorepo — the transmission wrapper chart + `common`.
+    #    Everything is core (StatefulSet with the RWO config volumeClaimTemplate,
+    #    the static NFS RWX downloads PV/PVC, the config + notification-script
+    #    ConfigMaps, the ExternalSecret and the two MetalLB LoadBalancer Services),
+    #    so there is no post-install source. Deployment -> StatefulSet cutover:
+    #    the old transmission-config PVC is pruned and config-transmission-0 comes
+    #    up empty (the initContainer rebuilds the Flood UI + settings.json).
+    - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
+      targetRevision: main
+      path: charts/transmission
+      helm:
+        valueFiles:
+          - $config/apps/transmission/values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: transmission

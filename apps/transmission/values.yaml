@@ -1,0 +1,446 @@
+# =============================================================================
+# transmission — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/transmission chart.
+#
+# This file is the COMPLETE, reviewable contract for the deployment. transmission
+# has no post-install source — everything is core and rendered by the chart.
+#
+# MIGRATION: moves Deployment -> StatefulSet. The RWO /config volume becomes a
+# volumeClaimTemplate (config-transmission-0); the old static transmission-config
+# PVC is discarded (the initContainer re-downloads the Flood UI and re-copies
+# settings.json on every start — only the active-torrent session state is lost,
+# and the downloaded data on the NFS share is untouched).
+# =============================================================================
+
+name: transmission
+namespace: transmission
+
+# -----------------------------------------------------------------------------
+# Container image. image.tag is the single source of truth for the app version.
+# -----------------------------------------------------------------------------
+image:
+  repository: lscr.io/linuxserver/transmission
+  # renovate: datasource=docker depName=lscr.io/linuxserver/transmission
+  tag: 4.0.6-r4-ls302
+  pullPolicy: IfNotPresent
+
+# -----------------------------------------------------------------------------
+# Controller. StatefulSet — transmission owns a writable RWO Longhorn /config
+# volume, so per the homelab bright-line rule it is a StatefulSet with a
+# volumeClaimTemplate (a Deployment + RollingUpdate on the RWO volume flaps on
+# Longhorn multi-attach). The RWX NFS downloads share is a separate STATIC
+# PV/PVC mounted alongside (see below).
+#
+# The two kube-linter waivers are preserved from the original: LinuxServer.io
+# images run root-then-drop via PUID/PGID and need a writable rootfs; the
+# get-flood initContainer also `apk add`s tools.
+# -----------------------------------------------------------------------------
+controller:
+  type: statefulset
+  replicas: 1
+  revisionHistoryLimit: 2
+  updateStrategy:
+    type: RollingUpdate
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "LinuxServer.io images do not require a read-only root filesystem"
+    ignore-check.kube-linter.io/run-as-non-root: "LinuxServer.io images do not require a non-root user"
+
+# Per-replica RWO config volume (-> config-transmission-0), mounted at /config.
+# Holds the Flood UI (re-downloaded by the initContainer), settings.json
+# (re-copied from the Secret), and transmission's session state.
+volumeClaimTemplates:
+  - metadata:
+      name: config
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: longhorn
+      resources:
+        requests:
+          storage: 1Gi
+
+# -----------------------------------------------------------------------------
+# ServiceAccount. transmission never calls the Kubernetes API — runs under
+# `default`.
+# -----------------------------------------------------------------------------
+serviceAccount:
+  create: false
+  secrets: []
+  tokenSecret:
+    create: false
+
+# -----------------------------------------------------------------------------
+# Pod security. LinuxServer.io images drop privileges via PUID/PGID (in the
+# ConfigMap below); the pod only pins fsGroup (119, the transmission group in the
+# image) and is NOT forced non-root — hence the run-as-non-root waiver above.
+# -----------------------------------------------------------------------------
+podSecurityContext:
+  fsGroup: 119
+
+# Container-level security context (MAIN container).
+securityContext:
+  allowPrivilegeEscalation: false
+
+podAntiAffinity: true
+
+# -----------------------------------------------------------------------------
+# Ports. rpc (the Web/Flood UI + RPC API) and the BitTorrent peer port.
+# -----------------------------------------------------------------------------
+ports:
+  - containerPort: 9091
+    name: rpc
+    protocol: TCP
+  - containerPort: 51413
+    name: peer-port
+    protocol: TCP
+
+# -----------------------------------------------------------------------------
+# Configuration. Non-secret env from a generated ConfigMap; the RPC username /
+# password come from the ExternalSecret-created Secret as individual env vars.
+# -----------------------------------------------------------------------------
+envFromConfigMap: transmission-config
+envFromSecrets: []
+env:
+  - name: USER
+    valueFrom:
+      secretKeyRef:
+        name: transmission-secret
+        key: username
+  - name: PASS
+    valueFrom:
+      secretKeyRef:
+        name: transmission-secret
+        key: password
+
+configMaps:
+  - name: transmission-config
+    data:
+      PUID: "1113"
+      PGID: "1113"
+      TZ: "Europe/Budapest"
+      WHITELIST: "127.0.0.1 10.*"
+      PEERPORT: "51413"
+      HOST_WHITELIST: "transmission.local.asztalos.net"
+      TRANSMISSION_WEB_HOME: "/config/flood-for-transmission"
+  - name: transmission-notification-script
+    files:
+      transmission_notification.sh: |
+        #!/bin/sh
+        #
+        # Send push notification to Apprise when a torrent is complete.
+        #
+        # Requires: Apprise server, Transmission torrent client and curl.
+        #
+        # Available environment variables from Transmission (as of v2.83) are:
+        #
+        # TR_APP_VERSION
+        # TR_TIME_LOCALTIME
+        # TR_TORRENT_DIR
+        # TR_TORRENT_HASH
+        # TR_TORRENT_ID
+        # TR_TORRENT_NAME
+        #
+
+        DATE="$(date '+%Y.%m.%d %H:%M')"
+
+        # Message for the notification.
+        TYPE="success"
+        NAME="${TR_TORRENT_NAME}"
+        BODY="[transmission] [✅] ${NAME} finished downloading on archer at ${DATE}."
+        TITLE="[k3s] Download complete"
+        TAG="transmission"
+
+        DATA='{"tag":"'${TAG}'","type":"'${TYPE}'","body":"'${BODY}'","title":"'${TITLE}'"}'
+
+        curl -X POST --data "${DATA}" -H "Content-Type: application/json" "http://apprise.apprise.svc.cluster.local:8000/notify/apprise"
+
+        exit $?
+
+# -----------------------------------------------------------------------------
+# Secrets — ExternalSecret (onepassword-connect). Renders the RPC username /
+# password AND the full settings.json (which embeds the same credentials via ESO
+# templating). NO secret material here — the {{ .* }} braces are ESO's OWN
+# runtime templating, written raw because valueFiles are not Helm-processed.
+# -----------------------------------------------------------------------------
+externalSecrets:
+  - name: transmission-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          username: "{{ .username }}"
+          password: "{{ .password }}"
+          settings.json: |
+            {
+                "alt-speed-down": 50,
+                "alt-speed-enabled": false,
+                "alt-speed-time-begin": 540,
+                "alt-speed-time-day": 127,
+                "alt-speed-time-enabled": false,
+                "alt-speed-time-end": 1020,
+                "alt-speed-up": 50,
+                "announce-ip": "",
+                "announce-ip-enabled": false,
+                "anti-brute-force-enabled": false,
+                "anti-brute-force-threshold": 100,
+                "bind-address-ipv4": "0.0.0.0",
+                "bind-address-ipv6": "::",
+                "blocklist-enabled": true,
+                "blocklist-url": "https://github.com/Naunter/BT_BlockLists/raw/master/bt_blocklists.gz",
+                "cache-size-mb": 4,
+                "default-trackers": "",
+                "dht-enabled": true,
+                "download-dir": "/downloads/complete",
+                "download-queue-enabled": true,
+                "download-queue-size": 5,
+                "encryption": 1,
+                "idle-seeding-limit": 30,
+                "idle-seeding-limit-enabled": false,
+                "incomplete-dir": "/downloads/incomplete",
+                "incomplete-dir-enabled": true,
+                "lpd-enabled": false,
+                "message-level": 2,
+                "peer-congestion-algorithm": "",
+                "peer-id-ttl-hours": 6,
+                "peer-limit-global": 200,
+                "peer-limit-per-torrent": 50,
+                "peer-port": 51413,
+                "peer-port-random-high": 65535,
+                "peer-port-random-low": 49152,
+                "peer-port-random-on-start": false,
+                "peer-socket-tos": "le",
+                "pex-enabled": true,
+                "port-forwarding-enabled": true,
+                "preallocation": 1,
+                "prefetch-enabled": true,
+                "queue-stalled-enabled": true,
+                "queue-stalled-minutes": 30,
+                "ratio-limit": 2,
+                "ratio-limit-enabled": false,
+                "rename-partial-files": true,
+                "rpc-authentication-required": true,
+                "rpc-bind-address": "0.0.0.0",
+                "rpc-enabled": true,
+                "rpc-host-whitelist": "transmission.local.asztalos.net",
+                "rpc-host-whitelist-enabled": true,
+                "rpc-password": "{{ .password }}",
+                "rpc-port": 9091,
+                "rpc-socket-mode": "0750",
+                "rpc-url": "/transmission/",
+                "rpc-username": "{{ .username }}",
+                "rpc-whitelist": "127.0.0.1 10.*",
+                "rpc-whitelist-enabled": true,
+                "scrape-paused-torrents-enabled": true,
+                "script-torrent-added-enabled": false,
+                "script-torrent-added-filename": "",
+                "script-torrent-done-enabled": true,
+                "script-torrent-done-filename": "/scripts/transmission_notification.sh",
+                "script-torrent-done-seeding-enabled": false,
+                "script-torrent-done-seeding-filename": "",
+                "seed-queue-enabled": false,
+                "seed-queue-size": 10,
+                "speed-limit-down": 100,
+                "speed-limit-down-enabled": false,
+                "speed-limit-up": 100,
+                "speed-limit-up-enabled": false,
+                "start-added-torrents": true,
+                "tcp-enabled": true,
+                "torrent-added-verify-mode": "fast",
+                "trash-original-torrent-files": false,
+                "umask": "002",
+                "upload-slots-per-torrent": 14,
+                "utp-enabled": true,
+                "watch-dir": "/watch",
+                "watch-dir-enabled": true,
+                "watch-dir-force-generic": true
+            }
+    data:
+      - secretKey: username
+        remoteRef:
+          key: transmission
+          property: username
+      - secretKey: password
+        remoteRef:
+          key: transmission
+          property: password
+
+# -----------------------------------------------------------------------------
+# Resources (MAIN container).
+# -----------------------------------------------------------------------------
+resources:
+  requests:
+    cpu: 100m
+    memory: 64Mi
+  limits:
+    cpu: 1000m
+    memory: 512Mi
+
+# -----------------------------------------------------------------------------
+# Probes — EXEC: the RPC endpoint returns 401 until transmission is fully up, so
+# the probe passes as soon as it stops returning 401. Preserved verbatim.
+# -----------------------------------------------------------------------------
+readinessProbe:
+  exec:
+    command:
+      - sh
+      - -c
+      - |
+        curl -u "$USER:$PASS" -s -o /dev/null -w "%{http_code}" http://localhost:9091/transmission/rpc | grep -q 401 || exit 0
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+livenessProbe:
+  exec:
+    command:
+      - sh
+      - -c
+      - |
+        curl -u "$USER:$PASS" -s -o /dev/null -w "%{http_code}" http://localhost:9091/transmission/rpc | grep -q 401 || exit 0
+  initialDelaySeconds: 30
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+# -----------------------------------------------------------------------------
+# initContainer — downloads the Flood-for-Transmission web UI into /config and
+# seeds settings.json from the Secret. Preserved verbatim (needs root + a
+# writable rootfs to `apk add`, covered by the controller waivers above).
+# -----------------------------------------------------------------------------
+initContainers:
+  - name: get-flood-for-transmission
+    image: alpine:3.24
+    imagePullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 100m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 256Mi
+    command:
+      - sh
+      - -c
+      - |
+        apk add --no-cache curl unzip
+        curl -L -o /tmp/flood.zip https://github.com/johman10/flood-for-transmission/releases/download/latest/flood-for-transmission.zip
+        unzip /tmp/flood.zip -d /config
+        cp /secrets/settings.json /config/settings.json && chmod 600 /config/settings.json
+    volumeMounts:
+      - name: transmission-secret
+        mountPath: /secrets/settings.json
+        subPath: settings.json
+      - name: config
+        mountPath: /config
+
+# -----------------------------------------------------------------------------
+# Volumes / mounts. `config` comes from the volumeClaimTemplate (so it is NOT in
+# `volumes`). Downloads + watch dir come from the STATIC NFS RWX PVC via subPaths;
+# the secret provides settings.json to the initContainer; the notification script
+# is a ConfigMap file (0755).
+# -----------------------------------------------------------------------------
+volumeMounts:
+  - name: config
+    mountPath: /config
+  - name: transmission-data
+    mountPath: /downloads
+    subPath: downloads
+  - name: transmission-data
+    mountPath: /watch
+    subPath: transmission_watch_dir/k3s
+  - name: notification-script
+    mountPath: /scripts/transmission_notification.sh
+    subPath: transmission_notification.sh
+
+volumes:
+  - name: transmission-secret
+    secret:
+      secretName: transmission-secret
+  - name: transmission-data
+    persistentVolumeClaim:
+      claimName: transmission-data
+  - name: notification-script
+    configMap:
+      name: transmission-notification-script
+      items:
+        - key: transmission_notification.sh
+          path: transmission_notification.sh
+      defaultMode: 0755
+
+extraContainers: []
+
+# -----------------------------------------------------------------------------
+# Static NFS downloads share — RWX PV + PVC (unchanged by the StatefulSet move;
+# it is shared storage, not a per-replica owned volume).
+# -----------------------------------------------------------------------------
+persistentVolumes:
+  - name: nfs-share-pv
+    spec:
+      capacity:
+        storage: 1000Gi
+      accessModes:
+        - ReadWriteMany
+      persistentVolumeReclaimPolicy: Retain
+      storageClassName: nfs-share
+      nfs:
+        server: unvr-pro.local.asztalos.net
+        path: /private
+
+persistentVolumeClaims:
+  - name: transmission-data
+    accessModes:
+      - ReadWriteMany
+    storageClassName: nfs-share
+    size: 1000Gi
+
+# -----------------------------------------------------------------------------
+# Services — TWO MetalLB LoadBalancers sharing one IP (metallb allow-shared-ip),
+# one TCP (peer + rpc) and one UDP (peer). externalTrafficPolicy: Local preserves
+# the peer's source IP. Requires common >= 0.5.0 for loadBalancerIP /
+# externalTrafficPolicy.
+# -----------------------------------------------------------------------------
+services:
+  - name: transmission-peer-tcp
+    enabled: true
+    type: LoadBalancer
+    loadBalancerIP: 10.10.50.32
+    externalTrafficPolicy: Local
+    annotations:
+      metallb.io/allow-shared-ip: "true"
+    ports:
+      - name: peer-tcp
+        protocol: TCP
+        port: 51413
+        targetPort: 51413
+      - name: rpc
+        protocol: TCP
+        port: 9091
+        targetPort: 9091
+  - name: transmission-peer-udp
+    enabled: true
+    type: LoadBalancer
+    loadBalancerIP: 10.10.50.32
+    externalTrafficPolicy: Local
+    annotations:
+      metallb.io/allow-shared-ip: "true"
+    ports:
+      - name: peer-udp
+        protocol: UDP
+        port: 51413
+        targetPort: 51413
+
+# No IngressRoute (reached via the LoadBalancer IP, not Traefik) and no
+# ServiceMonitor (transmission exposes no Prometheus metrics).
+ingressRoute: {}
+
+serviceMonitor:
+  enabled: false
+  labels: {}
+  endpoints: []
+
+extraLabels: {}
