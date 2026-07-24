@@ -1,0 +1,12 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# The two resources common does not model, synced as a separate ArgoCD source
+# alongside the Helm chart (see homelab-charts/PLAN.md "Scope boundary"):
+#   - postgresql-database.yaml   CNPG Database (in the `databases` namespace)
+#   - paperless-ngx-headers.yaml Traefik Middleware (in the `traefik` namespace),
+#     which forces the Host/Origin headers so paperless's OIDC + CSRF checks pass.
+resources:
+  - postgresql-database.yaml
+  - paperless-ngx-headers.yaml

@@ -1,0 +1,345 @@
+# =============================================================================
+# paperless-ngx — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/paperless-ngx chart.
+#
+# CORE workload: the app StatefulSet (RWO Longhorn data volumeClaimTemplate +
+# static NFS RWX consume/export share), Service, IngressRoute, the four
+# ExternalSecrets, and the config + notification-script ConfigMaps.
+#
+# NOT in this chart (see apps/paperless-ngx/post-install/, a separate ArgoCD
+# source): the CNPG Database and the paperless-ngx-headers Middleware (in the
+# `traefik` ns). See homelab-charts/PLAN.md "Scope boundary".
+#
+# MIGRATION: Deployment -> StatefulSet. The precious document/index volume becomes
+# a volumeClaimTemplate (`data` -> data-paperless-ngx-0); the migration is a
+# reversible Longhorn clone — see apps/paperless-ngx/MIGRATION-statefulset.md.
+# The NFS consume/export share is recreated by the chart (no data move); the CNPG
+# database is not touched.
+# =============================================================================
+
+name: paperless-ngx
+namespace: paperless-ngx
+
+image:
+  repository: ghcr.io/paperless-ngx/paperless-ngx
+  # renovate: datasource=docker depName=ghcr.io/paperless-ngx/paperless-ngx
+  tag: 3.0.2
+  pullPolicy: IfNotPresent
+
+# -----------------------------------------------------------------------------
+# Controller. StatefulSet — paperless owns a writable RWO Longhorn data volume
+# (scanned documents + search index), so per the homelab bright-line rule it is a
+# StatefulSet with a volumeClaimTemplate (a Deployment + RollingUpdate on the RWO
+# volume flaps on Longhorn multi-attach). The NFS consume/export share is a
+# separate STATIC PV/PVC mounted alongside.
+#
+# kube-linter waivers: paperless-ngx writes to its root filesystem (temp/work
+# dirs under /usr/src/paperless and /tmp) and runs as its own user via
+# USERMAP_UID/GID, so the rootfs is not read-only and the pod is not forced
+# runAsNonRoot.
+# -----------------------------------------------------------------------------
+controller:
+  type: statefulset
+  replicas: 1
+  revisionHistoryLimit: 2
+  updateStrategy:
+    type: RollingUpdate
+  annotations:
+    ignore-check.kube-linter.io/no-read-only-root-fs: "paperless-ngx writes work/temp dirs to its root filesystem; it cannot run read-only."
+    ignore-check.kube-linter.io/run-as-non-root: "paperless-ngx drops to its own user via USERMAP_UID/GID; the pod is not forced runAsNonRoot."
+
+# Per-replica RWO PRECIOUS volume (-> data-paperless-ngx-0), holding media/
+# (documents, thumbnails) and data/ (search index, db of record is CNPG). 1500Mi.
+# The volumeClaimTemplate is named `data` so the generated PVC is
+# `data-paperless-ngx-0` — the name the MIGRATION-statefulset.md clone targets.
+volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      storageClassName: longhorn
+      resources:
+        requests:
+          storage: 1500Mi
+
+serviceAccount:
+  create: false
+  secrets: []
+  tokenSecret:
+    create: false
+
+# -----------------------------------------------------------------------------
+# Pod security. paperless drops privileges via USERMAP_UID/GID (in the ConfigMap);
+# the pod pins only fsGroup and is NOT forced non-root — hence the waiver above.
+# -----------------------------------------------------------------------------
+podSecurityContext:
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+
+podAntiAffinity: true
+
+ports:
+  - containerPort: 8000
+    name: webui
+
+# -----------------------------------------------------------------------------
+# Configuration. Non-secret env from a generated ConfigMap; the DB creds, app
+# secret key, Redis URL and the OIDC provider JSON come from the four
+# ExternalSecrets, all via envFrom.
+# -----------------------------------------------------------------------------
+envFromConfigMap: paperless-ngx-config
+envFromSecrets:
+  - paperless-ngx-app-secret
+  - paperless-ngx-oauth-secret
+  - paperless-ngx-redis-secret
+  - paperless-ngx-postgres-secret
+env: []
+
+configMaps:
+  - name: paperless-ngx-config
+    data:
+      USERMAP_UID: "1000"
+      USERMAP_GID: "1000"
+      PAPERLESS_TIME_ZONE: "Europe/Budapest"
+      PAPERLESS_OCR_LANGUAGES: "hun eng"
+      PAPERLESS_OCR_LANGUAGE: "hun"
+      PAPERLESS_URL: "https://paperless.local.asztalos.net"
+      PAPERLESS_CSRF_TRUSTED_ORIGINS: "https://paperless.local.asztalos.net"
+      PAPERLESS_DBHOST: "postgres-rw.databases.svc.cluster.local"
+      PAPERLESS_REDIS_PREFIX: "paperless"
+      PAPERLESS_DATE_ORDER: "YMD"
+      PAPERLESS_FILENAME_DATE_ORDER: "YMD"
+      PAPERLESS_NUMBER_OF_SUGGESTED_DATES: "8"
+      PAPERLESS_APPS: "allauth.socialaccount.providers.openid_connect"
+      PAPERLESS_REDIRECT_LOGIN_TO_SSO: "False"
+      PAPERLESS_DISABLE_REGULAR_LOGIN: "False"
+      PAPERLESS_POST_CONSUME_SCRIPT: "/usr/src/paperless/scripts/notification.sh"
+      PAPERLESS_CONSUMPTION_DIR: "/usr/src/paperless/consume"
+      PAPERLESS_CONSUMER_POLLING: "60"
+  - name: paperless-ngx-notification-script
+    files:
+      notification.sh: |
+        #!/bin/sh
+
+        DATE="$(date '+%Y.%m.%d %H:%M')"
+
+        BODY="[paperless] [✅] A document ${DOCUMENT_ORIGINAL_FILENAME} was just consumed. Correspondent - ${DOCUMENT_CORRESPONDENT} || Tags - ${DOCUMENT_TAGS}"
+
+        TYPE="success"
+        TITLE="[k3s] Successful document consumption"
+        TAG="paperless"
+
+        DATA='{"tag":"'${TAG}'","type":"'${TYPE}'","body":"'${BODY}'","title":"'${TITLE}'"}'
+
+        curl -X POST --data "${DATA}" -H "Content-Type: application/json" "http://apprise.apprise.svc.cluster.local:8000/notify/apprise"
+
+        exit $?
+
+# -----------------------------------------------------------------------------
+# Secrets — ExternalSecrets (onepassword-connect). Postgres creds, the app secret
+# key, the Redis connection URL, and the Authentik OIDC provider JSON. NO secret
+# material here — the {{ .* }} braces are ESO's OWN runtime templating.
+# -----------------------------------------------------------------------------
+externalSecrets:
+  - name: paperless-ngx-postgres-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          PAPERLESS_DBUSER: "{{ .username }}"
+          PAPERLESS_DBPASS: "{{ .password }}"
+    data:
+      - secretKey: username
+        remoteRef:
+          key: paperless-postgres-password
+          property: username
+      - secretKey: password
+        remoteRef:
+          key: paperless-postgres-password
+          property: password
+  - name: paperless-ngx-app-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          PAPERLESS_SECRET_KEY: "{{ .paperless_secret_key }}"
+    data:
+      - secretKey: paperless_secret_key
+        remoteRef:
+          key: paperless-ngx-app
+          property: credential
+  - name: paperless-ngx-oauth-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          PAPERLESS_SOCIALACCOUNT_PROVIDERS: |
+            {
+              "openid_connect": {
+                "SCOPE":["openid","profile","email","offline_access"],
+                "APPS": [
+                  {
+                    "provider_id": "authentik",
+                    "name": "Authentik",
+                    "client_id": "paperless",
+                    "secret": "{{ .secret }}",
+                    "settings": {
+                      "server_url": "https://auth.local.asztalos.net/application/o/paperless/.well-known/openid-configuration"
+                    }
+                  }
+                ],
+                "OAUTH_PKCE_ENABLED": "True"
+              }
+            }
+    data:
+      - secretKey: secret
+        remoteRef:
+          key: authentik-blueprint-secrets
+          property: authentik-paperless-client-secret
+  - name: paperless-ngx-redis-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          PAPERLESS_REDIS: "redis://paperless:{{ .password }}@redis-master.redis.svc.cluster.local:6379"
+    data:
+      - secretKey: password
+        remoteRef:
+          key: redis-secrets
+          property: redis-paperless-password
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 1000Mi
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 20
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 10
+
+initContainers: []
+extraContainers: []
+
+# -----------------------------------------------------------------------------
+# Volumes / mounts. `data` comes from the volumeClaimTemplate (NOT in `volumes`),
+# split into media/ + data/ by subPath. The NFS consume/export share and the
+# notification script are normal volumes.
+# -----------------------------------------------------------------------------
+volumeMounts:
+  - name: data
+    mountPath: /usr/src/paperless/media
+    subPath: media
+  - name: data
+    mountPath: /usr/src/paperless/data
+    subPath: data
+  - name: paperless-ngx-notification-script
+    mountPath: /usr/src/paperless/scripts/notification.sh
+    subPath: notification.sh
+  - name: paperless-ngx-consume
+    mountPath: /usr/src/paperless/consume
+    subPath: paperless/consume
+  - name: paperless-ngx-consume
+    mountPath: /usr/src/paperless/export
+    subPath: paperless/export
+
+volumes:
+  - name: paperless-ngx-consume
+    persistentVolumeClaim:
+      claimName: paperless-ngx-consume
+  - name: paperless-ngx-notification-script
+    configMap:
+      name: paperless-ngx-notification-script
+      items:
+        - key: notification.sh
+          path: notification.sh
+      defaultMode: 0755
+
+# -----------------------------------------------------------------------------
+# Static NFS consume/export share — RWX PV + PVC (the transient ingest dropbox +
+# export target; unchanged by the StatefulSet move, it is shared storage).
+# -----------------------------------------------------------------------------
+persistentVolumes:
+  - name: nfs-share-small-pv
+    spec:
+      capacity:
+        storage: 100Mi
+      accessModes:
+        - ReadWriteMany
+      persistentVolumeReclaimPolicy: Retain
+      storageClassName: nfs-share-small
+      nfs:
+        server: unvr-pro.local.asztalos.net
+        path: /private
+
+persistentVolumeClaims:
+  - name: paperless-ngx-consume
+    accessModes:
+      - ReadWriteMany
+    storageClassName: nfs-share-small
+    size: 100Mi
+
+services:
+  - name: paperless-ngx
+    enabled: true
+    type: ClusterIP
+    ports:
+      - name: webui
+        port: 8000
+        targetPort: 8000
+
+# -----------------------------------------------------------------------------
+# IngressRoute — behind the paperless-ngx-headers Middleware (in the traefik ns,
+# rendered by post-install). Note: NO authentik forward-auth middleware here —
+# paperless does its OWN OIDC login against Authentik (PAPERLESS_APPS +
+# the oauth ExternalSecret), so auth is in-app, not at the ingress.
+# -----------------------------------------------------------------------------
+ingressRoute:
+  enabled: true
+  ingressClassName: traefik-external
+  entryPoint: websecure
+  tlsSecretName: local-asztalos-net-tls
+  routes:
+    - host: paperless.local.asztalos.net
+      port: 8000
+      priority: 10
+      middlewares:
+        - name: paperless-ngx-headers
+          namespace: traefik
+
+# No ServiceMonitor (paperless exposes no Prometheus endpoint in this setup).
+serviceMonitor:
+  enabled: false
+  labels: {}
+  endpoints: []
+
+extraLabels: {}

@@ -1,15 +1,16 @@
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: config-flexget-0
-  namespace: flexget
+  name: data-paperless-ngx-0
+  namespace: paperless-ngx
 spec:
   accessModes: ["ReadWriteOnce"]
   storageClassName: longhorn
   resources:
     requests:
-      storage: 350Mi            # == current size
+      storage: 1500Mi            # == current size (or larger)
   dataSource:
     kind: PersistentVolumeClaim
-    name: flexget-config-pvc     # the existing, populated PVC
+    name: paperless-ngx-data     # the existing, populated PVC
     apiGroup: ""

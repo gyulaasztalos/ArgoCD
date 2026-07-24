@@ -9,9 +9,26 @@ metadata:
 spec:
   project: default
   sources:
+    # 1) this repo — provides the tailored valueFile (referenced as $config below)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/paperless-ngx/install
+      ref: config
+    # 2) the homelab-charts monorepo — the paperless-ngx wrapper chart + `common`.
+    #    CORE workload: the StatefulSet (RWO data volumeClaimTemplate + static NFS
+    #    consume/export PV/PVC), the config + notification ConfigMaps, the four
+    #    ExternalSecrets, the Service and the IngressRoute. Deployment -> StatefulSet
+    #    cutover: see MIGRATION-statefulset.md (Longhorn clone of the data volume).
+    - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
+      targetRevision: main
+      path: charts/paperless-ngx
+      helm:
+        valueFiles:
+          - $config/apps/paperless-ngx/values.yaml
+    # 3) the two resources common does not model: the CNPG Database and the
+    #    paperless-ngx-headers Traefik Middleware
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/paperless-ngx/post-install
   destination:
     server: https://kubernetes.default.svc
     namespace: paperless-ngx
