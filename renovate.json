@@ -59,6 +59,17 @@
       "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>.+?) packageName=(?<packageName>.+?)(?:\\s+versioning=(?<versioning>[a-z-]+?))?\\s*\\n.+?:\\s*(?<currentValue>.+?)\\s*$"
       ]
+    },
+    {
+      "customType": "regex",
+      "description": "Update a version pinned in a shell variable inside an app values.yaml (e.g. transmission's initContainer that downloads the Flood web UI from a GitHub release), annotated with a renovate comment. The datasource is taken FROM the comment (github-releases, etc.).",
+      "managerFilePatterns": [
+        "/apps/.+/values\\.yaml$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>\\S+?)(?:\\s+versioning=(?<versioning>[a-z-]+))?\\s*\\n\\s*[A-Za-z_][A-Za-z0-9_]*=[\"']?(?<currentValue>[^\"'\\s]+)[\"']?"
+      ],
+      "datasourceTemplate": "{{{datasource}}}"
     }
   ]
 }

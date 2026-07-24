@@ -327,10 +327,20 @@ initContainers:
       - sh
       - -c
       - |
+        set -eu
         apk add --no-cache curl unzip
-        curl -L -o /tmp/flood.zip https://github.com/johman10/flood-for-transmission/releases/download/latest/flood-for-transmission.zip
-        unzip /tmp/flood.zip -d /config
-        cp /secrets/settings.json /config/settings.json && chmod 600 /config/settings.json
+        # Flood web UI, pinned to a GitHub release tag so Renovate can bump it
+        # (see the github-releases customManager in renovate.json). The URL uses a
+        # concrete tag — NOT `releases/download/latest/`, which treats "latest" as
+        # a literal tag and 404s. `--fail` + `set -e` fail the pod loudly on a bad
+        # download instead of silently serving a broken UI; `unzip -o` keeps
+        # re-runs idempotent on the persistent config volume.
+        # renovate: datasource=github-releases depName=johman10/flood-for-transmission
+        FLOOD_VERSION=v1.0.1
+        curl --fail -L -o /tmp/flood.zip "https://github.com/johman10/flood-for-transmission/releases/download/${FLOOD_VERSION}/flood-for-transmission.zip"
+        unzip -o /tmp/flood.zip -d /config
+        cp /secrets/settings.json /config/settings.json
+        chmod 600 /config/settings.json
     volumeMounts:
       - name: transmission-secret
         mountPath: /secrets/settings.json
