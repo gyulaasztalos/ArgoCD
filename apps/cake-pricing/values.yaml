@@ -130,7 +130,7 @@ externalSecrets:
     data:
       - secretKey: intake_token
         remoteRef:
-          key: cake-pricing-app
+          key: cake-order-app
           property: intake_token
   - name: cake-pricing-calendar-secret
     refreshInterval: 1h
