@@ -1,0 +1,36 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Everything that is NOT the cake-order core workload, synced as a separate ArgoCD
+# Application source alongside the Helm chart (see homelab-charts/PLAN.md "Scope
+# boundary"). All of these are resource types the `common` library chart does not
+# model, so they stay as raw manifests here:
+#
+#   - postgresql-database.yaml   CNPG Database (in the `databases` namespace)
+#   - cloudflared.yaml           the public Cloudflare tunnel Deployment + its
+#                                ExternalSecret (a second workload; replicas 0)
+#   - migrate-job.yaml           PreSync hook Job (alembic upgrade)
+#   - purge-cronjob.yaml         nightly GDPR retention CronJob
+#   - networkpolicy.yaml         the two default-deny NetworkPolicies
+#   - prometheus-alarms.yaml     the PrometheusRule
+#
+# The `labels` transformer reproduces the original install/ kustomization: it
+# stamps the four app.kubernetes.io/* labels on every object WITHOUT touching
+# selectors (includeSelectors: false), so the cloudflared Deployment keeps its own
+# distinct selector.
+resources:
+  - postgresql-database.yaml
+  - cloudflared.yaml
+  - migrate-job.yaml
+  - purge-cronjob.yaml
+  - networkpolicy.yaml
+  - prometheus-alarms.yaml
+
+labels:
+  - pairs:
+      app.kubernetes.io/name: cake-order
+      app.kubernetes.io/part-of: cake-order
+      app.kubernetes.io/instance: cake-order
+      app.kubernetes.io/component: cake-order
+    includeSelectors: false

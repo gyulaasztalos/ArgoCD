@@ -9,9 +9,26 @@ metadata:
 spec:
   project: default
   sources:
+    # 1) this repo — provides the tailored valueFile (referenced as $config below)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/cake-order/install
+      ref: config
+    # 2) the homelab-charts monorepo — the cake-order wrapper chart + `common`.
+    #    Renders the CORE workload: the app Deployment (with the gallery-prep
+    #    initContainer), Service, IngressRoute, the NFS gallery PV/PVC, the two
+    #    app ExternalSecrets and the ServiceMonitor.
+    - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
+      targetRevision: main
+      path: charts/cake-order
+      helm:
+        valueFiles:
+          - $config/apps/cake-order/values.yaml
+    # 3) everything common does not model: the CNPG Database, the migrate Job
+    #    (PreSync hook), the purge CronJob, the two NetworkPolicies, the
+    #    cloudflared tunnel Deployment + its ExternalSecret, and the PrometheusRule
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/cake-order/post-install
   destination:
     server: https://kubernetes.default.svc
     namespace: cake-order

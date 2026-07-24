@@ -39,6 +39,15 @@ spec:
             readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             privileged: false
+          # Resource requests/limits (kube-linter unset-cpu/memory). A quick
+          # alembic migration — modest, with a generous ceiling.
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
           env:
             - name: DB_HOST
               value: postgres-rw.databases.svc.cluster.local

@@ -1,0 +1,32 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Everything that is NOT the cake-pricing core workload, synced as a separate
+# ArgoCD Application source alongside the Helm chart (see homelab-charts/PLAN.md
+# "Scope boundary"). Resource types the `common` library chart does not model:
+#
+#   - postgresql-database.yaml       CNPG Database (in the `databases` namespace)
+#   - cake-pricing-headers.yaml      Traefik Middleware (in the `traefik` namespace)
+#   - cake-pricing-smtp-secret.yaml  ExternalSecret used only by the CronJob
+#   - migrate-job.yaml               PreSync hook Job (alembic upgrade)
+#   - price-sync-cronjob.yaml        daily price-update CronJob
+#   - prometheus-alarms.yaml         the PrometheusRule
+#
+# The `labels` transformer reproduces the original install/ kustomization: the
+# four app.kubernetes.io/* labels on every object, selectors untouched.
+resources:
+  - postgresql-database.yaml
+  - cake-pricing-headers.yaml
+  - cake-pricing-smtp-secret.yaml
+  - migrate-job.yaml
+  - price-sync-cronjob.yaml
+  - prometheus-alarms.yaml
+
+labels:
+  - pairs:
+      app.kubernetes.io/name: cake-pricing
+      app.kubernetes.io/part-of: cake-pricing
+      app.kubernetes.io/instance: cake-pricing
+      app.kubernetes.io/component: cake-pricing
+    includeSelectors: false

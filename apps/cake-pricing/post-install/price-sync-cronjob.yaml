@@ -8,6 +8,11 @@ kind: CronJob
 metadata:
   name: cake-pricing-price-sync
   namespace: cake-pricing
+  annotations:
+    # The jobTemplate deliberately sets ttlSecondsAfterFinished (auto-clean
+    # finished sync jobs); the history limits are also set intentionally. The
+    # interaction is understood and wanted, so waive kube-linter's warning.
+    ignore-check.kube-linter.io/job-ttl-seconds-after-finished: "Intentional: ttlSecondsAfterFinished plus successful/failedJobsHistoryLimit are both set on purpose."
   labels:
     app: cake-pricing
     app.kubernetes.io/name: cake-pricing

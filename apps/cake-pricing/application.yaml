@@ -9,9 +9,25 @@ metadata:
 spec:
   project: default
   sources:
+    # 1) this repo — provides the tailored valueFile (referenced as $config below)
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
-      path: apps/cake-pricing/install
+      ref: config
+    # 2) the homelab-charts monorepo — the cake-pricing wrapper chart + `common`.
+    #    Renders the CORE workload: the app Deployment, Service, IngressRoute, the
+    #    three app ExternalSecrets and the ServiceMonitor.
+    - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
+      targetRevision: main
+      path: charts/cake-pricing
+      helm:
+        valueFiles:
+          - $config/apps/cake-pricing/values.yaml
+    # 3) everything common does not model: the CNPG Database, the migrate Job
+    #    (PreSync hook), the price-sync CronJob, the cake-pricing-headers Middleware,
+    #    the smtp ExternalSecret, and the PrometheusRule
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      path: apps/cake-pricing/post-install
   destination:
     server: https://kubernetes.default.svc
     namespace: cake-pricing

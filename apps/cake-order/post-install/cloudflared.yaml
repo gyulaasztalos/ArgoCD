@@ -65,6 +65,11 @@ spec:
             - --metrics
             - 0.0.0.0:2000
             - run
+          ports:
+            # Declared so the liveness probe's port is exposed (kube-linter
+            # liveness-port); --metrics binds cloudflared's /ready + metrics here.
+            - containerPort: 2000
+              name: metrics
           env:
             - name: TUNNEL_TOKEN
               valueFrom:

@@ -1,0 +1,247 @@
+# =============================================================================
+# cake-pricing — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/cake-pricing chart.
+#
+# This file is the COMPLETE, reviewable contract for the CORE workload: the app
+# Deployment, Service, IngressRoute, three app ExternalSecrets (postgres/intake/
+# calendar), and the ServiceMonitor.
+#
+# NOT in this chart (see apps/cake-pricing/post-install/, synced as a separate
+# ArgoCD source): the CNPG Database, the migrate Job (PreSync hook), the
+# price-sync CronJob, the cake-pricing-headers Middleware (in the `traefik` ns),
+# the smtp ExternalSecret (used only by the CronJob), and the PrometheusRule.
+# See homelab-charts/PLAN.md "Scope boundary".
+# =============================================================================
+
+name: cake-pricing
+namespace: cake-pricing
+
+image:
+  repository: asztalosgyula/cake-pricing
+  # renovate: datasource=docker depName=asztalosgyula/cake-pricing
+  tag: 1.8.1
+  pullPolicy: IfNotPresent
+
+controller:
+  type: deployment
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+serviceAccount:
+  create: false
+  secrets: []
+  tokenSecret:
+    create: false
+
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  fsGroup: 1000
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  privileged: false
+
+podAntiAffinity: true
+
+ports:
+  - containerPort: 8000
+    name: http
+
+# -----------------------------------------------------------------------------
+# Configuration — all via env. DB + intake + calendar tokens from the three
+# ExternalSecrets below (the SMTP secret is used only by the price-sync CronJob,
+# which lives in post-install).
+# -----------------------------------------------------------------------------
+envFromConfigMap: ""
+envFromSecrets: []
+env:
+  - name: APP_ENV
+    value: prod
+  - name: DB_HOST
+    value: postgres-rw.databases.svc.cluster.local
+  - name: DB_NAME
+    value: cake-pricing
+  - name: DB_USER
+    valueFrom:
+      secretKeyRef:
+        name: cake-pricing-postgres-secret
+        key: username
+  - name: DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: cake-pricing-postgres-secret
+        key: password
+  - name: INTAKE_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: cake-pricing-intake-secret
+        key: intake_token
+  - name: CALENDAR_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: cake-pricing-calendar-secret
+        key: calendar_token
+
+configMaps: []
+
+# -----------------------------------------------------------------------------
+# Secrets — the web app's own DB role creds, intake token and calendar token.
+# The smtp secret lives with the CronJob in post-install. NO secret material here.
+# -----------------------------------------------------------------------------
+externalSecrets:
+  - name: cake-pricing-postgres-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          username: "{{ .username }}"
+          password: "{{ .password }}"
+    data:
+      - secretKey: username
+        remoteRef:
+          key: cake-pricing-postgres-password
+          property: username
+      - secretKey: password
+        remoteRef:
+          key: cake-pricing-postgres-password
+          property: password
+  - name: cake-pricing-intake-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          intake_token: "{{ .intake_token }}"
+    data:
+      - secretKey: intake_token
+        remoteRef:
+          key: cake-pricing-app
+          property: intake_token
+  - name: cake-pricing-calendar-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          calendar_token: "{{ .calendar_token }}"
+    data:
+      - secretKey: calendar_token
+        remoteRef:
+          key: cake-pricing-app
+          property: calendar_token
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 96Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: 8000
+  initialDelaySeconds: 5
+  periodSeconds: 15
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 5
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8000
+  initialDelaySeconds: 15
+  periodSeconds: 30
+  failureThreshold: 6
+  successThreshold: 1
+  timeoutSeconds: 5
+
+volumeMounts: []
+volumes: []
+initContainers: []
+extraContainers: []
+
+# -----------------------------------------------------------------------------
+# Service — port 80 → container 8000. The selector is CUSTOM: name + component,
+# NOT the chart default `app: <name>`. The migrate/price-sync Job pods also carry
+# `app: cake-pricing` + `app.kubernetes.io/name: cake-pricing` but NO `component`
+# label, so keying on the web component keeps them out of this Service's endpoints
+# (otherwise the ServiceMonitor scrapes a Job pod's :8000 → target "down").
+# -----------------------------------------------------------------------------
+services:
+  - name: cake-pricing
+    enabled: true
+    type: ClusterIP
+    selector:
+      app.kubernetes.io/name: cake-pricing
+      app.kubernetes.io/component: cake-pricing
+    ports:
+      - name: http
+        protocol: TCP
+        port: 80
+        targetPort: 8000
+
+# -----------------------------------------------------------------------------
+# IngressRoute — internal app behind Authentik. TWO routes:
+#   - /calendar/ (priority 20): the published .ics feed. Calendar apps can't do
+#     Authentik's browser forward-auth, so this SKIPS authentik and keeps only the
+#     custom headers middleware; the path embeds an unguessable CALENDAR_TOKEN the
+#     app verifies (anything else under /calendar/ 404s).
+#   - catch-all (priority 10): authentik + the custom headers middleware.
+# `cake-pricing-headers` is a per-app copy of default-headers with referrerPolicy
+# same-origin (so the forms' return_to works); it lives in post-install (traefik ns).
+# -----------------------------------------------------------------------------
+ingressRoute:
+  enabled: true
+  ingressClassName: traefik-external
+  entryPoint: websecure
+  tlsSecretName: local-asztalos-net-tls
+  routes:
+    - host: torta.local.asztalos.net
+      pathPrefix: /calendar/
+      port: 80
+      priority: 20
+      middlewares:
+        - name: cake-pricing-headers
+          namespace: traefik
+    - host: torta.local.asztalos.net
+      port: 80
+      priority: 10
+      middlewares:
+        - name: authentik
+          namespace: traefik
+        - name: cake-pricing-headers
+          namespace: traefik
+
+serviceMonitor:
+  enabled: true
+  labels:
+    release: prometheus-operator
+  endpoints:
+    - port: http
+      interval: 30s
+      path: /metrics
+      scheme: http
+      honorLabels: true
+
+persistentVolumeClaims: []
+persistentVolumes: []
+extraLabels: {}

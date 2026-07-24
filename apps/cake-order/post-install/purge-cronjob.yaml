@@ -6,6 +6,11 @@ kind: CronJob
 metadata:
   name: cake-order-purge
   namespace: cake-order
+  annotations:
+    # The jobTemplate deliberately sets ttlSecondsAfterFinished (auto-clean
+    # finished purge jobs); the history limits are also set intentionally. The
+    # interaction is understood and wanted, so waive kube-linter's warning.
+    ignore-check.kube-linter.io/job-ttl-seconds-after-finished: "Intentional: ttlSecondsAfterFinished plus successful/failedJobsHistoryLimit are both set on purpose."
   labels:
     app: cake-order
     app.kubernetes.io/name: cake-order
@@ -45,6 +50,15 @@ spec:
                 readOnlyRootFilesystem: true
                 allowPrivilegeEscalation: false
                 privileged: false
+              # Resource requests/limits (kube-linter unset-cpu/memory). A light
+              # nightly GDPR purge — modest, with a generous ceiling.
+              resources:
+                requests:
+                  cpu: 25m
+                  memory: 64Mi
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
               env:
                 - name: DB_HOST
                   value: postgres-rw.databases.svc.cluster.local
