@@ -20,7 +20,6 @@ resources:
   - unbound/application.yaml
   - nebula-sync/application.yaml
   - apprise/application.yaml
-  - nginx/application.yaml
   - whoami/application.yaml
   - ddns-updater/application.yaml
   - transmission/application.yaml
