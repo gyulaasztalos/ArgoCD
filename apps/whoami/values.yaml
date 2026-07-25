@@ -1,0 +1,146 @@
+# =============================================================================
+# whoami — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/whoami chart.
+#
+# whoami is a tiny HTTP echo service (traefik/whoami) used to smoke-test ingress,
+# TLS and Authentik forward-auth. It is pure core workload — Deployment + Service
+# + IngressRoute in the `default` namespace — so there is NO post-install source;
+# the chart renders everything.
+# =============================================================================
+name: whoami
+namespace: default
+
+image:
+  repository: traefik/whoami
+  # renovate: datasource=docker depName=traefik/whoami
+  tag: v1.11.0
+  pullPolicy: IfNotPresent
+
+controller:
+  type: daemonset
+  revisionHistoryLimit: 2
+  # DaemonSet uses `updateStrategy` (not the Deployment's `strategy`), and only
+  # maxUnavailable applies — it's pinned one pod per node, so there is no surge.
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+
+serviceAccount:
+  create: false
+  secrets: []
+  tokenSecret:
+    create: false
+
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  runAsUser: 1000
+  runAsGroup: 1000
+  runAsNonRoot: true
+  fsGroup: 1000
+
+securityContext:
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  privileged: false
+  capabilities:
+    drop: [ALL]
+    add: [NET_BIND_SERVICE]
+
+# Off: a DaemonSet already schedules exactly one pod per node, so host-topology
+# pod anti-affinity is redundant.
+podAntiAffinity: false
+
+ports:
+  - containerPort: 80
+    name: http
+    protocol: TCP
+
+envFromConfigMap: ""
+envFromSecrets: []
+env: []
+configMaps: []
+externalSecrets: []
+
+resources:
+  requests:
+    memory: 64Mi
+    cpu: 50m
+  limits:
+    memory: 128Mi
+    cpu: 250m
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 80
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 10
+  successThreshold: 1
+  failureThreshold: 5
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 80
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  timeoutSeconds: 10
+  successThreshold: 1
+  failureThreshold: 5
+
+initContainers: []
+extraContainers: []
+
+volumeMounts:
+  - name: whoami-cache
+    mountPath: /var/cache/whoami
+  - name: whoami-run
+    mountPath: /var/run
+  - name: whoami-tmp
+    mountPath: /tmp
+
+volumes:
+  - name: whoami-cache
+    emptyDir: {}
+  - name: whoami-run
+    emptyDir: {}
+  - name: whoami-tmp
+    emptyDir: {}
+
+persistentVolumes: []
+persistentVolumeClaims: []
+
+services:
+  - name: whoami
+    enabled: true
+    type: ClusterIP
+    ports:
+      - name: http
+        port: 80
+        targetPort: 80
+
+ingressRoute:
+  enabled: true
+  ingressClassName: traefik-external
+  entryPoint: websecure
+  tlsSecretName: local-asztalos-net-tls
+  routes:
+    - host: whoami.local.asztalos.net
+      port: 80
+
+serviceMonitor:
+  enabled: false
+  labels: {}
+  endpoints: []
+
+extraLabels: {}
+
+volumeClaimTemplates: []
+jobs: []
+cronJobs: []
+database: {}
+middlewares: []

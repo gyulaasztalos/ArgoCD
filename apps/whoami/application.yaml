@@ -7,14 +7,25 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:
+  project: default
+  sources:
+    # 1) this repo — provides the tailored valueFile (referenced as $config below)
+    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+      targetRevision: main
+      ref: config
+    # 2) the homelab-charts monorepo — the whoami wrapper chart + the `common`
+    #    library dependency (resolved from the same checkout). Renders everything:
+    #    the Deployment, the Service and the IngressRoute. whoami is pure core
+    #    workload, so there is NO post-install source.
+    - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
+      targetRevision: main
+      path: charts/whoami
+      helm:
+        valueFiles:
+          - $config/apps/whoami/values.yaml
   destination:
     namespace: default
     server: https://kubernetes.default.svc
-  project: default
-  source:
-    repoURL: https://github.com/gyulaasztalos/ArgoCD.git
-    targetRevision: main
-    path: apps/whoami/post-install
   syncPolicy:
     automated:
       selfHeal: true
