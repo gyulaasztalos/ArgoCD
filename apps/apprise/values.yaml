@@ -433,3 +433,24 @@ database: {}
 # them. Declared for completeness; this app defines none. See _middleware.tpl.
 # -----------------------------------------------------------------------------
 middlewares: []
+
+# -----------------------------------------------------------------------------
+# ingressRouteTCP (escape-hatch template, templates/ingressroutetcp.yaml) — the
+# `mailrise` Traefik TCP router on the `mailsecure` entryPoint, so appliances can
+# speak SMTP to the mailrise sidecar (in-pod) from outside the cluster. Routes
+# HostSNI(`*`) → the apprise Service :8025. NOT a common contract: mailrise is the
+# only homelab consumer and apprise works without it.
+# -----------------------------------------------------------------------------
+ingressRouteTCP:
+  enabled: true
+  name: mailrise
+  ingressClassName: traefik-external
+  entryPoints:
+    - mailsecure
+  match: "HostSNI(`*`)"
+  priority: 35
+  service:
+    name: apprise
+    port: 8025
+    nativeLB: true
+  tlsSecretName: local-asztalos-net-tls

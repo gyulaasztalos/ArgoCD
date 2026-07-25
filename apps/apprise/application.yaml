@@ -16,15 +16,15 @@ spec:
     # 2) the homelab-charts monorepo — the apprise wrapper chart + the `common`
     #    library dependency (resolved from the same checkout). Renders the API,
     #    its mailrise sidecar, the mailrise ConfigMap, the ExternalSecret, the
-    #    Service, the IngressRoute and the ServiceMonitor.
+    #    Service, the IngressRoute, the ServiceMonitor and the mailrise
+    #    IngressRouteTCP (per-chart escape-hatch template).
     - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
       targetRevision: main
       path: charts/apprise
       helm:
         valueFiles:
           - $config/apps/apprise/values.yaml
-    # 3) edge cases kept out of the chart: the mailrise IngressRouteTCP (Traefik
-    #    TCP router for SMTP) and the PrometheusRule alarms
+    # 3) the one object the scope boundary keeps out of the chart: the PrometheusRule
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       path: apps/apprise/post-install

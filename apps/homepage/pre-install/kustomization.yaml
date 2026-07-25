@@ -2,18 +2,16 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# Assets homepage needs in place to deploy and start correctly, synced as a
-# separate ArgoCD Application source alongside the Helm chart:
-#
-#   - rbac.yaml            the ClusterRole + ClusterRoleBinding granting the
-#                          `homepage` ServiceAccount its read access to
-#                          namespaces/pods/nodes/ingresses/ingressroutes/metrics.
-#                          The ServiceAccount and its long-lived token Secret are
-#                          rendered by the CHART (common >= 0.2.0), not here.
+# The one asset that CANNOT live in the Helm chart, synced as a separate ArgoCD
+# Application source alongside it:
 #
 #   - homepage-images      custom dashboard artwork. These are BINARY files, so
 #                          they cannot live in the chart's values.yaml — that is
 #                          the whole reason this generator stays in kustomize.
+#
+# The ClusterRole + ClusterRoleBinding (homepage's Kubernetes-widget read access)
+# now render from the CHART as a per-chart escape-hatch template
+# (templates/rbac.yaml), alongside the ServiceAccount they bind to.
 #
 # disableNameSuffixHash is REQUIRED, not cosmetic: the Deployment that mounts
 # this ConfigMap is rendered by Helm in a DIFFERENT ArgoCD source, so kustomize
@@ -31,9 +29,6 @@ configMapGenerator:
     files:
       - custom_background.jpg=./images/custom_background.jpg
       - telekom.png=./images/telekom.png
-
-resources:
-  - rbac.yaml
 
 generatorOptions:
   disableNameSuffixHash: true
