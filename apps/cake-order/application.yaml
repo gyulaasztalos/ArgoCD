@@ -14,18 +14,18 @@ spec:
       targetRevision: main
       ref: config
     # 2) the homelab-charts monorepo — the cake-order wrapper chart + `common`.
-    #    Renders the CORE workload: the app Deployment (with the gallery-prep
-    #    initContainer), Service, IngressRoute, the NFS gallery PV/PVC, the two
-    #    app ExternalSecrets and the ServiceMonitor.
+    #    Renders every mandatory resource (common 0.6.0): the app Deployment (with
+    #    the gallery-prep initContainer), Service, IngressRoute, NFS gallery PV/PVC,
+    #    the three ExternalSecrets, the ServiceMonitor, the migrate Job (PreSync) and
+    #    purge CronJob, the CNPG Database, and — as per-chart escape-hatch templates —
+    #    the cloudflared tunnel Deployment and the two NetworkPolicies.
     - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
       targetRevision: main
       path: charts/cake-order
       helm:
         valueFiles:
           - $config/apps/cake-order/values.yaml
-    # 3) everything common does not model: the CNPG Database, the migrate Job
-    #    (PreSync hook), the purge CronJob, the two NetworkPolicies, the
-    #    cloudflared tunnel Deployment + its ExternalSecret, and the PrometheusRule
+    # 3) the one object the scope boundary keeps out of the chart: the PrometheusRule
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       path: apps/cake-order/post-install

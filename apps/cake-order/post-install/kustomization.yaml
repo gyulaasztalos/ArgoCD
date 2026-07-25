@@ -2,29 +2,17 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-# Everything that is NOT the cake-order core workload, synced as a separate ArgoCD
-# Application source alongside the Helm chart (see homelab-charts/PLAN.md "Scope
-# boundary"). All of these are resource types the `common` library chart does not
-# model, so they stay as raw manifests here:
+# Post-install source: only the observability object the scope boundary keeps out
+# of the chart. As of common 0.6.0 every mandatory resource — the CNPG Database,
+# migrate Job, purge CronJob (common contracts), and the cloudflared tunnel +
+# NetworkPolicies (per-chart escape-hatch templates) — is rendered by the chart
+# from apps/cake-order/values.yaml.
 #
-#   - postgresql-database.yaml   CNPG Database (in the `databases` namespace)
-#   - cloudflared.yaml           the public Cloudflare tunnel Deployment + its
-#                                ExternalSecret (a second workload; replicas 0)
-#   - migrate-job.yaml           PreSync hook Job (alembic upgrade)
-#   - purge-cronjob.yaml         nightly GDPR retention CronJob
-#   - networkpolicy.yaml         the two default-deny NetworkPolicies
-#   - prometheus-alarms.yaml     the PrometheusRule
+#   - prometheus-alarms.yaml   the PrometheusRule
 #
-# The `labels` transformer reproduces the original install/ kustomization: it
-# stamps the four app.kubernetes.io/* labels on every object WITHOUT touching
-# selectors (includeSelectors: false), so the cloudflared Deployment keeps its own
-# distinct selector.
+# The `labels` transformer stamps the four app.kubernetes.io/* labels on the rule,
+# matching the chart's label block.
 resources:
-  - postgresql-database.yaml
-  - cloudflared.yaml
-  - migrate-job.yaml
-  - purge-cronjob.yaml
-  - networkpolicy.yaml
   - prometheus-alarms.yaml
 
 labels:

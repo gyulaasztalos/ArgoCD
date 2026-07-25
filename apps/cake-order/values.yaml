@@ -7,19 +7,22 @@
 # Deployment (with its gallery-prep initContainer), Service, IngressRoute, the
 # NFS gallery PV/PVC, the two app ExternalSecrets, and the ServiceMonitor.
 #
-# NOT in this chart (see apps/cake-order/post-install/, synced as a separate
-# ArgoCD source): the CNPG Database, the migrate Job (PreSync hook), the purge
-# CronJob, the two NetworkPolicies, the cloudflared tunnel Deployment + its
-# ExternalSecret, and the PrometheusRule. See homelab-charts/PLAN.md "Scope
-# boundary".
+# The chart renders every mandatory resource: the app Deployment + gallery-prep
+# initContainer, Service, IngressRoute, NFS gallery PV/PVC, the three
+# ExternalSecrets (postgres/app/tunnel), the ServiceMonitor, the migrate Job
+# (PreSync hook) and purge CronJob (common jobs/cronJobs), the CNPG Database
+# (common database), and — as per-chart escape-hatch templates — the cloudflared
+# tunnel Deployment and the two NetworkPolicies. Only the PrometheusRule remains in
+# apps/cake-order/post-install/. See homelab-charts/PLAN.md "Scope boundary".
 # =============================================================================
 
 name: cake-order
 namespace: cake-order
 
 # -----------------------------------------------------------------------------
-# Container image. image.tag is the single source of truth for the app version.
-# The migrate Job and purge CronJob (post-install) pin the SAME tag in lockstep.
+# Container image. image.tag is the single source of truth for the app version —
+# the migrate Job and purge CronJob default their image from it (common 0.6.0), so
+# there is no second tag to keep in lockstep.
 # -----------------------------------------------------------------------------
 image:
   repository: asztalosgyula/cake-order
@@ -208,6 +211,21 @@ externalSecrets:
         remoteRef:
           key: cake-order-app
           property: intake_token
+  # Cloudflare tunnel token, consumed by the cloudflared Deployment (the escape-
+  # hatch template). From the cake-order-app 1Password item.
+  - name: cake-order-tunnel-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          token: "{{ .cloudflare_tunnel_token }}"
+    data:
+      - secretKey: cloudflare_tunnel_token
+        remoteRef:
+          key: cake-order-app
+          property: cloudflare_tunnel_token
 
 # -----------------------------------------------------------------------------
 # Resources (MAIN container).
@@ -435,24 +453,134 @@ extraLabels: {}
 volumeClaimTemplates: []
 
 # -----------------------------------------------------------------------------
-# Batch workloads (common >= 0.6.0). Declared for completeness (library
-# capability); this app runs none. See charts/common/templates/_job.tpl.
-#   jobs:      one-shot batch/v1 Jobs (e.g. DB migrate; image defaults to app image)
-#   cronJobs:  scheduled batch/v1 CronJobs (e.g. purge / sync)
+# Batch workloads (common >= 0.6.0). migrate Job (PreSync) + purge CronJob, both on
+# the app image (defaulted from image.tag). Pods carry app.kubernetes.io/name but
+# NOT `app`, so they stay out of the Service's endpoints (no spurious TargetDown).
 # -----------------------------------------------------------------------------
-jobs: []
-cronJobs: []
+jobs:
+  # Alembic schema migration, run as an ArgoCD PreSync hook before every sync.
+  - name: cake-order-migrate
+    hook: PreSync
+    backoffLimit: 2
+    ttlSecondsAfterFinished: 300
+    command: ["alembic", "upgrade", "head"]
+    securityContext:
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      privileged: false
+    podSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsGroup: 1000
+      runAsNonRoot: true
+    resources:
+      requests:
+        cpu: 25m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    env:
+      - name: DB_HOST
+        value: postgres-rw.databases.svc.cluster.local
+      - name: DB_NAME
+        value: cake-order
+      - name: DB_USER
+        valueFrom:
+          secretKeyRef:
+            name: cake-order-postgres-secret
+            key: username
+      - name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: cake-order-postgres-secret
+            key: password
+
+cronJobs:
+  # GDPR retention (PLANNING §3.5): nightly 03:20 purge of unverified orders (48h),
+  # completed orders (30d) and stale rate-limit events.
+  - name: cake-order-purge
+    schedule: "20 3 * * *"
+    timeZone: Europe/Budapest
+    concurrencyPolicy: Forbid
+    successfulJobsHistoryLimit: 1
+    failedJobsHistoryLimit: 2
+    backoffLimit: 2
+    ttlSecondsAfterFinished: 3600
+    annotations:
+      ignore-check.kube-linter.io/job-ttl-seconds-after-finished: "Intentional: ttlSecondsAfterFinished plus successful/failedJobsHistoryLimit are both set on purpose."
+    command: ["python", "-m", "app.jobs.purge"]
+    securityContext:
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      privileged: false
+    podSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsGroup: 1000
+      runAsNonRoot: true
+    resources:
+      requests:
+        cpu: 25m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    env:
+      - name: DB_HOST
+        value: postgres-rw.databases.svc.cluster.local
+      - name: DB_NAME
+        value: cake-order
+      - name: DB_USER
+        valueFrom:
+          secretKeyRef:
+            name: cake-order-postgres-secret
+            key: username
+      - name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: cake-order-postgres-secret
+            key: password
 
 # -----------------------------------------------------------------------------
-# database (common >= 0.6.0) — the app's CNPG database on the shared cluster.
-# Declared for completeness (library capability); this app has none. Set a
-# `database:` block only for apps with a dedicated Postgres DB (see _database.tpl).
+# database (common >= 0.6.0) — dedicated DB on the shared CNPG cluster. UTF-8 + C
+# locale for the Hungarian data. Object (cake-order-db), db name and owner
+# (cake-order) come from the common defaults; the managed role is on the cluster.
 # -----------------------------------------------------------------------------
-database: {}
+database:
+  encoding: UTF8
+  localeCType: C
+  localeCollate: C
+  template: template0
 
 # -----------------------------------------------------------------------------
-# middlewares (common >= 0.6.0) — the app's own Traefik Middleware objects (e.g.
-# per-app security headers), rendered alongside the IngressRoute that references
-# them. Declared for completeness; this app defines none. See _middleware.tpl.
+# middlewares — cake-order uses the shared `default-headers` (referenced by the
+# IngressRoute); it defines no app-specific Middleware of its own.
 # -----------------------------------------------------------------------------
 middlewares: []
+
+# -----------------------------------------------------------------------------
+# cloudflared (escape-hatch template, charts/cake-order/templates/cloudflared.yaml)
+# — the Cloudflare Tunnel connector, the only public entry to cake-order. A second
+# workload with its own identity, so it's a per-chart template, not a common
+# contract. replicas 0 = parked; scale up to go live. Token from the
+# cake-order-tunnel-secret ExternalSecret below.
+# -----------------------------------------------------------------------------
+cloudflared:
+  enabled: true
+  replicas: 0
+  image:
+    repository: cloudflare/cloudflared
+    # renovate: datasource=docker depName=cloudflare/cloudflared
+    tag: 2026.7.3
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 250m
+      memory: 128Mi
