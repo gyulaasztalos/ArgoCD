@@ -9,9 +9,6 @@ kind: Kustomization
 #   - two Grafana dashboards, GENERATED from JSON (fridge-HACCP + OSS metrics),
 #     labelled grafana_dashboard: "1" and discovered by the kube-prometheus
 #     Grafana sidecar in any namespace.
-#   - grafana-datasource.yaml — an ExternalSecret rendering a grafana_datasource
-#     Secret so the sidecar wires Grafana to influxdb (reuses the admin token).
-#     This is observability glue, not influxdb's own workload, so it lives here.
 #   - prometheus-rules.yaml — the influxdb PrometheusRule alarms.
 #   - haccp-backup-alert-job.yaml + haccp-backup-alert-template.yml — a PostSync
 #     Job that applies an InfluxDB-native Task (the HACCP backup alarm). The Job
@@ -46,7 +43,6 @@ configMapGenerator:
         app.kubernetes.io/component: haccp-alert-apply
 
 resources:
-  - grafana-datasource.yaml
   - prometheus-rules.yaml
   - haccp-backup-alert-job.yaml
 

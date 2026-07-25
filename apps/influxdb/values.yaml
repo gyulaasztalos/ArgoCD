@@ -139,9 +139,8 @@ configMaps: []
 
 # -----------------------------------------------------------------------------
 # Secrets — the app's OWN admin credentials + setup token (1Password item
-# "influxdb"). The Grafana datasource ExternalSecret is NOT here: it is
-# observability glue and lives in apps/influxdb/post-install/ with the dashboards.
-# NO secret material is stored here — only references.
+# "influxdb"), plus the Grafana datasource Secret (moved out of post-install into
+# the chart, common 0.6.0). NO secret material is stored here — only references.
 # -----------------------------------------------------------------------------
 externalSecrets:
   - name: influxdb-init
@@ -162,6 +161,43 @@ externalSecrets:
           metadataPolicy: None
           property: password
       - secretKey: admin-token
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          key: influxdb
+          metadataPolicy: None
+          property: admin-token
+  # Grafana datasource for InfluxDB 2.x (Flux). Rendered as a labeled Secret
+  # (grafana_datasource: "1") the Grafana datasources sidecar auto-discovers.
+  # Reuses the same admin token (1Password "influxdb" / admin-token).
+  - name: influxdb-grafana-datasource
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        metadata:
+          labels:
+            grafana_datasource: "1"
+        data:
+          influxdb.yaml: |
+            apiVersion: 1
+            datasources:
+              - name: InfluxDB
+                uid: influxdb
+                type: influxdb
+                access: proxy
+                # in-cluster service — no ingress/TLS hop needed
+                url: http://influxdb.influxdb.svc.cluster.local:8086
+                jsonData:
+                  version: Flux
+                  organization: homelab
+                  defaultBucket: homeassistant
+                secureJsonData:
+                  token: "{{ .credential }}"
+                editable: false
+    data:
+      - secretKey: credential
         remoteRef:
           conversionStrategy: Default
           decodingStrategy: None
