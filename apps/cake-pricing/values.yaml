@@ -7,10 +7,11 @@
 # Deployment, Service, IngressRoute, three app ExternalSecrets (postgres/intake/
 # calendar), and the ServiceMonitor.
 #
-# NOT in this chart (see apps/cake-pricing/post-install/, synced as a separate
-# ArgoCD source): the CNPG Database, the migrate Job (PreSync hook), the
-# price-sync CronJob, the cake-pricing-headers Middleware (in the `traefik` ns),
-# the smtp ExternalSecret (used only by the CronJob), and the PrometheusRule.
+# The chart now renders every mandatory resource: the app Deployment, Service,
+# IngressRoute, the four ExternalSecrets, the ServiceMonitor, the migrate Job
+# (PreSync hook), the price-sync CronJob, the CNPG Database (databases ns) and the
+# cake-pricing-headers Middleware (traefik ns) — all via common 0.6.0 contracts.
+# Only the PrometheusRule remains in apps/cake-pricing/post-install/.
 # See homelab-charts/PLAN.md "Scope boundary".
 # =============================================================================
 
@@ -145,6 +146,26 @@ externalSecrets:
         remoteRef:
           key: cake-pricing-app
           property: calendar_token
+  # SMTP creds for the price-sync report e-mail; reuses cake-order's iCloud account
+  # (same 1Password item) so the two apps can't drift. Consumed by the CronJob.
+  - name: cake-pricing-smtp-secret
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          smtp_user: "{{ .smtp_user }}"
+          smtp_password: "{{ .smtp_password }}"
+    data:
+      - secretKey: smtp_user
+        remoteRef:
+          key: cake-order-app
+          property: username
+      - secretKey: smtp_password
+        remoteRef:
+          key: cake-order-app
+          property: password
 
 resources:
   requests:
@@ -180,11 +201,11 @@ initContainers: []
 extraContainers: []
 
 # -----------------------------------------------------------------------------
-# Service — port 80 → container 8000. The selector is CUSTOM: name + component,
-# NOT the chart default `app: <name>`. The migrate/price-sync Job pods also carry
-# `app: cake-pricing` + `app.kubernetes.io/name: cake-pricing` but NO `component`
-# label, so keying on the web component keeps them out of this Service's endpoints
-# (otherwise the ServiceMonitor scrapes a Job pod's :8000 → target "down").
+# Service — port 80 → container 8000. Selector keys on name + component (not the
+# chart default `app: <name>`). Belt-and-suspenders with common 0.6.0: the
+# migrate/price-sync Job pods carry only `app.kubernetes.io/name` (no `app`, no
+# `component`), so they stay out of this Service's endpoints either way — the
+# ServiceMonitor never scrapes a Job pod's :8000 (which would report "down").
 # -----------------------------------------------------------------------------
 services:
   - name: cake-pricing
@@ -245,3 +266,161 @@ serviceMonitor:
 persistentVolumeClaims: []
 persistentVolumes: []
 extraLabels: {}
+
+# -----------------------------------------------------------------------------
+# volumeClaimTemplates — per-replica RWO PVCs for a StatefulSet controller.
+# Declared for completeness (library capability); this app is not a StatefulSet
+# and owns no such volume. Populate only when controller.type is statefulset.
+# -----------------------------------------------------------------------------
+volumeClaimTemplates: []
+
+# -----------------------------------------------------------------------------
+# Batch workloads (common >= 0.6.0). The migrate Job and price-sync CronJob, both
+# on the app image (defaulted from image.tag — no hardcoded tag to keep in sync).
+# The pods carry app.kubernetes.io/name but NOT `app`, so they never land in the
+# app Service's endpoints (no spurious ServiceMonitor TargetDown).
+# -----------------------------------------------------------------------------
+jobs:
+  # Alembic schema migration, run as an ArgoCD PreSync hook before every sync.
+  - name: cake-pricing-migrate
+    hook: PreSync
+    backoffLimit: 2
+    ttlSecondsAfterFinished: 300
+    command: ["alembic", "upgrade", "head"]
+    securityContext:
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      privileged: false
+    podSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsGroup: 1000
+      runAsNonRoot: true
+    resources:
+      requests:
+        cpu: 25m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    env:
+      - name: DB_HOST
+        value: postgres-rw.databases.svc.cluster.local
+      - name: DB_NAME
+        value: cake-pricing
+      - name: DB_USER
+        valueFrom:
+          secretKeyRef:
+            name: cake-pricing-postgres-secret
+            key: username
+      - name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: cake-pricing-postgres-secret
+            key: password
+
+cronJobs:
+  # Daily 08:00 Europe/Budapest price update: downloads the árfigyelő XLSX, updates
+  # changed component prices, e-mails a report, records last-success for the
+  # staleness gauge. Any failure fails the Job → the PriceSyncJobFailed alert.
+  - name: cake-pricing-price-sync
+    schedule: "0 8 * * *"
+    timeZone: Europe/Budapest
+    concurrencyPolicy: Forbid
+    startingDeadlineSeconds: 3600
+    successfulJobsHistoryLimit: 3
+    failedJobsHistoryLimit: 3
+    backoffLimit: 1
+    ttlSecondsAfterFinished: 86400
+    annotations:
+      ignore-check.kube-linter.io/job-ttl-seconds-after-finished: "Intentional: ttlSecondsAfterFinished plus successful/failedJobsHistoryLimit are both set on purpose."
+    command: ["python", "-m", "app.jobs.price_sync"]
+    securityContext:
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      privileged: false
+    podSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsGroup: 1000
+      runAsNonRoot: true
+    resources:
+      requests:
+        cpu: 50m
+        memory: 192Mi
+      limits:
+        cpu: "1"
+        memory: 512Mi
+    env:
+      - name: DB_HOST
+        value: postgres-rw.databases.svc.cluster.local
+      - name: DB_NAME
+        value: cake-pricing
+      - name: DB_USER
+        valueFrom:
+          secretKeyRef:
+            name: cake-pricing-postgres-secret
+            key: username
+      - name: DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: cake-pricing-postgres-secret
+            key: password
+      - name: SMTP_HOST
+        value: smtp.mail.me.com
+      - name: SMTP_PORT
+        value: "587"
+      - name: SMTP_SECURITY
+        value: starttls
+      - name: SMTP_USER
+        valueFrom:
+          secretKeyRef:
+            name: cake-pricing-smtp-secret
+            key: smtp_user
+      - name: SMTP_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: cake-pricing-smtp-secret
+            key: smtp_password
+      - name: MAIL_FROM
+        value: info@anitatortai.hu
+      - name: ORDER_INBOX
+        value: info@anitatortai.hu
+
+# -----------------------------------------------------------------------------
+# database (common >= 0.6.0) — dedicated DB on the shared CNPG cluster. UTF-8 + C
+# locale are mandatory for the Hungarian data. Object name (cake-pricing-db), db
+# name and owner (cake-pricing) come from the common defaults; the managed role is
+# provisioned on the cluster (apps/cnpg/.../postgresql-cluster.yaml).
+# -----------------------------------------------------------------------------
+database:
+  encoding: UTF8
+  localeCType: C
+  localeCollate: C
+  template: template0
+
+# -----------------------------------------------------------------------------
+# middlewares (common >= 0.6.0) — cake-pricing-headers (traefik ns), referenced by
+# the IngressRoute routes above. A copy of default-headers with referrerPolicy
+# same-origin so the forms' return_to reads the Referer on same-origin nav.
+# -----------------------------------------------------------------------------
+middlewares:
+  - name: cake-pricing-headers
+    namespace: traefik
+    spec:
+      headers:
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 15552000
+        referrerPolicy: same-origin
+        contentSecurityPolicy: "default-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' https: data:; connect-src 'self' https:; frame-src 'self' https:; media-src 'self' https:; object-src 'none'; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"
+        customFrameOptionsValue: SAMEORIGIN
+        customRequestHeaders:
+          X-Forwarded-Proto: https

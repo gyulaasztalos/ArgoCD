@@ -19,7 +19,9 @@ spec:
   template:
     metadata:
       labels:
-        app: cake-order
+        # NOT `app`: the cake-order Service selects app=cake-order, so a running
+        # migrate pod carrying it becomes a Service endpoint scraped on :8000
+        # → spurious TargetDown. app.kubernetes.io/name keeps netpol coverage.
         app.kubernetes.io/name: cake-order
     spec:
       restartPolicy: Never

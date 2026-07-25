@@ -276,3 +276,33 @@ persistentVolumeClaims: []
 persistentVolumes: []
 
 extraLabels: {}
+
+# -----------------------------------------------------------------------------
+# volumeClaimTemplates — per-replica RWO PVCs for a StatefulSet controller.
+# Declared for completeness (library capability); this app is not a StatefulSet
+# and owns no such volume. Populate only when controller.type is statefulset.
+# -----------------------------------------------------------------------------
+volumeClaimTemplates: []
+
+# -----------------------------------------------------------------------------
+# Batch workloads (common >= 0.6.0). Declared for completeness (library
+# capability); this app runs none. See charts/common/templates/_job.tpl.
+#   jobs:      one-shot batch/v1 Jobs (e.g. DB migrate; image defaults to app image)
+#   cronJobs:  scheduled batch/v1 CronJobs (e.g. purge / sync)
+# -----------------------------------------------------------------------------
+jobs: []
+cronJobs: []
+
+# -----------------------------------------------------------------------------
+# database (common >= 0.6.0) — the app's CNPG database on the shared cluster.
+# Declared for completeness (library capability); this app has none. Set a
+# `database:` block only for apps with a dedicated Postgres DB (see _database.tpl).
+# -----------------------------------------------------------------------------
+database: {}
+
+# -----------------------------------------------------------------------------
+# middlewares (common >= 0.6.0) — the app's own Traefik Middleware objects (e.g.
+# per-app security headers), rendered alongside the IngressRoute that references
+# them. Declared for completeness; this app defines none. See _middleware.tpl.
+# -----------------------------------------------------------------------------
+middlewares: []

@@ -14,17 +14,17 @@ spec:
       targetRevision: main
       ref: config
     # 2) the homelab-charts monorepo — the cake-pricing wrapper chart + `common`.
-    #    Renders the CORE workload: the app Deployment, Service, IngressRoute, the
-    #    three app ExternalSecrets and the ServiceMonitor.
+    #    Renders every mandatory resource (common 0.6.0): the app Deployment,
+    #    Service, IngressRoute, the four ExternalSecrets, the ServiceMonitor, the
+    #    migrate Job (PreSync hook), the price-sync CronJob, the CNPG Database and
+    #    the cake-pricing-headers Middleware.
     - repoURL: 'https://github.com/gyulaasztalos/homelab-charts.git'
       targetRevision: main
       path: charts/cake-pricing
       helm:
         valueFiles:
           - $config/apps/cake-pricing/values.yaml
-    # 3) everything common does not model: the CNPG Database, the migrate Job
-    #    (PreSync hook), the price-sync CronJob, the cake-pricing-headers Middleware,
-    #    the smtp ExternalSecret, and the PrometheusRule
+    # 3) the one object the scope boundary keeps out of the chart: the PrometheusRule
     - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
       targetRevision: main
       path: apps/cake-pricing/post-install
