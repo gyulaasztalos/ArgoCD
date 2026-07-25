@@ -22,8 +22,12 @@ name: paperless-ngx
 namespace: paperless-ngx
 
 image:
-  repository: ghcr.io/paperless-ngx/paperless-ngx
-  # renovate: datasource=docker depName=ghcr.io/paperless-ngx/paperless-ngx
+  # Docker Hub, NOT ghcr.io — same image. GHCR's tag-list pagination is broken for
+  # this repo's 200+ tags (the `next` page link comes back with n=0), so Renovate's
+  # docker datasource never reaches the 3.x tags there and fails with "no-result".
+  # Docker Hub paginates correctly. Do not switch back to ghcr.io.
+  repository: paperlessngx/paperless-ngx
+  # renovate: datasource=docker depName=paperlessngx/paperless-ngx
   tag: 3.0.2
   pullPolicy: IfNotPresent
 
