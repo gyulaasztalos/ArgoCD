@@ -28,7 +28,7 @@ image:
   # Docker Hub paginates correctly. Do not switch back to ghcr.io.
   repository: paperlessngx/paperless-ngx
   # renovate: datasource=docker depName=paperlessngx/paperless-ngx
-  tag: 3.0.2
+  tag: 3.0.3
   pullPolicy: IfNotPresent
 
 # -----------------------------------------------------------------------------
