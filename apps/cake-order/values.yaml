@@ -27,7 +27,7 @@ namespace: cake-order
 image:
   repository: asztalosgyula/cake-order
   # renovate: datasource=docker depName=asztalosgyula/cake-order
-  tag: 1.2.0
+  tag: 1.2.1
   pullPolicy: IfNotPresent
 
 # -----------------------------------------------------------------------------
