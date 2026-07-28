@@ -21,7 +21,7 @@ namespace: cake-pricing
 image:
   repository: asztalosgyula/cake-pricing
   # renovate: datasource=docker depName=asztalosgyula/cake-pricing
-  tag: 1.13.0
+  tag: 1.14.0
   pullPolicy: IfNotPresent
 
 controller:
