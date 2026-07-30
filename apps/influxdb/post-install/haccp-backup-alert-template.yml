@@ -34,8 +34,8 @@ spec:
                 data: json.encode(v: {title: title, body: body, tag: "influxdb", type: "failure"}),
             )
 
-        fridgeLimitC = 5.0
-        freezerLimitC = -18.0
+        fridgeLimitC = 6.5
+        freezerLimitC = -15.0
         fridgeProbes = ["0x58e6c5fffe0f58b0_temperature_3", "0x58e6c5fffe0f58b0_temperature_4"]
         freezerProbes = ["0x58e6c5fffe0f58b0_temperature_5", "0x58e6c5fffe0f58b0_temperature_6"]
         // Flux's `+` doesn't concatenate arrays, so this is spelled out as its own literal.
