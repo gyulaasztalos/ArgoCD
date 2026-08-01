@@ -19,9 +19,9 @@ namespace: flexget
 # (there is deliberately no Chart.yaml appVersion). Renovate bumps the tag below.
 # -----------------------------------------------------------------------------
 image:
-  repository: lscr.io/linuxserver/flexget
-  # renovate: datasource=docker depName=lscr.io/linuxserver/flexget
-  tag: v3.16.14-ls239
+  repository: linuxserver/flexget
+  # renovate: datasource=docker depName=linuxserver/flexget
+  tag: v3.19.31-ls354
   pullPolicy: IfNotPresent
 
 # -----------------------------------------------------------------------------
