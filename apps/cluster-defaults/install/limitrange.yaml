@@ -1,0 +1,33 @@
+---
+# Container resource defaults for kube-system.
+#
+# Without a LimitRange, containers that declare no `resources` land in BestEffort
+# QoS: the scheduler cannot account for them and the kernel kills them first
+# under pressure. On 8GB rPi 5 nodes running at 70-85% memory that is not
+# theoretical. `default`/`defaultRequest` fill in the missing values at admission;
+# `min`/`max` bound what a container may ask for.
+#
+# Previously lived in apps/multus/post-install/ and was owned by the multus
+# Application purely because multus happened to be the app targeting kube-system.
+# It moved here when multus was decommissioned — see
+# resources/unused/multus/README.md.
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: kube-system-resource-limits
+  namespace: kube-system
+spec:
+  limits:
+    - type: Container
+      max:
+        cpu: "1"
+        memory: 512Mi
+      min:
+        cpu: 10m
+        memory: 32Mi
+      default:
+        cpu: 200m
+        memory: 512Mi
+      defaultRequest:
+        cpu: 10m
+        memory: 32Mi

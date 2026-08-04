@@ -5,7 +5,7 @@ k3s HA cluster on 4× Raspberry Pi 5, managed entirely via GitOps. Entry point: 
 ## Cluster
 
 - **Nodes:** 1 worker Archer `10.10.50.21`, 3 control-plane Lana/Pam/Cheryl `10.10.50.22-24`, KubeVIP API `10.10.50.20`
-- **Networking:** MetalLB BGP `10.10.50.30-39`, Traefik `.30`, Pi-Hole `.31`, Flannel + Multus
+- **Networking:** MetalLB BGP `10.10.50.30-39`, Traefik `.30`, Pi-Hole `.31`, Flannel (Multus decommissioned — `resources/unused/multus/`)
 - **Storage:** Longhorn (HA), CloudNativePG (PostgreSQL HA), Redis HA
 - **Secrets:** Sealed Secrets + 1Password-Connect + External Secrets Operator + Reflector
 - **Auth:** Authentik (OIDC/forward auth for Traefik)
