@@ -301,6 +301,12 @@ persistentVolumes:
         - ReadWriteMany
       persistentVolumeReclaimPolicy: Retain
       storageClassName: nfs-share-small
+      # `soft` so an unreachable NAS returns I/O errors instead of blocking
+      # processes indefinitely. See apps/transmission/values.yaml.
+      mountOptions:
+        - soft
+        - timeo=600
+        - retrans=3
       nfs:
         server: unvr-pro.local.asztalos.net
         path: /private

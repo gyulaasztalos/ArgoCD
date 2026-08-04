@@ -387,6 +387,13 @@ persistentVolumes:
         - ReadOnlyMany
       persistentVolumeReclaimPolicy: Retain
       storageClassName: cake-order-gallery
+      # `soft` so an unreachable NAS returns I/O errors instead of blocking
+      # processes indefinitely. No write-truncation downside here — the volume
+      # is ReadOnlyMany. See apps/transmission/values.yaml.
+      mountOptions:
+        - soft
+        - timeo=600
+        - retrans=3
       nfs:
         server: unvr-pro.local.asztalos.net
         path: /private/anitatortai
