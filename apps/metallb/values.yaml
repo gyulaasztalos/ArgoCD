@@ -404,6 +404,14 @@ frr-k8s:
     serviceMonitor:
       # -- Enable Prometheus ServiceMonitor for frr-k8s metrics.
       enabled: true
+      # The frrk8s_* metrics carry `pod` but no `node` label, while the speaker's
+      # metallb_* metrics carry `node`. Without this the dashboard cannot line BGP
+      # state up with the node it belongs to, and every pod restart renames the
+      # series. Copy the node name off the scrape target's pod metadata.
+      relabelings:
+        - sourceLabels: [__meta_kubernetes_pod_node_name]
+          targetLabel: node
+          action: replace
       # Left un-renamed on purpose: nothing in this repo consumes the legacy
       # "metallb_" BGP metric names, and keeping the native prefix makes it
       # obvious which component actually owns the BGP session.

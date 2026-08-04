@@ -23,8 +23,15 @@ spec:
         # address families. A session that stays down means the LoadBalancer
         # prefixes stop being announced and every service IP in 10.10.50.30-39
         # becomes unreachable from the rest of the LAN.
+        #
+        # The IPv6 peer is excluded: fdbf:c39a:a943:50:: is the subnet-router
+        # anycast address of the /64 and has never established a session — it
+        # came over from metal_lb_bgp_peer_address_v6 in the k3s-ansible vars and
+        # was simply invisible before MetalLB was scraped. No IPv6 LoadBalancer
+        # exists (ipv6-pool: 0 of 10 assigned), so it alerts on nothing. Drop this
+        # matcher once the peer address is corrected or the v6 peer is removed.
         - alert: MetalLBBGPSessionDown
-          expr: frrk8s_bgp_session_up == 0
+          expr: frrk8s_bgp_session_up{peer!="fdbf:c39a:a943:50::"} == 0
           for: 5m
           labels:
             severity: critical

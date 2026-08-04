@@ -1,0 +1,37 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Everything MetalLB needs that the upstream chart deliberately does not ship:
+# the config CRs (pools / peers / advertisements), the namespace LimitRange, the
+# alert rules, and the Grafana dashboard.
+#
+# NOTE: this directory used to be a plain manifest directory. Adding a
+# kustomization.yaml means ArgoCD now renders it with kustomize, so every file
+# has to be listed below — anything omitted is not just skipped, it gets PRUNED
+# from the cluster on the next sync.
+configMapGenerator:
+  - name: metallb-dashboard
+    namespace: metallb-system
+    files:
+      - metallb-dashboard.json=metallb-dashboard.json
+    options:
+      labels:
+        # Picked up by the kube-prometheus-stack Grafana dashboards sidecar,
+        # which runs with searchNamespace: ALL.
+        grafana_dashboard: "1"
+      annotations:
+        grafana_folder: "/tmp/dashboards/Kubernetes"
+
+resources:
+  - ipaddresspools.yaml
+  - bgppeers.yaml
+  - bgpadvertisements.yaml
+  - limitrange.yaml
+  - prometheus-rules.yaml
+
+generatorOptions:
+  labels:
+    app.kubernetes.io/name: metallb
+    app.kubernetes.io/instance: metallb
+    app.kubernetes.io/part-of: metallb

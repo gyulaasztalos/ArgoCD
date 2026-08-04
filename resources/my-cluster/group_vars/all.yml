@@ -115,28 +115,16 @@ kube_vip_tag_version: v1.0.4
 # (uncomment to use kube-vip for services instead of MetalLB)
 # kube_vip_lb_ip_range: "10.10.50.30-10.10.50.39"
 
-# metallb type frr or native
-metal_lb_type: frr
-
-# metallb mode layer2 or bgp
-metal_lb_mode: bgp
-
-# bgp options
-metal_lb_bgp_my_asn: "65001"
-metal_lb_bgp_peer_asn: "65000"
-metal_lb_bgp_peer_address: "10.10.50.1"
-metal_lb_bgp_peer_address_v6: "fdbf:c39a:a943:50::"
-
-# image tag for metal lb
-# renovate: datasource=github-releases depName=metallb packageName=metallb/metallb versioning=semver
-metal_lb_speaker_tag_version: v0.15.3
-# renovate: datasource=github-releases depName=metallb packageName=metallb/metallb versioning=semver
-metal_lb_controller_tag_version: v0.15.3
-
-# metallb ip range for load balancer
-metal_lb_ip_range:
-  - 10.10.50.30-10.10.50.39
-  - fdbf:c39a:a943:50::30-fdbf:c39a:a943:50::39
+# MetalLB is NOT deployed by this playbook any more — it moved to ArgoCD on
+# 2026-08-04 (chart 0.16.1, frr-k8s backend). See apps/metallb/MIGRATION.md.
+# The whole metal_lb_* block was removed: leaving it here would let a playbook run
+# write /var/lib/rancher/k3s/server/manifests/metallb-crds.yaml back onto the
+# control-plane nodes and start a second controller fighting ArgoCD over
+# metallb-system. The pools, peers and advertisements now live in
+# apps/metallb/post-install/.
+#
+# Do NOT remove --disable servicelb from extra_server_args above: without it k3s
+# starts klipper-lb, which competes with MetalLB for every LoadBalancer Service.
 
 # Only enable if your nodes are proxmox LXC nodes, make sure to configure your proxmox nodes
 # in your hosts.ini file.

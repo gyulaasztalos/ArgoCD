@@ -1,5 +1,6 @@
 ---
-# Mirrors metal_lb_ip_range from resources/my-cluster/group_vars/all.yml.
+# Ported verbatim from the old k3s-ansible metal_lb_ip_range var, which has since
+# been deleted — this file is now the only definition. See ../MIGRATION.md.
 # Pool names are load-bearing: live Services carry
 # `metallb.io/ip-allocated-from-pool: ipv4-pool`, so renaming these would
 # re-allocate every LoadBalancer IP.

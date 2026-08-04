@@ -1,6 +1,7 @@
 ---
-# Mirrors metal_lb_bgp_* from resources/my-cluster/group_vars/all.yml:
-#   my ASN 65001 (the cluster) peering with ASN 65000 (the router).
+# My ASN 65001 (the cluster) peering with ASN 65000 (the router). Ported verbatim
+# from the old k3s-ansible metal_lb_bgp_* vars, which have since been deleted —
+# this file is now the only definition. See ../MIGRATION.md.
 apiVersion: metallb.io/v1beta2
 kind: BGPPeer
 metadata:
