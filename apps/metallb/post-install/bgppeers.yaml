@@ -1,0 +1,22 @@
+---
+# Mirrors metal_lb_bgp_* from resources/my-cluster/group_vars/all.yml:
+#   my ASN 65001 (the cluster) peering with ASN 65000 (the router).
+apiVersion: metallb.io/v1beta2
+kind: BGPPeer
+metadata:
+  name: default
+  namespace: metallb-system
+spec:
+  myASN: 65001
+  peerASN: 65000
+  peerAddress: 10.10.50.1
+---
+apiVersion: metallb.io/v1beta2
+kind: BGPPeer
+metadata:
+  name: default-v6
+  namespace: metallb-system
+spec:
+  myASN: 65001
+  peerASN: 65000
+  peerAddress: 'fdbf:c39a:a943:50::'

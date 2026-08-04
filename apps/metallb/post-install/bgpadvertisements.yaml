@@ -1,0 +1,24 @@
+---
+# One advertisement per address family, each pinned to the matching peer, so the
+# v4 pool is never announced over the v6 session and vice versa.
+apiVersion: metallb.io/v1beta1
+kind: BGPAdvertisement
+metadata:
+  name: ipv4-preferred
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - ipv4-pool
+  peers:
+    - default
+---
+apiVersion: metallb.io/v1beta1
+kind: BGPAdvertisement
+metadata:
+  name: ipv6-preferred
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - ipv6-pool
+  peers:
+    - default-v6

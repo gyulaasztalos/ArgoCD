@@ -1,0 +1,68 @@
+---
+# Replacement for the chart's MetalLBBGPSessionDown alert, which is disabled in
+# values.yaml. That rule matches `metallb_bgp_session_up{job=~"metallb.*"}` — a
+# metric that only exists in the legacy FRR mode. With the frr-k8s backend the
+# BGP/BFD session metrics live on the frr-k8s daemonset instead, named
+# `frrk8s_bgp_session_up` / `frrk8s_bfd_session_up`.
+#
+# Everything else (stale config, config-not-loaded, pool exhaustion, pool usage)
+# still comes from the chart's own PrometheusRule.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: metallb-frrk8s-alerts
+  namespace: metallb-system
+  labels:
+    app.kubernetes.io/name: metallb
+    app.kubernetes.io/part-of: metallb
+spec:
+  groups:
+    - name: metallb-frrk8s.rules
+      rules:
+        # The cluster peers with the router (AS 65001 -> AS 65000) over both
+        # address families. A session that stays down means the LoadBalancer
+        # prefixes stop being announced and every service IP in 10.10.50.30-39
+        # becomes unreachable from the rest of the LAN.
+        - alert: MetalLBBGPSessionDown
+          expr: frrk8s_bgp_session_up == 0
+          for: 5m
+          labels:
+            severity: critical
+            namespace: metallb-system
+            app: metallb
+          annotations:
+            summary: "MetalLB BGP session down on {{ $labels.pod }}"
+            description: "frr-k8s pod {{ $labels.pod }} has had its BGP session to peer {{ $labels.peer }} down for 5m. LoadBalancer IPs announced from this node are not being routed."
+
+        # BFD is not configured today (no BFDProfile), so this only fires if one
+        # is added later and its session drops.
+        - alert: MetalLBBFDSessionDown
+          expr: frrk8s_bfd_session_up == 0
+          for: 5m
+          labels:
+            severity: warning
+            namespace: metallb-system
+            app: metallb
+          annotations:
+            summary: "MetalLB BFD session down on {{ $labels.pod }}"
+            description: "frr-k8s pod {{ $labels.pod }} has had its BFD session to peer {{ $labels.peer }} down for 5m."
+
+        # frr-k8s runs as a daemonset on every node; the speaker needs a local
+        # frr-k8s to program routes, so a missing instance silently stops that
+        # node from announcing.
+        #
+        # The job name is awkward on purpose. The subchart's ServiceMonitor sets
+        # jobLabel: app.kubernetes.io/name, but the headless monitor Service it
+        # selects only carries a `name:` label — so Prometheus falls back to the
+        # Service name, "metallb-frr-k8s-frr-k8s-monitor-service". The second
+        # alternative covers the case where the subchart fixes that label later.
+        - alert: MetalLBFRRK8sDown
+          expr: absent(up{namespace="metallb-system", job=~"metallb-frr-k8s.*|frr-k8s"} == 1)
+          for: 10m
+          labels:
+            severity: critical
+            namespace: metallb-system
+            app: metallb
+          annotations:
+            summary: "No healthy frr-k8s scrape target"
+            description: "No frr-k8s instance has been scrapeable for 10m. MetalLB cannot announce LoadBalancer IPs over BGP."

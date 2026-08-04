@@ -1,0 +1,27 @@
+---
+# Mirrors metal_lb_ip_range from resources/my-cluster/group_vars/all.yml.
+# Pool names are load-bearing: live Services carry
+# `metallb.io/ip-allocated-from-pool: ipv4-pool`, so renaming these would
+# re-allocate every LoadBalancer IP.
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: ipv4-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.10.50.30-10.10.50.39
+  autoAssign: true
+  avoidBuggyIPs: false
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: ipv6-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - fdbf:c39a:a943:50::30-fdbf:c39a:a943:50::39
+  autoAssign: true
+  # avoidBuggyIPs intentionally omitted (as in the k3s-ansible manifest); it only
+  # has meaning for IPv4 .0/.255 addresses and defaults to false anyway.
