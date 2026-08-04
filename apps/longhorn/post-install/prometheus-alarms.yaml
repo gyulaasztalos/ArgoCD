@@ -162,15 +162,50 @@ spec:
         namespace: longhorn-system
         app: longhorn
 
-    # Direct read of the CronJob the RecurringJob generates. Catches the
+    # Direct read of the CronJobs the RecurringJobs generate. Catches the
     # Forbid-blocking case even if the Longhorn metrics themselves go missing.
-    - alert: LonghornBackupCronJobNotSucceeding
+    #
+    # This covers ALL five Longhorn recurring jobs, not just the backup, because
+    # the failure mode is a property of how Longhorn drives them rather than of
+    # backups specifically: concurrencyPolicy Forbid, no activeDeadlineSeconds,
+    # and failedJobsHistoryLimit 1 which can GC the Job while its pod keeps
+    # running — orphaning the pod and letting a second one start alongside it.
+    #
+    # Snapshots get no dedicated alert of their own because Longhorn exposes no
+    # snapshot state or age metric (only longhorn_snapshot_actual_size_bytes),
+    # so there is no equivalent of longhorn_volume_last_backup_at to alert on.
+    # The CronJob success timestamp is the only usable signal for them.
+    #
+    # Thresholds are ~2 missed runs plus grace, per cadence.
+    - alert: LonghornRecurringJobNotSucceeding4h
       annotations:
-        description: CronJob {{$labels.cronjob}} in longhorn-system has not completed successfully in over 36h. With concurrencyPolicy Forbid a single hung run suppresses all later ones indefinitely — there is no activeDeadlineSeconds to break the deadlock.
-        summary: Longhorn backup CronJob {{$labels.cronjob}} is not succeeding
-      expr: time() - kube_cronjob_status_last_successful_time{namespace="longhorn-system", cronjob="daily-volume-backup"} > 129600
+        description: CronJob {{$labels.cronjob}} runs every 4h but has not completed successfully in over 9h. Check for an orphaned recurring-job pod holding the slot — `kubectl get pods -n longhorn-system` and look for one whose Job no longer exists.
+        summary: Longhorn 4-hourly job {{$labels.cronjob}} is not succeeding
+      expr: time() - kube_cronjob_status_last_successful_time{namespace="longhorn-system", cronjob="hourly-volume-snapshot"} > 32400
+      for: 30m
+      labels:
+        severity: warning
+        namespace: longhorn-system
+        app: longhorn
+
+    - alert: LonghornRecurringJobNotSucceedingDaily
+      annotations:
+        description: CronJob {{$labels.cronjob}} runs daily but has not completed successfully in over 36h. With concurrencyPolicy Forbid a single hung run suppresses all later ones indefinitely — there is no activeDeadlineSeconds to break the deadlock.
+        summary: Longhorn daily job {{$labels.cronjob}} is not succeeding
+      expr: time() - kube_cronjob_status_last_successful_time{namespace="longhorn-system", cronjob=~"daily-volume-backup|extra-filesystem-trim"} > 129600
       for: 30m
       labels:
         severity: critical
+        namespace: longhorn-system
+        app: longhorn
+
+    - alert: LonghornRecurringJobNotSucceedingWeekly
+      annotations:
+        description: CronJob {{$labels.cronjob}} runs weekly but has not completed successfully in over 9 days.
+        summary: Longhorn weekly job {{$labels.cronjob}} is not succeeding
+      expr: time() - kube_cronjob_status_last_successful_time{namespace="longhorn-system", cronjob=~"weekly-filesystem-trim|weekly-system-backup"} > 777600
+      for: 30m
+      labels:
+        severity: warning
         namespace: longhorn-system
         app: longhorn
