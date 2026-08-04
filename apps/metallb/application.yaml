@@ -31,11 +31,3 @@ spec:
       prune: true
     syncOptions:
       - CreateNamespace=true
-  # The speaker and frr-k8s pods run hostNetwork with NET_ADMIN/NET_RAW, so the
-  # namespace has to be PSA-privileged. k3s-ansible already set these labels on the
-  # live namespace; keeping them here makes a fresh bootstrap work too.
-  managedNamespaceMetadata:
-    labels:
-      pod-security.kubernetes.io/enforce: privileged
-      pod-security.kubernetes.io/audit: privileged
-      pod-security.kubernetes.io/warn: privileged
