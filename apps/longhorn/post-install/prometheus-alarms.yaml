@@ -105,3 +105,72 @@ spec:
         severity: warning
         namespace: longhorn-system
         app: longhorn
+
+  # --- Backup coverage -------------------------------------------------
+  # Added 2026-08-04 after volume backups silently stopped for 5 days: one
+  # volume's backup hung at 0% and, because the RecurringJob's CronJob is
+  # concurrencyPolicy: Forbid with no activeDeadlineSeconds, the hung run
+  # blocked every subsequent nightly run. Nothing above this group would have
+  # noticed — the existing alerts cover space, robustness and node health only.
+  #
+  # Metric semantics verified against the live cluster:
+  #   longhorn_backup_state       2 = InProgress, 3 = Completed
+  #                               (labels: backup, volume, recurring_job)
+  #   longhorn_volume_last_backup_at   unix seconds; 0 = never backed up
+  #                               (labels: volume, pvc, pvc_namespace, node)
+  # A healthy full run backs up every volume in ~6 minutes.
+  - name: longhorn-backup.rules
+    rules:
+    # The exact failure that happened. Per-volume backups finish in well under
+    # a minute, so anything still InProgress after an hour is wedged, not slow.
+    - alert: LonghornBackupStuck
+      annotations:
+        description: Longhorn backup {{$labels.backup}} of volume {{$labels.volume}} has been InProgress for over 1h. A healthy backup completes in under a minute. It is blocking every later run of the {{$labels.recurring_job}} job (concurrencyPolicy Forbid).
+        summary: Longhorn backup of {{$labels.volume}} is stuck
+      expr: longhorn_backup_state == 2
+      for: 1h
+      labels:
+        severity: critical
+        namespace: longhorn-system
+        app: longhorn
+
+    # Backups stopped altogether. Uses max() across all volumes so it fires on
+    # "the nightly job is not running", independent of which volumes are in the
+    # backup groups. 36h = the daily schedule plus a 12h grace period.
+    - alert: LonghornNoRecentBackup
+      annotations:
+        description: No Longhorn volume has been backed up in over 36h. The daily 02:00 backup job is not completing — check for a stuck backup and a blocked CronJob in longhorn-system.
+        summary: No Longhorn backup has completed in 36h
+      expr: time() - max(longhorn_volume_last_backup_at) > 129600
+      for: 30m
+      labels:
+        severity: critical
+        namespace: longhorn-system
+        app: longhorn
+
+    # A single volume falling out of the rotation while others keep working.
+    # Volumes that have never been backed up (value 0) are excluded on purpose —
+    # not every volume is in the default/temp backup groups.
+    - alert: LonghornVolumeBackupStale
+      annotations:
+        description: Volume {{$labels.volume}} ({{$labels.pvc_namespace}}/{{$labels.pvc}}) has not been backed up for over 48h while other volumes have. It may have dropped out of the backup group.
+        summary: Longhorn volume {{$labels.pvc}} has a stale backup
+      expr: longhorn_volume_last_backup_at != 0 and time() - longhorn_volume_last_backup_at > 172800
+      for: 30m
+      labels:
+        severity: warning
+        namespace: longhorn-system
+        app: longhorn
+
+    # Direct read of the CronJob the RecurringJob generates. Catches the
+    # Forbid-blocking case even if the Longhorn metrics themselves go missing.
+    - alert: LonghornBackupCronJobNotSucceeding
+      annotations:
+        description: CronJob {{$labels.cronjob}} in longhorn-system has not completed successfully in over 36h. With concurrencyPolicy Forbid a single hung run suppresses all later ones indefinitely — there is no activeDeadlineSeconds to break the deadlock.
+        summary: Longhorn backup CronJob {{$labels.cronjob}} is not succeeding
+      expr: time() - kube_cronjob_status_last_successful_time{namespace="longhorn-system", cronjob="daily-volume-backup"} > 129600
+      for: 30m
+      labels:
+        severity: critical
+        namespace: longhorn-system
+        app: longhorn
