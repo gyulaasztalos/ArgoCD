@@ -2621,8 +2621,14 @@ kube-state-metrics:
         #   replacement: $1
         #   action: replace
 
+  # Exposes kube-state-metrics' own telemetry port (8081) and adds it to the
+  # ServiceMonitor. Without it the kube_state_metrics_* self metrics are never
+  # collected, so all four alerts in defaultRules.rules.kubeStateMetrics
+  # (ListErrors, WatchErrors, ShardingMismatch, ShardsMissing) had no data and
+  # could never fire. Cheap: a handful of series, unrelated to the kube_* object
+  # metrics which were always being scraped fine.
   selfMonitor:
-    enabled: false
+    enabled: true
 
 ## Deploy node exporter as a daemonset to all nodes
 ##

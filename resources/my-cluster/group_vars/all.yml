@@ -88,6 +88,14 @@ extra_args: >-
 #   --disable traefik
 
 # IPv6
+#
+# --etcd-expose-metrics=true: k3s embeds etcd and does not expose its metrics by
+# default, so the kube-prometheus-stack etcd rule group (15 alerts, including
+# etcdNoLeader, etcdMembersDown and etcdHighFsyncDurations) had no underlying
+# metrics at all and could never fire. That matters here because etcd shares
+# nodes with a memory-constrained workload and has been getting swapped.
+# NOTE: everything below is a YAML folded block — '#' is NOT a comment inside
+# it, any such line would be passed to k3s as an argument.
 extra_server_args: >-
   {{ extra_args }}
   --tls-san {{ apiserver_endpoint }}
@@ -99,6 +107,7 @@ extra_server_args: >-
   --flannel-ipv6-masq
   --etcd-s3
   --etcd-s3-config-secret=etcd-backblaze-secret
+  --etcd-expose-metrics
 
 extra_agent_args: >-
   {{ extra_args }}
