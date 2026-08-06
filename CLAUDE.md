@@ -40,6 +40,11 @@ kubectl apply -f bootstrap/app-of-apps.yaml
 
 # 4. After bootstrap, apply manual EndpointSlice for Unifi redirect
 kubectl apply -f apps/traefik/post-install/unifi-redirect.yaml
+
+# 5. Apply manual Endpoints for the etcd ServiceMonitor (k3s embeds etcd, so the
+#    chart's Service selector matches nothing). Endpoints, NOT EndpointSlice —
+#    Prometheus defaults to serviceDiscoveryRole: Endpoints.
+kubectl apply -f apps/monitoring/post-install/kube-etcd-endpoints.yaml
 ```
 
 ## Sealed Secrets
@@ -77,6 +82,6 @@ Single-writer databases use a **StatefulSet** (not Deployment) with a Longhorn R
 
 ## Known Constraints
 
-- `EndpointSlice` for `unifi-redirect` must be applied manually — ArgoCD intentionally ignores EndpointSlices
+- `EndpointSlice` for `unifi-redirect` and `Endpoints` for `kube-etcd` must be applied manually — `argocd-cm` excludes both kinds, so anything a chart renders of those kinds is silently dropped. The etcd one fails invisibly: Service and ServiceMonitor exist, but the dashboard is blank and all 15 etcd alerts can never fire.
 - Paperless-NGX requires a manual SQL command after first install — see `apps/paperless-ngx/README.md`
 - High memory pressure on rPi hardware; OOM kills possible under full load

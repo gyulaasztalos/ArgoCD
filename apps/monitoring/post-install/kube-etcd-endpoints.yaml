@@ -1,0 +1,43 @@
+---
+# MUST BE APPLIED MANUALLY — ArgoCD will not create this.
+#
+#   kubectl apply -f apps/monitoring/post-install/kube-etcd-endpoints.yaml
+#
+# Same limitation as apps/traefik/post-install/unifi-redirect.yaml: argocd-cm
+# excludes Endpoints and EndpointSlice from all apiGroups to cut watch load, so
+# anything ArgoCD renders of those kinds is silently dropped. Setting
+# kubeEtcd.endpoints in values.yaml makes the chart render exactly this object —
+# it just never reaches the cluster.
+#
+# Why it is needed: k3s runs etcd inside the k3s server process rather than as a
+# pod, so the chart's kubeEtcd Service selector matches nothing and its Endpoints
+# stays empty. That left the ServiceMonitor with no target, and the whole etcd
+# rule group (15 alerts) plus the etcd dashboard permanently blank.
+#
+# Endpoints, NOT EndpointSlice. The Prometheus CR leaves serviceDiscoveryRole
+# unset, which defaults to "Endpoints", so Prometheus reads this API. Kubernetes
+# mirrors Endpoints -> EndpointSlice automatically but never the reverse, so an
+# EndpointSlice alone is invisible to Prometheus.
+#
+# Reachable because --etcd-expose-metrics (k3s extra_server_args) binds 2381 on
+# the node IP as well as 127.0.0.1. Verify with:
+#   ss -lnt | grep 2381        -> expect 10.10.50.2x:2381 and 127.0.0.1:2381
+#
+# Archer (.21) is a worker and runs no etcd, so it is deliberately absent.
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: monitoring-kube-prometheus-kube-etcd
+  namespace: kube-system
+  labels:
+    app: kube-prometheus-stack-kube-etcd
+    release: monitoring
+subsets:
+  - addresses:
+      - ip: 10.10.50.22      # lana
+      - ip: 10.10.50.23      # pam
+      - ip: 10.10.50.24      # cheryl
+    ports:
+      - name: http-metrics
+        port: 2381
+        protocol: TCP
