@@ -2248,10 +2248,18 @@ kubeEtcd:
 
   ## If your etcd is not deployed as a pod, specify IPs it can be found on
   ##
-  endpoints: []
-  # - 10.141.4.22
-  # - 10.141.4.23
-  # - 10.141.4.24
+  # k3s runs etcd inside the k3s server process, not as a pod, so the chart's
+  # pod selector matches nothing and the Service was created with an empty
+  # Endpoints object — the ServiceMonitor had no target and every etcd metric
+  # and the etcd dashboard were empty. Listing the control-plane node IPs makes
+  # the chart write the Endpoints explicitly.
+  # Reachable because --etcd-expose-metrics binds 2381 on the node IP as well
+  # as 127.0.0.1 (verified: "10.10.50.22:2381" and "127.0.0.1:2381" listening).
+  # Archer (.21) is a worker and runs no etcd.
+  endpoints:
+    - 10.10.50.22   # lana
+    - 10.10.50.23   # pam
+    - 10.10.50.24   # cheryl
 
   ## Etcd service. If using kubeEtcd.endpoints only the port and targetPort are used
   ##
@@ -4451,10 +4459,27 @@ prometheus:
 
     ## Resource limits & requests
     ##
+    # Request and limit are deliberately NOT equal.
+    #
+    # The request is what the scheduler reserves, and 2800Mi reserved ~36% of a
+    # node whether or not it was used. After the metricRelabelings cut the head
+    # from 1,046k to 308k series, steady state is ~1,460Mi with a 30m peak of
+    # ~1,614Mi, so 1700Mi reserves what is actually needed and returns >1Gi of
+    # schedulable capacity to the node.
+    #
+    # The limit stays at 2800Mi because the transient peaks are much higher than
+    # steady state: WAL replay on startup and the 2h compaction cycle both spike
+    # (2,536Mi was observed during the post-change replay). The limit is what
+    # stands between such a spike and an OOM kill, so it keeps full headroom.
+    #
+    # Consequence, accepted knowingly: request < limit makes this pod Burstable
+    # rather than Guaranteed, so it is an earlier eviction candidate under node
+    # pressure. That is the right ordering here — Prometheus is the least
+    # critical of the large consumers on these nodes.
     resources:
       requests:
         cpu: 400m
-        memory: 2800Mi
+        memory: 1700Mi
       limits:
         cpu: 2000m
         memory: 2800Mi
