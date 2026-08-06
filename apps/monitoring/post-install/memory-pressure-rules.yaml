@@ -1,0 +1,55 @@
+---
+# Fills the two gaps kube-prometheus-stack leaves on a node that deliberately
+# runs with swap enabled.
+#
+# Already covered by the shipped rules, so NOT duplicated here:
+#   NodeMemoryHighUtilization    MemAvailable < 10%
+#   NodeMemoryMajorPagesFaults   pgmajfault > 500/s — also the thrash signal
+#   KubeMemoryOvercommit         requests exceed capacity-minus-one-node
+#   KubeNodePressure             kubelet MemoryPressure condition
+#
+# Neither of those is relaxed or silenced: on this cluster they are currently
+# firing because they are correct.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: node-memory-pressure-alerts
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: monitoring
+    app.kubernetes.io/part-of: kube-prometheus-stack
+spec:
+  groups:
+    - name: node-memory-pressure.rules
+      rules:
+        # Nothing in the stack alerts on OOM kills, so containers die and
+        # restart unnoticed — the failure mode this cluster actually has.
+        - alert: PodOOMKilled
+          expr: |
+            increase(kube_pod_container_status_restarts_total[1h]) > 0
+            and on (namespace, pod, container)
+            kube_pod_container_status_last_terminated_reason{reason="OOMKilled"} == 1
+          for: 5m
+          labels:
+            severity: warning
+            app: node
+          annotations:
+            summary: "{{ $labels.namespace }}/{{ $labels.pod }} was OOM killed"
+            description: "Container {{ $labels.container }} in {{ $labels.namespace }}/{{ $labels.pod }} restarted after an OOM kill within the last hour. Either its limit is below its real working set, or the node is overcommitted."
+
+        # Swap is the reserve that keeps these nodes alive. If it is nearly
+        # consumed the reserve is gone and the next spike hits the OOM killer.
+        # Distinct from NodeMemoryHighUtilization, which only sees RAM.
+        - alert: NodeSwapNearlyFull
+          expr: |
+            node_memory_SwapTotal_bytes > 0
+            and
+            (node_memory_SwapTotal_bytes - node_memory_SwapFree_bytes)
+              / node_memory_SwapTotal_bytes * 100 > 80
+          for: 30m
+          labels:
+            severity: warning
+            app: node
+          annotations:
+            summary: "{{ $labels.instance }} has used over 80% of swap"
+            description: "Swap on {{ $labels.instance }} is {{ $value | printf \"%.0f\" }}% consumed. The emergency reserve that keeps this node out of the OOM killer is nearly exhausted."

@@ -1633,7 +1633,21 @@ kubeApiServer:
     ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#relabelconfig
     ##
     metricRelabelings:
-      # Drop excessively noisy apiserver buckets.
+      # Whole metric families that serve no dashboard and no alert on this
+      # cluster. defaultRules.rules.kubeApiserver{Availability,Burnrate,
+      # Histogram,Slos} are all false above, so nothing consumes these
+      # histograms — they were being scraped, stored and compacted for nobody.
+      # Measured: ~570k series across these families.
+      - action: drop
+        sourceLabels: [__name__]
+        regex: 'apiserver_(request_duration_seconds|request_sli_duration_seconds|request_body_size_bytes|watch_list_duration_seconds|response_sizes|watch_cache_read_wait_seconds|watch_events_sizes|admission_controller_admission_duration_seconds|admission_webhook_admission_duration_seconds)_(bucket|sum|count)'
+      # etcd request latency. The etcd rule group IS enabled, but it reads
+      # etcd_disk_*, etcd_network_peer_*, etcd_server_* and etcd_mvcc_* — never
+      # these. ~141k series.
+      - action: drop
+        sourceLabels: [__name__]
+        regex: 'etcd_(requests_total|request_duration_seconds_(bucket|sum|count))'
+      # Trim remaining buckets that survive the drops above.
       - action: drop
         regex: (etcd_request|apiserver_request_slo|apiserver_request_sli|apiserver_request)_duration_seconds_bucket;(0\.15|0\.2|0\.3|0\.35|0\.4|0\.45|0\.6|0\.7|0\.8|0\.9|1\.25|1\.5|1\.75|2|3|3\.5|4|4\.5|6|7|8|9|15|20|40|45|50)(\.0)?
         sourceLabels:
@@ -1867,6 +1881,30 @@ kubelet:
     ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#relabelconfig
     ##
     metricRelabelings:
+      # k3s is a single binary: the API server, etcd, scheduler and
+      # controller-manager all serve their metrics from the same endpoint the
+      # kubelet does. So this scrape returns the whole lot, and every one of
+      # those series is ALSO collected by the kubeApiServer / kubeEtcd jobs —
+      # stored twice, for nothing.
+      #
+      # Measured on this cluster: 640,428 of the kubelet job's 732,045 series
+      # (87%) were apiserver_* / etcd_*. Dropping them here loses no coverage,
+      # because the apiserver job still collects them.
+      - action: drop
+        sourceLabels: [__name__]
+        regex: '(apiserver|etcd)_.*'
+      # Scheduler metrics. kubeScheduler.enabled is false and both
+      # defaultRules.rules.kubeScheduler{Alerting,Recording} are false — but
+      # because k3s serves everything from one endpoint, disabling the
+      # ServiceMonitor never stopped these arriving. ~11k series.
+      - action: drop
+        sourceLabels: [__name__]
+        regex: 'scheduler_.*'
+      # Histograms served here that no dashboard and no alert reads.
+      # workqueue_queue_duration_seconds_bucket IS used, so only _work_ goes.
+      - action: drop
+        sourceLabels: [__name__]
+        regex: '(workqueue_work_duration_seconds|prober_probe_duration_seconds)_bucket'
       # Reduce bucket cardinality of kubelet storage operations.
       - action: drop
         sourceLabels: [__name__, le]
@@ -2411,7 +2449,9 @@ kubeScheduler:
 ## Component scraping kube proxy
 ##
 kubeProxy:
-  enabled: true
+  # Disabled: defaultRules.rules.kubeProxy is already false, so the ~2,700
+  # kubeproxy_* series this scrape produced fed no alert and no dashboard.
+  enabled: false
 
   ## If your kube proxy is not deployed as a pod, specify IPs it can be found on
   ##
