@@ -137,7 +137,26 @@ image:
 
 ## @param architecture Redis(R) architecture. Allowed values: `standalone` or `replication`
 ##
-architecture: replication
+# Standalone on purpose.
+#
+# This Redis holds ~29Mi of rebuildable state: ArgoCD cache, Authentik sessions
+# and the Paperless Celery queue. Every consumer connects to redis-master; the
+# replicas served no reads.
+#
+# With sentinel.enabled false there is no automatic promotion, so the replicas
+# could not take over a failed master — they were a manual-recovery asset only,
+# duplicating protection the master's 3-replica Longhorn volume already gives.
+#
+# Sentinel would make them real, but costs 918Mi of memory requests across 3
+# nodes (the sentinel sidecar alone requests 128Mi, 2.5x Redis itself) and
+# disables the redis-master/redis-replicas services, so ArgoCD, Authentik and
+# Celery would each need sentinel-aware reconfiguration. Not justifiable for a
+# rebuildable cache on a memory-constrained cluster.
+#
+# Standalone: 178Mi requests vs 534Mi, no replication traffic, and the
+# redis-master service is still created so no consumer needs changing.
+# The single volume stays on 3-replica Longhorn — it is now the only copy.
+architecture: standalone
 ## Redis(R) Authentication parameters
 ## ref: https://github.com/bitnami/containers/tree/main/bitnami/redis#setting-the-server-password-on-first-run
 ##
@@ -1062,21 +1081,10 @@ replica:
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
     ## If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner
     ##
-    # Single Longhorn replica ON PURPOSE — the master keeps the default 3r.
-    #
-    # A Redis replica is already a full copy of the master's dataset, so putting
-    # it on a 3-replica Longhorn volume stores the same data nine times over
-    # (Redis 3x, Longhorn 3x again). If a replica's node dies its volume is
-    # unavailable, that pod stays down, and the master plus the other replica
-    # keep serving; when the node returns the replica resyncs from the master.
-    # That is the same property that makes 1r safe here.
-    #
-    # The master stays on 3r (master.persistence.storageClass) because
-    # sentinel.enabled is false: there is no automatic promotion, so the master
-    # volume being able to attach elsewhere IS the availability of Redis writes.
-    #
-    # Saves ~4GB of physical storage and two thirds of the replication write
-    # traffic for the replicas.
+    # INERT while architecture is standalone — no replicas are created, so this
+    # is never used. Kept (rather than reverted to the default) so that if
+    # replication is ever re-enabled, replicas land on a single Longhorn replica
+    # instead of triplicating data the master already holds three copies of.
     storageClass: longhorn-1r
     ## @param replica.persistence.accessModes Persistent Volume access modes
     ##
