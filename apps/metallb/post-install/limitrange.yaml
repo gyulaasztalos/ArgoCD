@@ -10,12 +10,23 @@ spec:
     max:
       cpu: "1"
       memory: 256Mi
+    # `min` is an ADMISSION floor, not a hint: a container requesting less is
+    # rejected outright. At 64Mi it blocked the frr-k8s DaemonSet the moment
+    # that chart got honest per-container requests --
+    #   "pods ... is forbidden: minimum memory usage per Container is 64Mi,
+    #    but request is 16Mi" (reloader), 32Mi (frr-status), 48Mi (frr-metrics)
+    # -- leaving the DaemonSet stuck at current=3/desired=4 with one node's BGP
+    # session down. 16Mi admits the genuinely tiny sidecars (reloader measures
+    # 0-3Mi) without letting anything declare zero.
     min:
       cpu: 10m
-      memory: 64Mi
+      memory: 16Mi
     default:
       cpu: 200m
       memory: 256Mi
+    # Kept at 64Mi: this is the fallback for containers that declare nothing,
+    # where a conservative guess is right. Everything in this namespace now
+    # declares its own request, so it is a safety net rather than the norm.
     defaultRequest:
       cpu: 10m
       memory: 64Mi
