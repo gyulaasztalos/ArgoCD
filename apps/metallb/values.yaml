@@ -231,13 +231,20 @@ controller:
     # nobody
     runAsUser: 65534
     fsGroup: 65534
-  resources: {}
-    # limits:
-      # cpu: 100m
-      # memory: 100Mi
+  # Not a DaemonSet, but it shipped with the same `resources: {}` hole and was
+  # the largest unaccounted pod in this namespace: 75Mi measured, 0 requested.
+  resources:
+    requests:
+      cpu: "25m"
+      memory: "128Mi"
   nodeSelector: {}
   tolerations: []
-  priorityClassName: ""
+  # cluster-critical, NOT node-critical: this is a single-replica controller
+  # that allocates IPs for new LoadBalancer Services. If it goes away, already
+  # -assigned IPs keep being advertised by the speakers and traffic is
+  # unaffected -- only new Service allocations stall. That is a lower tier than
+  # the per-node data-path components below.
+  priorityClassName: "system-cluster-critical"
   runtimeClassName: ""
   affinity: {}
   podAnnotations: {}
@@ -306,13 +313,24 @@ speaker:
   ## By default secretName: {{ "metallb.fullname" }}-memberlist
   ##
   # secretName:
-  resources: {}
-    # limits:
-      # cpu: 100m
-      # memory: 100Mi
+  # The chart ships no requests at all. A pod requesting nothing is not merely
+  # unaccounted for in capacity planning -- it is permanently in kubelet's
+  # most-evictable bucket, because "usage exceeds request" is true for any
+  # usage above zero. Measured speaker usage is 34-45Mi across the 4 nodes.
+  #
+  # No memory limit on purpose: if the speaker dies this node stops answering
+  # BGP and its share of the LoadBalancer IPs blackholes. Eviction thresholds
+  # are the backstop, not an OOM kill.
+  resources:
+    requests:
+      cpu: "25m"
+      memory: "96Mi"
   nodeSelector: {}
   tolerations: []
-  priorityClassName: ""
+  # The speaker owns this node's BGP session to the router (10.10.50.1).
+  # Evicting or failing to schedule it withdraws the node from ECMP for every
+  # service in 10.10.50.30-39, so it ranks with the CNI and kube-vip.
+  priorityClassName: "system-node-critical"
   affinity: {}
   ## Selects which runtime class will be used by the pod.
   runtimeClassName: ""
@@ -429,6 +447,58 @@ frr-k8s:
       #   regex: "frrk8s_bfd_(.*)"
       #   targetLabel: "__name__"
       #   replacement: "metallb_bfd_$1"
+
+  # NOTE the doubled key: these are the subchart's OWN `frrk8s:` values, so from
+  # here they are addressed as `frr-k8s.frrk8s.*`. The top-level `frrk8s:` block
+  # further up this file is MetalLB's own enable/external switch and is a
+  # different thing entirely.
+  frrk8s:
+    # frr-k8s runs the actual BGP daemon for the speaker. If it is evicted, the
+    # node's sessions to 10.10.50.1 drop with it -- same blast radius as the
+    # speaker, so the same priority class.
+    priorityClassName: "system-node-critical"
+
+    # Like the speaker, every container here shipped with `resources: {}`.
+    # That left ~110Mi per node of real memory invisible to the scheduler AND
+    # put all five containers in kubelet's first-to-evict bucket. Requests are
+    # sized from measured steady state across the 4 nodes, with headroom:
+    #
+    #   controller  21-28Mi -> 64Mi     frr-status  16-19Mi -> 32Mi
+    #   frr         31-33Mi -> 64Mi     reloader     0- 3Mi -> 16Mi
+    #   frr-metrics 22-30Mi -> 48Mi                  total    224Mi
+    #
+    # Limits are deliberately omitted throughout: an OOM kill here is a routing
+    # outage, and the node eviction thresholds are the intended safety net.
+    # -- frr-k8s controller container.
+    resources:
+      requests:
+        cpu: "25m"
+        memory: "64Mi"
+    frr:
+      resources:
+        requests:
+          cpu: "25m"
+          memory: "64Mi"
+    frrMetrics:
+      resources:
+        requests:
+          cpu: "10m"
+          memory: "48Mi"
+    frrStatus:
+      resources:
+        requests:
+          cpu: "10m"
+          memory: "32Mi"
+    reloader:
+      resources:
+        requests:
+          cpu: "10m"
+          memory: "16Mi"
+    # Note: the statuscleaner Deployment has no knobs of its own -- the subchart
+    # reuses `frrk8s.resources` and `frrk8s.priorityClassName` for it, so it
+    # inherits the controller's 64Mi/25m and system-node-critical from above.
+    # Verified by `helm template`. It measures 17Mi, so the request is generous
+    # rather than tight, and at one replica that is not worth working around.
 
 # networkpolicies
 networkpolicies:

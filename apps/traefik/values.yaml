@@ -1311,11 +1311,20 @@ serviceAccountAnnotations: {}
 
 # -- [Resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for `traefik` container.
 
+# Measured steady-state across the 4 nodes is 65-100Mi, i.e. the old 64Mi
+# request was below actual usage on EVERY node. That matters for more than
+# accounting: kubelet ranks eviction victims by "usage exceeds request" FIRST,
+# so an under-requested pod is always in the most-evictable bucket. With soft
+# eviction now armed at memory.available<1Gi, that put ingress at the front of
+# the queue on any node under pressure.
+#
+# No memory limit on purpose: this is the node's data path. A limit would let
+# the kernel OOM-kill the very component we are trying to keep alive, and the
+# node-level eviction thresholds are the intended backstop instead.
 resources:
   requests:
-    memory: "64Mi"
-  # limits:
-    # memory: "256Mi"
+    cpu: "50m"
+    memory: "128Mi"
 
 # -- This example pod anti-affinity forces the scheduler to put traefik pods
 # -- on nodes where no other traefik pods are scheduled.
@@ -1355,7 +1364,14 @@ topologySpreadConstraints: []
 #    whenUnsatisfiable: DoNotSchedule
 
 # -- [Pod Priority and Preemption](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
-priorityClassName: ""
+# Traefik is a DaemonSet carrying all ingress traffic for the node it runs on.
+# Losing it on one node blackholes that node's share of the MetalLB-advertised
+# LoadBalancer IPs, so it belongs in the same tier as the CNI and kube-vip.
+# Priority is the SECOND key kubelet sorts eviction victims by, after
+# "usage exceeds request" -- so this and the request above work together.
+# system-node-critical is usable outside kube-system (verified by server
+# dry-run); the namespace restriction people remember does not apply here.
+priorityClassName: "system-node-critical"
 
 # -- [SecurityContext](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#security-context-1)
 # @default -- See _values.yaml_
