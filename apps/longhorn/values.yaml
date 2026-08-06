@@ -417,6 +417,19 @@ privateRegistry:
   # -- If create a new private registry secret is true, create a Kubernetes secret with this name; else use the existing secret of this name. Use it to pull images from your private registry.
   registrySecret: ~
 longhornManager:
+  # Set explicitly because longhorn-manager is the ONE component this chart lets
+  # us size (see `resources` further down in this block). Everything else in the
+  # namespace falls back to the LimitRange in post-install/limitrange.yaml.
+  #
+  # Measured 24h peak: 240Mi. Requesting 256Mi keeps it honest to the scheduler
+  # rather than inheriting the LimitRange's generic default, and a 512Mi limit
+  # leaves headroom without the 1800Mi the LimitRange would otherwise apply.
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
   log:
     # -- Format of Longhorn Manager logs. (Options: "plain", "json")
     format: plain

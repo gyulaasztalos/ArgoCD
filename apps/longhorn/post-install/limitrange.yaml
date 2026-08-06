@@ -1,3 +1,31 @@
+# This LimitRange exists because the Longhorn chart exposes `resources` for
+# longhornManager ONLY — the other 39 of 43 containers in this namespace
+# (CSI sidecars, csi-plugin, engine-image, UI, driver-deployer, and the
+# instance-manager pods owned by the InstanceManager CR rather than the chart)
+# declare nothing, so this is the only way to bound them.
+#
+# `default` (the limit) is the anti-OOM guard and is deliberately UNCHANGED.
+#
+# `defaultRequest` was the collateral damage: at 256Mi it reserved
+# 43 containers x 256Mi = 10.75Gi of schedulable capacity cluster-wide, ~34% of
+# a 31.5Gi cluster, for pods whose measured 24h peaks are:
+#
+#   instance-manager   395-621Mi   (4 containers, the only genuinely large one)
+#   longhorn-manager        240Mi   (set explicitly in values.yaml instead)
+#   longhorn-csi-plugin      79Mi
+#   csi-attacher/provisioner/resizer/snapshotter  58-60Mi
+#   engine-image, UI, driver-deployer, probes      <32Mi
+#
+# NOTE: defaultRequest cannot simply be removed. With `default` set and
+# `defaultRequest` absent, Kubernetes sets the request EQUAL TO THE LIMIT —
+# i.e. 1800Mi per container, which is far worse. It must be set explicitly.
+#
+# 128Mi covers everything except instance-manager, which stays under-requested
+# (it already was at 256Mi vs a 621Mi peak) and cannot be fixed here: Longhorn
+# exposes only guaranteedInstanceManagerCPU, no memory equivalent.
+#
+# min must be <= defaultRequest, so it drops too; the small probe/registrar
+# containers genuinely want less than 128Mi.
 apiVersion: v1
 kind: LimitRange
 metadata:
@@ -11,10 +39,10 @@ spec:
       memory: 2Gi
     min:
       cpu: 100m
-      memory: 128Mi
+      memory: 32Mi
     default:
       cpu: 480m
       memory: 1800Mi
     defaultRequest:
       cpu: 100m
-      memory: 256Mi
+      memory: 128Mi
