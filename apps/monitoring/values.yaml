@@ -1892,7 +1892,17 @@ kubelet:
       # because the apiserver job still collects them.
       - action: drop
         sourceLabels: [__name__]
-        regex: '(apiserver|etcd)_.*'
+        regex: 'apiserver_.*'
+      # etcd is NOT dropped wholesale here, deliberately. A blanket etcd_.*
+      # would also remove etcd_server_has_leader, etcd_disk_wal_fsync_*,
+      # etcd_mvcc_db_total_size_* and the etcd_network_peer_* family — every one
+      # of which the etcd dashboard and the (enabled) etcd alert rules depend on.
+      # Those are exactly the metrics --etcd-expose-metrics was turned on to
+      # obtain, so a broad drop would silently undo it. Only the request-latency
+      # families, which nothing reads, go.
+      - action: drop
+        sourceLabels: [__name__]
+        regex: 'etcd_(requests_total|request_duration_seconds_(bucket|sum|count))'
       # Scheduler metrics. kubeScheduler.enabled is false and both
       # defaultRules.rules.kubeScheduler{Alerting,Recording} are false — but
       # because k3s serves everything from one endpoint, disabling the
@@ -2449,9 +2459,13 @@ kubeScheduler:
 ## Component scraping kube proxy
 ##
 kubeProxy:
-  # Disabled: defaultRules.rules.kubeProxy is already false, so the ~2,700
-  # kubeproxy_* series this scrape produced fed no alert and no dashboard.
-  enabled: false
+  # Keep true. The ServiceMonitor itself is inert — k3s binds kube-proxy's
+  # metrics port to 127.0.0.1:10249, so the scrape can never connect and adds
+  # zero series. But this flag ALSO controls the Kubernetes/Proxy dashboard, and
+  # the kubeproxy_* metrics it charts do arrive (via the kubelet endpoint, k3s
+  # being a single binary). Setting this false costs the dashboard and saves
+  # nothing.
+  enabled: true
 
   ## If your kube proxy is not deployed as a pod, specify IPs it can be found on
   ##
