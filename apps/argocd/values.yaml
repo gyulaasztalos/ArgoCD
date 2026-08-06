@@ -1000,10 +1000,21 @@ controller:
   podLabels: {}
 
   # -- Resource limits and requests for the application controller pods
+  # The application-controller was the only large UNBOUNDED container in the
+  # cluster: the argocd namespace has no LimitRange and this block set a request
+  # but no limit, so nothing capped it. Measured 7-day peak is 1033Mi against a
+  # 512Mi request - it routinely runs at double what it reserves.
+  #
+  # 2Gi limit, not the commented-out 1500Mi: the peak is already 1033Mi and this
+  # controller's memory scales with the number of Applications and tracked
+  # resources, so 1500Mi is uncomfortably close. 2Gi bounds the blast radius on
+  # a 7.87Gi node while leaving ~2x headroom over observed peak.
+  #
+  # Request stays 512Mi rather than rising to match the peak: raising it would
+  # reserve capacity we are trying to free, and the pod is Burstable either way.
   resources:
-  #  limits:
-  #    cpu: 500m
-  #    memory: 1500Mi
+    limits:
+      memory: 2Gi
     requests:
   #    cpu: 250m
       memory: 512Mi
