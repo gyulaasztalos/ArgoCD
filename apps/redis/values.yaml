@@ -1062,7 +1062,22 @@ replica:
     ## If set to "-", storageClassName: "", which disables dynamic provisioning
     ## If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner
     ##
-    storageClass: longhorn
+    # Single Longhorn replica ON PURPOSE — the master keeps the default 3r.
+    #
+    # A Redis replica is already a full copy of the master's dataset, so putting
+    # it on a 3-replica Longhorn volume stores the same data nine times over
+    # (Redis 3x, Longhorn 3x again). If a replica's node dies its volume is
+    # unavailable, that pod stays down, and the master plus the other replica
+    # keep serving; when the node returns the replica resyncs from the master.
+    # That is the same property that makes 1r safe here.
+    #
+    # The master stays on 3r (master.persistence.storageClass) because
+    # sentinel.enabled is false: there is no automatic promotion, so the master
+    # volume being able to attach elsewhere IS the availability of Redis writes.
+    #
+    # Saves ~4GB of physical storage and two thirds of the replication write
+    # traffic for the replicas.
+    storageClass: longhorn-1r
     ## @param replica.persistence.accessModes Persistent Volume access modes
     ##
     accessModes:
