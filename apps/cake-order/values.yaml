@@ -234,8 +234,10 @@ resources:
   requests:
     cpu: 25m
     memory: 96Mi
+  # cpu limit intentionally absent: a CPU limit is a CFS quota per 100ms period,
+  # so it throttles bursty work whose average sits far below the cap. The cpu
+  # request in this block is what allocates CPU under contention (cpu.shares).
   limits:
-    cpu: 500m
     memory: 256Mi
 
 # -----------------------------------------------------------------------------
@@ -336,8 +338,10 @@ initContainers:
       requests:
         cpu: 100m
         memory: 128Mi
+      # cpu limit intentionally absent: a CPU limit is a CFS quota per 100ms period,
+      # so it throttles bursty work whose average sits far below the cap. The cpu
+      # request in this block is what allocates CPU under contention (cpu.shares).
       limits:
-        cpu: "1"
         memory: 512Mi
     volumeMounts:
       - name: gallery-nfs
@@ -486,8 +490,10 @@ jobs:
       requests:
         cpu: 25m
         memory: 64Mi
+      # cpu limit intentionally absent: a CPU limit is a CFS quota per 100ms period,
+      # so it throttles bursty work whose average sits far below the cap. The cpu
+      # request in this block is what allocates CPU under contention (cpu.shares).
       limits:
-        cpu: 500m
         memory: 256Mi
     env:
       - name: DB_HOST
@@ -534,8 +540,10 @@ cronJobs:
       requests:
         cpu: 25m
         memory: 64Mi
+      # cpu limit intentionally absent: a CPU limit is a CFS quota per 100ms period,
+      # so it throttles bursty work whose average sits far below the cap. The cpu
+      # request in this block is what allocates CPU under contention (cpu.shares).
       limits:
-        cpu: 500m
         memory: 256Mi
     env:
       - name: DB_HOST
@@ -588,6 +596,8 @@ cloudflared:
     requests:
       cpu: 10m
       memory: 32Mi
+    # cpu limit intentionally absent: a CPU limit is a CFS quota per 100ms period,
+    # so it throttles bursty work whose average sits far below the cap. The cpu
+    # request in this block is what allocates CPU under contention (cpu.shares).
     limits:
-      cpu: 250m
       memory: 128Mi

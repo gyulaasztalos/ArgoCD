@@ -179,8 +179,10 @@ initContainers:
       requests:
         cpu: 10m
         memory: 32Mi
+      # cpu limit intentionally absent: a CPU limit is a CFS quota per 100ms period,
+      # so it throttles bursty work whose average sits far below the cap. The cpu
+      # request in this block is what allocates CPU under contention (cpu.shares).
       limits:
-        cpu: 100m
         memory: 64Mi
     command:
       - sh
@@ -202,8 +204,10 @@ resources:
   requests:
     cpu: 10m
     memory: 32Mi
+  # cpu limit intentionally absent: a CPU limit is a CFS quota per 100ms period,
+  # so it throttles bursty work whose average sits far below the cap. The cpu
+  # request in this block is what allocates CPU under contention (cpu.shares).
   limits:
-    cpu: 100m
     memory: 64Mi
 
 # -----------------------------------------------------------------------------
