@@ -421,15 +421,27 @@ longhornManager:
   # us size (see `resources` further down in this block). Everything else in the
   # namespace falls back to the LimitRange in post-install/limitrange.yaml.
   #
-  # Measured 24h peak: 240Mi. Requesting 256Mi keeps it honest to the scheduler
-  # rather than inheriting the LimitRange's generic default, and a 512Mi limit
-  # leaves headroom without the 1800Mi the LimitRange would otherwise apply.
+  # SIZED OFF THE WRONG WINDOW ONCE ALREADY -- do not tighten without checking
+  # a backup window. The original 256Mi/512Mi came from a 24h peak of 240Mi
+  # observed while the daily backups were BROKEN (the stuck-NFS outage). Once
+  # backups resumed, longhorn-manager on lana was OOM-killed at 05:55Z:
+  #
+  #   lastExit=OOMKilled code=137, node at 78% -- a cgroup-limit kill, not node
+  #   pressure. Steady state is only 207-252Mi, so the ceiling was never the
+  #   problem day-to-day; it is the overnight window that blows through it.
+  #
+  # longhorn-manager coordinates backup uploads and its working set scales with
+  # the volumes in flight -- daily backups here include 1.7GB and 1.8GB volumes.
+  # 1Gi is ~4x the steady state and ~3x the highest excursion ever measured
+  # (338Mi outside a backup window), which is the margin an overnight spike
+  # needs. The request moves to 320Mi to cover that 338Mi excursion, so the
+  # container is not sitting in kubelet's first-to-evict group between backups.
   resources:
     requests:
       cpu: 100m
-      memory: 256Mi
+      memory: 320Mi
     limits:
-      memory: 512Mi
+      memory: 1Gi
   log:
     # -- Format of Longhorn Manager logs. (Options: "plain", "json")
     format: plain

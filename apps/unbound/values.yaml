@@ -582,6 +582,28 @@ extraContainers:
       - name: metrics
         containerPort: 9167
         protocol: TCP
+    # This exporter reads unbound's control socket (see args below), and a unix
+    # socket is exactly the kind of dependency that can wedge while the process
+    # stays alive -- the container looks healthy, the scrape hangs, and the
+    # dashboards just go flat. httpGet on /metrics exercises the whole path
+    # (HTTP server -> socket read), so liveness restarts it when the socket
+    # side is stuck, which is the only thing that recovers this today.
+    readinessProbe:
+      httpGet:
+        path: /metrics
+        port: 9167
+      initialDelaySeconds: 10
+      periodSeconds: 20
+      timeoutSeconds: 5
+      failureThreshold: 3
+    livenessProbe:
+      httpGet:
+        path: /metrics
+        port: 9167
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 5
+      failureThreshold: 3
     volumeMounts:
       - name: unbound-socket
         mountPath: /var/run/unbound

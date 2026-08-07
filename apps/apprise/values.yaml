@@ -323,6 +323,26 @@ extraContainers:
       - containerPort: 8025
         name: mailsecure
         protocol: TCP
+    # mailrise speaks SMTP, not HTTP, so an httpGet probe is impossible here --
+    # tcpSocket is the correct probe type for a plain TCP listener. It is worth
+    # having: the failure mode this catches is the listener dying while the
+    # process stays up, which looks perfectly healthy from the outside while
+    # every Grafana alert and FlexGet notification is silently dropped. Nothing
+    # else in the cluster would report that.
+    readinessProbe:
+      tcpSocket:
+        port: 8025
+      initialDelaySeconds: 10
+      periodSeconds: 20
+      timeoutSeconds: 3
+      failureThreshold: 3
+    livenessProbe:
+      tcpSocket:
+        port: 8025
+      initialDelaySeconds: 30
+      periodSeconds: 30
+      timeoutSeconds: 3
+      failureThreshold: 3
     volumeMounts:
       - name: mailrise-config
         mountPath: /etc/mailrise.conf

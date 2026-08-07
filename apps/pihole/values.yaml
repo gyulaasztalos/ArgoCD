@@ -211,13 +211,20 @@ probes:
 # -- choice for the user. This also increases chances charts run on environments with little
 # -- resources, such as Minikube. If you do want to specify resources, uncomment the following
 # -- lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+# Measured 191Mi against a 96Mi request -- 2x over, which places it in the
+# group kubelet evicts FIRST under memory pressure. Pi-hole is the cluster's
+# only DNS resolver for the LAN, so an eviction takes name resolution down for
+# every client, not just the cluster. 256Mi covers the measured working set
+# (FTL's query database grows with retention) with headroom.
+#
+# The 512Mi limit is a guard against an FTL leak rather than a target; there is
+# no LimitRange in this namespace, so without it the container is unbounded.
 resources:
-  # limits:
-    # cpu: 200m
-    # memory: 1024Mi
+  limits:
+    memory: 512Mi
   requests:
-    # cpu: 10m
-    memory: 96Mi
+    cpu: 50m
+    memory: 256Mi
 
 # -- `spec.PersitentVolumeClaim` configuration
 persistentVolumeClaim:

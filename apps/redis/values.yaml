@@ -727,7 +727,19 @@ master:
   extraPodSpec: {}
   ## @param master.annotations Additional custom annotations for Redis(R) Master resource
   ##
-  annotations: {}
+  # `latest` here is FORCED, not an oversight. Bitnami moved versioned tags behind
+  # a paid subscription; `latest` is what remains publicly pullable. So the usual
+  # fix (pin a version, let Renovate bump it) is not available -- Renovate cannot
+  # track a mutable tag either, which is why this image will never appear in a
+  # Renovate PR and must be reasoned about by hand.
+  #
+  # Recorded as a waiver so the deviation is explicit and matches how apps/apprise
+  # documents the same decision. Without it this is indistinguishable from an
+  # unreviewed mutable tag -- and it was the only unwaived `latest` in the repo.
+  #
+  # Covers both containers on this StatefulSet: redis and redis-exporter.
+  annotations:
+    ignore-check.kube-linter.io/latest-tag: "Bitnami moved versioned tags behind a paid subscription; latest is the only publicly pullable tag, so this cannot be pinned and Renovate cannot track it."
 ## @section Redis(R) replicas configuration parameters
 ##
 replica:

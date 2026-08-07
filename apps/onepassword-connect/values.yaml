@@ -63,7 +63,21 @@ connect:
     # -- The 1Password Connect Sync repository
     imageRepository: 1password/connect-sync
     # -- The resources requests/limits for the 1Password Connect Sync pod
-    resources: {}
+    #
+    # Was `{}`, which made this one of only TWO containers in the whole cluster
+    # with no memory request at all -- the `onepassword` namespace has no
+    # LimitRange to backfill one. That means the scheduler could not see it, and
+    # kubelet treated any usage above zero as "over request", i.e. first in line
+    # for eviction. It sits alongside connect-api in the same pod, so losing it
+    # takes the credential sync that every ExternalSecret depends on with it.
+    #
+    # Mirrors the connect-api sizing above; both containers measure ~20-30Mi.
+    resources:
+      limits:
+        memory: 128Mi
+      requests:
+        cpu: 0.1
+        memory: 32Mi
     # -- The port serving the health of the Sync container
     httpPort: 8081
     # -- Log level of the Connect Sync container. Valid options are: trace, debug, info, warn, error.

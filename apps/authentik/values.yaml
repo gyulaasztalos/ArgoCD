@@ -292,10 +292,22 @@ server:
     annotations: {}
     # -- Number of pods that are available after eviction as number or percentage (eg.: 50%)
     # @default -- `""` (defaults to 0 if not specified)
-    minAvailable: 1
+    #
+    # DELIBERATELY EMPTY. `minAvailable: 1` against `replicas: 1` (see above)
+    # yields disruptionsAllowed=0 -- a PDB demanding 1 of 1 stay up forbids
+    # every VOLUNTARY eviction, so `kubectl drain` on whichever node hosts this
+    # pod hangs forever with no timeout. That is the opposite of what a PDB is
+    # for: it protected nothing (a single replica has no redundancy to protect)
+    # while making planned node maintenance impossible.
+    minAvailable: ""
     # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%)
     ## Has higher precedence over `server.pdb.minAvailable`
-    maxUnavailable: ""
+    #
+    # maxUnavailable wins over minAvailable, so this is the whole fix. At
+    # replicas=1 it means "the one pod may be evicted", i.e. drains work. If
+    # this is ever scaled to 2+, the same value keeps the semantics we actually
+    # want -- evict at most one at a time -- with no further edit needed.
+    maxUnavailable: "1"
 
   ## authentik server image
   ## This should match what is deployed in the worker. Prefer using global.image
@@ -735,10 +747,13 @@ worker:
     annotations: {}
     # -- Number of pods that are available after eviction as number or percentage (eg.: 50%)
     # @default -- `""` (defaults to 0 if not specified)
-    minAvailable: "1"
+    #
+    # Emptied for the same reason as server.pdb above: minAvailable=1 with
+    # replicas=1 gives disruptionsAllowed=0 and wedges `kubectl drain`.
+    minAvailable: ""
     # -- Number of pods that are unavailable after eviction as number or percentage (eg.: 50%)
     ## Has higher precedence over `worker.pdb.minAvailable`
-    maxUnavailable: ""
+    maxUnavailable: "1"
 
   ## authentik worker image
   ## This should match what is deployed in the server. Prefer using global.image

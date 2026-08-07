@@ -1010,14 +1010,19 @@ controller:
   # resources, so 1500Mi is uncomfortably close. 2Gi bounds the blast radius on
   # a 7.87Gi node while leaving ~2x headroom over observed peak.
   #
-  # Request stays 512Mi rather than rising to match the peak: raising it would
-  # reserve capacity we are trying to free, and the pod is Burstable either way.
+  # Request raised 512Mi -> 768Mi. The earlier reasoning ("leave it low, the pod
+  # is Burstable either way") had it backwards: usage is now a measured 725Mi,
+  # and a container above its request is in the FIRST group kubelet evicts.
+  # Under-requesting does not save memory the process is already using -- it
+  # only hides that usage from the scheduler and volunteers the pod for
+  # eviction. 768Mi covers the measured working set; the 2Gi limit still bounds
+  # the blast radius.
   resources:
     limits:
       memory: 2Gi
     requests:
   #    cpu: 250m
-      memory: 512Mi
+      memory: 768Mi
 
   # Application controller container ports
   containerPorts:
@@ -1425,13 +1430,16 @@ dex:
   podLabels: {}
 
   # -- Resource limits and requests for dex
+  # 42Mi measured against a 32Mi request. Small absolute numbers, but being over
+  # request is what decides eviction order, not the size of the overshoot.
+  # There is no LimitRange in the argocd namespace, so the limit is stated here
+  # or the container is unbounded.
   resources:
-   # limits:
-      # cpu:50m
-      # memory: 256Mi
+    limits:
+      memory: 128Mi
     requests:
-      # cpu:10m
-      memory: 32Mi
+      cpu: 10m
+      memory: 64Mi
 
   # Dex container ports
   # NOTE: These ports are currently hardcoded and cannot be changed
@@ -2376,13 +2384,15 @@ server:
   podLabels: {}
 
   # -- Resource limits and requests for the Argo CD server
+  # 46Mi measured against a 32Mi request. This is the API and UI -- if it is
+  # evicted you lose the ability to see or drive syncs, which is precisely when
+  # you need it. No LimitRange in this namespace, so the limit is set here.
   resources:
-    # limits:
-      # cpu:100m
-      # memory: 256Mi
+    limits:
+      memory: 256Mi
     requests:
-      # cpu:50m
-      memory: 32Mi
+      cpu: 50m
+      memory: 64Mi
 
   # Server container ports
   containerPorts:
@@ -3239,12 +3249,18 @@ repoServer:
   podLabels: {}
 
   # -- Resource limits and requests for the repo server pods
+  # The request stays at 192Mi -- idle usage is only ~49Mi, so this is already
+  # generous. What was missing is the LIMIT. This is the spikiest component in
+  # the namespace: it shells out to `helm template` and kustomize for all 39
+  # Applications, and memory scales with the largest chart being rendered
+  # (kube-prometheus-stack is a big one). With no limit and no namespace
+  # LimitRange, a bad render could climb until the NODE ran out rather than
+  # just the pod. 1Gi is well clear of any observed render and still bounded.
   resources:
-    # limits:
-      # cpu:50m
-      # memory: 512Mi
+    limits:
+      memory: 1Gi
     requests:
-      # cpu:10m
+      cpu: 10m
       memory: 192Mi
 
   # Repo server container ports
@@ -3673,12 +3689,14 @@ applicationSet:
   podLabels: {}
 
   # -- Resource limits and requests for the ApplicationSet controller pods.
+  # 41Mi measured against 64Mi requested -- the one argocd component that was
+  # already sized correctly. Only the limit is added, for the same reason as the
+  # others: no LimitRange in this namespace means unbounded otherwise.
   resources:
-   # limits:
-      # cpu:100m
-      # memory: 256Mi
+    limits:
+      memory: 128Mi
     requests:
-      # cpu:100m
+      cpu: 50m
       memory: 64Mi
 
   # ApplicationSet controller container ports
@@ -4182,13 +4200,13 @@ notifications:
   podLabels: {}
 
   # -- Resource limits and requests for the notifications controller
+  # 38Mi measured against a 32Mi request. Same treatment as dex and server.
   resources:
-    # limits:
-      # cpu:100m
-      # memory: 256Mi
+    limits:
+      memory: 128Mi
     requests:
-      # cpu:100m
-      memory: 32Mi
+      cpu: 50m
+      memory: 64Mi
 
   # Notification controller container ports
   containerPorts:
