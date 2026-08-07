@@ -1,3 +1,18 @@
+# CPU is intentionally absent from `max` and `default` in BOTH LimitRanges below;
+# memory keeps both. Applied cluster-wide for consistency, not only where
+# throttling was already firing — a CPU limit is a CFS quota per 100ms period, so
+# it penalises bursty work whose average sits far under the cap, and these nodes
+# idle at 8-16% CPU with nothing to arbitrate. Requests stay: cpu.shares come from
+# requests and are what actually allocate CPU under contention.
+# Full rationale: apps/metallb/post-install/limitrange.yaml.
+#
+# `max.cpu` must be dropped together with `default.cpu` — LimitRanger REJECTS a
+# container that sets no limit for a resource carrying a `max` ("maximum cpu
+# usage per Container is 500m. No limit is specified").
+#
+# Postgres matters here specifically: a 500m cap applied to a CNPG base backup or
+# a replica rebuild throttles exactly the operation you want to finish quickly,
+# lengthening the window where the cluster is short a healthy replica.
 apiVersion: v1
 kind: LimitRange
 metadata:
@@ -7,13 +22,11 @@ spec:
   limits:
   - type: Container
     max:
-      cpu: "500m"
       memory: 1024Mi
     min:
       cpu: 50m
       memory: 64Mi
     default:
-      cpu: 500m
       memory: 1024Mi
     defaultRequest:
       cpu: 100m
@@ -27,14 +40,13 @@ metadata:
 spec:
   limits:
   - type: Container
+    # See the header comment: CPU removed from max/default, memory keeps both.
     max:
-      cpu: "500m"
       memory: 512Mi
     min:
       cpu: 50m
       memory: 64Mi
     default:
-      cpu: 200m
       memory: 256Mi
     defaultRequest:
       cpu: 50m

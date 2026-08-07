@@ -4,7 +4,25 @@
 # instance-manager pods owned by the InstanceManager CR rather than the chart)
 # declare nothing, so this is the only way to bound them.
 #
-# `default` (the limit) is the anti-OOM guard and is deliberately UNCHANGED.
+# `default.memory` (the limit) is the anti-OOM guard and is deliberately UNCHANGED.
+#
+# `default.cpu` (was 480m) and `max.cpu` are GONE, and this namespace is the
+# clearest reason why. instance-manager runs the replica/engine processes, and
+# during a Longhorn rebuild it peaked at 941m of demand against that 480m cap —
+# spending 98.2% of its CFS periods throttled. The cap was not protecting the
+# cluster during a rebuild (nodes idle at 8-16% CPU); it was halving rebuild
+# throughput and therefore roughly DOUBLING the window in which a volume runs
+# short a replica. That is the opposite of what a storage safety margin is for.
+#
+# instance-manager keeps its 480m REQUEST (Longhorn's guaranteedInstanceManagerCPU,
+# 12% of a 4-core node), so it still has a guaranteed floor under contention —
+# it simply may now also use idle CPU. Its QoS class is unchanged: memory
+# request 128Mi vs limit 1800Mi already made it Burstable, not Guaranteed.
+#
+# `max.cpu` has to be removed alongside `default.cpu`: LimitRanger's max check
+# REJECTS a container that specifies no limit for a capped resource ("maximum
+# cpu usage per Container is 1. No limit is specified"), so leaving it would
+# fail admission for all 43 containers here.
 #
 # `defaultRequest` was the collateral damage: at 256Mi it reserved
 # 43 containers x 256Mi = 10.75Gi of schedulable capacity cluster-wide, ~34% of
@@ -35,13 +53,11 @@ spec:
   limits:
   - type: Container
     max:
-      cpu: "1"
       memory: 2Gi
     min:
       cpu: 100m
       memory: 32Mi
     default:
-      cpu: 480m
       memory: 1800Mi
     defaultRequest:
       cpu: 100m

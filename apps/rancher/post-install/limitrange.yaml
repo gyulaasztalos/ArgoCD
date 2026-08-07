@@ -1,3 +1,14 @@
+# CPU is intentionally absent from `max` and `default` in ALL THREE LimitRanges
+# below; memory keeps both. Applied for consistency with every other namespace,
+# not only where throttling was observed — a CPU limit is a CFS quota per 100ms
+# period, so it throttles bursty containers whose average is far below the cap,
+# and these nodes idle at 8-16% CPU. Requests stay: cpu.shares derive from
+# requests and are what allocate CPU under real contention.
+# Full rationale: apps/metallb/post-install/limitrange.yaml.
+#
+# `max.cpu` must go with `default.cpu` — LimitRanger REJECTS a container that
+# sets no limit for a resource carrying a `max`, so leaving it behind would fail
+# admission for every pod in these namespaces.
 apiVersion: v1
 kind: LimitRange
 metadata:
@@ -7,13 +18,11 @@ spec:
   limits:
   - type: Container
     max:
-      cpu: "1"
       memory: 2Gi
     min:
       cpu: 100m
       memory: 64Mi
     default:
-      cpu: 300m
       memory: 256Mi
     defaultRequest:
       cpu: 100m
@@ -27,14 +36,13 @@ metadata:
 spec:
   limits:
   - type: Container
+    # See the header comment: CPU removed from max/default, memory keeps both.
     max:
-      cpu: "1"
       memory: 512Mi
     min:
       cpu: 100m
       memory: 64Mi
     default:
-      cpu: 300m
       memory: 256Mi
     defaultRequest:
       cpu: 100m
@@ -48,14 +56,13 @@ metadata:
 spec:
   limits:
   - type: Container
+    # See the header comment: CPU removed from max/default, memory keeps both.
     max:
-      cpu: "1"
       memory: 512Mi
     min:
       cpu: 100m
       memory: 32Mi
     default:
-      cpu: 200m
       memory: 64Mi
     defaultRequest:
       cpu: 100m

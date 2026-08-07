@@ -6,14 +6,22 @@ metadata:
 spec:
   limits:
   - type: Container
+    # CPU intentionally absent from `max` and `default` — memory keeps both.
+    # This namespace held the worst case measured: grafana-sc-dashboard was
+    # throttled 68% of CFS periods (peaking at 96%) while consuming 1 millicore,
+    # because a 200m quota is 20ms per 100ms period and the sidecar's work
+    # arrives in bursts. Requests stay — they are what allocate CPU under real
+    # contention. Full rationale: apps/metallb/post-install/limitrange.yaml.
+    #
+    # `max.cpu` goes with `default.cpu`: LimitRanger rejects a container with no
+    # limit for a resource that has a `max`, so keeping it would break admission
+    # once the default is gone. Memory keeps both — it is incompressible.
     max:
-      cpu: "2"
       memory: 3Gi
     min:
       cpu: 100m
       memory: 32Mi
     default:
-      cpu: 200m
       memory: 768Mi
     defaultRequest:
       cpu: 100m

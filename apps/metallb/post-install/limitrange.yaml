@@ -7,8 +7,27 @@ metadata:
 spec:
   limits:
   - type: Container
+    # NO CPU KEY IN `max` OR `default` -- deliberate, see below. Memory keeps both.
+    #
+    # CPU limits were removed cluster-wide after measuring what they actually did.
+    # A CPU limit is a CFS quota over a 100ms period, so 200m means 20ms per
+    # period: a container averaging 2-9m still gets throttled whenever a single
+    # burst exceeds 20ms. Measured result in this namespace: frr-metrics 34%
+    # throttled, reloader peaking at 95%, on nodes running at 8-16% CPU. The cap
+    # was not arbitrating contention -- there was none -- it was just adding
+    # latency to bursty exporters.
+    #
+    # Requests are what matter and they stay: cpu.shares are derived from
+    # requests, so under real contention every container still gets its
+    # proportional share. Guaranteed floor, elastic ceiling.
+    #
+    # `max.cpu` has to go with `default.cpu`, not just alongside it: LimitRanger's
+    # maxConstraint REJECTS a container that sets no limit for a resource it
+    # caps ("maximum cpu usage per Container is 1. No limit is specified"). Left
+    # in place it would fail admission for every pod here once the default is
+    # gone. Memory is unaffected -- memory is incompressible and its limit is the
+    # OOM guard, so max.memory and default.memory both stay.
     max:
-      cpu: "1"
       memory: 256Mi
     # `min` is an ADMISSION floor, not a hint: a container requesting less is
     # rejected outright. At 64Mi it blocked the frr-k8s DaemonSet the moment
@@ -22,7 +41,6 @@ spec:
       cpu: 10m
       memory: 16Mi
     default:
-      cpu: 200m
       memory: 256Mi
     # Kept at 64Mi: this is the fallback for containers that declare nothing,
     # where a conservative guess is right. Everything in this namespace now

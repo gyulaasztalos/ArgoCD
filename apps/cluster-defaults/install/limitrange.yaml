@@ -19,14 +19,23 @@ metadata:
 spec:
   limits:
     - type: Container
+      # CPU intentionally absent from `max` and `default` — memory keeps both.
+      # A CPU limit is a CFS quota per 100ms period, so it throttles bursty
+      # containers whose *average* is far below the cap; measured cluster-wide
+      # while nodes idled at 8-16% CPU. Requests stay and are what actually
+      # allocate CPU under contention (cpu.shares). Rationale in full:
+      # apps/metallb/post-install/limitrange.yaml.
+      #
+      # `max.cpu` is removed together with `default.cpu` and not on its own:
+      # LimitRanger rejects a container that sets no limit for a resource that
+      # has a `max`, so leaving it would fail admission for every kube-system
+      # pod. Memory is incompressible and its limit is the OOM guard — untouched.
       max:
-        cpu: "1"
         memory: 512Mi
       min:
         cpu: 10m
         memory: 32Mi
       default:
-        cpu: 200m
         memory: 512Mi
       defaultRequest:
         cpu: 10m

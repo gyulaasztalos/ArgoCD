@@ -6,14 +6,20 @@ metadata:
 spec:
   limits:
   - type: Container
+    # CPU intentionally absent from `max` and `default` — memory keeps both.
+    # The old `default.cpu: 20m` was the most extreme in the cluster: 20m is a
+    # 2ms slice of each 100ms CFS period, and loki-sc-rules duly sat at 100%
+    # throttled. Requests stay and are what allocate CPU under contention.
+    # Full rationale: apps/metallb/post-install/limitrange.yaml.
+    #
+    # `max.cpu` is removed with it, not left behind: LimitRanger rejects a
+    # container that sets no limit for a resource carrying a `max`.
     max:
-      cpu: "1"
       memory: 1500Mi
     min:
       cpu: 10m
       memory: 32Mi
     default:
-      cpu: 20m
       memory: 150Mi
     defaultRequest:
       cpu: 10m
