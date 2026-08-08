@@ -2008,7 +2008,24 @@ metrics:
   ##     cpu: 3
   ##     memory: 1024Mi
   ##
-  resources: {}
+  # MUST be set explicitly — an empty `resources: {}` here does NOT mean "no
+  # limits". Bitnami falls back to `resourcesPreset` above, and the `nano` preset
+  # emits `limits.cpu: 150m`, which is why this exporter was still 33% CPU
+  # throttled after every other CPU limit in the cluster was removed. The limit
+  # was never in this file, so a search for `limits:` could not find it.
+  #
+  # Setting `resources` at all makes the chart ignore the preset (see the
+  # @param note above), which is how master/replica ended up uncapped — their
+  # blocks are non-empty. So the fix is to state the block, not to edit a value.
+  #
+  # Measured: 1m CPU, 13Mi. No cpu limit, for the same reason as everywhere else;
+  # the memory limit stays as the guard.
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      memory: 128Mi
   ## @param metrics.podLabels Extra labels for Redis(R) exporter pods
   ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
   ##
