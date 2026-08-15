@@ -1,0 +1,53 @@
+# Allows Prometheus to scrape longhorn-manager metrics while the chart's own
+# NetworkPolicies (`networkPolicies.restrictInternalTraffic: true`) stay on.
+#
+# Longhorn 1.12.1 introduced `networkPolicies.restrictInternalTraffic`, default
+# TRUE, gating six NetworkPolicies. It is NOT gated behind the older
+# `networkPolicies.enabled` flag, so upgrading from 1.12.0 turned them on even
+# though values.yaml sets `enabled: false`. The chart's `longhorn-manager`
+# policy allows ingress only from longhorn-manager, longhorn-ui,
+# longhorn-csi-plugin, longhorn-driver-deployer and recurring-job pods —
+# Prometheus is not on that list, so all four `longhorn-backend` scrape targets
+# went DOWN with "connection refused" (k3s's kube-router policy engine REJECTs
+# rather than drops, so it surfaces as refused, not as a timeout).
+#
+# The chart exposes no hook for extra ingress sources, but it does not need to:
+# NetworkPolicy ingress rules are a UNION across every policy selecting a pod,
+# so this file simply adds Prometheus to what the chart already permits, and
+# needs no coordination with the chart's own policy.
+#
+# Note the longhorn-manager pod also carries `longhorn.io/admission-webhook`
+# and `longhorn.io/recovery-backend`, so the chart's webhook and
+# recovery-backend policies select the SAME pod. That is why the admission
+# webhook kept working through the outage: with `kubeAPIServerSourceCIDRs`
+# empty (the default, and what this repo uses), the webhook policy renders as a
+# ports-only rule with no `from:`, allowing 9501/9502 from any source.
+#
+# Scoped to port 9500 (`manager`) and to the Prometheus pod specifically rather
+# than to the whole monitoring namespace — Grafana, Loki and Alloy have no
+# reason to reach the Longhorn API, and this policy grants full API access on
+# that port, not just /metrics.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: longhorn-manager-allow-monitoring
+  namespace: longhorn-system
+spec:
+  podSelector:
+    matchLabels:
+      app: longhorn-manager
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        # `kubernetes.io/metadata.name` is the only label on the monitoring
+        # namespace; it is set automatically by the apiserver and cannot drift.
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus
+      ports:
+        - protocol: TCP
+          port: 9500

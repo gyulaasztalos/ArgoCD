@@ -32,10 +32,25 @@ global:
         systemManagedComponentsNodeSelector: kubernetes.io/os:linux
 networkPolicies:
   # -- Setting that allows you to enable network policies that control access to Longhorn pods.
+  # Left false: the UI policy this gates targets an ingress-nginx/traefik pod in
+  # kube-system, but Traefik runs in the `traefik` namespace here, and it only
+  # renders when the chart's own `ingress.enabled` is set — this repo exposes the
+  # UI with a Traefik IngressRoute from post-install/ingressroute.yaml instead.
   enabled: false
-  restrictInternalTraffic: false
+  # -- Gates six NetworkPolicies restricting longhorn-system to internal traffic.
+  # New in chart 1.12.1 and NOT gated behind `enabled` above, so the 1.12.1 bump
+  # silently switched it on and blocked Prometheus from longhorn-manager:9500.
+  # Kept on deliberately; post-install/networkpolicy-monitoring.yaml re-admits
+  # Prometheus. Do not set this false without also removing that file.
+  restrictInternalTraffic: true
   # -- Distribution that determines the policy for allowing access for an ingress. (Options: "k3s", "rke2", "rke1")
   type: "k3s"
+  # -- Source CIDRs allowed to reach the admission webhook on 9501/9502. Empty
+  # disables source filtering, which is what we want: the k3s apiserver reaches
+  # the webhook from whichever control-plane node it runs on, and a wrong CIDR
+  # here fails admission for every longhorn.io CRD write — i.e. it breaks all
+  # storage operations, not just metrics.
+  kubeAPIServerSourceCIDRs: []
 image:
   longhorn:
     engine:
