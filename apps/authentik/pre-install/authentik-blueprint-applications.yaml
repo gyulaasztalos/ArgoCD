@@ -69,4 +69,4 @@ data:
           provider: !Find [authentik_providers_oauth2.oauth2provider, [name, homepage-oauth-provider]]
           policy_engine_mode: any
           meta_launch_url: "https://homepage.local.asztalos.net"
-          icon: https://homepage.local.asztalos.net/favicon.ico
+          icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/homepage.png
