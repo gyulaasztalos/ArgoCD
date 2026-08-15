@@ -24,7 +24,7 @@ namespace: homepage
 image:
   repository: ghcr.io/gethomepage/homepage
   # renovate: datasource=docker depName=ghcr.io/gethomepage/homepage
-  tag: v1.13.2
+  tag: v2.0.0
   pullPolicy: IfNotPresent
 
 # -----------------------------------------------------------------------------
@@ -92,7 +92,8 @@ ports:
 # artwork needs `kubectl rollout restart deploy/homepage -n homepage`.)
 # -----------------------------------------------------------------------------
 envFromConfigMap: homepage-env
-envFromSecrets: []
+envFromSecrets:
+  - homepage-auth
 env: []
 
 configMaps:
@@ -105,6 +106,11 @@ configMaps:
       # the request with a bad-host error.
       HOMEPAGE_ALLOWED_HOSTS: "homepage.local.asztalos.net,localhost:3000"
       HOMEPAGE_PROXY_DISABLE_IPV6: "true"
+      HOMEPAGE_AUTH_ENABLED: "true"
+      HOMEPAGE_EXTERNAL_URL: "https://homepage.local.asztalos.net"
+      HOMEPAGE_OIDC_ISSUER: "https://auth.local.asztalos.net/application/o/homepage/"
+      HOMEPAGE_OIDC_CLIENT_ID: "homepage"
+      HOMEPAGE_OIDC_NAME: "Authentik"
 
   - name: homepage-config
     files:
@@ -580,6 +586,33 @@ externalSecrets:
           key: homeassistant
           property: credential  # 1Password item name
 
+  - name: homepage-auth
+    refreshInterval: 1h
+    target:
+      template:
+        engineVersion: v2
+        type: Opaque
+        data:
+          HOMEPAGE_OIDC_CLIENT_SECRET: "{{ .oidc_client_secret }}"
+          HOMEPAGE_AUTH_SECRET: "{{ .auth_secret }}"
+    data:
+      - secretKey: oidc_client_secret
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          metadataPolicy: None
+          nullBytePolicy: Ignore
+          key: homepage
+          property: oidc.clientSecret
+      - secretKey: auth_secret
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          metadataPolicy: None
+          nullBytePolicy: Ignore
+          key: homepage
+          property: auth-secret
+
 # -----------------------------------------------------------------------------
 # Resources.
 # -----------------------------------------------------------------------------
@@ -721,8 +754,6 @@ ingressRoute:
       port: 3000
       priority: 10
       middlewares:
-        - name: authentik
-          namespace: traefik
         - name: default-headers
           namespace: traefik
 
