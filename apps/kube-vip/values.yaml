@@ -5,7 +5,7 @@ image:
   repository: ghcr.io/kube-vip/kube-vip
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1.2.2"
+  tag: "v1.2.3"
 
 config:
   address: "fdbf:c39a:a943:50::20"
