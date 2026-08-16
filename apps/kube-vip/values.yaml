@@ -96,8 +96,8 @@ securityContext:
 updateStrategy:
   type: RollingUpdate
   rollingUpdate:
-    maxSurge: 0
-    maxUnavailable: 1
+    maxSurge: 1
+    maxUnavailable: 0
 
 resources:
   limits:
