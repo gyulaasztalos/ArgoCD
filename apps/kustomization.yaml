@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - cluster-defaults/application.yaml
   - argocd/application.yaml
+  - kube-vip/application.yaml
   - metallb/application.yaml
   - traefik/application.yaml
   - sealed-secrets/application.yaml

@@ -1,0 +1,68 @@
+image:
+  repository: ghcr.io/kube-vip/kube-vip
+  pullPolicy: Always
+
+config:
+  address: "fdbf:c39a:a943:50::20"
+
+env:
+  vip_interface: null
+  lb_enable: null
+  lb_port: null
+  svc_election: null
+  prometheus_server: null
+  address: "fdbf:c39a:a943:50::20"
+  vip_arp: "true"
+  vip_subnet: "128"
+  cp_enable: "true"
+  cp_namespace: "kube-system"
+  svc_enable: "false"
+  bgp_enable: "false"
+  vip_ddns: "false"
+  port: "6443"
+  vip_leaderelection: "true"
+  vip_leaseduration: "25"
+  vip_renewdeadline: "20"
+  vip_retryperiod: "5"
+
+serviceAccount:
+  create: true
+  name: kube-vip
+
+priorityClassName: system-node-critical
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 32Mi
+
+securityContext:
+  capabilities:
+    drop: null
+    add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_TIME
+
+updateStrategy:
+  rollingUpdate:
+    maxSurge: 0
+    maxUnavailable: 1
+  type: RollingUpdate
+
+tolerations:
+  - effect: NoSchedule
+    operator: Exists
+  - effect: NoExecute
+    operator: Exists
+
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-role.kubernetes.io/master
+              operator: Exists
+        - matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
