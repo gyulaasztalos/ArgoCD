@@ -103,8 +103,23 @@ kubectl --server https://[<node-ipv6>]:6443 get ds -n kube-system
 ## Ansible-side follow-up
 
 `roles/k3s_server/tasks/vip.yml` **stays**. It is what creates the VIP on a
-fresh cluster, before ArgoCD exists — the same arrangement as MetalLB. After
-bootstrap, ArgoCD's copy takes over and Renovate keeps it current.
+fresh cluster, before ArgoCD exists — the same arrangement as MetalLB.
 
-The template still emits the dead `vip_cidr` env var; removing it there is
-tracked as follow-up.
+On a rebuild the two do **not** merge: Ansible creates `kube-vip-ds`, ArgoCD
+creates `kube-vip`, and both run until the Ansible one is removed. That is the
+same overlap this migration used, and it is safe for the same reason — one
+`plndr-cp-lock` lease, one leader, the VIP never doubles. So a restore ends with
+the last step of the runbook above:
+
+```bash
+kubectl delete ds -n kube-system kube-vip-ds
+kubectl delete clusterrole system:kube-vip-role
+kubectl delete clusterrolebinding system:kube-vip-binding
+```
+
+The overlap is only safe while both sides run the same kube-vip version. After a
+Renovate bump the ArgoCD copy will be ahead of the Ansible template, so on a
+rebuild delete `kube-vip-ds` promptly rather than leaving the two running.
+
+`vip.yaml.j2` previously emitted `vip_cidr`, which kube-vip has never parsed —
+it is now `vip_subnet`, matching what the chart sets.

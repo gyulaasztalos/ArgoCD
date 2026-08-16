@@ -90,7 +90,8 @@ securityContext:
       - NET_ADMIN
       - NET_RAW
       - SYS_TIME
-    drop: null
+    drop:
+      - ALL
 
 updateStrategy:
   type: RollingUpdate
@@ -99,6 +100,8 @@ updateStrategy:
     maxUnavailable: 1
 
 resources:
+  limits:
+    memory: 256Mi
   requests:
     cpu: 25m
     memory: 32Mi
