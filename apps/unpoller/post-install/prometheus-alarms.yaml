@@ -64,3 +64,55 @@ spec:
       annotations:
         summary: "unpoller is serving stale data"
         description: "Last successful controller refresh was over 5 minutes ago (cache_age > 300s) for 10 minutes — metrics are stale."
+    # --- Monitored UniFi device health ---------------------------------
+    # These watch the DEVICES unpoller polls, not the exporter itself.
+    #
+    # Added after a Suricata v6->v8 upgrade on the UDM-Pro failed every hour for
+    # over a week (184 consecutive INSUFFICIENT_MEMORY events) while the gateway
+    # sat at 80-85% memory. Nothing surfaced it: the data was already being
+    # collected, it just had no alert attached.
+    #
+    # Thresholds calibrated against measured baselines on 2026-08-17, after the
+    # upgrade: UDMPRO 0.67, U6-Pro 0.60-0.65, USW Pro 24 0.35, U6-IW/Mesh 0.26.
+    # The UDM peaked at 0.855 while degraded, so 0.80 sits above every healthy
+    # device and below the bad state.
+    - alert: unifi-device-memory-high
+      expr: unpoller_device_memory_utilization_ratio > 0.80
+      for: 30m
+      labels:
+        severity: warning
+        namespace: unpoller
+        app: unpoller
+      annotations:
+        summary: "UniFi device {{ $labels.name }} memory is high"
+        description: "{{ $labels.name }} has been above 80% memory for 30 minutes (currently {{ $value | humanizePercentage }}). Healthy baseline is 0.26-0.67 depending on model."
+    - alert: unifi-device-memory-critical
+      expr: unpoller_device_memory_utilization_ratio > 0.90
+      for: 10m
+      labels:
+        severity: critical
+        namespace: unpoller
+        app: unpoller
+      annotations:
+        summary: "UniFi device {{ $labels.name }} is nearly out of memory"
+        description: "{{ $labels.name }} has been above 90% memory for 10 minutes (currently {{ $value | humanizePercentage }}). On the UDM-Pro this blocks IDS/IPS engine upgrades and risks earlyoom kills."
+    # The rule that would have caught the original problem: a slow climb that
+    # never trips a static threshold until it is already too late. Fires when the
+    # 6h trend projects >95% within 24h.
+    #
+    # The `> 0` guard is deliberate — several devices (USW Flex Mini always, others
+    # while rebooting or briefly dropping out of the poll) report exactly 0, and a
+    # 0 must not be extrapolated as a steep downward slope or read as healthy.
+    - alert: unifi-device-memory-exhaustion-predicted
+      expr: |
+        unpoller_device_memory_utilization_ratio > 0
+        and
+        predict_linear(unpoller_device_memory_utilization_ratio[6h], 24 * 3600) > 0.95
+      for: 1h
+      labels:
+        severity: warning
+        namespace: unpoller
+        app: unpoller
+      annotations:
+        summary: "UniFi device {{ $labels.name }} is trending toward memory exhaustion"
+        description: "{{ $labels.name }} memory is climbing; the 6h trend projects >95% within 24 hours (currently {{ $value | humanizePercentage }}). Check for a leaking service or a stuck upgrade loop."
