@@ -20,7 +20,7 @@ spec:
     # Upstream chart (HelmForge). Umami app version comes from the chart's
     # appVersion; the image is pinned in values.yaml.
     - repoURL: https://repo.helmforge.dev
-      targetRevision: 2.3.1
+      targetRevision: 2.3.2
       helm:
         valueFiles:
           - $config/apps/umami/values.yaml
