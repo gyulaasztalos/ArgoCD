@@ -96,23 +96,38 @@ spec:
       annotations:
         summary: "UniFi device {{ $labels.name }} is nearly out of memory"
         description: "{{ $labels.name }} has been above 90% memory for 10 minutes (currently {{ $value | humanizePercentage }}). On the UDM-Pro this blocks IDS/IPS engine upgrades and risks earlyoom kills."
-    # The rule that would have caught the original problem: a slow climb that
-    # never trips a static threshold until it is already too late. Fires when the
-    # 6h trend projects >95% within 24h.
+    # A real leak raises the FLOOR, not just the peak.
     #
-    # The `> 0` guard is deliberate — several devices (USW Flex Mini always, others
-    # while rebooting or briefly dropping out of the poll) report exactly 0, and a
-    # 0 must not be extrapolated as a steep downward slope or read as healthy.
+    # The previous version used predict_linear over a 6h window, which
+    # extrapolates any upswing of an oscillating signal. On 2026-08-18 it
+    # projected >95% while the UDM-Pro was in fact flat at ~65% (verified against
+    # sar on the device itself), and the reboot that appeared to confirm it was
+    # an unrelated rack-wide power loss when the UPS battery failed.
+    #
+    # This compares the current 1h floor against the 1h floor six hours earlier.
+    # Sawtooth oscillation leaves the floor where it was; a leak lifts it. The
+    # device must also already sit above 0.75, so a rising floor low in the
+    # range stays quiet.
+    #
+    # No explicit `> 0` guard is needed here: devices that report exactly 0
+    # (USW Flex Mini always, others while rebooting or dropping out of the poll)
+    # drag the 1h minimum to 0, which fails the > 0.75 test on its own.
+    #
+    # Series churn is handled for free — when the exporter pod restarts its
+    # `instance` label changes, the offset-6h series no longer matches, the
+    # subtraction produces no sample, and the rule simply stays silent rather
+    # than extrapolating from a truncated window.
     - alert: unifi-device-memory-exhaustion-predicted
       expr: |
-        unpoller_device_memory_utilization_ratio > 0
+        min_over_time(unpoller_device_memory_utilization_ratio[1h]) > 0.75
         and
-        predict_linear(unpoller_device_memory_utilization_ratio[6h], 24 * 3600) > 0.95
+        min_over_time(unpoller_device_memory_utilization_ratio[1h])
+          - min_over_time(unpoller_device_memory_utilization_ratio[1h] offset 6h) > 0.05
       for: 1h
       labels:
         severity: warning
         namespace: unpoller
         app: unpoller
       annotations:
-        summary: "UniFi device {{ $labels.name }} is trending toward memory exhaustion"
-        description: "{{ $labels.name }} memory is climbing; the 6h trend projects >95% within 24 hours (currently {{ $value | humanizePercentage }}). Check for a leaking service or a stuck upgrade loop."
+        summary: "UniFi device {{ $labels.name }} memory floor is rising"
+        description: "{{ $labels.name }} shows a rising memory floor: the 1h minimum is now {{ $value | humanizePercentage }} and has climbed more than 5 points in 6 hours. A rising floor indicates a leak rather than normal load variation."
