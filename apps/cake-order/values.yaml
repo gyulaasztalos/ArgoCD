@@ -277,8 +277,20 @@ initContainers:
       - -c
       - |
         set -u
+        # Start from an empty /local on EVERY run.
+        #
+        # /local is an emptyDir, so a rescheduled pod gets a fresh one — but an
+        # in-place container restart keeps the same emptyDir while still re-running
+        # this initContainer. The copy below then landed on top of the previous
+        # run's output, and because the rename step gives each fresh copy a
+        # timestamp name, the new files never overwrote the old ones: they were
+        # suffixed -2, -3, ... Every restart added another full set of the gallery.
+        #
+        # Wiping is safe: everything here is DERIVED. The originals live on the NFS
+        # PVC at /nfs, which is mounted readOnly and is never written to.
         for KIND in cakes desserts hero
         do
+          rm -rf "/local/${KIND}"
           mkdir -p "/local/${KIND}"
           cp -a "/nfs/${KIND}/." "/local/${KIND}/" 2>/dev/null || true
         done
