@@ -21,7 +21,7 @@ namespace: unpoller
 image:
   repository: ghcr.io/unpoller/unpoller
   # renovate: datasource=docker depName=ghcr.io/unpoller/unpoller
-  tag: v5.2.0
+  tag: v5.2.1
   pullPolicy: IfNotPresent
 
 # -----------------------------------------------------------------------------
