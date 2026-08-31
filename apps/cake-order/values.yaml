@@ -603,7 +603,7 @@ cloudflared:
   image:
     repository: cloudflare/cloudflared
     # renovate: datasource=docker depName=cloudflare/cloudflared
-    tag: 2026.8.2
+    tag: 2026.8.3
   resources:
     requests:
       cpu: 10m
