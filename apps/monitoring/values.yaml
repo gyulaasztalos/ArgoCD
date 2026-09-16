@@ -539,9 +539,12 @@ alertmanager:
       group_interval: 5m
       repeat_interval: 12h
       routes:
-      - receiver: 'null'
+      - receiver: 'deadmanswitch'
         matchers:
           - alertname = "Watchdog"
+        group_wait: 0s
+        group_interval: 1m
+        repeat_interval: 1m
       - receiver: 'null'
         matchers:
           - alertname = "InfoInhibitor"
@@ -553,6 +556,10 @@ alertmanager:
           - severity = "critical"
     receivers:
       - name: 'null'
+      - name: 'deadmanswitch'
+        webhook_configs:
+          - url_file: /etc/alertmanager/secrets/deadmans_url
+            send_resolved: false
       - name: "mailrise"
         email_configs:
           - to: "alertmanager@mailrise.xyz"     # Or your custom Mailrise domain/recipient
@@ -1172,14 +1179,14 @@ alertmanager:
 
     # Additional volumes on the output StatefulSet definition.
     volumes:
-      - name: smtp-secret-volume
+      - name: alertmanager-secrets-volume
         secret:
-          secretName: alertmanager-smtp-secret
+          secretName: alertmanager-secrets
           defaultMode: 420
 
     # Additional VolumeMounts on the output StatefulSet definition.
     volumeMounts:
-      - name: smtp-secret-volume
+      - name: alertmanager-secrets-volume
         mountPath: /etc/alertmanager/secrets
         readOnly: true
 
