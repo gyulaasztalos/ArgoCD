@@ -395,7 +395,7 @@ cronJobs:
       - name: MAIL_FROM
         value: info@anitatortai.hu
       - name: ORDER_INBOX
-        value: info@anitatortai.hu
+        value: anita@anitatortai.hu
 
 # -----------------------------------------------------------------------------
 # database (common >= 0.6.0) — dedicated DB on the shared CNPG cluster. UTF-8 + C
