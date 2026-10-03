@@ -119,7 +119,7 @@ externalSecrets:
             [loki]
                 disable = true
             [[unifi.controller]]
-                url         = "https://unifi.local.asztalos.net"
+                url         = "https://10.10.50.1"
                 user        = "{{ .username }}"
                 pass        = "{{ .password }}"
                 sites       = ["all"]
