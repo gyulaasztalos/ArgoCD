@@ -122,7 +122,7 @@ configMaps:
       PAPERLESS_DISABLE_REGULAR_LOGIN: "False"
       PAPERLESS_POST_CONSUME_SCRIPT: "/usr/src/paperless/scripts/notification.sh"
       PAPERLESS_CONSUMPTION_DIR: "/usr/src/paperless/consume"
-      PAPERLESS_CONSUMER_POLLING: "60"
+      PAPERLESS_CONSUMER_POLLING_INTERVAL: "60"
   - name: paperless-ngx-notification-script
     files:
       notification.sh: |
