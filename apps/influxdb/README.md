@@ -114,6 +114,7 @@ influxdb:
     entities:
       - sensor.0x58e6c5fffe0f58b0_temperature_3   # LG Fridge
       - sensor.0x58e6c5fffe0f58b0_temperature_4   # Electrolux Fridge
+      - sensor.liebherr_brpsvh_6501_temperature   # Liebherr Fridge (liebherr_localapi integration)
       - sensor.0x58e6c5fffe0f58b0_temperature_5   # LG Freezer
       - sensor.0x58e6c5fffe0f58b0_temperature_6   # Electrolux Freezer
 ```
@@ -121,9 +122,10 @@ influxdb:
 ## HACCP gap detection (missing readings)
 
 Retention answers "how long is data kept"; it says nothing about **holes**. A month of data with a
-silent 2-day gap fails an audit as surely as an over-temperature reading. Because all four probes
-ride one Zigbee device (`0x58e6c5fffe0f58b0`), a single device dropout loses **all** control points
-at once — so gap detection matters more here than the threshold alert.
+silent 2-day gap fails an audit as surely as an over-temperature reading. Four of the probes
+ride one Zigbee device (`0x58e6c5fffe0f58b0`), so a single device dropout loses all of them at
+once — so gap detection matters more here than the threshold alert. The Liebherr fridge reports
+its own built-in sensor over its LocalAPI (polled every 30 s) and goes `unavailable` independently.
 
 Gap detection must live on the **HA side**: the temperature data goes to InfluxDB, not Prometheus,
 so a cluster-side Prometheus rule can't see per-probe readings. HA also keeps working if the cluster
@@ -173,7 +175,7 @@ Datasource and dashboard are shipped as code — no manual Grafana clicking:
   - Uses **Flux** (the native v2 query language) over the in-cluster service
     (`http://influxdb.influxdb.svc:8086`) — no DBRP/InfluxQL compatibility mapping needed.
 - `install/fridge-haccp-dashboard.json` — a HACCP temperature dashboard with two separate
-  sections (Fridges, limit 5 °C / Freezers, limit −18 °C), each with current/min/max/mean tiles +
+  sections (Fridges, limit 13 °C / Freezers, limit −18 °C), each with current/min/max/mean tiles +
   step-line history over a 30-day default window and its own threshold line. Discovered via
   `grafana_dashboard: "1"`, lands in the **HomeAssistant** folder.
 - `install/influxdb-oss-metrics-dashboard.json` — **server-health** dashboard built **only on the
@@ -227,7 +229,7 @@ reference):
 >
 > | section | endpoints | appliances | over-temp limit |
 > |---------|-----------|------------|-----------------|
-> | Fridges | `_temperature_[34]` | LG Fridge (`_3`), Electrolux Fridge (`_4`) | > 5 °C |
+> | Fridges | `_temperature_[34]`, `liebherr_brpsvh_6501_temperature` | LG Fridge (`_3`), Electrolux Fridge (`_4`), Liebherr Fridge | > 13 °C (Liebherr default alarm, 60 min) |
 > | Freezers | `_temperature_[56]` | LG Freezer (`_5`), Electrolux Freezer (`_6`) | > −18 °C |
 >
 > **This mapping is current-setup-specific and will change** (per your note). When appliances
@@ -262,9 +264,9 @@ running InfluxDB instance, and the already-running apprise service.
 
 It re-implements the same two checks as the HA automation:
 
-- **Threshold** — mean temperature over the last 15m per probe, fridges > 5 °C / freezers > −18 °C
-  (same limits as the dashboard — see the probe map above).
-- **Deadman** — via Flux's `monitor.deadman()`, any of the four probes silent for 30m+ (a longer
+- **Threshold** — mean temperature per probe, fridges > 13 °C over the last 60m / freezers
+  > −15 °C over the last 15m (the dashboard's freezer line stays at −18 °C — see the probe map above).
+- **Deadman** — via Flux's `monitor.deadman()`, any of the five probes silent for 30m+ (a longer
   window than HA's 15m, intentionally: this is a backstop, not the fast path).
 
 ### Idempotent apply — no manual bootstrap

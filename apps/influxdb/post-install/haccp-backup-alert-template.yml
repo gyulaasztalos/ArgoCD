@@ -34,14 +34,20 @@ spec:
                 data: json.encode(v: {title: title, body: body, tag: "influxdb", type: "failure"}),
             )
 
-        fridgeLimitC = 6.5
+        // Fridges use the Liebherr default alarm (13 C for 60 min) for every fridge.
+        fridgeLimitC = 13.0
         freezerLimitC = -15.0
-        fridgeProbes = ["0x58e6c5fffe0f58b0_temperature_3", "0x58e6c5fffe0f58b0_temperature_4"]
+        fridgeProbes = [
+            "0x58e6c5fffe0f58b0_temperature_3",
+            "0x58e6c5fffe0f58b0_temperature_4",
+            "liebherr_brpsvh_6501_temperature",
+        ]
         freezerProbes = ["0x58e6c5fffe0f58b0_temperature_5", "0x58e6c5fffe0f58b0_temperature_6"]
         // Flux's `+` doesn't concatenate arrays, so this is spelled out as its own literal.
         allProbes = [
             "0x58e6c5fffe0f58b0_temperature_3",
             "0x58e6c5fffe0f58b0_temperature_4",
+            "liebherr_brpsvh_6501_temperature",
             "0x58e6c5fffe0f58b0_temperature_5",
             "0x58e6c5fffe0f58b0_temperature_6",
         ]
@@ -54,6 +60,7 @@ spec:
                 pairs: [
                     {key: "0x58e6c5fffe0f58b0_temperature_3", value: "LG Fridge"},
                     {key: "0x58e6c5fffe0f58b0_temperature_4", value: "Electrolux Fridge"},
+                    {key: "liebherr_brpsvh_6501_temperature", value: "Liebherr Fridge"},
                     {key: "0x58e6c5fffe0f58b0_temperature_5", value: "LG Freezer"},
                     {key: "0x58e6c5fffe0f58b0_temperature_6", value: "Electrolux Freezer"},
                 ],
@@ -70,15 +77,18 @@ spec:
                 |> filter(fn: (r) => contains(value: r.entity_id, set: allProbes))
                 |> group(columns: ["entity_id"])
 
-        // --- Threshold: fridges averaging above limit over the last 15m ---
-        readings
+        // --- Threshold: fridges averaging above limit over the last 60m ---
+        from(bucket: "homeassistant")
+            |> range(start: -60m)
+            |> filter(fn: (r) => r._measurement == "°C" and r._field == "value")
             |> filter(fn: (r) => contains(value: r.entity_id, set: fridgeProbes))
+            |> group(columns: ["entity_id"])
             |> mean()
             |> filter(fn: (r) => r._value > fridgeLimitC)
             |> map(fn: (r) => ({r with _sent: apprise(
                 title: "HACCP backup: fridge over temperature",
                 body: friendly(id: r.entity_id) + " averaged " + string(v: round2(x: r._value)) +
-                    " C over the last 15m (limit " + string(v: fridgeLimitC) +
+                    " C over the last 60m (limit " + string(v: fridgeLimitC) +
                     " C). [InfluxDB-native backup check]",
             )}))
             |> yield(name: "fridgeThresholdCheck")

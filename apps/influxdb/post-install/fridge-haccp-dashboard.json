@@ -32,7 +32,7 @@
     {
       "id": 100,
       "type": "row",
-      "title": "Fridges (limit 5 °C)",
+      "title": "Fridges (limit 13 °C)",
       "collapsed": false,
       "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }
     },
@@ -49,7 +49,7 @@
             "mode": "absolute",
             "steps": [
               { "color": "green", "value": null },
-              { "color": "red", "value": 5 }
+              { "color": "red", "value": 13 }
             ]
           }
         },
@@ -57,7 +57,9 @@
           { "matcher": { "id": "byRegexp", "options": ".*_temperature_3.*" },
             "properties": [ { "id": "displayName", "value": "LG Fridge" } ] },
           { "matcher": { "id": "byRegexp", "options": ".*_temperature_4.*" },
-            "properties": [ { "id": "displayName", "value": "Electrolux Fridge" } ] }
+            "properties": [ { "id": "displayName", "value": "Electrolux Fridge" } ] },
+          { "matcher": { "id": "byRegexp", "options": ".*liebherr_brpsvh_6501_temperature.*" },
+            "properties": [ { "id": "displayName", "value": "Liebherr Fridge" } ] }
         ]
       },
       "options": {
@@ -69,7 +71,7 @@
       "targets": [
         {
           "datasource": { "type": "influxdb", "uid": "influxdb" },
-          "query": "from(bucket: \"homeassistant\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°C\" and r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id =~ /0x58e6c5fffe0f58b0_temperature_[34]/)\n  |> last()",
+          "query": "from(bucket: \"homeassistant\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°C\" and r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id =~ /^(0x58e6c5fffe0f58b0_temperature_[34]|liebherr_brpsvh_6501_temperature)$/)\n  |> last()",
           "refId": "A"
         }
       ]
@@ -87,7 +89,7 @@
             "mode": "absolute",
             "steps": [
               { "color": "green", "value": null },
-              { "color": "red", "value": 5 }
+              { "color": "red", "value": 13 }
             ]
           }
         },
@@ -95,7 +97,9 @@
           { "matcher": { "id": "byRegexp", "options": ".*_temperature_3.*" },
             "properties": [ { "id": "displayName", "value": "LG Fridge" } ] },
           { "matcher": { "id": "byRegexp", "options": ".*_temperature_4.*" },
-            "properties": [ { "id": "displayName", "value": "Electrolux Fridge" } ] }
+            "properties": [ { "id": "displayName", "value": "Electrolux Fridge" } ] },
+          { "matcher": { "id": "byRegexp", "options": ".*liebherr_brpsvh_6501_temperature.*" },
+            "properties": [ { "id": "displayName", "value": "Liebherr Fridge" } ] }
         ]
       },
       "options": {
@@ -106,7 +110,7 @@
       "targets": [
         {
           "datasource": { "type": "influxdb", "uid": "influxdb" },
-          "query": "from(bucket: \"homeassistant\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°C\" and r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id =~ /0x58e6c5fffe0f58b0_temperature_[34]/)\n  |> max()",
+          "query": "from(bucket: \"homeassistant\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°C\" and r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id =~ /^(0x58e6c5fffe0f58b0_temperature_[34]|liebherr_brpsvh_6501_temperature)$/)\n  |> max()",
           "refId": "A"
         }
       ]
@@ -123,7 +127,9 @@
           { "matcher": { "id": "byRegexp", "options": ".*_temperature_3.*" },
             "properties": [ { "id": "displayName", "value": "LG Fridge" } ] },
           { "matcher": { "id": "byRegexp", "options": ".*_temperature_4.*" },
-            "properties": [ { "id": "displayName", "value": "Electrolux Fridge" } ] }
+            "properties": [ { "id": "displayName", "value": "Electrolux Fridge" } ] },
+          { "matcher": { "id": "byRegexp", "options": ".*liebherr_brpsvh_6501_temperature.*" },
+            "properties": [ { "id": "displayName", "value": "Liebherr Fridge" } ] }
         ]
       },
       "options": {
@@ -134,7 +140,7 @@
       "targets": [
         {
           "datasource": { "type": "influxdb", "uid": "influxdb" },
-          "query": "from(bucket: \"homeassistant\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°C\" and r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id =~ /0x58e6c5fffe0f58b0_temperature_[34]/)\n  |> min()",
+          "query": "from(bucket: \"homeassistant\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°C\" and r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id =~ /^(0x58e6c5fffe0f58b0_temperature_[34]|liebherr_brpsvh_6501_temperature)$/)\n  |> min()",
           "refId": "A"
         }
       ]
@@ -160,7 +166,7 @@
             "mode": "absolute",
             "steps": [
               { "color": "green", "value": null },
-              { "color": "red", "value": 5 }
+              { "color": "red", "value": 13 }
             ]
           }
         },
@@ -168,7 +174,9 @@
           { "matcher": { "id": "byRegexp", "options": ".*_temperature_3.*" },
             "properties": [ { "id": "displayName", "value": "LG Fridge" } ] },
           { "matcher": { "id": "byRegexp", "options": ".*_temperature_4.*" },
-            "properties": [ { "id": "displayName", "value": "Electrolux Fridge" } ] }
+            "properties": [ { "id": "displayName", "value": "Electrolux Fridge" } ] },
+          { "matcher": { "id": "byRegexp", "options": ".*liebherr_brpsvh_6501_temperature.*" },
+            "properties": [ { "id": "displayName", "value": "Liebherr Fridge" } ] }
         ]
       },
       "options": {
@@ -178,7 +186,7 @@
       "targets": [
         {
           "datasource": { "type": "influxdb", "uid": "influxdb" },
-          "query": "from(bucket: \"homeassistant\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°C\" and r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id =~ /0x58e6c5fffe0f58b0_temperature_[34]/)\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
+          "query": "from(bucket: \"homeassistant\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"°C\" and r._field == \"value\")\n  |> filter(fn: (r) => r.entity_id =~ /^(0x58e6c5fffe0f58b0_temperature_[34]|liebherr_brpsvh_6501_temperature)$/)\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)",
           "refId": "A"
         }
       ]
