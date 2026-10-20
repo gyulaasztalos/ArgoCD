@@ -20,7 +20,7 @@ namespace: nebula-sync
 image:
   repository: ghcr.io/lovelaze/nebula-sync
   # renovate: datasource=docker depName=ghcr.io/lovelaze/nebula-sync
-  tag: v0.11.2
+  tag: v0.11.3
   pullPolicy: IfNotPresent
 
 # -----------------------------------------------------------------------------
