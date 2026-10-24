@@ -409,7 +409,7 @@ externalSecrets:
                 - Pi-Hole Cluster:
                     icon: pi-hole
                     href: https://pihole.local.asztalos.net/admin/
-                    siteMonitor: http://pihole-web.pihole.svc.cluster.local
+                    siteMonitor: http://pihole-web.pihole.svc.cluster.local/admin/
                     app: pihole
                     namespace: pihole
                     widget:
