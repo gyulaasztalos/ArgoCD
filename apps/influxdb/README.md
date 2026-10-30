@@ -112,20 +112,26 @@ influxdb:
   max_retries: 10                      # buffer across brief cluster blips
   include:
     entities:
-      - sensor.0x58e6c5fffe0f58b0_temperature_3   # LG Fridge
-      - sensor.0x58e6c5fffe0f58b0_temperature_4   # Electrolux Fridge
+      - sensor.pastry_shop_fridge_thread_probe_2  # LG Fridge
+      - sensor.pastry_shop_fridge_thread_probe_1  # Samsung Fridge
       - sensor.liebherr_brpsvh_6501_temperature   # Liebherr Fridge (liebherr_localapi integration)
-      - sensor.0x58e6c5fffe0f58b0_temperature_5   # LG Freezer
-      - sensor.0x58e6c5fffe0f58b0_temperature_6   # Electrolux Freezer
+      - sensor.pastry_shop_fridge_thread_probe_3  # LG Freezer
+      - sensor.pastry_shop_fridge_thread_probe_4  # Samsung Freezer
 ```
+
+The four `probe_N` sensors are DS18B20s on one ESPHome Thread board (`fridge-thread`, XIAO
+ESP32-C6), which replaced the Zigbee board (`0x58e6c5fffe0f58b0`, `_temperature_3..6`) on
+2026-10-30. The Samsung appliances were previously labelled Electrolux.
 
 ## HACCP gap detection (missing readings)
 
 Retention answers "how long is data kept"; it says nothing about **holes**. A month of data with a
 silent 2-day gap fails an audit as surely as an over-temperature reading. Four of the probes
-ride one Zigbee device (`0x58e6c5fffe0f58b0`), so a single device dropout loses all of them at
-once — so gap detection matters more here than the threshold alert. The Liebherr fridge reports
-its own built-in sensor over its LocalAPI (polled every 30 s) and goes `unavailable` independently.
+ride one ESPHome Thread board, so a single board dropout loses all of them at once — so gap
+detection matters more here than the threshold alert. The live HA automation for that is
+"HACCP Fridge Thread Sensor Offline" (`binary_sensor.fridge_thread_status` off/unavailable for
+5 min). The Liebherr fridge reports its own built-in sensor over its LocalAPI (polled every 30 s)
+and goes `unavailable` independently.
 
 Gap detection must live on the **HA side**: the temperature data goes to InfluxDB, not Prometheus,
 so a cluster-side Prometheus rule can't see per-probe readings. HA also keeps working if the cluster
@@ -138,19 +144,19 @@ automation:
     trigger:
       - platform: state
         entity_id:
-          - sensor.0x58e6c5fffe0f58b0_temperature_3
-          - sensor.0x58e6c5fffe0f58b0_temperature_4
-          - sensor.0x58e6c5fffe0f58b0_temperature_5
-          - sensor.0x58e6c5fffe0f58b0_temperature_6
+          - sensor.pastry_shop_fridge_thread_probe_1
+          - sensor.pastry_shop_fridge_thread_probe_2
+          - sensor.pastry_shop_fridge_thread_probe_3
+          - sensor.pastry_shop_fridge_thread_probe_4
         to: "unavailable"
         for: { minutes: 15 }
       # also catch a probe that goes stale without flipping to 'unavailable'
       - platform: template
         value_template: >
-          {{ now() - states.sensor.0x58e6c5fffe0f58b0_temperature_3.last_updated > timedelta(minutes=15)
-          or now() - states.sensor.0x58e6c5fffe0f58b0_temperature_4.last_updated > timedelta(minutes=15)
-          or now() - states.sensor.0x58e6c5fffe0f58b0_temperature_5.last_updated > timedelta(minutes=15)
-          or now() - states.sensor.0x58e6c5fffe0f58b0_temperature_6.last_updated > timedelta(minutes=15) }}
+          {{ now() - states.sensor.pastry_shop_fridge_thread_probe_1.last_updated > timedelta(minutes=15)
+          or now() - states.sensor.pastry_shop_fridge_thread_probe_2.last_updated > timedelta(minutes=15)
+          or now() - states.sensor.pastry_shop_fridge_thread_probe_3.last_updated > timedelta(minutes=15)
+          or now() - states.sensor.pastry_shop_fridge_thread_probe_4.last_updated > timedelta(minutes=15) }}
     action:
       - service: notify.notify   # replace with your notifier
         data:
@@ -229,12 +235,19 @@ reference):
 >
 > | section | endpoints | appliances | over-temp limit |
 > |---------|-----------|------------|-----------------|
-> | Fridges | `_temperature_[34]`, `liebherr_brpsvh_6501_temperature` | LG Fridge (`_3`), Electrolux Fridge (`_4`), Liebherr Fridge | > 13 °C (Liebherr default alarm, 60 min) |
-> | Freezers | `_temperature_[56]` | LG Freezer (`_5`), Electrolux Freezer (`_6`) | > −18 °C |
+> | Fridges | `fridge_thread_probe_[12]`, `liebherr_brpsvh_6501_temperature` | LG Fridge (`probe_2`), Samsung Fridge (`probe_1`), Liebherr Fridge | > 13 °C (Liebherr default alarm, 60 min) |
+> | Freezers | `fridge_thread_probe_[34]` | LG Freezer (`probe_3`), Samsung Freezer (`probe_4`) | > −18 °C |
 >
 > **This mapping is current-setup-specific and will change** (per your note). When appliances
 > change, update the `entity_id` regexes in each section's queries and the `displayName`
 > field overrides.
+>
+> **Zigbee → Thread switchover (2026-10-30).** Each query also reads the old Zigbee series
+> (`0x58e6c5fffe0f58b0_temperature_3..6`) and renames it to the Thread probe now measuring the
+> same appliance (`_3`→`probe_2`, `_4`→`probe_1`, `_5`→`probe_3`, `_6`→`probe_4`), so every
+> appliance stays one continuous series across the switch. The old series age out of the 45-day
+> bucket by mid-December 2026; after that the old ids, the `map()` and the `group()`/`sort()`
+> after it can be dropped from the queries.
 
 ## HACCP backup alarm (InfluxDB-native)
 

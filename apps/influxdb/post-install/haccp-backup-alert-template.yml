@@ -38,31 +38,31 @@ spec:
         fridgeLimitC = 13.0
         freezerLimitC = -15.0
         fridgeProbes = [
-            "0x58e6c5fffe0f58b0_temperature_3",
-            "0x58e6c5fffe0f58b0_temperature_4",
+            "pastry_shop_fridge_thread_probe_2",
+            "pastry_shop_fridge_thread_probe_1",
             "liebherr_brpsvh_6501_temperature",
         ]
-        freezerProbes = ["0x58e6c5fffe0f58b0_temperature_5", "0x58e6c5fffe0f58b0_temperature_6"]
+        freezerProbes = ["pastry_shop_fridge_thread_probe_3", "pastry_shop_fridge_thread_probe_4"]
         // Flux's `+` doesn't concatenate arrays, so this is spelled out as its own literal.
         allProbes = [
-            "0x58e6c5fffe0f58b0_temperature_3",
-            "0x58e6c5fffe0f58b0_temperature_4",
+            "pastry_shop_fridge_thread_probe_2",
+            "pastry_shop_fridge_thread_probe_1",
             "liebherr_brpsvh_6501_temperature",
-            "0x58e6c5fffe0f58b0_temperature_5",
-            "0x58e6c5fffe0f58b0_temperature_6",
+            "pastry_shop_fridge_thread_probe_3",
+            "pastry_shop_fridge_thread_probe_4",
         ]
 
-        // Map the raw Zigbee entity_id to the human-readable appliance name for the
-        // alert body (the hex id means nothing to whoever reads the Telegram push).
+        // Map the raw probe entity_id to the human-readable appliance name for the
+        // alert body (probe_N means nothing to whoever reads the Telegram push).
         // `friendly` falls back to the raw id if an unmapped probe ever appears.
         probeNames =
             dict.fromList(
                 pairs: [
-                    {key: "0x58e6c5fffe0f58b0_temperature_3", value: "LG Fridge"},
-                    {key: "0x58e6c5fffe0f58b0_temperature_4", value: "Electrolux Fridge"},
+                    {key: "pastry_shop_fridge_thread_probe_2", value: "LG Fridge"},
+                    {key: "pastry_shop_fridge_thread_probe_1", value: "Samsung Fridge"},
                     {key: "liebherr_brpsvh_6501_temperature", value: "Liebherr Fridge"},
-                    {key: "0x58e6c5fffe0f58b0_temperature_5", value: "LG Freezer"},
-                    {key: "0x58e6c5fffe0f58b0_temperature_6", value: "Electrolux Freezer"},
+                    {key: "pastry_shop_fridge_thread_probe_3", value: "LG Freezer"},
+                    {key: "pastry_shop_fridge_thread_probe_4", value: "Samsung Freezer"},
                 ],
             )
         friendly = (id) => dict.get(dict: probeNames, key: id, default: id)
