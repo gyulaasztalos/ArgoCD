@@ -23,7 +23,7 @@ namespace: tado-exporter
 image:
   repository: asztalosgyula/tado-exporter
   # renovate: datasource=docker depName=asztalosgyula/tado-exporter
-  tag: "20260504"
+  tag: "v2026.11.01"
   pullPolicy: IfNotPresent
 
 # -----------------------------------------------------------------------------
