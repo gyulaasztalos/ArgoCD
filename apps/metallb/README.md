@@ -128,8 +128,14 @@ probe aimed at the 2026-11-05 failure. After a switch firmware update flapped et
 kept the connected `10.10.50.0/24` route at `eth0 inactive` while the kernel had eth0 up.
 bgpd then reported `No path to specified Neighbor` and never reconnected.
 
-The probe fails only when kernel `operstate` is `up` **and** zebra's nexthop for
-`10.10.50.0/24` is not `"active":true`. During a genuine switch or UDM outage, eth0 is
+The probe fails only when kernel `operstate` is `up` **and** zebra's *connected*
+`10.10.50.0/24` route is not selected and installed (`C>*` in `show ip route connected`).
+It has to be the connected entry. bgpd resolves the UDM peer only through that one, and
+during the second switch update that day, archer also had a kernel-learned copy of the
+route that was active. An earlier version of the probe grepped the route JSON for
+`"active":true`. It matched that copy and passed, while BGP stayed down with
+`10.10.50.1` unresolved. The container has no jq or python, so the probe parses vtysh's
+text output, which is worth re-checking on FRR upgrades. During a genuine switch or UDM outage, eth0 is
 down or the route is fine, so it passes and causes no restart loops. A hung zebra or vtysh
 also fails it, which covers what `/livez` checked. After 10 × 30 s ≈ 5 min, kubelet
 restarts the `frr` container. FRR's config survives that, because it lives on the pod's

@@ -10,6 +10,13 @@
 # switch/UDM outage) it passes, so a network outage never causes restart loops.
 # A hung zebra/vtysh also fails it, covering what /livez used to check.
 #
+# It checks the *connected* route specifically ("C>*" = selected and installed).
+# bgpd resolves the UDM peer only via the connected route, so a kernel-learned
+# copy of 10.10.50.0/24 being active is not enough: on archer (second switch
+# update, 2026-11-05) that copy was active, an older probe grepping the route
+# JSON for "active":true passed, and BGP stayed down with 10.10.50.1 unresolved.
+# The container has no jq/python, hence the text output.
+#
 # 10 failures x 30s = ~5 min of mismatch before kubelet restarts the container.
 apiVersion: apps/v1
 kind: DaemonSet
@@ -29,7 +36,7 @@ spec:
                 - -c
                 - >-
                   [ "$(cat /sys/class/net/eth0/operstate)" != "up" ] ||
-                  vtysh -c 'show ip route 10.10.50.0/24 json' | grep -q '"active":true'
+                  vtysh -c 'show ip route connected' | grep -q '^C>\* 10.10.50.0/24 '
             periodSeconds: 30
             failureThreshold: 10
             timeoutSeconds: 10
