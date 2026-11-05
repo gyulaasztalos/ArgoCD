@@ -3,12 +3,20 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: longhorn-1r
+  annotations:
+    # StorageClass parameters are immutable, so any parameter change must be a
+    # delete + recreate. Existing PVs/volumes are unaffected by that.
+    argocd.argoproj.io/sync-options: Force=true,Replace=true
 provisioner: driver.longhorn.io
 parameters:
   numberOfReplicas: "1"  # Critical for PG workloads
   staleReplicaTimeout: "30"
   fsType: "ext4"
   dataLocality: "strict-local"
+  # A single strict-local replica has nothing to balance. With auto-balance on,
+  # node pressure on the volume's node makes Longhorn create a duplicate that can
+  # never schedule, which then blocks every snapshot/backup (2026-11-04).
+  replicaAutoBalance: "disabled"
 allowVolumeExpansion: true
 reclaimPolicy: Delete
 volumeBindingMode: Immediate

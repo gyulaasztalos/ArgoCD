@@ -1,0 +1,35 @@
+---
+# Replace the frr container's liveness probe with one that catches zebra losing
+# track of eth0 after a link flap (seen 2026-11-05 after a switch firmware
+# update): the kernel has eth0 up, but zebra keeps the connected 10.10.50.0/24
+# route at "eth0 inactive", so bgpd reports "No path to specified Neighbor" and
+# never reconnects to the UDM. Nothing in frr-k8s re-checks this; the chart's
+# /livez probe stays green throughout.
+#
+# The probe only fails on that mismatch. While eth0 itself is down (a real
+# switch/UDM outage) it passes, so a network outage never causes restart loops.
+# A hung zebra/vtysh also fails it, covering what /livez used to check.
+#
+# 10 failures x 30s = ~5 min of mismatch before kubelet restarts the container.
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: metallb-frr-k8s
+  namespace: metallb-system
+spec:
+  template:
+    spec:
+      containers:
+        - name: frr
+          livenessProbe:
+            httpGet: null
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - >-
+                  [ "$(cat /sys/class/net/eth0/operstate)" != "up" ] ||
+                  vtysh -c 'show ip route 10.10.50.0/24 json' | grep -q '"active":true'
+            periodSeconds: 30
+            failureThreshold: 10
+            timeoutSeconds: 10

@@ -17,6 +17,7 @@ Each `apps/<name>/application.yaml` is an ArgoCD `Application`. Two patterns:
 
 - **Multi-source (Helm)** — most apps: one source refs this repo (`ref: config`) for `values.yaml`, another pulls the Helm chart from upstream. Chart version pinned in `targetRevision`, updated by Renovate.
 - **Single-source (plain manifests)** — apps *without* an upstream chart: one source, `path: apps/<name>/install` pointing at a kustomize dir of hand-written manifests. Use this instead of forcing a chart. (e.g. `apps/influxdb`.)
+- **Kustomize over a chart** — only when the chart's rendered output must be patched and no value exposes the field: `apps/<name>/kustomization.yaml` renders the chart via `helmCharts:` (version bumped by Renovate's kustomize manager) plus `patches:`, and the Application points `path:` at `apps/<name>`. Relies on `kustomize.buildOptions: --enable-helm` in argocd-cm. Keep `releaseName` equal to the old Helm release name, or every resource is renamed and the old ones pruned. Diff the render against the old Helm render before switching. (e.g. `apps/metallb`, for the frr liveness probe.)
 
 ## Adding or Modifying an App
 
@@ -30,6 +31,8 @@ Each `apps/<name>/application.yaml` is an ArgoCD `Application`. Two patterns:
 ```bash
 # 1. Install ArgoCD
 helm repo add argo https://argoproj.github.io/argo-helm && helm repo update
+#    bootstrap-values.yaml must set configs.cm."kustomize.buildOptions": --enable-helm,
+#    or apps/metallb (kustomize-over-chart) fails to render until the argocd app syncs.
 helm install argocd argo/argo-cd --namespace argocd --values bootstrap-values.yaml
 
 # 2. Apply sealed-secrets master key BEFORE bootstrapping (stored in 1Password)

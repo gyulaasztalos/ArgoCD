@@ -9,19 +9,10 @@ metadata:
     argocd.argoproj.io/sync-wave: "-2"
 spec:
   project: default
-  sources:
-    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
-      targetRevision: main
-      ref: config
-    - repoURL: https://metallb.github.io/metallb
-      chart: metallb
-      targetRevision: 0.16.2
-      helm:
-        valueFiles:
-          - $config/apps/metallb/values.yaml
-    - repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
-      targetRevision: main
-      path: apps/metallb/post-install
+  source:
+    repoURL: 'https://github.com/gyulaasztalos/ArgoCD.git'
+    targetRevision: main
+    path: apps/metallb
   destination:
     server: https://kubernetes.default.svc
     namespace: metallb-system

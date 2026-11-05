@@ -3,8 +3,11 @@
 BGP load balancer for the cluster. Peers with the router (`10.10.50.1`, AS 65000) from
 AS 65001 and announces `10.10.50.30-39` (+ the matching IPv6 range).
 
-- **Chart:** `metallb` 0.16.1 from <https://metallb.github.io/metallb> — Renovate keeps
-  `targetRevision` current via the `argocd` manager.
+- **Chart:** `metallb` from <https://metallb.github.io/metallb>, rendered by kustomize
+  (`helmCharts:` in `kustomization.yaml`) rather than an ArgoCD Helm source, so the
+  frr-k8s liveness probe can be patched (see "FRR liveness probe"). Renovate keeps
+  `version` current via its `kustomize` manager. Needs `kustomize.buildOptions:
+  --enable-helm` in argocd-cm (`apps/argocd/values.yaml`).
 - **BGP backend:** `frr-k8s` (bundled subchart, `frrk8s.enabled: true`). The legacy
   in-speaker FRR mode (`speaker.frr.enabled`) is deprecated upstream and stays off.
 
@@ -15,8 +18,11 @@ component will hit.
 ## Layout
 
 ```
-application.yaml                 # multi-source Application (repo values + upstream chart + post-install)
-values.yaml                      # full upstream 0.16.1 defaults, with our overrides marked by comments
+application.yaml                 # single-source Application, path: apps/metallb (kustomize)
+kustomization.yaml               # renders the chart (helmCharts) + post-install/ + patches/
+values.yaml                      # full upstream defaults, with our overrides marked by comments
+patches/
+  frr-liveness-probe.yaml        # replaces the chart's frr /livez probe (see "FRR liveness probe")
 post-install/
   kustomization.yaml             # lists everything below — an omitted file gets PRUNED
   ipaddresspools.yaml            # ipv4-pool 10.10.50.30-39, ipv6-pool fdbf:c39a:a943:50::30-39
@@ -112,6 +118,34 @@ Because it can never come up as configured, `MetalLBBGPSessionDown` in
 it would fire continuously and train everyone to ignore the alert. **Remove that matcher
 when dual-stack is finished**, or the real v6 session going down will be silent. The
 dashboard deliberately still *shows* the peer, so it is visible without being noisy.
+
+## FRR liveness probe
+
+The chart hardcodes the `frr` container's liveness probe as `httpGet /livez` (only the
+period and threshold are values), and `/livez` stays green through both known ways BGP
+gets stuck after a network blip. `patches/frr-liveness-probe.yaml` swaps it for an exec
+probe aimed at the 2026-11-05 failure. After a switch firmware update flapped eth0, zebra
+kept the connected `10.10.50.0/24` route at `eth0 inactive` while the kernel had eth0 up.
+bgpd then reported `No path to specified Neighbor` and never reconnected.
+
+The probe fails only when kernel `operstate` is `up` **and** zebra's nexthop for
+`10.10.50.0/24` is not `"active":true`. During a genuine switch or UDM outage, eth0 is
+down or the route is fine, so it passes and causes no restart loops. A hung zebra or vtysh
+also fails it, which covers what `/livez` checked. After 10 × 30 s ≈ 5 min, kubelet
+restarts the `frr` container. FRR's config survives that, because it lives on the pod's
+`frr-conf` volume.
+
+The probe does **not** cover the 2026-09-01 failure, where FRR's runtime config was wiped
+but the neighbour state was otherwise sane. That one is still a manual
+`kubectl delete pod` of the affected frr-k8s pods, alerted by `MetalLBBGPSessionDown`.
+
+The interface name (`eth0`) and the subnet are hardcoded in the patch. Update them if the
+node NIC or the LB network ever changes.
+
+When bumping the chart, check that the frr container is still named `frr` in the
+`metallb-frr-k8s` DaemonSet. The patch is a strategic merge keyed on that name, and if
+the name changed it would add a stray container entry instead of patching the real one.
+Rendering with `kustomize build --enable-helm apps/metallb` shows this.
 
 ## Resource limits
 
