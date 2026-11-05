@@ -130,7 +130,9 @@ Requires `--etcd-expose-metrics` in the k3s server args, otherwise port 2381 onl
 ### BGP routing
 On the UDM-PRO:
   - Settings/Policy Engine/BGP -> Create new
-  - Load resources/frr.conf (custom)
+  - Load resources/bgp.conf (custom). Keep that filename: uploads named `frr.conf` are reported to misbehave.
+
+Since UniFi OS 6 this is the only way BGP runs on the UDM. The `frr.service` unit is gone, and UniFi runs FRR itself from the uploaded config, which it stores in the Network app's database alongside the other settings. That means it is included in UniFi backups and survives reboots and firmware updates. `/etc/frr/frr.conf` on the UDM is no longer read, and nothing in Ansible manages BGP any more.
 
 **Troubleshooting**
   - ssh into the UDM-PRO
