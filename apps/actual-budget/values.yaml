@@ -1,0 +1,262 @@
+# =============================================================================
+# actual-budget — TAILORED deployment values (this GitOps repo)
+# Consumed by the ArgoCD Application (see application.yaml) as a Helm valueFile
+# layered over the generic homelab-charts/charts/actual-budget chart.
+#
+# This file is the COMPLETE, reviewable contract for the live deployment: the real
+# hostname AND all unchanged defaults, so the whole configuration is visible in
+# one place.
+# =============================================================================
+name: actual-budget
+namespace: actual-budget
+
+# -----------------------------------------------------------------------------
+# Container image. `image.tag` is the SINGLE source of truth for the app version.
+# -----------------------------------------------------------------------------
+image:
+  repository: actualbudget/actual-server
+  # renovate: datasource=docker depName=actualbudget/actual-server
+  tag: "26.11.0"
+  pullPolicy: IfNotPresent
+
+# -----------------------------------------------------------------------------
+# Controller. type = deployment | statefulset | daemonset.
+# -----------------------------------------------------------------------------
+controller:
+  type: statefulset
+  replicas: 1
+  revisionHistoryLimit: 2
+
+volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: actual-budget-data
+      labels:
+        app: actual-budget
+        app.kubernetes.io/name: actual-budget
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      storageClassName: longhorn
+      resources:
+        requests:
+          storage: 1Gi
+
+# -----------------------------------------------------------------------------
+# ServiceAccount. See charts/homepage for the full knob set.
+# -----------------------------------------------------------------------------
+serviceAccount:
+  create: false
+  secrets: []
+  tokenSecret:
+    create: false
+
+# -----------------------------------------------------------------------------
+# Pod security.
+# -----------------------------------------------------------------------------
+podSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  runAsNonRoot: true
+  runAsUser: 1001
+  runAsGroup: 1001
+  fsGroup: 1001
+  fsGroupChangePolicy: OnRootMismatch
+
+# Container-level security context.
+securityContext:
+  allowPrivilegeEscalation: false
+  privileged: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# Schedule at most one replica per node (default true in the library chart).
+podAntiAffinity: true
+
+# -----------------------------------------------------------------------------
+# Ports.
+# -----------------------------------------------------------------------------
+ports:
+  - containerPort: 5006
+    name: http
+
+# -----------------------------------------------------------------------------
+# Configuration.
+# -----------------------------------------------------------------------------
+envFromConfigMap: ""
+envFromSecrets: []
+env:
+  - name: NODE_OPTIONS
+    value: "--max-old-space-size=256"
+  - name: ACTUAL_LOGIN_METHOD
+    value: "openid"
+  - name: ACTUAL_ALLOWED_LOGIN_METHODS
+    value: "openid"
+  - name: ACTUAL_OPENID_ENFORCE
+    value: "true"
+  - name: ACTUAL_OPENID_DISCOVERY_URL
+    value: "https://auth.local.asztalos.net/application/o/actual-budget/.well-known/openid-configuration"
+  - name: ACTUAL_OPENID_SERVER_HOSTNAME
+    value: "https://budget.local.asztalos.net"
+  - name: ACTUAL_OPENID_CLIENT_ID
+    value: "actual-budget"
+  - name: ACTUAL_OPENID_CLIENT_SECRET
+    valueFrom:
+      secretKeyRef:
+        name: actual-budget-oidc
+        key: client_secret
+
+# No chart-owned ConfigMaps.
+configMaps: []
+
+# -----------------------------------------------------------------------------
+# Secrets — NO secret material is stored here, only references.
+# -----------------------------------------------------------------------------
+externalSecrets:
+  - name: actual-budget-oidc
+    refreshInterval: 1h
+    data:
+      - secretKey: client_secret
+        remoteRef:
+          conversionStrategy: Default
+          decodingStrategy: None
+          key: authentik-blueprint-secrets
+          metadataPolicy: None
+          property: authentik-actual-budget-client-secret
+
+# -----------------------------------------------------------------------------
+# Resources.
+# -----------------------------------------------------------------------------
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  # cpu limit intentionally absent: a CPU limit is a CFS quota per 100ms period,
+  # so it throttles bursty work whose average sits far below the cap. The cpu
+  # request in this block is what allocates CPU under contention (cpu.shares).
+  limits:
+    memory: 512Mi
+
+# -----------------------------------------------------------------------------
+# Probes.
+# -----------------------------------------------------------------------------
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 5006
+  initialDelaySeconds: 10
+  periodSeconds: 20
+  failureThreshold: 3
+  timeoutSeconds: 5
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 5006
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  failureThreshold: 5
+  timeoutSeconds: 5
+
+# -----------------------------------------------------------------------------
+# Volumes / mounts. `actual-budget-data` comes from the volumeClaimTemplate (so
+# it is NOT repeated in `volumes`).
+# -----------------------------------------------------------------------------
+volumeMounts:
+  - name: actual-budget-data
+    mountPath: /data
+  - name: tmp
+    mountPath: /tmp
+
+volumes:
+  - name: tmp
+    emptyDir: {}
+
+# Init containers (none for this app).
+initContainers: []
+
+# -----------------------------------------------------------------------------
+# Sidecar containers (common >= 0.4.0) — none. See charts/unbound.
+# -----------------------------------------------------------------------------
+extraContainers: []
+
+# -----------------------------------------------------------------------------
+# Service.
+# -----------------------------------------------------------------------------
+services:
+  - name: actual-budget
+    enabled: true
+    type: ClusterIP
+    ports:
+      - name: http
+        protocol: TCP
+        port: 5006
+        targetPort: http
+
+# -----------------------------------------------------------------------------
+# Traefik IngressRoute.
+# -----------------------------------------------------------------------------
+ingressRoute:
+  enabled: true
+  ingressClassName: traefik-external
+  entryPoint: websecure
+  tlsSecretName: local-asztalos-net-tls
+  routes:
+    - host: budget.local.asztalos.net
+      port: 5006
+      priority: 10
+      middlewares:
+        - name: actual-budget-headers
+          namespace: traefik
+
+# No ServiceMonitor.
+serviceMonitor:
+  enabled: false
+  labels: {}
+  endpoints: []
+
+# Static PVCs / PVs — none (RWO data via volumeClaimTemplate above).
+persistentVolumeClaims: []
+persistentVolumes: []
+
+# Extra labels merged into the standard label block.
+extraLabels: {}
+
+# -----------------------------------------------------------------------------
+# Batch workloads (common >= 0.6.0). Declared for completeness (library
+# capability); this app runs none. See charts/common/templates/_job.tpl.
+#   jobs:      one-shot batch/v1 Jobs (e.g. DB migrate; image defaults to app image)
+#   cronJobs:  scheduled batch/v1 CronJobs (e.g. purge / sync)
+# -----------------------------------------------------------------------------
+jobs: []
+cronJobs: []
+
+# -----------------------------------------------------------------------------
+# database (common >= 0.6.0) — the app's CNPG database on the shared cluster.
+# Declared for completeness (library capability); this app has none. Set a
+# `database:` block only for apps with a dedicated Postgres DB (see _database.tpl).
+# -----------------------------------------------------------------------------
+database: {}
+
+# -----------------------------------------------------------------------------
+# middlewares (common >= 0.6.0) — the app's own Traefik Middleware objects,
+# rendered alongside the IngressRoute that references them. See _middleware.tpl.
+# -----------------------------------------------------------------------------
+middlewares:
+  - name: actual-budget-headers
+    namespace: traefik
+    spec:
+      headers:
+        browserXssFilter: true
+        contentTypeNosniff: true
+        forceSTSHeader: true
+        stsIncludeSubdomains: true
+        stsPreload: true
+        stsSeconds: 15552000
+        referrerPolicy: no-referrer
+        customFrameOptionsValue: SAMEORIGIN
+        customRequestHeaders:
+          X-Forwarded-Proto: https

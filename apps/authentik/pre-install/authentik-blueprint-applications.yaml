@@ -70,3 +70,13 @@ data:
           policy_engine_mode: any
           meta_launch_url: "https://homepage.local.asztalos.net"
           icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/homepage.png
+      - model: authentik_core.application
+        state: present
+        identifiers:
+          slug: actual-budget
+        attrs:
+          name: Actual Budget
+          provider: !Find [authentik_providers_oauth2.oauth2provider, [name, actual-budget-oauth-provider]]
+          policy_engine_mode: any
+          meta_launch_url: "https://budget.local.asztalos.net"
+          icon: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/actual-budget.png

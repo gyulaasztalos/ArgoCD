@@ -13,11 +13,13 @@ k3s HA cluster on 4× Raspberry Pi 5, managed entirely via GitOps. Entry point: 
 
 ## Application Manifest Pattern
 
-Each `apps/<name>/application.yaml` is an ArgoCD `Application`. Two patterns:
+Each `apps/<name>/application.yaml` is an ArgoCD `Application`. Three patterns:
 
-- **Multi-source (Helm)** — most apps: one source refs this repo (`ref: config`) for `values.yaml`, another pulls the Helm chart from upstream. Chart version pinned in `targetRevision`, updated by Renovate.
-- **Single-source (plain manifests)** — apps *without* an upstream chart: one source, `path: apps/<name>/install` pointing at a kustomize dir of hand-written manifests. Use this instead of forcing a chart. (e.g. `apps/influxdb`.)
+- **Upstream chart (multi-source Helm)** — infrastructure and apps with a maintained upstream chart (traefik, longhorn, authentik, monitoring, …): one source refs this repo (`ref: config`) for `values.yaml`, another pulls the chart from upstream. Chart version pinned in `targetRevision`, updated by Renovate.
+- **homelab-charts wrapper** — apps *without* a fitting upstream chart (paperless-ngx, influxdb, homepage, the exporters, …): the chart lives in the sibling repo [homelab-charts](https://github.com/gyulaasztalos/homelab-charts) (checked out at `../homelab-charts`) as a thin wrapper over its `common` library chart, which renders the homelab conventions (StatefulSet for RWO state, ExternalSecrets, Traefik IngressRoute + authentik middlewares, ServiceMonitor, CNPG `Database`, app-owned Middleware). Sources: `ref: config`, then `path: charts/<name>` at `targetRevision: main` with `valueFiles: $config/apps/<name>/values.yaml`, plus an optional `apps/<name>/post-install` source for Grafana dashboards, PrometheusRules and non-mandatory cross-namespace objects. `apps/whoami` is the minimal reference. Prefer this over a community chart that fights the conventions (plain `Ingress`, Deployment on an RWO PVC, inline secrets). homelab-charts' own `CLAUDE.md` holds the values contract and test gates.
 - **Kustomize over a chart** — only when the chart's rendered output must be patched and no value exposes the field: `apps/<name>/kustomization.yaml` renders the chart via `helmCharts:` (version bumped by Renovate's kustomize manager) plus `patches:`, and the Application points `path:` at `apps/<name>`. Relies on `kustomize.buildOptions: --enable-helm` in argocd-cm. Keep `releaseName` equal to the old Helm release name, or every resource is renamed and the old ones pruned. Diff the render against the old Helm render before switching. (e.g. `apps/metallb`, for the frr liveness probe.)
+
+Plain hand-written manifests (`path: apps/<name>/install`) are retired for apps — every former `install/` app was migrated to homelab-charts. Only `apps/cluster-defaults` (cluster-wide LimitRange, not an app) still uses it.
 
 ## Adding or Modifying an App
 
@@ -25,6 +27,8 @@ Each `apps/<name>/application.yaml` is an ArgoCD `Application`. Two patterns:
 2. Add `values.yaml` if needed
 3. Register in `apps/kustomization.yaml`
 4. Push to `main` — ArgoCD auto-syncs (`selfHeal: true`, `prune: true`)
+
+A homelab-charts app spans **two repos**: add `charts/<name>/` there (generic `values.yaml` on `example.com`) and the Application + tailored `values.yaml` here. Push homelab-charts **first** — the Application tracks `charts/<name>` on `main` and errors until the path exists. An app with in-app OIDC also needs a provider + application in the Authentik blueprints (`apps/authentik/pre-install/`) and its client-secret field added to the 1Password item `authentik-blueprint-secrets` **before** pushing — a missing property fails that whole ExternalSecret, freezing every provider.
 
 ## Bootstrap (Fresh Cluster)
 

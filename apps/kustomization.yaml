@@ -41,3 +41,4 @@ resources:
   - cake-order/application.yaml
   - umami/application.yaml
   - cake-pricing/application.yaml
+  - actual-budget/application.yaml
