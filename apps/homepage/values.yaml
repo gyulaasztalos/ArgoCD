@@ -338,7 +338,7 @@ externalSecrets:
                 - Actual Budget:
                     icon: actual-budget
                     href: https://budget.local.asztalos.net
-                    siteMonitor: http://actual-budget.actual-budget.svc.cluster.local:8080
+                    siteMonitor: http://actual-budget.actual-budget.svc.cluster.local:5006
                     app: actual-budget
                     namespace: actual-budget
 
