@@ -2,7 +2,7 @@
 # renovate: datasource=github-releases depName=k3s-ansible packageName=techno-tim/k3s-ansible
 playbook_version: v1.30.2+k3s2+tt1
 # renovate: datasource=github-releases depName=k3s packageName=k3s-io/k3s
-k3s_version: v1.34.4+k3s1
+k3s_version: v1.37.2+k3s1
 # this is the user that has ssh access to these machines
 ansible_user: red
 systemd_dir: /etc/systemd/system
@@ -85,6 +85,12 @@ k3s_master_taint: false
 # grace period for graceful shutdown, hard at 500Mi is the last resort before
 # the kernel steps in. minimum-reclaim frees a little beyond the threshold so
 # kubelet does not evict, recover, and immediately evict again.
+#
+# system-reserved: memory the OS itself needs (journald, sshd, unattended-upgrades,
+# nic-watchdog, page tables), about 0.5Gi per node. It is taken out of node
+# allocatable, and the kubelet also caps the kubepods cgroup at
+# capacity - kube-reserved - system-reserved. That makes it a real limit on
+# how much pods can take, not just bookkeeping for the scheduler.
 extra_args: >-
   {{ '--flannel-iface=' + flannel_iface if calico_iface is not defined and cilium_iface is not defined else '' }}
   --node-ip={{ k3s_node_ip }}
@@ -93,6 +99,7 @@ extra_args: >-
   --kubelet-arg=eviction-soft-grace-period=memory.available=2m
   --kubelet-arg=eviction-max-pod-grace-period=60
   --kubelet-arg=eviction-minimum-reclaim=memory.available=200Mi,nodefs.available=10%,imagefs.available=10%
+  --kubelet-arg=system-reserved=memory=512Mi
 
 # change these to your liking, the only required are: --disable servicelb, --tls-san {{ apiserver_endpoint }}
 # the contents of the if block is also required if using calico or cilium
@@ -115,6 +122,29 @@ extra_args: >-
 # etcdNoLeader, etcdMembersDown and etcdHighFsyncDurations) had no underlying
 # metrics at all and could never fire. That matters here because etcd shares
 # nodes with a memory-constrained workload and has been getting swapped.
+#
+# kube-reserved: on a server, k3s is the apiserver, etcd, scheduler,
+# controller-manager, kubelet and containerd in one process tree, measured at
+# 2.3-3.1Gi typical and 3.3-4.3Gi peak. Before this, the scheduler counted it
+# as zero (allocatable == capacity - eviction-hard on every node). So the
+# control-plane nodes were filled to the same pod requests as archer, ran out of
+# real memory, swapped etcd, lost leader election and restarted k3s
+# (2026-11-11, -12, -13). Each restart shifted its watches onto the surviving
+# apiservers and pushed the next node over.
+#
+# 1536Mi rather than the full typical footprint: kubelet re-admits every
+# running pod when it restarts, oldest first, and REJECTS whatever no longer
+# fits the new allocatable. At 2Gi, lana and pam would still be ~200-300Mi over
+# even after the Longhorn LimitRange cut. On pam the newest pod is the CNPG
+# primary. At 1536Mi every node fits (servers 5514Mi allocatable). Raise it once
+# requests have shifted towards archer.
+#
+# Leader election: the embedded controller-manager, scheduler and
+# cloud-controller-manager each exit k3s on "leaderelection lost". With the
+# defaults (15s lease, 10s renew deadline), one short etcd/apiserver stall
+# restarts the whole node's k3s. 60s/40s rides out a stall. The cost is up to
+# ~60s of failover if a leader really dies.
+#
 # NOTE: everything below is a YAML folded block — '#' is NOT a comment inside
 # it, any such line would be passed to k3s as an argument.
 extra_server_args: >-
@@ -129,6 +159,13 @@ extra_server_args: >-
   --etcd-s3
   --etcd-s3-config-secret=etcd-backblaze-secret
   --etcd-expose-metrics
+  --kubelet-arg=kube-reserved=memory=1536Mi
+  --kube-controller-manager-arg=leader-elect-lease-duration=60s
+  --kube-controller-manager-arg=leader-elect-renew-deadline=40s
+  --kube-scheduler-arg=leader-elect-lease-duration=60s
+  --kube-scheduler-arg=leader-elect-renew-deadline=40s
+  --kube-cloud-controller-manager-arg=leader-elect-lease-duration=60s
+  --kube-cloud-controller-manager-arg=leader-elect-renew-deadline=40s
 
 extra_agent_args: >-
   {{ extra_args }}

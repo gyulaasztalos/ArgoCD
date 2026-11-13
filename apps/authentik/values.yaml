@@ -855,7 +855,7 @@ worker:
     limits:
       memory: 1500Mi
     requests:
-      memory: 768Mi
+      memory: 384Mi
 
   # -- Host Network for authentik worker pods
   hostNetwork: false

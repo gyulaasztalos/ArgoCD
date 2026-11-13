@@ -38,12 +38,29 @@
 # `defaultRequest` absent, Kubernetes sets the request EQUAL TO THE LIMIT —
 # i.e. 1800Mi per container, which is far worse. It must be set explicitly.
 #
-# 128Mi covers everything except instance-manager, which stays under-requested
-# (it already was at 256Mi vs a 621Mi peak) and cannot be fixed here: Longhorn
-# exposes only guaranteedInstanceManagerCPU, no memory equivalent.
+# 128Mi (the next step down) was still 4.7Gi of requested-but-unused memory:
+# 47 containers, most of them using under 25Mi. Measured 5-day peaks
+# (2026-11-13):
 #
-# min must be <= defaultRequest, so it drops too; the small probe/registrar
-# containers genuinely want less than 128Mi.
+#   global-manager 54Mi, csi-attacher 52Mi, csi-provisioner 43Mi,
+#   csi-snapshotter/resizer 34-35Mi, csi-plugin 30Mi, liveness-probe 24Mi,
+#   engine-image 22Mi, node-driver-registrar 19Mi, driver-deployer 12Mi, UI 6Mi
+#
+# That phantom 4.7Gi is what made the scheduler see archer as 85% full while it
+# sat at 57% real usage. It also blocked reserving memory for k3s on the
+# control-plane nodes (kube-reserved in resources/my-cluster/group_vars/all.yml):
+# total requests would not have fit the remaining allocatable memory.
+#
+# 32Mi sits in the middle of those peaks and equals `min`. A request below
+# usage costs nothing at runtime, because the limit (`default`) is the OOM guard.
+#
+# instance-manager (up to ~700Mi) stays badly under-requested and cannot be
+# fixed here: Longhorn exposes only guaranteedInstanceManagerCPU, no memory
+# equivalent. It is one pod per node, so the under-count is the same on every
+# node and does not skew placement.
+#
+# A LimitRange applies at admission only: running pods keep their old request
+# until they are recreated.
 apiVersion: v1
 kind: LimitRange
 metadata:
@@ -61,4 +78,4 @@ spec:
       memory: 1800Mi
     defaultRequest:
       cpu: 100m
-      memory: 128Mi
+      memory: 32Mi
