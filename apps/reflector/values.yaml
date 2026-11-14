@@ -95,7 +95,7 @@ resources:
   limits:
     memory: 300Mi
   requests:
-    memory: 150Mi
+    memory: 256Mi
 
 autoscaling:
   enabled: false

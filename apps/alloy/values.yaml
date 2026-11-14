@@ -128,7 +128,7 @@ alloy:
   # -- Resource requests and limits to apply to the Grafana Alloy container.
   resources:
     requests:
-      memory: "256Mi"
+      memory: "192Mi"
     limits:
       memory: "512Mi"
 

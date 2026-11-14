@@ -409,7 +409,7 @@ server:
     limits:
       memory: 2Gi
     requests:
-      memory: 768Mi
+      memory: 896Mi
 
   # authentik server container ports
   containerPorts:

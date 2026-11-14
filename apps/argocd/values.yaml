@@ -1024,7 +1024,7 @@ controller:
       memory: 2Gi
     requests:
   #    cpu: 250m
-      memory: 768Mi
+      memory: 896Mi
 
   # Application controller container ports
   containerPorts:
@@ -3263,7 +3263,7 @@ repoServer:
       memory: 1Gi
     requests:
       cpu: 10m
-      memory: 192Mi
+      memory: 128Mi
 
   # Repo server container ports
   containerPorts:

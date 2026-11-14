@@ -66,7 +66,7 @@ externalSecrets: []
 
 resources:
   requests:
-    memory: 64Mi
+    memory: 32Mi
     cpu: 50m
   # cpu limit intentionally absent: a CPU limit is a CFS quota per 100ms period,
   # so it throttles bursty work whose average sits far below the cap. The cpu

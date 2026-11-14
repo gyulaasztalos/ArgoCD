@@ -10,6 +10,14 @@ systemd_dir: /etc/systemd/system
 # Set your timezone
 system_timezone: Europe/Budapest
 
+# The prereq role (k3s-ansible >= v1.36) runs `swapoff -a` on every node by
+# default. Swap is handled by Ansible-Playbooks roles/rpi5_cluster
+# (tasks/disable_swap.yml) instead. That version refuses a node whose RAM
+# cannot absorb what is currently in swap, and goes one node at a time.
+# A blind parallel swapoff on a full control-plane node is exactly the OOM
+# this cluster is trying to avoid.
+disable_swap: false
+
 # interface which will be used for flannel
 flannel_iface: eth0
 
@@ -170,7 +178,17 @@ extra_server_args: >-
 extra_agent_args: >-
   {{ extra_args }}
 
-# image tag for kube-vip
+# kube-vip is NOT deployed by this playbook any more — it moved to ArgoCD
+# (apps/kube-vip, see MIGRATION.md there). With kube_vip_enabled at its role
+# default (true), a run would write vip.yaml back into
+# /var/lib/rancher/k3s/server/manifests and resurrect the old kube-vip-ds
+# DaemonSet. That copy runs a different kube-vip version than ArgoCD's and
+# competes for the same plndr-cp-lock lease.
+# Consequence for a FRESH bootstrap: the API VIP does not exist until ArgoCD
+# has synced apps/kube-vip, so bootstrap against a master's own address.
+kube_vip_enabled: false
+
+# image tag for kube-vip (unused while kube_vip_enabled is false)
 # renovate: datasource=github-releases depName=kube-vip packageName=kube-vip/kube-vip versioning=semver
 kube_vip_tag_version: v1.0.4
 # v0.8.2
@@ -189,6 +207,12 @@ kube_vip_tag_version: v1.0.4
 # control-plane nodes and start a second controller fighting ArgoCD over
 # metallb-system. The pools, peers and advertisements now live in
 # apps/metallb/post-install/.
+#
+# Removing the block is no longer enough on its own: k3s-ansible >= v1.36 role
+# defaults (metal_lb_enabled: true, a sample 192.168.30.x range) would deploy
+# MetalLB anyway. The switch below turns it off in both k3s_server and
+# k3s_server_post.
+metal_lb_enabled: false
 #
 # Do NOT remove --disable servicelb from extra_server_args above: without it k3s
 # starts klipper-lb, which competes with MetalLB for every LoadBalancer Service.
