@@ -131,12 +131,12 @@ priorityClassName: rancher-critical
 resources:
   requests:
     cpu: 200m
-    memory: 800Mi
+    memory: 1648Mi
   # cpu limit intentionally absent: a CPU limit is a CFS quota per 100ms period,
   # so it throttles bursty work whose average sits far below the cap. The cpu
   # request in this block is what allocates CPU under contention (cpu.shares).
   limits:
-    memory: 1800Mi
+    memory: 2Gi
 
 #
 # tls
@@ -216,7 +216,10 @@ readinessProbe:
 
 # helm values to use when installing the rancher-webhook chart.
 # helm values set here will override all other global values used when installing the webhook such as priorityClassName and systemRegistry settings.
-webhook: ""
+webhook:
+  resources:
+    requests:
+      memory: 144Mi
 
 # helm values to use when installing the fleet chart.
 # helm values set here will override all other global values used when installing the fleet chart.
