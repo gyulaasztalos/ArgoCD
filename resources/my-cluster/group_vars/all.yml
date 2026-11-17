@@ -65,7 +65,7 @@ apiserver_endpoint: fdbf:c39a:a943:50::20
 
 # k3s_token is required  masters can talk together securely
 # this token should be alpha numeric only
-k3s_token: iRed7SxMUvKDAM745VLkpeWJO4AhIxhkZ1zVlw+1Uk8=
+k3s_token: "{{ lookup('community.general.onepassword', 'k3s_token', field='credential', vault='kubernetes') }}"
 
 # The IP on which the node is reachable in the cluster.
 # Here, a sensible default is provided, you can still override
