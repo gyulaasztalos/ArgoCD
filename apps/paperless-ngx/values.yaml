@@ -112,6 +112,7 @@ configMaps:
       PAPERLESS_OCR_LANGUAGE: "hun"
       PAPERLESS_URL: "https://paperless.local.asztalos.net"
       PAPERLESS_CSRF_TRUSTED_ORIGINS: "https://paperless.local.asztalos.net"
+      PAPERLESS_ALLOWED_HOSTS: "paperless-ngx.paperless-ngx.svc.cluster.local"
       PAPERLESS_DBHOST: "postgres-rw.databases.svc.cluster.local"
       PAPERLESS_REDIS_PREFIX: "paperless"
       PAPERLESS_DATE_ORDER: "YMD"
@@ -237,6 +238,9 @@ readinessProbe:
   httpGet:
     path: /
     port: 8000
+    httpHeaders:
+      - name: Host
+        value: localhost
   initialDelaySeconds: 10
   periodSeconds: 20
   failureThreshold: 5
@@ -247,6 +251,9 @@ livenessProbe:
   httpGet:
     path: /
     port: 8000
+    httpHeaders:
+      - name: Host
+        value: localhost
   initialDelaySeconds: 30
   periodSeconds: 20
   failureThreshold: 5
