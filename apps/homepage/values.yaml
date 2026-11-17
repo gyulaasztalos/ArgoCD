@@ -451,9 +451,9 @@ externalSecrets:
                         - state: sensor.outdoor_module_temperature
                           label: Temp
                         - state: alarm_control_panel.home
-                        - state: binary_sensor.0x00158d000359f895_water_leak
+                        - state: binary_sensor.water_sensor_7_water_leak_detected
                           label: Water leak
-                        - state: sensor.solaredge_i1_ac_power
+                        - state: sensor.solaredge_se9k_power
                           label: Solar power
 
             - Line 4:
