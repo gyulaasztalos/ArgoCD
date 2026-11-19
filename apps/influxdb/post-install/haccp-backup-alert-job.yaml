@@ -43,7 +43,7 @@ spec:
         runAsGroup: 1000
       containers:
         - name: apply-haccp-backup-alert
-          image: "influxdb:2.9"
+          image: "influxdb:2.10"
           command:
             - sh
             - -c

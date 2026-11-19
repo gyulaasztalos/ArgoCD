@@ -23,7 +23,7 @@ namespace: influxdb
 image:
   repository: influxdb
   # renovate: datasource=docker depName=influxdb
-  tag: "2.9"
+  tag: "2.10"
   pullPolicy: IfNotPresent
 
 # -----------------------------------------------------------------------------
