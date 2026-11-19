@@ -39,7 +39,7 @@ bash .claude/skills/cluster-healthcheck/scripts/healthcheck.sh 3d         # expl
 ```
 
 **Window.** Normally pass nothing. The script records each run's time outside the repo, in
-`~/.local/state/cluster-healthcheck/last-run`, and defaults to "since the previous check",
+`~/.local/state/cluster-healthcheck/`, one file per kube context, and defaults to "since the previous check",
 clamped to 1h–5d, with 5d being Prometheus retention. Pass a window only when the user names
 one ("the last 3 days") or when you need to look further back than the previous check.
 
@@ -152,9 +152,27 @@ When a baseline or an accepted-noise item changes for good, also update
 `references/known-issues.md` so the next run classifies it correctly. It is a file in the
 repo, so the owner commits it.
 
-## Cluster facts the battery relies on
+## Cluster-specific configuration
 
-- Nodes: archer `10.10.50.21` (agent, unit `k3s-node`); lana `.22`, pam `.23` and cheryl `.24` (servers with embedded etcd, unit `k3s`).
-- Prometheus is reached through the apiserver service proxy; no port-forward is needed. Retention is 5d.
-- The node-exporter scrape set includes an external Pi (`raspberrypi.local…`) that is not part of the cluster. Always filter with `instance=~"archer|lana|pam|cheryl"`.
-- Shell scripts follow the owner's style (`shell-script-style`): UPPERCASE braced vars, `then`/`do` on their own line, generous comments.
+Everything cluster-specific lives in **`cluster.conf`**, which the scripts read:
+- nodes and their addresses
+- the ssh user
+- the Prometheus service and its retention
+- the ArgoCD namespace and the git branch
+- which optional components exist (Longhorn, CNPG, frr-k8s BGP)
+- the hint thresholds printed next to the battery's sections
+
+`HEALTHCHECK_CONF=<path>` points the scripts at a private copy instead. The scripts
+themselves contain no hostnames or addresses. For ad-hoc PromQL, use the selector from
+`cluster.conf`'s `NODE_EXPORTER_SELECTOR` to keep node-exporter series limited to cluster
+nodes, because the scrape set can include machines outside the cluster.
+
+**If the battery prints `WARNING: cluster.conf nodes … differ from the live cluster`,**
+the skill is pointed at a cluster it was not adapted to. The node-level results are then
+unreliable. Say so at the top of the report, and walk the user through `ADAPTING.md`:
+run `scripts/discover.sh`, update `cluster.conf`, re-baseline `references/known-issues.md`.
+Don't silently guess the mapping.
+
+Shell scripts follow the repo owner's style (`shell-script-style`): UPPERCASE braced vars,
+`then`/`do` on their own line, generous comments, and they must work on both macOS
+bash 3.2 and Linux.

@@ -1,5 +1,9 @@
 # Known issues, fingerprints and accepted noise
 
+> **Site-specific.** The baselines, the accepted noise and some failure modes below describe
+> the original homelab (4× Pi 5 8GB, k3s). On another cluster, re-baseline and prune this
+> file as described in `../ADAPTING.md`, step 5.
+
 Use this file to classify what `healthcheck.sh` found. For each finding, decide:
 **accepted noise** (mention briefly), **known failure mode** (name it and point to its
 memory note), or **new** (investigate). Memory notes are named by their slug. They live in

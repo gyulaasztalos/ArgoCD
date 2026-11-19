@@ -8,12 +8,13 @@
 # those labels are printed (in that order), which keeps the noisy
 # endpoint/job/service labels out of the output.
 #
-# No port-forward needed: kubectl's current context reaches Prometheus via
-# /api/v1/namespaces/monitoring/services/<svc>:9090/proxy.
+# No port-forward needed: kubectl's current context reaches Prometheus via the
+# apiserver service proxy; namespace/service/port come from cluster.conf.
 # =============================================================================
 set -o pipefail
 
-PROM_PATH="/api/v1/namespaces/monitoring/services/monitoring-kube-prometheus-prometheus:9090/proxy/api/v1/query"
+. "$(cd "$(dirname "${0}")" && pwd)/lib.sh"
+PROM_PATH="${PROM_API}/query"
 QUERY="${1:?usage: promq.sh '<promql>' [label1,label2,...]}"
 LABELS="${2:-}"
 
