@@ -114,7 +114,7 @@ database:
       # and Umami's own migrations handle the schema.
       enabled: false
       # -- PostgreSQL client image used by the init container.
-      image: docker.io/library/postgres:18-alpine
+      image: docker.io/library/postgres:19-alpine
       # -- Administrative database user used only by the init container.
       adminUsername: postgres
       # -- Existing secret containing the administrative database password.
