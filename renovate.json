@@ -25,6 +25,26 @@
       "automerge": true
     },
     {
+      "description": "A PostgreSQL major bump in the ClusterImageCatalog must not be merged as-is: each entry is keyed by `major:`, so a new major is a new entry plus a Cluster change (CNPG offline pg_upgrade), not a tag bump. Keep the PR as a notification, but flag it. Minor bumps within the major stay automerged.",
+      "matchFileNames": [
+        "apps/cnpg/pre-install/clusterimagecatalog.yaml"
+      ],
+      "matchPackageNames": [
+        "ghcr.io/cloudnative-pg/postgresql"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false,
+      "labels": [
+        "do-not-merge"
+      ],
+      "commitMessageSuffix": "(DO NOT MERGE - add a new major entry instead)",
+      "prBodyNotes": [
+        "> [!CAUTION]\n> **Do not merge this PR.** It swaps the image under the existing (old) `major:` catalog entry for a new PostgreSQL major, which would put new-major binaries on old-major data.\n>\n> To upgrade instead:\n> 1. Add a **new** `- major: N` entry to `apps/cnpg/pre-install/clusterimagecatalog.yaml` (keep the old one for rollback).\n> 2. Check that the CNPG release in use lists the new major as supported.\n> 3. In `apps/cnpg/post-install/postgresql-cluster.yaml`, bump `imageCatalogRef.major` **and** the barman `serverName` (e.g. `postgres-pgN`) in the same commit.\n> 4. After the upgrade: `ANALYZE`, take a fresh base backup, update `resources/postgres-cloud-restore.yaml`.\n>\n> Then close this PR."
+      ]
+    },
+    {
       "description": "Causes the bot to create a PR (and thus, an email notification), whenever there is a new Renovate version",
       "matchFileNames": [
         "renovate-update-notification/Dockerfile"

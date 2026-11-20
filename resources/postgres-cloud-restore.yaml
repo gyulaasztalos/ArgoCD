@@ -36,10 +36,13 @@ spec:
     apiGroup: postgresql.cnpg.io
     kind: ClusterImageCatalog
     name: postgresql
-    major: 17
+    major: 18
   storage:
     size: 20Gi
     storageClass: longhorn-1r
+  resources:
+    requests:
+      memory: 448Mi
   affinity:
     podAntiAffinityType: required
 
@@ -47,10 +50,12 @@ spec:
   bootstrap:
     recovery:
       source: postgres-origin
-      # Optional PITR:
-      recoveryTarget:
-        backupID: "20260206T200835"
-        targetImmediate: true
+      # Default: latest base backup + replay of all archived WAL (most recent state).
+      # Optional: pin a specific base backup (list IDs with
+      #   barman-cloud-backup-list or the Backup objects in the databases namespace)
+      # recoveryTarget:
+      #   backupID: "YYYYMMDDTHHMMSS"
+      #   targetImmediate: true
 
   # Where to fetch backups/WAL from
   externalClusters:
@@ -80,6 +85,43 @@ spec:
         passwordSecret:
           name: paperless-postgres-password
         login: true
+      - name: cake-pricing
+        connectionLimit: -1
+        ensure: present
+        inherit: true
+        passwordSecret:
+          name: cake-pricing-postgres-password
+        login: true
+      - name: cake-order
+        connectionLimit: -1
+        ensure: present
+        inherit: true
+        passwordSecret:
+          name: cake-order-postgres-password
+        login: true
+      - name: umami
+        connectionLimit: -1
+        ensure: present
+        inherit: true
+        passwordSecret:
+          name: umami-postgres-password
+        login: true
+    services:
+      additional:
+        - selectorType: rw
+          serviceTemplate:
+            metadata:
+              name: postgres-rw-lb
+            spec:
+              type: LoadBalancer
+              loadBalancerIP: 10.10.50.33
+              externalTrafficPolicy: Local
+              ports:
+                - name: postgres
+                  port: 5432
+                  targetPort: 5432
+                  protocol: TCP
+          updateStrategy: patch
 
   # IMPORTANT: plugins section is intentionally omitted during restore
   # plugins:
