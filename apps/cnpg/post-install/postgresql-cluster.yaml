@@ -9,6 +9,7 @@ metadata:
   name: backblaze-b2
   namespace: databases
 spec:
+  retentionPolicy: "30d"
   configuration:
     destinationPath: s3://homelab-cnpg-backup-production/cnpg-backup/
     endpointURL: https://s3.eu-central-003.backblazeb2.com
@@ -115,5 +116,4 @@ spec:
       parameters:
         barmanObjectName: backblaze-b2
         serverName: postgres
-        retentionPolicy: "7d"
 
