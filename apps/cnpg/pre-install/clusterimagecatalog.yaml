@@ -10,7 +10,5 @@ metadata:
     images.cnpg.io/publisher: cnpg.io
 spec:
   images:
-    - major: 18
-      image: ghcr.io/cloudnative-pg/postgresql:18.7-system-trixie
     - major: 19
       image: ghcr.io/cloudnative-pg/postgresql:19.0-system-trixie
