@@ -1934,6 +1934,9 @@ kubeApiServer:
         sourceLabels:
           - __name__
           - le
+      - action: drop
+        sourceLabels: [__name__]
+        regex: 'apiserver_(watch_events_dispatch_duration_seconds|storage_list_duration_seconds|watch_cache_initialization_duration_seconds)_bucket'
     # - action: keep
     #   regex: 'kube_(daemonset|deployment|pod|namespace|node|statefulset).+'
     #   sourceLabels: [__name__]

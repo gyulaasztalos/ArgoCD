@@ -44,6 +44,7 @@ faults (file-page thrash) and evictions, not as swap use.
 - **ArgoAppNotSynced rancher / app `rancher` sync=Unknown**: every Rancher chart ≤2.15.3
   declares `kubeVersion < 1.37` and the cluster runs 1.37.2. Rancher keeps running; only
   syncing is blocked. (`rancher-limit-thrash-and-kubeversion-gate`, `k3s-auto-minor-upgrades-stable-channel`)
+- **Rancher at its memory limit** (≈98% of 1800Mi, restarts roughly every 4–5 days with `leaderelection lost`, KubeAggregatedAPIDown `v1.ext.cattle.io` for a few minutes): the owner decided on 2026-11-23 to leave Rancher as is until a Rancher release supports k3s 1.37. Report the restart in one line and don't propose fixes. (`rancher-limit-thrash-and-kubeversion-gate`)
 - **TargetDown nut-exporter**: since 2026-07-24. The exporter times out against upsd, and
   it still scrapes the removed Keor UPS. A separate task was offered for it.
 - **helm-install-gateway-api-crd FailedCreate** in kube-system: blocked by the LimitRange
@@ -92,6 +93,24 @@ How it shows:
 - A hard eviction takes pods whose usage exceeds their request. The worst case is the Longhorn instance-manager, which stops every engine and replica on that node, so volumes degrade and the CNPG primary fails over.
 
 Fix pattern: right-size the requests of the evicted pods. The rule is request = max(p95×1.2, peak×0.8), rounded up to 16Mi, with a 32Mi floor.
+
+### LonghornNodeDown from kubelet memory pressure (not a storage outage)
+Seen on 2026-11-23, lana, 08:02–08:20 CET.
+
+Longhorn marks its node not-ready whenever the Kubernetes node reports MemoryPressure. The Longhorn node events read "Kubernetes node X has pressure: KubeletHasInsufficientMemory", then "Waiting for disk … to be ready". The engines and replicas keep running and the volumes stay healthy.
+
+Confirm with:
+```bash
+kubectl get events -n longhorn-system --field-selector involvedObject.name=<node>
+```
+Then find what pushed MemAvailable under ~1 GiB.
+
+On the Prometheus node, the usual trigger is the TSDB head compaction every 2 h (07:00Z, 09:00Z, …), which adds 200–350 MiB of RSS for a few minutes. It bites when it coincides with watches moving onto that node's apiserver, or with slow growth of the node's pods.
+
+### ESO webhook restarts every 5 min (cert lookahead > renewBefore)
+How it shows: the `external-secrets-webhook` pods show `Completed exit=0`, with hundreds of restarts. Their logs end in "certs are not valid at now + lookahead, triggering shutdown" (`certLookahead` 2160h).
+
+The webhook's default lookahead is 90 days, while cert-manager's `renewBefore` is 360h. So once the self-signed cert has less than 90 days left (from 2026-11-22), the webhook shuts down on every cert check. The fix is `webhook.lookaheadInterval` < `renewBefore`, in `apps/external-secrets/values.yaml`.
 
 ### Pending pod from fragmentation
 How it shows: a large pod (usually prometheus at 2112Mi) is Pending after a rollout reshuffle, although the free memory summed across the cluster would fit it.

@@ -327,7 +327,7 @@ then
   do
     NAME="${ENTRY%%:*}"
     IP="${ENTRY#*:}"
-    RESULT="$(ssh -o BatchMode=yes -o ConnectTimeout=5 "${SSH_USER}@${IP}" \
+    RESULT="$(ssh -o BatchMode=yes -o ConnectTimeout=5 -o ServerAliveInterval=5 -o ServerAliveCountMax=3 "${SSH_USER}@${IP}" \
       "journalctl -k --since '-${WINDOW_H}h' -q --no-pager 2>/dev/null | grep -cE 'NETDEV WATCHDOG|transmit queue .* timed out'; journalctl -k --since '-${WINDOW_H}h' -q --no-pager 2>/dev/null | grep -cE 'Out of memory|oom-kill'" 2>/dev/null | paste -sd' ' -)"
     if [ -n "${RESULT}" ]
     then
