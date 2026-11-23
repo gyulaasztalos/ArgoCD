@@ -5585,8 +5585,8 @@ prometheus:
       #   resendDelay: 1m
 
     ## RuntimeConfig configures the values for the Prometheus process behavior.
-    runtime: {}
-      # goGC: 75
+    runtime:
+      goGC: 40
 
     ## Defines the sharding strategy applied by the operator.
     ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api-reference/api.md#monitoring.coreos.com/v1.ShardingStrategy
