@@ -159,7 +159,12 @@ git log --since=<window> origin/main
 ```
 Then read the release notes of the bumped image. Example: paperless-ngx 3.5.0 restricted ALLOWED_HOSTS, see `paperless-allowed-hosts-3-5`. `healthcheck.sh` prints the merges in the window.
 
-Renovate's `automergeSchedule` is *meant* to allow weekdays 05:00–16:00 plus weekends (Europe/Budapest). As of 11-19, though, `renovate.json` lists "after 5am every weekday" and "before 4pm every weekday" as separate entries, and Renovate ORs them, so merges also land on weekday evenings (for example 22:04). Don't rule out a merge as a trigger because of its time of day.
+Renovate's `automergeSchedule` is *meant* to allow weekdays 05:00–16:00 plus weekends (Europe/Budapest). But `renovate.json` sets `platformAutomerge: true`, so Renovate enables GitHub native auto-merge when it creates the PR, and GitHub merges as soon as checks pass, at any hour (11-25 20:43 authentik, 11-26 01:52 traefik). Don't rule out a merge as a trigger because of its time of day. (`renovate-platform-automerge-ignores-schedule`)
+
+### Rollout co-locates real usage on one control-plane node
+`control-plane-swap-thrash-follows-watches`
+
+How it shows: right after a merge, a node's pod working set jumps by ~1 GiB without any pod growing, because the rollout's new pods (e.g. authentik server + worker) both landed there. MemAvailable sits under 1 GiB with 150–300 faults/s for hours, then k3s on that node stalls and the watch cascade takes down the other servers. Compare `sum(container_memory_working_set_bytes{node="<n>",container!=""})` before and after the merge, and where the moved pods ran before.
 
 ### Rancher working-set creep
 `rancher-limit-thrash-and-kubeversion-gate`

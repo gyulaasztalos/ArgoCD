@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Install Pluto
-        uses: FairwindsOps/pluto/github-action@master
+        uses: FairwindsOps/pluto/github-action@436c77cea5a73e95a1a1d8a64e5177f0b3942fc0 # v5.24.6
       - name: Scan Kubernetes manifests
         run: |
           printf "\nScanning YAML manifests for deprecated APIs...\n"
