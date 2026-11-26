@@ -159,7 +159,7 @@ git log --since=<window> origin/main
 ```
 Then read the release notes of the bumped image. Example: paperless-ngx 3.5.0 restricted ALLOWED_HOSTS, see `paperless-allowed-hosts-3-5`. `healthcheck.sh` prints the merges in the window.
 
-Renovate's `automergeSchedule` is *meant* to allow weekdays 05:00–16:00 plus weekends (Europe/Budapest). But `renovate.json` sets `platformAutomerge: true`, so Renovate enables GitHub native auto-merge when it creates the PR, and GitHub merges as soon as checks pass, at any hour (11-25 20:43 authentik, 11-26 01:52 traefik). Don't rule out a merge as a trigger because of its time of day. (`renovate-platform-automerge-ignores-schedule`)
+Renovate's `automergeSchedule` allows weekdays 05:00–16:00 plus weekends (Europe/Budapest). Until 2026-11-26, `platformAutomerge: true` let GitHub merge as soon as checks passed, at any hour (11-25 20:43 authentik, 11-26 01:52 traefik). It is `false` since then, so Renovate merges itself, only inside the window. A merge outside the window is now itself a finding: check `renovate.json` for a reverted `platformAutomerge` and the PR's `mergedBy` (a human merge is fine). (`renovate-platform-automerge-ignores-schedule`)
 
 ### Rollout co-locates real usage on one control-plane node
 `control-plane-swap-thrash-follows-watches`
