@@ -10,7 +10,7 @@ jobs:
   pluto-scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Install Pluto
         uses: FairwindsOps/pluto/github-action@436c77cea5a73e95a1a1d8a64e5177f0b3942fc0 # v5.24.6
       - name: Scan Kubernetes manifests
