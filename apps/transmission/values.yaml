@@ -466,6 +466,12 @@ serviceMonitor:
   labels: {}
   endpoints: []
 
+networkPolicy:
+  rpcClientCidrs:
+    - 10.10.10.0/24
+    - 10.10.90.0/24
+    - 10.10.60.0/24
+
 extraLabels: {}
 
 # -----------------------------------------------------------------------------
